@@ -1,0 +1,14 @@
+name: model_dpm
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12.2
+  - numpy
+  - scipy
+  - pandas
+  - matplotlib
+  - jupyter
+  - pip
+  - pip:
+      - pymc
+      - arviz
