@@ -1,0 +1,32 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "model_dpm_cookie"
+version = "0.0.1"
+description = "Sandbox de estructura de proyecto para modelos bayesianos no param\u00e9tricos basados en Dirichlet Mixture Processes."
+authors = [
+  { name = "Juan Ceballos" },
+]
+
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    
+]
+requires-python = "==3.12.2"
+
+
+[tool.ruff]
+line-length = 99
+src = ["model_dpm_cookie"]
+include = ["pyproject.toml", "model_dpm_cookie/**/*.py"]
+
+[tool.ruff.lint]
+extend-select = ["I"]  # Add import sorting
+
+[tool.ruff.lint.isort]
+known-first-party = ["model_dpm_cookie"]
+force-sort-within-sections = true
+
