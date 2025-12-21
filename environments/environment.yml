@@ -1,21 +1,39 @@
-name: model_dpm_cookie
+name: model_dpm
 channels:
   - conda-forge
 dependencies:
   - python=3.12.2
   - pip
+  
+  # CLI y utilidades
   - typer
   - loguru
   - tqdm
   - ipython
+  
+  # Notebooks y visualización
   - jupyterlab
-  - matplotlib
   - notebook
+  - matplotlib
+  - seaborn                    # Gráficas estadísticas más bonitas
+  - plotly                     # Gráficas interactivas (opcional pero útil)
+  
+  # Computación científica
   - numpy
+  - scipy                      
   - pandas
+  
+  # Machine Learning y estadística
   - scikit-learn
-  - ruff
-  - pytest
+  - statsmodels                # Modelos estadísticos adicionales
+  
+  # Bayesiano
+  - pymc                       # PyMC para modelos bayesianos
+  - arviz                      # Diagnósticos y visualización bayesiana
+  
+  # YAML (para tu config.yaml)
+  - pyyaml
+  
   - pip:
     - python-dotenv
     - -e .

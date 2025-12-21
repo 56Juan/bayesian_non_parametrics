@@ -6,60 +6,67 @@ Este repositorio implementa la estimación de densidades mediante un **modelo de
 Se elaboraron dos versiones del modelo, que difieren en el kernel utilizado, pero siguen la **misma estructura de jerarquía aleatorizada**.
 
 **Kernels utilizados:**
-- **Normal**: \(y_i \mid \theta_i \sim \mathcal{N}(\mu_i, \sigma_i^2)\)  
-- **Laplace**: \(y_i \mid \theta_i \sim \text{Laplace}(\mu_i, b_i)\)
+- **Normal**: `y_i ∣ θ_i ∼ N(μ_i, σ_i²)`  
+- **Laplace**: `y_i ∣ θ_i ∼ Laplace(μ_i, b_i)`
 
 **Nivel de cluster:**  
-\(\theta_i \mid G \sim G\)
+`θ_i ∣ G ∼ G`
 
 **Proceso de Dirichlet:**  
-\(G \mid M, G_0 \sim DP(M, G_0)\)
+`G ∣ M, G_0 ∼ DP(M, G_0)`
 
 **Parámetro de concentración:**  
-\(M \sim \text{Gamma}(\alpha_M, \beta_M)\)
+`M ∼ Gamma(α_M, β_M)`
 
 **Medida base:**  
-\(G_0 = \text{Normal-Inversa-Gamma}(\mu_0, \kappa_0, a_0, b_0)\)
+`G_0 = Normal-Inversa-Gamma(μ_0, κ_0, a_0, b_0)`
 
 **Hiperparámetros de la medida base:**  
-\[
-\begin{aligned}
-\mu_0 &\sim \mathcal{N}(m_0, s_0^2) \\
-\kappa_0 &\sim \text{Gamma}(\alpha_\kappa, \beta_\kappa) \\
-a_0 &\sim \text{Gamma}(\alpha_a, \beta_a) \\
-b_0 &\sim \text{Gamma}(\alpha_b, \beta_b)
-\end{aligned}
-\]
+
+`μ_0 ∼ N(m_0, s_0²)`  
+`κ_0 ∼ Gamma(α_κ, β_κ)`  
+`a_0 ∼ Gamma(α_a, β_a)`  
+`b_0 ∼ Gamma(α_b, β_b)`
 
 ## Estructura del Repositorio
-dirichlet_mixture_process/
-├── graphics/       : Módulos para generación de gráficas
-├── models/         : Clases de los modelos
-└── simulations/    : Módulos de simulaciones
-
-data/
-├── reales/         : Datos reales
-└── simulaciones/   : Datos simulados
-
-notebooks/
-├── reales/         : Implementaciones con datos reales
-└── simulaciones/   : Implementaciones con datos simulados
-
-reports/
-├── reales/         : Reportes con datos reales
-└── simulaciones/   : Reportes con datos simulados
-
-references/         : Bibliografía y artículos
-versioning/         : Control de versiones
-environments/       : Archivos de configuración de entorno
-ref.bib             : Archivo bibliográfico
-README.md           : Descripción general del repositorio
-
+```
+model_dpm/
+├── model_dpm/                 # Paquete principal Python
+│   ├── graphics/              # Clases y módulos de gráficas
+│   ├── models/                # Clases de los modelos DPM
+│   ├── simulations/           # Clases y lógica de simulación
+│   ├── utils/                 # Módulos de utilidades
+│   └── __init__.py           # Imports internos del paquete
+│
+├── data/                     # Datos (reales y/o simulados)
+│   ├── reales/
+│   └── simulaciones/
+│
+├── notebooks/                # Notebooks de análisis
+│   ├── simulaciones/
+│   └── reales/
+│
+├── reports/                  # Reportes de resultados
+│   ├── simulaciones/
+│   └── reales/
+│
+├── references/               # Documentos de referencia
+│
+├── versioning/               # Control experimental
+│   ├── config.yaml
+│   ├── experiment_registry.md
+│   └── changelog.md
+│
+├── environments/             # Configuración de entorno
+│   └── environment.yml
+│
+├── ref.bib                   # Bibliografía formal
+├── README.md                 # Documento principal
+└── __init__.py               # Marca DPM como unidad lógica
+```
 
 ## Extra
 
 Este repositorio tiene la finalidad de documentar mi proyecto de tesis. No sigue un formato estándar de documentación, por lo que **no se incluyeron módulos de ETL ni pipelines de validación de datos**.  
 
 Se crea un archivo `__init__.py` para permitir la interacción con otras branches en caso de futuras extensiones.
-
-
