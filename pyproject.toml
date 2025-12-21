@@ -1,0 +1,56 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "model_ddp"
+version = "0.1.0"
+description = "Modelos de Procesos Dirichlet Dependientes"
+authors = [
+  { name = "Juan Ceballos", email = "juan.ceballos.g@usach.cl" },
+]
+
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+]
+requires-python = ">=3.12.2"
+
+# Dependencias del proyecto (sincronizadas con environment.yml)
+dependencies = [
+    "numpy",
+    "scipy",
+    "pandas",
+    "matplotlib",
+    "seaborn",
+    "plotly",
+    "scikit-learn",
+    "statsmodels",
+    "pyyaml",
+    "python-dotenv",
+    "typer",
+    "loguru",
+    "tqdm",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ipython",
+    "jupyterlab",
+    "notebook",
+    "ruff",
+    "pytest",
+]
+
+[tool.ruff]
+line-length = 99
+src = ["model_ddp"]
+include = ["pyproject.toml", "model_ddp/**/*.py"]
+
+[tool.ruff.lint]
+extend-select = ["I"]  # Add import sorting
+
+[tool.ruff.lint.isort]
+known-first-party = ["model_ddp"]
+force-sort-within-sections = true

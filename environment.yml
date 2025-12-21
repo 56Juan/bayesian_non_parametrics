@@ -1,0 +1,35 @@
+name: model_ddp
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12.2
+  - pip
+  
+  # CLI y utilidades
+  - typer
+  - loguru
+  - tqdm
+  - ipython
+  
+  # Notebooks y visualización
+  - jupyterlab
+  - notebook
+  - matplotlib
+  - seaborn                    # Gráficas estadísticas más bonitas
+  - plotly                     # Gráficas interactivas (opcional pero útil)
+  
+  # Computación científica
+  - numpy
+  - scipy                      
+  - pandas
+  
+  # Machine Learning y estadística
+  - scikit-learn
+  - statsmodels                # Modelos estadísticos adicionales
+  
+  # YAML (para tu config.yaml)
+  - pyyaml
+  
+  - pip:
+    - python-dotenv
+    - -e .

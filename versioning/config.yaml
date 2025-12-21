@@ -1,0 +1,49 @@
+# versioning/config.yaml
+
+# Configuración de rutas del proyecto
+project:
+  name: "model_dpm"
+  version: "1.0.0"
+  root_dir: ".."
+
+# Rutas de datos
+data:
+  simulations:
+    input: "../data/simulaciones"
+    output: "../data/simulaciones"
+  real:
+    input: "../data/reales"
+    output: "../data/reales"
+
+# Rutas de reportes/gráficas
+reports:
+  simulations:
+    graphics: "../reports/simulaciones"
+    tables: "../reports/simulaciones"
+  real:
+    graphics: "../reports/reales"
+    tables: "../reports/reales"
+
+# Configuración de experimentos
+experiments:
+  log_dir: "../versioning"
+  save_config: true
+  save_metadata: true
+
+# Configuración de modelos
+models:
+  save_dir: "../versioning/models"
+  checkpoint_dir: "../versioning/checkpoints"
+
+# Configuración de ejecución
+execution:
+  seed: 42
+  verbose: true
+  save_intermediate: false
+
+# Metadatos de experimento
+current_experiment:
+  id: null
+  description: ""
+  type: "simulation"
+  tags: []
