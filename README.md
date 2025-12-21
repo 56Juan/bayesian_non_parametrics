@@ -31,38 +31,37 @@ Se elaboraron dos versiones del modelo, que difieren en el kernel utilizado, per
 ## Estructura del Repositorio
 ```
 model_dpm/
-├── model_dpm/                 # Paquete principal Python
+├── model_dpm/
 │   ├── graphics/              # Clases y módulos de gráficas
 │   ├── models/                # Clases de los modelos DPM
 │   ├── simulations/           # Clases y lógica de simulación
 │   ├── utils/                 # Módulos de utilidades
 │   └── __init__.py           # Imports internos del paquete
 │
-├── data/                     # Datos (reales y/o simulados)
+├── data/                      # Datos (reales y/o simulados)
 │   ├── reales/
 │   └── simulaciones/
 │
-├── notebooks/                # Notebooks de análisis
+├── notebooks/
 │   ├── simulaciones/
 │   └── reales/
 │
-├── reports/                  # Reportes de resultados
+├── reports/
 │   ├── simulaciones/
 │   └── reales/
 │
-├── references/               # Documentos de referencia
+├── references/                # Documentos de referencia
 │
-├── versioning/               # Control experimental
+├── versioning/                # Control experimental
 │   ├── config.yaml
 │   ├── experiment_registry.md
 │   └── changelog.md
 │
-├── environments/             # Configuración de entorno
-│   └── environment.yml
-│
-├── ref.bib                   # Bibliografía formal
-├── README.md                 # Documento principal
-└── __init__.py               # Marca DPM como unidad lógica
+├── environment.yml            # Configuración de entorno
+├── pyproject.toml             # Configuración del proyecto
+├── ref.bib                    # Bibliografía formal
+├── README.md                  # Documento principal
+└── __init__.py                # Marca DPM como unidad lógica
 ```
 
 ## Extra

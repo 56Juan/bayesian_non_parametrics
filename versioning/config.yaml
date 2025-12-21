@@ -4,7 +4,7 @@
 project:
   name: "model_dpm"
   version: "1.0.0"
-  root_dir: ".."  # Ruta relativa desde versioning/ a la raíz del proyecto
+  root_dir: ".."
 
 # Rutas de datos
 data:
@@ -41,9 +41,9 @@ execution:
   verbose: true
   save_intermediate: false
 
-# Metadatos de experimento (puedes modificar para cada corrida)
+# Metadatos de experimento
 current_experiment:
-  id: null  # Se auto-genera si es null
+  id: null
   description: ""
-  type: "simulation"  # o "real"
+  type: "simulation"
   tags: []
