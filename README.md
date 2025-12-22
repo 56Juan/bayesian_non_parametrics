@@ -1,6 +1,6 @@
 # Mezcla de Proceso de Dirichlet Completamente Aleatorizado
 
-Este repositorio implementa la estimación de densidades mediante un **modelo de mezclas de procesos de Dirichlet completamente aleatorizado**, utilizando el **algoritmo de slice sampling** propuesto por (referenciar).
+Este repositorio implementa la estimación de densidades mediante un **modelo de mezclas de procesos de Dirichlet completamente aleatorizado**, utilizando el **algoritmo de slice sampling** propuesto por [Neal, 2000](ref.bib).
 
 ## Modelos
 Se elaboraron dos versiones del modelo, que difieren en el kernel utilizado, pero siguen la **misma estructura de jerarquía aleatorizada**.
