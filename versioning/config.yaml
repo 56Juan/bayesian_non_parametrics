@@ -1,8 +1,6 @@
-# versioning/config.yaml
-
 # Configuración de rutas del proyecto
 project:
-  name: "model_dpm"
+  name: "model_ddp"
   version: "1.0.0"
   root_dir: ".."
 
@@ -29,11 +27,12 @@ experiments:
   log_dir: "../versioning"
   save_config: true
   save_metadata: true
+  registry_file: "../versioning/experiment_registry.md"
 
 # Configuración de modelos
 models:
-  save_dir: "../versioning/models"
-  checkpoint_dir: "../versioning/checkpoints"
+  save_dir: "../artefact/models"        # Guardar modelos entrenados (.pkl)
+  checkpoint_dir: "../artefact/checkpoints"
 
 # Configuración de ejecución
 execution:

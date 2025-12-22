@@ -1,71 +1,86 @@
-# Mezcla de Proceso de Dirichlet Completamente Aleatorizado
+#  Proceso de Dirichlet Dependientes
 
-Este repositorio implementa la estimación de densidades mediante un **modelo de mezclas de procesos de Dirichlet completamente aleatorizado**, utilizando el **algoritmo de slice sampling** propuesto por (referenciar).
+Este repositorio implementa la estimación de densidades mediante un **modelos de procesos de dirichlet dependientes**. 
+
+Los modelos implemenentados se basan en los trabajos de:
+
+- Modelo DDP con dependencia en Pesos con Kernel Probit/Logit (LSBP-PSBP), porpuesto en [Chung
+y Dunson, 2009](ref.bib)
+- Modelo DDP con dependencia en Pesos con Kernel Gaussiano (KSBP), propuesto en  [](ref.bib)
+- Modelo DDP con dependencia en Atomos con  
+
 
 ## Modelos
-Se elaboraron dos versiones del modelo, que difieren en el kernel utilizado, pero siguen la **misma estructura de jerarquía aleatorizada**.
 
-**Kernels utilizados:**
-- **Normal**: `y_i ∣ θ_i ∼ N(μ_i, σ_i²)`  
-- **Laplace**: `y_i ∣ θ_i ∼ Laplace(μ_i, b_i)`
+### Modelo LSBP
+En el modelo LSBP se utilizaron dos estructuras una basadas en mezclas de normales y otras en mezclas de Laplace, se busco la conjugacion para priorizar la optimizacion del metodo. 
 
-**Nivel de cluster:**  
-`θ_i ∣ G ∼ G`
-
-**Proceso de Dirichlet:**  
-`G ∣ M, G_0 ∼ DP(M, G_0)`
-
-**Parámetro de concentración:**  
-`M ∼ Gamma(α_M, β_M)`
-
-**Medida base:**  
-`G_0 = Normal-Inversa-Gamma(μ_0, κ_0, a_0, b_0)`
-
-**Hiperparámetros de la medida base:**  
-
-`μ_0 ∼ N(m_0, s_0²)`  
-`κ_0 ∼ Gamma(α_κ, β_κ)`  
-`a_0 ∼ Gamma(α_a, β_a)`  
-`b_0 ∼ Gamma(α_b, β_b)`
-
-## Estructura del Repositorio
+**Modelo con kernel Normal y Logit Stick-Breaking:** 
 ```
-model_dpm/
-├── model_dpm/
-│   ├── graphics/              # Clases y módulos de gráficas
-│   ├── models/                # Clases de los modelos DPM
-│   ├── simulations/           # Clases y lógica de simulación
-│   ├── utils/                 # Módulos de utilidades
-│   └── __init__.py           # Imports internos del paquete
-│
-├── data/                      # Datos (reales y/o simulados)
-│   ├── reales/
-│   └── simulaciones/
-│
-├── notebooks/
-│   ├── simulaciones/
-│   └── reales/
-│
-├── reports/
-│   ├── simulaciones/
-│   └── reales/
-│
-├── references/                # Documentos de referencia
-│
-├── versioning/                # Control experimental
-│   ├── config.yaml
-│   ├── experiment_registry.md
-│   └── changelog.md
-│
-├── environment.yml            # Configuración de entorno
-├── pyproject.toml             # Configuración del proyecto
-├── ref.bib                    # Bibliografía formal
-├── README.md                  # Documento principal
-└── __init__.py                # Marca DPM como unidad lógica
+# Likelihood
+y_i | z_i = h, μ_h, σ²_h ~ N(μ_h, σ²_h)
+
+# Asignaciones dependientes
+z_i | x_i, {w_h(x_i)} ~ Categorical(w_1(x_i), ..., w_T(x_i))
+
+# Pesos dependientes (Logit stick-breaking)
+w_h(x) = v_h(x) ∏_{ℓ<h} (1 - v_ℓ(x))
+v_h(x) = logit⁻¹(η_h(x)) = exp(η_h(x)) / [1 + exp(η_h(x))]
+
+# Predictor lineal con kernel de dependencia
+η_h(x) = α_h - Σ_j ψ_{hj} |x_j - ℓ_{hj}|
+
+# Priors para dependencia
+α_h ~ N(μ, 1)
+ψ_{hj} ~ N⁺(μ_ψ_j, τ⁻¹_ψ_j)
+ℓ_{hj} ~ Discrete-Uniform{ℓ*_{jm}}_{m=1}^{M_j}
+
+# Átomos globales (Normal-Inverse-Gamma)
+σ²_h ~ InvGamma(a₀, b₀)
+μ_h | σ²_h ~ N(μ₀, σ²_h/κ₀)
+
+# Hiperparámetros
+μ ~ N(μ_μ, τ⁻¹_μ)
+μ₀ ~ N(m₀, s₀²)
+κ₀ ~ Gamma(α_κ, β_κ)
+a₀ ~ Gamma(α_a, β_a)
+b₀ ~ Gamma(α_b, β_b)
 ```
 
-## Extra
+**Modelo con kernel Laplace y Logit Stick-Breaking:** 
+```
+# Likelihood
+y_i | z_i = h, μ_h, b_h ~ Laplace(μ_h, b_h)
 
-Este repositorio tiene la finalidad de documentar mi proyecto de tesis. No sigue un formato estándar de documentación, por lo que **no se incluyeron módulos de ETL ni pipelines de validación de datos**.  
+# Asignaciones dependientes
+z_i | x_i, {w_h(x_i)} ~ Categorical(w_1(x_i), ..., w_T(x_i))
 
-Se crea un archivo `__init__.py` para permitir la interacción con otras branches en caso de futuras extensiones.
+# Pesos dependientes (Logit stick-breaking)
+w_h(x) = v_h(x) ∏_{ℓ<h} (1 - v_ℓ(x))
+v_h(x) = logit⁻¹(η_h(x)) = exp(η_h(x)) / [1 + exp(η_h(x))]
+
+# Predictor lineal con kernel de dependencia
+η_h(x) = α_h - Σ_j ψ_{hj} |x_j - ℓ_{hj}|
+
+# Priors para dependencia
+α_h ~ N(μ, 1)
+ψ_{hj} ~ N⁺(μ_ψ_j, τ⁻¹_ψ_j)
+ℓ_{hj} ~ Discrete-Uniform{ℓ*_{jm}}_{m=1}^{M_j}
+
+# Átomos globales (Normal-Gamma para Laplace)
+b_h ~ Gamma(a₀, β₀)
+μ_h ~ N(μ₀, τ₀⁻¹)
+
+# Hiperparámetros
+μ ~ N(μ_μ, τ⁻¹_μ)
+μ₀ ~ N(m₀, s₀²)
+τ₀ ~ Gamma(α_τ, β_τ)
+a₀ ~ Gamma(α_a, β_a)
+β₀ ~ Gamma(α_β, β_β)
+```
+### Modelo PSBP
+En el modelo PSBP se utilizaron dos estructuras una basadas en mezclas de normales y otras en mezclas de Laplace, se busco la conjugacion para priorizar la optimizacion del metodo. 
+
+**Modelo con kernel Normal y Probit Stick-Breaking:** 
+
+**Modelo con kernel Laplace y Probit Stick-Breaking:**
