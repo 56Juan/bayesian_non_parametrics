@@ -374,17 +374,17 @@ class LSBPNormal:
     def update_alpha(self):
         """
         Paso 4: Actualizar α_h usando Metropolis-Hastings
-        
+
         α_h ~ N(μ, 1) [prior]
         Likelihood: producto sobre i con z_i ≥ h de términos logit
         """
         for h in range(self.H - 1):  # No actualizar último (fijo a 1)
             # Propuesta
             alpha_prop = np.random.normal(self.alpha[h], self.mh_scales['alpha'])
-            
+
             # Observaciones asignadas a clusters h o superiores
             affected = np.where(self.z >= h)[0]
-            
+
             if len(affected) == 0:
                 # No hay datos, solo prior
                 log_prior_curr = -0.5 * ((self.alpha[h] - self.mu)**2)
@@ -397,34 +397,34 @@ class LSBPNormal:
                                                 self.alpha[h])
                 eta_prop = self._compute_eta_h(self.X_normalized[affected], h, 
                                                 alpha_prop)
-                
+
                 v_curr = expit(eta_curr)
                 v_prop = expit(eta_prop)
-                
+
                 # Log-likelihood: suma de log(v_h) si z_i=h, log(1-v_h) si z_i>h
                 log_like_curr = 0.0
                 log_like_prop = 0.0
-                for idx in affected:
+                for idx_local, idx in enumerate(affected):  # <- CAMBIO AQUÍ: usar enumerate
                     if self.z[idx] == h:
-                        log_like_curr += np.log(np.clip(v_curr[idx], 1e-10, 1.0))
-                        log_like_prop += np.log(np.clip(v_prop[idx], 1e-10, 1.0))
+                        log_like_curr += np.log(np.clip(v_curr[idx_local], 1e-10, 1.0))  # <- usar idx_local
+                        log_like_prop += np.log(np.clip(v_prop[idx_local], 1e-10, 1.0))  # <- usar idx_local
                     else:
-                        log_like_curr += np.log(np.clip(1 - v_curr[idx], 1e-10, 1.0))
-                        log_like_prop += np.log(np.clip(1 - v_prop[idx], 1e-10, 1.0))
-                
+                        log_like_curr += np.log(np.clip(1 - v_curr[idx_local], 1e-10, 1.0))  # <- usar idx_local
+                        log_like_prop += np.log(np.clip(1 - v_prop[idx_local], 1e-10, 1.0))  # <- usar idx_local
+
                 # Log-prior
                 log_prior_curr = -0.5 * ((self.alpha[h] - self.mu)**2)
                 log_prior_prop = -0.5 * ((alpha_prop - self.mu)**2)
-                
+
                 log_r = (log_like_prop + log_prior_prop) - (log_like_curr + log_prior_curr)
-            
+
             log_r = np.clip(log_r, -50, 50)
-            
+
             # Aceptar/rechazar
             accept = math.log(np.random.rand()) < log_r
             if accept:
                 self.alpha[h] = alpha_prop
-            
+
             self.mh_acceptance['alpha'].append(float(accept))
     
     def _compute_eta_h(self, X_batch, h, alpha_h_value):

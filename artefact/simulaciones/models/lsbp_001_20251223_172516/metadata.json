@@ -1,0 +1,52 @@
+{
+  "experiment_id": "lsbp_001_20251223_172516",
+  "timestamp": "2025-12-23 18:20:44",
+  "model_type": "LSBPNormal",
+  "data_shape": {
+    "n": 50,
+    "p": 5
+  },
+  "hyperparameters": {
+    "H_initial": 15,
+    "iterations": 50,
+    "burnin": 10,
+    "n_grid": 50
+  },
+  "priors": {
+    "mu_prior": [
+      0.0,
+      1.0
+    ],
+    "mu0_prior": [
+      0.0,
+      100.0
+    ],
+    "kappa0_prior": [
+      2.0,
+      1.0
+    ],
+    "a0_prior": [
+      3.0,
+      1.0
+    ],
+    "b0_prior": [
+      2.0,
+      1.0
+    ],
+    "psi_prior": [
+      0.0,
+      1.0
+    ]
+  },
+  "final_stats": {
+    "H_final": 100,
+    "n_clusters_mean": 11.025,
+    "n_clusters_std": 1.012114123999858
+  },
+  "acceptance_rates": {
+    "alpha": 0.84,
+    "psi": 0.9,
+    "kappa0": 0.78,
+    "a0": 0.48
+  }
+}
