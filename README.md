@@ -70,6 +70,9 @@ model_dpm/
 └── __init__.py                # Marca DPM como unidad lógica
 
 ```
+### Aplicacion
+
+La apliación real es de un dataset obtenido de https://www.kaggle.com/datasets/prince7489/employee-salary-dataset?resource=download.
 
 ## Extra
 
