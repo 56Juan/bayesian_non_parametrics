@@ -29,10 +29,10 @@ experiments:
   save_metadata: true
   registry_file: "../versioning/experiment_registry.md"
 
-# Configuración de modelos
-models:
-  save_dir: "../artefact/models"        # Guardar modelos entrenados (.pkl)
-  checkpoint_dir: "../artefact/checkpoints"
+# Configuración de artefactos
+artifacts:
+  simulations: "../artefact/simulaciones/models"
+  real: "../artefact/reales/models"
 
 # Configuración de ejecución
 execution:
