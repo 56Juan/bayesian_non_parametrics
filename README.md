@@ -36,7 +36,13 @@ model_dpm/
 │   ├── models/                # Clases de los modelos DPM
 │   ├── simulations/           # Clases y lógica de simulación
 │   ├── utils/                 # Módulos de utilidades
-│   └── __init__.py           # Imports internos del paquete
+│   └── __init__.py            # Imports internos del paquete
+│
+├── artefact/
+│   ├── reales/
+│   │   └── models/            # Modelos entrenados (objetos .pkl reutilizables)
+│   └── simulaciones/
+│       └── models/            # Modelos entrenados (objetos .pkl reutilizables)
 │
 ├── data/                      # Datos (reales y/o simulados)
 │   ├── reales/
@@ -62,6 +68,7 @@ model_dpm/
 ├── ref.bib                    # Bibliografía formal
 ├── README.md                  # Documento principal
 └── __init__.py                # Marca DPM como unidad lógica
+
 ```
 
 ## Extra

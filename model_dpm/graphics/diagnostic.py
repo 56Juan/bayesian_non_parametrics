@@ -65,7 +65,8 @@ def plot_cluster_densities(data: np.ndarray,
                           clusters: np.ndarray,
                           figsize: Tuple[int, int] = (12, 6),
                           title: str = "Densidad por Cluster",
-                          save_path: Optional[str] = None) -> plt.Figure:
+                          save_path: Optional[str] = None,
+                          bandwidth: Optional[float] = None) -> plt.Figure:
     """
     Visualiza la densidad KDE de cada cluster en un mismo gráfico.
     
@@ -81,6 +82,8 @@ def plot_cluster_densities(data: np.ndarray,
         Título del gráfico
     save_path : str, optional
         Ruta para guardar la figura
+    bandwidth : float, optional
+        Ancho de banda para KDE. Si None, se calcula automáticamente.
     
     Returns
     -------
@@ -92,24 +95,47 @@ def plot_cluster_densities(data: np.ndarray,
     unique_clusters = np.unique(clusters)
     colors = plt.cm.viridis(np.linspace(0, 1, len(unique_clusters)))
     
+    # Calcular rango global con margen
+    data_min, data_max = data.min(), data.max()
+    data_range = data_max - data_min
+    margin = data_range * 0.1  # 10% de margen a cada lado
+    x_min = data_min - margin
+    x_max = data_max + margin
+    
+    # Rango común para todos los clusters
+    x_range = np.linspace(x_min, x_max, 500)
+    
     # Graficar densidad para cada cluster
     for i, cluster in enumerate(sorted(unique_clusters)):
         cluster_data = data[clusters == cluster]
         
         if len(cluster_data) > 1:  # KDE necesita al menos 2 puntos
-            kde = gaussian_kde(cluster_data)
-            x_range = np.linspace(cluster_data.min(), cluster_data.max(), 200)
+            # Configurar KDE con bandwidth personalizado si se especifica
+            if bandwidth is not None:
+                kde = gaussian_kde(cluster_data, bw_method=bandwidth)
+            else:
+                kde = gaussian_kde(cluster_data)
+            
             kde_vals = kde(x_range)
             
             ax.plot(x_range, kde_vals, linewidth=2.5, 
                    color=colors[i], label=f'Cluster {cluster} (n={len(cluster_data)})')
             ax.fill_between(x_range, kde_vals, alpha=0.2, color=colors[i])
+        else:
+            # Si solo hay un punto, dibujar una línea vertical
+            ax.axvline(cluster_data[0], color=colors[i], linewidth=2, 
+                      linestyle='--', label=f'Cluster {cluster} (n=1)')
     
     ax.set_xlabel('Valor', fontsize=12)
     ax.set_ylabel('Densidad', fontsize=12)
     ax.set_title(title, fontsize=14, fontweight='bold')
-    ax.grid(True, alpha=0.3)
-    ax.legend(fontsize=10, loc='best')
+    ax.set_xlim(x_min, x_max)
+    ax.grid(True, alpha=0.3, linestyle='--', linewidth=0.5)
+    ax.legend(fontsize=10, loc='best', framealpha=0.9)
+    
+    # Mejorar estética
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
     
     plt.tight_layout()
     
@@ -117,7 +143,6 @@ def plot_cluster_densities(data: np.ndarray,
         fig.savefig(save_path, dpi=300, bbox_inches='tight')
     
     return fig
-
 
 def plot_traces(trace: dict,
                burn_in: int = 0,
@@ -157,30 +182,30 @@ def plot_traces(trace: dict,
     axes[0].legend(fontsize=10)
     axes[0].grid(True, alpha=0.3)
     
-    # μ₀
+    # μ₀ - usar notación LaTeX
     axes[1].plot(trace['mu0'][burn_in:], linewidth=1, color='steelblue')
     axes[1].axhline(np.mean(trace['mu0'][burn_in:]), color='red', 
                     linestyle='--', linewidth=2, label=f"Media: {np.mean(trace['mu0'][burn_in:]):.2f}")
-    axes[1].set_ylabel('μ₀', fontsize=12)
-    axes[1].set_title('Hiperparámetro μ₀', fontsize=12, fontweight='bold')
+    axes[1].set_ylabel(r'$\mu_0$', fontsize=12)
+    axes[1].set_title(r'Hiperparámetro $\mu_0$', fontsize=12, fontweight='bold')
     axes[1].legend(fontsize=10)
     axes[1].grid(True, alpha=0.3)
     
-    # κ₀
+    # κ₀ - usar notación LaTeX
     axes[2].plot(trace['kappa0'][burn_in:], linewidth=1, color='steelblue')
     axes[2].axhline(np.mean(trace['kappa0'][burn_in:]), color='red', 
                     linestyle='--', linewidth=2, label=f"Media: {np.mean(trace['kappa0'][burn_in:]):.2f}")
-    axes[2].set_ylabel('κ₀', fontsize=12)
-    axes[2].set_title('Hiperparámetro κ₀', fontsize=12, fontweight='bold')
+    axes[2].set_ylabel(r'$\kappa_0$', fontsize=12)
+    axes[2].set_title(r'Hiperparámetro $\kappa_0$', fontsize=12, fontweight='bold')
     axes[2].legend(fontsize=10)
     axes[2].grid(True, alpha=0.3)
     
-    # a₀
+    # a₀ - usar notación LaTeX
     axes[3].plot(trace['a0'][burn_in:], linewidth=1, color='steelblue')
     axes[3].axhline(np.mean(trace['a0'][burn_in:]), color='red', 
                     linestyle='--', linewidth=2, label=f"Media: {np.mean(trace['a0'][burn_in:]):.2f}")
-    axes[3].set_ylabel('a₀', fontsize=12)
-    axes[3].set_title('Hiperparámetro a₀', fontsize=12, fontweight='bold')
+    axes[3].set_ylabel(r'$a_0$', fontsize=12)
+    axes[3].set_title(r'Hiperparámetro $a_0$', fontsize=12, fontweight='bold')
     axes[3].legend(fontsize=10)
     axes[3].grid(True, alpha=0.3)
     
@@ -193,7 +218,7 @@ def plot_traces(trace: dict,
     axes[4].legend(fontsize=10)
     axes[4].grid(True, alpha=0.3)
     
-    # Promedio de μ de clusters activos
+    # Promedio de μ de clusters activos - usar LaTeX
     mu_active_mean = []
     for z, mu in zip(trace['z'][burn_in:], trace['mu'][burn_in:]):
         counts = np.array([np.sum(z == k) for k in range(len(mu))])
@@ -206,8 +231,8 @@ def plot_traces(trace: dict,
     axes[5].plot(mu_active_mean, linewidth=1, color='steelblue')
     axes[5].axhline(np.nanmean(mu_active_mean), color='red', 
                     linestyle='--', linewidth=2, label=f"Media: {np.nanmean(mu_active_mean):.2f}")
-    axes[5].set_ylabel('μ promedio', fontsize=12)
-    axes[5].set_title('Promedio de μ en Clusters Activos', fontsize=12, fontweight='bold')
+    axes[5].set_ylabel(r'$\mu$ promedio', fontsize=12)
+    axes[5].set_title(r'Promedio de $\mu$ en Clusters Activos', fontsize=12, fontweight='bold')
     axes[5].legend(fontsize=10)
     axes[5].grid(True, alpha=0.3)
     

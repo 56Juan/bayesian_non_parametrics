@@ -16,6 +16,7 @@ def plot_density_credible_interval(trace: dict,
                                    n_posterior: int = 2000,
                                    figsize: Tuple[int, int] = (12, 6),
                                    title: str = "Estimación de Densidad con Intervalo Credible",
+                                   x_margin: float = 0.15,
                                    save_path: Optional[str] = None) -> plt.Figure:
     """
     Visualiza la densidad estimada con intervalo credible del 95%.
@@ -39,6 +40,8 @@ def plot_density_credible_interval(trace: dict,
         Tamaño de la figura
     title : str
         Título del gráfico
+    x_margin : float
+        Margen extra como fracción del rango de datos (default: 0.15 = 15%)
     save_path : str, optional
         Ruta para guardar la figura
     
@@ -95,9 +98,13 @@ def plot_density_credible_interval(trace: dict,
     
     simulated = np.array(simulated)  # shape: (n_post, n_posterior)
     
-    # Estimación de densidad KDE
-    x_min = min(y_data.min(), simulated.min()) - 3
-    x_max = max(y_data.max(), simulated.max()) + 3
+    # Calcular rango basado en datos reales con margen controlado
+    data_min, data_max = y_data.min(), y_data.max()
+    data_range = data_max - data_min
+    margin = data_range * x_margin
+    
+    x_min = data_min - margin
+    x_max = data_max + margin
     x_grid = np.linspace(x_min, x_max, 500)
     
     kde_matrix = []
@@ -134,8 +141,13 @@ def plot_density_credible_interval(trace: dict,
     ax.set_xlabel('Valor', fontsize=12)
     ax.set_ylabel('Densidad', fontsize=12)
     ax.set_title(title, fontsize=14, fontweight='bold')
+    ax.set_xlim(x_min, x_max)  # Aplicar límites
     ax.legend(fontsize=11, loc='best')
-    ax.grid(True, alpha=0.3)
+    ax.grid(True, alpha=0.3, linestyle='--', linewidth=0.5)
+    
+    # Mejorar estética
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
     
     plt.tight_layout()
     
