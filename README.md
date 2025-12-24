@@ -1,2 +1,12 @@
-# bayesian_non_parametrics
-This repository contains the development of my thesis on Bayesian nonparametric models applied to functional time series. It includes theoretical foundations, computational implementations, and Bayesian inference methods. The repository is designed as a modular and extensible platform for future research and model extensions.
+# bayesian_non_parametrics - Repositorio
+
+¡Hola! Actualmente te encuentras en la **branch principal**.  
+Cada línea aquí sirve como un pilar para implementar modelos de **procesos de Dirichlet dependientes** en el contexto de **series de tiempo funcionales**.  
+
+## Branches disponibles
+
+- **main**: ¡ Aqui estas!, branch principal
+- **model_dpm**: Implementaciones de modelos de **mezclas de procesos de Dirichlet**.  
+- **model_dpp**: Trabajo con **modelos dependientes de procesos de Dirichlet**.  
+- **model_time_series_fd**: Implementaciones de **series de tiempo funcionales y multivariadas**.  
+- **cookiecutter-setup**: Sandbox de carpetas para la **construcción de nuevos módulos o proyectos**.  
