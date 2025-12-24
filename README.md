@@ -3,6 +3,7 @@
 ¡Hola! Actualmente te encuentras en la **branch principal**.  
 Cada línea aquí sirve como un pilar para implementar modelos de **procesos de Dirichlet dependientes** en el contexto de **series de tiempo funcionales**.  
 
+**Recordar que contiene avances por lo que no todas las branch a la fecha estaran listas**
 ## Branches disponibles
 
 - **main**: ¡ Aqui estas!, branch principal
