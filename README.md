@@ -52,6 +52,7 @@ b₀ ~ Gamma(α_b, β_b)
 ```
 # Likelihood
 y_i | z_i = h, μ_h, b_h ~ Laplace(μ_h, b_h)
+  donde: p(y_i | μ_h, b_h) = (1/2b_h) exp(-|y_i - μ_h|/b_h)
 
 # Asignaciones dependientes
 z_i | x_i, {w_h(x_i)} ~ Categorical(w_1(x_i), ..., w_T(x_i))
@@ -63,19 +64,21 @@ v_h(x) = logit⁻¹(η_h(x)) = exp(η_h(x)) / [1 + exp(η_h(x))]
 # Predictor lineal con kernel de dependencia
 η_h(x) = α_h - Σ_j ψ_{hj} |x_j - ℓ_{hj}|
 
-# Priors para dependencia
-α_h ~ N(μ, 1)
-ψ_{hj} ~ N⁺(μ_ψ_j, τ⁻¹_ψ_j)
+# Priors para dependencia (idénticos a Normal)
+α_h ~ N(μ_α, σ²_α)
+ψ_{hj} ~ N⁺(μ_ψ, σ²_ψ)
 ℓ_{hj} ~ Discrete-Uniform{ℓ*_{jm}}_{m=1}^{M_j}
 
-# Átomos globales (Normal-Gamma para Laplace)
+# Átomos globales (parámetros Laplace)
 b_h ~ Gamma(a₀, β₀)
 μ_h ~ N(μ₀, τ₀⁻¹)
 
-# Hiperparámetros
-μ ~ N(μ_μ, τ⁻¹_μ)
-μ₀ ~ N(m₀, s₀²)
+# Hiperparámetros Nivel 1
+μ_α ~ N(m_α, s²_α)
+μ₀ ~ N(m₀, s²₀)
 τ₀ ~ Gamma(α_τ, β_τ)
+
+# Hiperparámetros Nivel 2  
 a₀ ~ Gamma(α_a, β_a)
 β₀ ~ Gamma(α_β, β_β)
 ```
@@ -93,38 +96,40 @@ z_i | x_i, {w_h(x_i)} ~ Categorical(w_1(x_i), ..., w_T(x_i))
 
 # Pesos dependientes (Probit stick-breaking)
 w_h(x) = v_h(x) ∏_{ℓ<h} (1 - v_ℓ(x))
-v_h(x) = Φ(η_h(x)) = ∫_{-∞}^{η_h(x)} N(t|0,1) dt
+v_h(x) = Φ(η_h(x)) donde Φ(·) es la CDF Normal estándar
 
-# Variables latentes para conjugación probit
-u_{ih} ~ N(η_h(x_i), 1), para i: z_i ≥ h
-v_h(x_i) = I(u_{ih} > 0)
-u_{ih} | v_h(x_i) ~ { N⁺(η_h(x_i), 1) si z_i = h
-                    { N⁻(η_h(x_i), 1) si z_i > h
+# Variables latentes de aumentación (Data Augmentation)
+u_{ih} | η_h(x_i), z_i ~ TruncatedNormal(η_h(x_i), 1, truncation)
+  donde truncation = [0, ∞) si z_i = h     (v_h = 1)
+        truncation = (-∞, 0] si z_i > h     (v_h = 0)
 
 # Predictor lineal con kernel de dependencia
-η_h(x) = α_h - Σ_j ψ_{hj} |x_j - ℓ_{hj}|
+η_h(x) = α_h - Σ_j γ_{hj} · ψ_{hj} · |x_j - ℓ_{hj}|
 
-# Priors para dependencia
-α_h ~ N(μ, 1)
-ψ_{hj} ~ N⁺(μ_ψ_j, τ⁻¹_ψ_j)
+# Priors para parámetros de dependencia
+α_h ~ N(μ_α, σ²_α)
+ψ_{hj} | γ_{hj} = 1 ~ N⁺(μ_ψ_j, τ⁻¹_ψ_j)
+ψ_{hj} | γ_{hj} = 0 = 0
 ℓ_{hj} ~ Discrete-Uniform{ℓ*_{jm}}_{m=1}^{M_j}
 
-# Priors con estructura de selección de variables
+# Spike-and-slab para selección de variables
 γ_{hj} ~ Bernoulli(κ_j)
-ψ_{hj} | γ_{hj} = 0 = 0
-ψ_{hj} | γ_{hj} = 1 ~ N⁺(μ_ψ_j, τ⁻¹_ψ_j)
 κ_j ~ Beta(a_κ_j, b_κ_j)
 
 # Átomos globales (Normal-Inverse-Gamma)
 σ²_h ~ InvGamma(a₀, b₀)
 μ_h | σ²_h ~ N(μ₀, σ²_h/κ₀)
 
-# Hiperparámetros
-μ ~ N(μ_μ, τ⁻¹_μ)
-μ₀ ~ N(m₀, s₀²)
+# Hiperparámetros Nivel 1
+μ_α ~ N(m_α, s²_α)
+μ₀ ~ N(m₀, s²₀)
 κ₀ ~ Gamma(α_κ, β_κ)
+
+# Hiperparámetros Nivel 2
 a₀ ~ Gamma(α_a, β_a)
 b₀ ~ Gamma(α_b, β_b)
+
+# Hiperparámetros de kernel (por covariable)
 μ_ψ_j ~ N(m_ψ_j, s²_ψ_j)
 τ_ψ_j ~ Gamma(α_τ_j, β_τ_j)
 ```
