@@ -199,6 +199,14 @@ model_ddp/
 
 ## Aplicacion real 
 
+## Carpeta `artefact`
+
+Los artefactos entrenados no se incluyen en el repositorio. En algunos casos, su tamaño supera los **2 GB**, lo que excede los límites operativos de GitHub para la subida de contenido.
+
+Por este motivo, se optó por versionar **únicamente los reportes y resultados resumidos**, manteniendo fuera del repositorio los artefactos pesados.
+
+El **código se mantiene completamente funcional** y preparado para generar y guardar dichos artefactos de forma local cuando sea necesario.
+
 ## Extra
 
 Este repositorio tiene la finalidad de documentar mi proyecto de tesis. No sigue un formato estándar de documentación, por lo que **no se incluyeron módulos de ETL**.  
