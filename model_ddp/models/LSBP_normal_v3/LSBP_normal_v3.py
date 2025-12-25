@@ -5,11 +5,14 @@ import math
 
 # Importar el módulo C++
 try:
-    import lsbp_cpp
+    from . import lsbp_cpp
     CPP_AVAILABLE = True
-except ImportError:
+    print("Implementacion en C++ Exitosa")
+except ImportError as e:
     CPP_AVAILABLE = False
-    print("Warning: C++ module not available. Using pure Python implementation.")
+    _IMPORT_ERROR = e
+    print("Implementacion en C++ Fallida")
+
 
 class LSBPNormal:
     """
@@ -48,7 +51,7 @@ class LSBPNormal:
         self.use_cpp = use_cpp and CPP_AVAILABLE
         
         if self.use_cpp:
-            print("Using C++ acceleration for compute_eta, compute_weights, update_assignments, and update_atoms")
+            print("Using C++ acceleration")
         
         self.y_mean = np.mean(y)
         self.y_std = np.std(y)
@@ -314,45 +317,62 @@ class LSBPNormal:
                     )
     
     def update_alpha(self):
-        for h in range(self.H - 1):
-            alpha_prop = np.random.normal(self.alpha[h], self.mh_scales['alpha'])
-            affected = np.where(self.z >= h)[0]
+        if self.use_cpp:
+            result = lsbp_cpp.update_alpha(
+                self.alpha,
+                self.z,
+                self.X_normalized,
+                self.psi,
+                self.ell,
+                self.ell_grid,
+                self.mu,
+                self.mh_scales['alpha'],
+                self.H
+            )
+            self.alpha = np.array(result.alpha)
+            # Registrar aceptaciones
+            self.mh_acceptance['alpha'].extend(result.acceptances)
+        else:
+            # Código Python original (sin cambios)
+            for h in range(self.H - 1):
+                alpha_prop = np.random.normal(self.alpha[h], self.mh_scales['alpha'])
+                affected = np.where(self.z >= h)[0]
 
-            if len(affected) == 0:
-                log_prior_curr = -0.5 * ((self.alpha[h] - self.mu)**2)
-                log_prior_prop = -0.5 * ((alpha_prop - self.mu)**2)
-                log_r = log_prior_prop - log_prior_curr
-            else:
-                eta_curr = self._compute_eta_h(self.X_normalized[affected], h, 
-                                                self.alpha[h])
-                eta_prop = self._compute_eta_h(self.X_normalized[affected], h, 
-                                                alpha_prop)
+                if len(affected) == 0:
+                    log_prior_curr = -0.5 * ((self.alpha[h] - self.mu)**2)
+                    log_prior_prop = -0.5 * ((alpha_prop - self.mu)**2)
+                    log_r = log_prior_prop - log_prior_curr
+                else:
+                    eta_curr = self._compute_eta_h(self.X_normalized[affected], h, 
+                                                    self.alpha[h])
+                    eta_prop = self._compute_eta_h(self.X_normalized[affected], h, 
+                                                    alpha_prop)
 
-                v_curr = expit(eta_curr)
-                v_prop = expit(eta_prop)
+                    v_curr = expit(eta_curr)
+                    v_prop = expit(eta_prop)
 
-                log_like_curr = 0.0
-                log_like_prop = 0.0
-                for idx_local, idx in enumerate(affected):
-                    if self.z[idx] == h:
-                        log_like_curr += np.log(np.clip(v_curr[idx_local], 1e-10, 1.0))
-                        log_like_prop += np.log(np.clip(v_prop[idx_local], 1e-10, 1.0))
-                    else:
-                        log_like_curr += np.log(np.clip(1 - v_curr[idx_local], 1e-10, 1.0))
-                        log_like_prop += np.log(np.clip(1 - v_prop[idx_local], 1e-10, 1.0))
+                    log_like_curr = 0.0
+                    log_like_prop = 0.0
+                    for idx_local, idx in enumerate(affected):
+                        if self.z[idx] == h:
+                            log_like_curr += np.log(np.clip(v_curr[idx_local], 1e-10, 1.0))
+                            log_like_prop += np.log(np.clip(v_prop[idx_local], 1e-10, 1.0))
+                        else:
+                            log_like_curr += np.log(np.clip(1 - v_curr[idx_local], 1e-10, 1.0))
+                            log_like_prop += np.log(np.clip(1 - v_prop[idx_local], 1e-10, 1.0))
 
-                log_prior_curr = -0.5 * ((self.alpha[h] - self.mu)**2)
-                log_prior_prop = -0.5 * ((alpha_prop - self.mu)**2)
+                    log_prior_curr = -0.5 * ((self.alpha[h] - self.mu)**2)
+                    log_prior_prop = -0.5 * ((alpha_prop - self.mu)**2)
 
-                log_r = (log_like_prop + log_prior_prop) - (log_like_curr + log_prior_curr)
+                    log_r = (log_like_prop + log_prior_prop) - (log_like_curr + log_prior_curr)
 
-            log_r = np.clip(log_r, -50, 50)
+                log_r = np.clip(log_r, -50, 50)
 
-            accept = math.log(np.random.rand()) < log_r
-            if accept:
-                self.alpha[h] = alpha_prop
+                accept = math.log(np.random.rand()) < log_r
+                if accept:
+                    self.alpha[h] = alpha_prop
 
-            self.mh_acceptance['alpha'].append(float(accept))
+                self.mh_acceptance['alpha'].append(float(accept))
     
     def _compute_eta_h(self, X_batch, h, alpha_h_value):
         n_batch = X_batch.shape[0]
@@ -366,96 +386,129 @@ class LSBPNormal:
         return eta
     
     def update_psi(self):
-        for h in range(self.H - 1):
-            for j in range(self.p):
-                psi_curr = self.psi[h, j]
-                psi_prop = np.random.normal(psi_curr, self.mh_scales['psi'])
-                
-                if psi_prop < 0:
-                    continue
-                
-                affected = np.where(self.z >= h)[0]
-                
-                if len(affected) == 0:
-                    log_prior_curr = -0.5 * ((psi_curr - self.mu_psi)**2) / self.tau_psi_inv
-                    log_prior_prop = -0.5 * ((psi_prop - self.mu_psi)**2) / self.tau_psi_inv
-                    log_r = log_prior_prop - log_prior_curr
-                else:
-                    ell_hj_value = self.ell_grid[j, self.ell[h, j]]
-                    dist = np.abs(self.X_normalized[affected, j] - ell_hj_value)
+        if self.use_cpp:
+            result = lsbp_cpp.update_psi(
+                self.psi,
+                self.z,
+                self.X_normalized,
+                self.alpha,
+                self.ell,
+                self.ell_grid,
+                self.mu_psi,
+                self.tau_psi_inv,
+                self.mh_scales['psi'],
+                self.H
+            )
+            self.psi = np.array(result.psi)
+            # Registrar aceptaciones
+            self.mh_acceptance['psi'].extend(result.acceptances)
+        else:
+            # Código Python original (sin cambios)
+            for h in range(self.H - 1):
+                for j in range(self.p):
+                    psi_curr = self.psi[h, j]
+                    psi_prop = np.random.normal(psi_curr, self.mh_scales['psi'])
                     
-                    eta_curr = self.alpha[h] - np.sum(
-                        [self.psi[h, jj] * np.abs(
-                            self.X_normalized[affected, jj] - 
-                            self.ell_grid[jj, self.ell[h, jj]]
-                        ) for jj in range(self.p)], axis=0
-                    )
+                    if psi_prop < 0:
+                        self.mh_acceptance['psi'].append(False)
+                        continue
                     
-                    delta_eta = (psi_curr - psi_prop) * dist
-                    eta_prop = eta_curr + delta_eta
+                    affected = np.where(self.z >= h)[0]
                     
-                    v_curr = expit(eta_curr)
-                    v_prop = expit(eta_prop)
+                    if len(affected) == 0:
+                        log_prior_curr = -0.5 * ((psi_curr - self.mu_psi)**2) / self.tau_psi_inv
+                        log_prior_prop = -0.5 * ((psi_prop - self.mu_psi)**2) / self.tau_psi_inv
+                        log_r = log_prior_prop - log_prior_curr
+                    else:
+                        ell_hj_value = self.ell_grid[j, self.ell[h, j]]
+                        dist = np.abs(self.X_normalized[affected, j] - ell_hj_value)
+                        
+                        eta_curr = self.alpha[h] - np.sum(
+                            [self.psi[h, jj] * np.abs(
+                                self.X_normalized[affected, jj] - 
+                                self.ell_grid[jj, self.ell[h, jj]]
+                            ) for jj in range(self.p)], axis=0
+                        )
+                        
+                        delta_eta = (psi_curr - psi_prop) * dist
+                        eta_prop = eta_curr + delta_eta
+                        
+                        v_curr = expit(eta_curr)
+                        v_prop = expit(eta_prop)
+                        
+                        log_like_curr = 0.0
+                        log_like_prop = 0.0
+                        for idx_local, idx in enumerate(affected):
+                            if self.z[idx] == h:
+                                log_like_curr += np.log(np.clip(v_curr[idx_local], 1e-10, 1.0))
+                                log_like_prop += np.log(np.clip(v_prop[idx_local], 1e-10, 1.0))
+                            else:
+                                log_like_curr += np.log(np.clip(1 - v_curr[idx_local], 1e-10, 1.0))
+                                log_like_prop += np.log(np.clip(1 - v_prop[idx_local], 1e-10, 1.0))
+                        
+                        log_prior_curr = -0.5 * ((psi_curr - self.mu_psi)**2) / self.tau_psi_inv
+                        log_prior_prop = -0.5 * ((psi_prop - self.mu_psi)**2) / self.tau_psi_inv
+                        
+                        log_r = (log_like_prop + log_prior_prop) - (log_like_curr + log_prior_curr)
                     
-                    log_like_curr = 0.0
-                    log_like_prop = 0.0
-                    for idx_local, idx in enumerate(affected):
-                        if self.z[idx] == h:
-                            log_like_curr += np.log(np.clip(v_curr[idx_local], 1e-10, 1.0))
-                            log_like_prop += np.log(np.clip(v_prop[idx_local], 1e-10, 1.0))
-                        else:
-                            log_like_curr += np.log(np.clip(1 - v_curr[idx_local], 1e-10, 1.0))
-                            log_like_prop += np.log(np.clip(1 - v_prop[idx_local], 1e-10, 1.0))
+                    log_r = np.clip(log_r, -50, 50)
                     
-                    log_prior_curr = -0.5 * ((psi_curr - self.mu_psi)**2) / self.tau_psi_inv
-                    log_prior_prop = -0.5 * ((psi_prop - self.mu_psi)**2) / self.tau_psi_inv
+                    accept = math.log(np.random.rand()) < log_r
+                    if accept:
+                        self.psi[h, j] = psi_prop
                     
-                    log_r = (log_like_prop + log_prior_prop) - (log_like_curr + log_prior_curr)
-                
-                log_r = np.clip(log_r, -50, 50)
-                
-                accept = math.log(np.random.rand()) < log_r
-                if accept:
-                    self.psi[h, j] = psi_prop
-                
-                self.mh_acceptance['psi'].append(float(accept))
+                    self.mh_acceptance['psi'].append(float(accept))
     
     def update_ell(self):
-        for h in range(self.H - 1):
-            for j in range(self.p):
-                affected = np.where(self.z >= h)[0]
-                
-                if len(affected) == 0:
-                    self.ell[h, j] = np.random.randint(0, self.n_grid)
-                    continue
-                
-                log_likes = np.zeros(self.n_grid)
-                
-                for m in range(self.n_grid):
-                    ell_value = self.ell_grid[j, m]
-                    dist = np.abs(self.X_normalized[affected, j] - ell_value)
+        if self.use_cpp:
+            result = lsbp_cpp.update_ell(
+                self.ell,
+                self.z,
+                self.X_normalized,
+                self.alpha,
+                self.psi,
+                self.ell_grid,
+                self.H,
+                self.n_grid
+            )
+            self.ell = np.array(result.ell)
+        else:
+            # Código Python original (sin cambios)
+            for h in range(self.H - 1):
+                for j in range(self.p):
+                    affected = np.where(self.z >= h)[0]
                     
-                    eta = self.alpha[h] - self.psi[h, j] * dist
-                    for jj in range(self.p):
-                        if jj != j:
-                            ell_jj_value = self.ell_grid[jj, self.ell[h, jj]]
-                            eta -= self.psi[h, jj] * np.abs(
-                                self.X_normalized[affected, jj] - ell_jj_value
-                            )
+                    if len(affected) == 0:
+                        self.ell[h, j] = np.random.randint(0, self.n_grid)
+                        continue
                     
-                    v = expit(eta)
+                    log_likes = np.zeros(self.n_grid)
                     
-                    for idx_local, idx in enumerate(affected):
-                        if self.z[idx] == h:
-                            log_likes[m] += np.log(np.clip(v[idx_local], 1e-10, 1.0))
-                        else:
-                            log_likes[m] += np.log(np.clip(1 - v[idx_local], 1e-10, 1.0))
-                
-                log_likes = log_likes - np.max(log_likes)
-                probs = np.exp(log_likes)
-                probs /= probs.sum()
-                
-                self.ell[h, j] = np.random.choice(self.n_grid, p=probs)
+                    for m in range(self.n_grid):
+                        ell_value = self.ell_grid[j, m]
+                        dist = np.abs(self.X_normalized[affected, j] - ell_value)
+                        
+                        eta = self.alpha[h] - self.psi[h, j] * dist
+                        for jj in range(self.p):
+                            if jj != j:
+                                ell_jj_value = self.ell_grid[jj, self.ell[h, jj]]
+                                eta -= self.psi[h, jj] * np.abs(
+                                    self.X_normalized[affected, jj] - ell_jj_value
+                                )
+                        
+                        v = expit(eta)
+                        
+                        for idx_local, idx in enumerate(affected):
+                            if self.z[idx] == h:
+                                log_likes[m] += np.log(np.clip(v[idx_local], 1e-10, 1.0))
+                            else:
+                                log_likes[m] += np.log(np.clip(1 - v[idx_local], 1e-10, 1.0))
+                    
+                    log_likes = log_likes - np.max(log_likes)
+                    probs = np.exp(log_likes)
+                    probs /= probs.sum()
+                    
+                    self.ell[h, j] = np.random.choice(self.n_grid, p=probs)
     
     def update_weights(self):
         self.w = self._compute_weights()
@@ -697,22 +750,66 @@ class LSBPNormal:
         
         return density
     
-    def predict_mean(self, X_new, n_samples=100):
-        n_new = X_new.shape[0]
-        predictions = np.zeros((n_samples, n_new))
+    def predict_mean(self, X_new, n_samples=100, return_full_uncertainty=True):
+        """
+        Predice E[Y|X] y la desviación estándar predictiva total.
         
+        Parámetros:
+        -----------
+        X_new : array (n_new, p)
+            Covariables para predicción
+        
+        n_samples : int
+            Número de muestras posteriores a usar
+        
+        return_full_uncertainty : bool
+            Si True, devuelve la incertidumbre predictiva total (epistémica + aleatoria)
+            Si False, solo devuelve la incertidumbre epistémica (variabilidad de E[Y|X])
+        
+        Retorna:
+        --------
+        mean_pred : array (n_new,)
+            Media predictiva E[Y|X]
+        
+        std_pred : array (n_new,)
+            Desviación estándar predictiva:
+            - Si return_full_uncertainty=True: sqrt(Var[Y|X]) (incertidumbre total)
+            - Si return_full_uncertainty=False: std(E[Y|X]) (solo epistémica)
+        
+        Fórmulas:
+        ---------
+        E[Y|X] = Σ_h w_h(x) · μ_h
+        
+        Var[Y|X] = Σ_h w_h(x) · [σ²_h + μ²_h] - [E[Y|X]]²
+                 = E[μ²_h + σ²_h] - [E[μ_h]]²  (Ley de Varianza Total)
+                 = Var_between + E[Var_within]
+        """
+        n_new = X_new.shape[0]
+        
+        # Normalizar covariables
         X_new_norm = (X_new - self.X_mean) / self.X_std
         
+        # Seleccionar muestras posteriores
         n_post = len(self.trace['z'])
         indices = np.linspace(0, n_post - 1, n_samples, dtype=int)
         
+        # Almacenar predicciones
+        predictions_mean = np.zeros((n_samples, n_new))
+        predictions_var = np.zeros((n_samples, n_new))
+        
         for s, idx in enumerate(indices):
+            # Extraer parámetros de la muestra posterior
             alpha_sample = self.trace['alpha'][idx]
             psi_sample = self.trace['psi'][idx]
             ell_sample = self.trace['ell'][idx]
             theta_mu_sample = self.trace['theta_mu'][idx]
+            theta_sigma2_sample = self.trace['theta_sigma2'][idx]
             
             H_sample = len(alpha_sample)
+            
+            # ========================================
+            # Calcular pesos w_h(x) para X_new
+            # ========================================
             eta = np.zeros((n_new, H_sample))
             
             for h in range(H_sample):
@@ -724,15 +821,212 @@ class LSBPNormal:
             
             v = expit(eta)
             w = np.zeros((n_new, H_sample))
+            
             for i in range(n_new):
                 remaining = 1.0
                 for h in range(H_sample):
                     w[i, h] = v[i, h] * remaining
                     remaining *= (1 - v[i, h])
             
-            predictions[s, :] = np.sum(w * theta_mu_sample[np.newaxis, :H_sample], axis=1)
+            # Normalizar pesos (por seguridad numérica)
+            w = w / w.sum(axis=1, keepdims=True)
+            
+            # ========================================
+            # Calcular E[Y|X] y Var[Y|X] para esta muestra
+            # ========================================
+            
+            # E[Y|X] = Σ_h w_h(x) · μ_h
+            mean_sample = np.sum(w * theta_mu_sample[np.newaxis, :H_sample], axis=1)
+            
+            # Var[Y|X] = Σ_h w_h(x) · [σ²_h + μ²_h] - [E[Y|X]]²
+            second_moment = np.sum(
+                w * (theta_sigma2_sample[np.newaxis, :H_sample] + 
+                     theta_mu_sample[np.newaxis, :H_sample]**2), 
+                axis=1
+            )
+            var_sample = second_moment - mean_sample**2
+            
+            # Asegurar varianza no negativa (por errores numéricos)
+            var_sample = np.maximum(var_sample, 1e-8)
+            
+            predictions_mean[s, :] = mean_sample
+            predictions_var[s, :] = var_sample
         
-        mean_pred = np.mean(predictions, axis=0)
-        std_pred = np.std(predictions, axis=0)
+        # ========================================
+        # Agregación sobre muestras posteriores
+        # ========================================
+        
+        # Media predictiva (promedio de E[Y|X] sobre el posterior)
+        mean_pred = np.mean(predictions_mean, axis=0)
+        
+        if return_full_uncertainty:
+            # Incertidumbre total: promedio de Var[Y|X] + varianza de E[Y|X]
+            # Var_total = E[Var[Y|X]] + Var[E[Y|X]]
+            var_within = np.mean(predictions_var, axis=0)  # E[Var[Y|X]]
+            var_between = np.var(predictions_mean, axis=0)  # Var[E[Y|X]]
+            
+            total_var = var_within + var_between
+            std_pred = np.sqrt(total_var)
+        else:
+            # Solo incertidumbre epistémica (variabilidad de E[Y|X])
+            std_pred = np.std(predictions_mean, axis=0)
         
         return mean_pred, std_pred
+
+
+    def predict_with_decomposition(self, X_new, n_samples=100):
+        """
+        Versión extendida que devuelve descomposición completa de incertidumbre.
+
+        Retorna:
+        --------
+        results : dict
+            - 'mean': E[Y|X]
+            - 'std_total': Desviación estándar total
+            - 'std_aleatoric': Incertidumbre aleatoria (heterocedasticidad)
+            - 'std_epistemic': Incertidumbre epistémica (sobre parámetros)
+            - 'var_within': Varianza dentro de clusters E[σ²_h]
+            - 'var_between': Varianza entre clusters Var[μ_h]
+        """
+        n_new = X_new.shape[0]
+        X_new_norm = (X_new - self.X_mean) / self.X_std
+
+        n_post = len(self.trace['z'])
+        indices = np.linspace(0, n_post - 1, n_samples, dtype=int)
+
+        predictions_mean = np.zeros((n_samples, n_new))
+        predictions_var = np.zeros((n_samples, n_new))
+
+        for s, idx in enumerate(indices):
+            alpha_sample = self.trace['alpha'][idx]
+            psi_sample = self.trace['psi'][idx]
+            ell_sample = self.trace['ell'][idx]
+            theta_mu_sample = self.trace['theta_mu'][idx]
+            theta_sigma2_sample = self.trace['theta_sigma2'][idx]
+
+            H_sample = len(alpha_sample)
+            eta = np.zeros((n_new, H_sample))
+
+            for h in range(H_sample):
+                eta[:, h] = alpha_sample[h]
+                for j in range(self.p):
+                    ell_hj_value = self.ell_grid[j, ell_sample[h, j]]
+                    dist = np.abs(X_new_norm[:, j] - ell_hj_value)
+                    eta[:, h] -= psi_sample[h, j] * dist
+
+            v = expit(eta)
+            w = np.zeros((n_new, H_sample))
+
+            for i in range(n_new):
+                remaining = 1.0
+                for h in range(H_sample):
+                    w[i, h] = v[i, h] * remaining
+                    remaining *= (1 - v[i, h])
+
+            w = w / w.sum(axis=1, keepdims=True)
+
+            mean_sample = np.sum(w * theta_mu_sample[np.newaxis, :H_sample], axis=1)
+            second_moment = np.sum(
+                w * (theta_sigma2_sample[np.newaxis, :H_sample] + 
+                     theta_mu_sample[np.newaxis, :H_sample]**2), 
+                axis=1
+            )
+            var_sample = second_moment - mean_sample**2
+            var_sample = np.maximum(var_sample, 1e-8)
+
+            predictions_mean[s, :] = mean_sample
+            predictions_var[s, :] = var_sample
+
+        # Descomposición de incertidumbre
+        mean_pred = np.mean(predictions_mean, axis=0)
+        var_within = np.mean(predictions_var, axis=0)  # Aleatoria
+        var_between = np.var(predictions_mean, axis=0)  # Epistémica
+
+        return {
+            'mean': mean_pred,
+            'std_total': np.sqrt(var_within + var_between),
+            'std_aleatoric': np.sqrt(var_within),
+            'std_epistemic': np.sqrt(var_between),
+            'var_within': var_within,
+            'var_between': var_between
+        }
+
+
+    def predict_quantiles(self, X_new, quantiles=[0.025, 0.25, 0.5, 0.75, 0.975], n_samples=100):
+        """
+        Predice cuantiles de la distribución predictiva P(Y|X).
+        Útil para intervalos de credibilidad sin asumir normalidad.
+
+        Parámetros:
+        -----------
+        X_new : array (n_new, p)
+            Covariables
+
+        quantiles : list
+            Cuantiles a calcular (por defecto: 2.5%, 25%, 50%, 75%, 97.5%)
+
+        n_samples : int
+            Muestras posteriores
+
+        Retorna:
+        --------
+        results : dict
+            Diccionario con claves: 'mean', 'q_0.025', 'q_0.25', etc.
+        """
+        n_new = X_new.shape[0]
+        X_new_norm = (X_new - self.X_mean) / self.X_std
+
+        n_post = len(self.trace['z'])
+        indices = np.linspace(0, n_post - 1, n_samples, dtype=int)
+
+        # Simular de la distribución predictiva
+        n_pred_samples = 1000
+        y_samples = np.zeros((n_pred_samples, n_new))
+
+        for i in range(n_pred_samples):
+            # Elegir una muestra posterior aleatoria
+            post_idx = np.random.choice(indices)
+
+            alpha_sample = self.trace['alpha'][post_idx]
+            psi_sample = self.trace['psi'][post_idx]
+            ell_sample = self.trace['ell'][post_idx]
+            theta_mu_sample = self.trace['theta_mu'][post_idx]
+            theta_sigma2_sample = self.trace['theta_sigma2'][post_idx]
+
+            H_sample = len(alpha_sample)
+            eta = np.zeros((n_new, H_sample))
+
+            for h in range(H_sample):
+                eta[:, h] = alpha_sample[h]
+                for j in range(self.p):
+                    ell_hj_value = self.ell_grid[j, ell_sample[h, j]]
+                    dist = np.abs(X_new_norm[:, j] - ell_hj_value)
+                    eta[:, h] -= psi_sample[h, j] * dist
+
+            v = expit(eta)
+            w = np.zeros((n_new, H_sample))
+
+            for k in range(n_new):
+                remaining = 1.0
+                for h in range(H_sample):
+                    w[k, h] = v[k, h] * remaining
+                    remaining *= (1 - v[k, h])
+
+            w = w / w.sum(axis=1, keepdims=True)
+
+            # Para cada observación, muestrear de la mezcla
+            for k in range(n_new):
+                # Elegir cluster según w[k, :]
+                cluster = np.random.choice(H_sample, p=w[k, :])
+                # Muestrear Y de ese cluster
+                y_samples[i, k] = np.random.normal(
+                    theta_mu_sample[cluster],
+                    np.sqrt(theta_sigma2_sample[cluster])
+                )
+
+        # Calcular cuantiles
+        results = {'mean': np.mean(y_samples, axis=0)}
+        for q in quantiles:
+            results[f'q_{q}'] = np.quantile(y_samples, q, axis=0)
+
+        return results
