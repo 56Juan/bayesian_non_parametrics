@@ -5,6 +5,10 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import r2_score
 
 
+# =========================
+# GRÁFICOS INDIVIDUALES
+# =========================
+
 def plot_density(y_true, y_pred, ax, title=None, xlabel="Y"):
     ax.hist(y_true, bins=30, alpha=0.5, density=True, label="Real")
     ax.hist(y_pred, bins=30, alpha=0.5, density=True, label="Predicho")
@@ -35,7 +39,7 @@ def plot_scatter(y_true, y_pred, ax, title=None):
 def plot_residuals(y_true, y_pred, ax, title=None):
     residuals = y_true - y_pred
     ax.scatter(y_pred, residuals, alpha=0.5, s=12)
-    ax.axhline(0.0, color="r", linestyle="--", lw=2)
+    ax.axhline(0.0, linestyle="--", lw=2)
     ax.set_xlabel("Predicho")
     ax.set_ylabel("Residuo")
     if title:
@@ -43,50 +47,87 @@ def plot_residuals(y_true, y_pred, ax, title=None):
     ax.grid(alpha=0.3)
 
 
+# =========================
+# PIPELINE DE ANÁLISIS
+# =========================
+
 def plot_regression_analysis(
     splits,
     output_path,
     model_name="Modelo"
 ):
     """
-    splits: lista de tuplas [(y_true, y_pred, label), ...]
+    splits: lista de tuplas (y_true, y_pred, label)
     """
 
+    n_splits = len(splits)
+
     # =========================
-    # Densidades + Scatter
+    # DENSIDADES + SCATTER
     # =========================
-    fig, axes = plt.subplots(2, len(splits), figsize=(6 * len(splits), 10))
-    fig.suptitle(f"Análisis de Regresión - {model_name}", fontsize=14, fontweight="bold")
+    fig, axes = plt.subplots(
+        2,
+        n_splits,
+        figsize=(6 * n_splits, 10),
+        squeeze=False
+    )
+
+    fig.suptitle(
+        f"Análisis de Regresión - {model_name}",
+        fontsize=14,
+        fontweight="bold"
+    )
 
     for i, (y_true, y_pred, label) in enumerate(splits):
         plot_density(
-            y_true, y_pred,
+            y_true,
+            y_pred,
             ax=axes[0, i],
             title=f"Densidad - {label}"
         )
         plot_scatter(
-            y_true, y_pred,
+            y_true,
+            y_pred,
             ax=axes[1, i],
             title=label
         )
 
     plt.tight_layout()
-    plt.savefig(f"{output_path}/analisis_regresion.png", dpi=300, bbox_inches="tight")
+    plt.savefig(
+        f"{output_path}/analisis_regresion.png",
+        dpi=300,
+        bbox_inches="tight"
+    )
     plt.close()
 
     # =========================
-    # Residuos
+    # RESIDUOS
     # =========================
-    fig, axes = plt.subplots(1, len(splits), figsize=(6 * len(splits), 5))
-    fig.suptitle(f"Residuos - {model_name}", fontsize=14, fontweight="bold")
+    fig, axes = plt.subplots(
+        1,
+        n_splits,
+        figsize=(6 * n_splits, 5),
+        squeeze=False
+    )
+
+    fig.suptitle(
+        f"Residuos - {model_name}",
+        fontsize=14,
+        fontweight="bold"
+    )
 
     for i, (y_true, y_pred, label) in enumerate(splits):
         plot_residuals(
-            y_true, y_pred,
-            ax=axes[i],
+            y_true,
+            y_pred,
+            ax=axes[0, i],
             title=f"Residuos - {label}"
         )
 
     plt.tight_layout()
-    plt.savefig(f"{output_path}/residuos_regresion.png", dpi=300, bbox_inches="tight")
+    plt.savefig(
+        f"{output_path}/residuos_regresion.png",
+        dpi=300,
+        bbox_inches="tight"
+    )
     plt.close()

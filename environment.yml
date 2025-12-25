@@ -1,35 +1,34 @@
 name: model_ddp
 channels:
   - conda-forge
+  - defaults
 dependencies:
+  # Python base
   - python=3.12.2
-  - pip
   
-  # CLI y utilidades
-  - typer
-  - loguru
-  - tqdm
-  - ipython
+  # Cientifico
+  - numpy>=1.24
+  - scipy>=1.10
+  - pandas>=2.0
+  - matplotlib>=3.7
+  - seaborn>=0.12
   
-  # Notebooks y visualización
-  - jupyterlab
-  - notebook
-  - matplotlib
-  - seaborn                    # Gráficas estadísticas más bonitas
-  - plotly                     # Gráficas interactivas (opcional pero útil)
+  # Notebooks
+  - jupyter>=1.0
+  - ipykernel>=6.0
   
-  # Computación científica
-  - numpy
-  - scipy                      
-  - pandas
+  # Compilacion C++ - IMPORTANTE: orden correcto
+  - pybind11>=2.10
+  - cmake>=3.15
+  - ninja
+  - cxx-compiler
+  - libpython
   
-  # Machine Learning y estadística
-  - scikit-learn
-  - statsmodels                # Modelos estadísticos adicionales
+  # Utilidades
+  - pyyaml>=6.0
+  - tqdm>=4.65
   
-  # YAML (para tu config.yaml)
-  - pyyaml
-  
+  # Pip packages
+  - pip>=23.0
   - pip:
-    - python-dotenv
-    - -e .
+      - scikit-learn>=1.3

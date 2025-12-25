@@ -309,49 +309,41 @@ def get_all_paths(config):
 
 def save_experiment_metadata(config, experiment_data):
     """
-    Guarda los metadatos de un experimento en el registro.
-    
+    Guarda metadatos básicos de un experimento en el registro.
+
     Args:
         config (dict): Diccionario de configuración
-        experiment_data (dict): Datos del experimento a guardar
-        
+        experiment_data (dict): Información básica del experimento
+
     Returns:
-        Path: Ruta al archivo de registro actualizado
+        Path: Ruta al archivo de registro
     """
     project_root = get_project_root()
     registry_path = Path(config['experiments']['registry_file'].replace('../', ''))
     registry_file = project_root / registry_path
-    
+
     # Asegurar que el directorio existe
     registry_file.parent.mkdir(parents=True, exist_ok=True)
-    
-    # Crear entrada de registro
+
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    
+
     registry_entry = f"""
 ## {experiment_data.get('experiment_id', 'unknown')}
 - **Nombre**: {experiment_data.get('nombre', 'N/A')}
 - **Fecha**: {timestamp}
-- **Tipo**: {experiment_data.get('tipo', 'simulation')}
-- **Descripción**: {experiment_data.get('descripcion', 'N/A')}
+- **Tipo**: {experiment_data.get('tipo', 'N/A')}
 
-### Configuración
-{experiment_data.get('configuracion', 'N/A')}
-
-### Resultados
-{experiment_data.get('resultados', 'N/A')}
-
-### Archivos Generados
-{experiment_data.get('archivos', 'N/A')}
+**Descripción**
+{experiment_data.get('descripcion', 'N/A')}
 
 ---
 """
-    
-    # Agregar al registro
+
     with open(registry_file, 'a', encoding='utf-8') as f:
         f.write(registry_entry)
-    
+
     return registry_file
+
 
 
 def print_project_structure(config):

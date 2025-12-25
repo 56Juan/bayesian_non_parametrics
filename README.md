@@ -4,13 +4,14 @@ Este repositorio implementa la estimación de densidades mediante un **modelos d
 
 Los modelos implemenentados se basan en los trabajos de:
 
-- Modelo DDP con dependencia en Pesos con Kernel Probit/Logit (LSBP-PSBP), porpuesto en [Chung
-y Dunson, 2009](ref.bib)
-- Modelo DDP con dependencia en Pesos con Kernel Gaussiano (KSBP), propuesto en  [](ref.bib)
-- Modelo DDP con dependencia en Atomos con  
+- Modelo DDP con dependencia en Pesos con Kernel Probit/Logit (LSBP-PSBP), porpuesto en [Chung y Dunson, 2009](ref.bib)
+- Modelo DDP con dependencia en Pesos con Kernel Gaussiano (KSBP), propuesto en  [Ren et al., 2011](ref.bib)
+- Modelo DDP con dependencia Lineal en Atomos, propuesto en [Iorio et al., 2004 ](ref.bib)
+- Modelo DDP con dependencia Espacial en Atomos, propuesto en [Gelfand, Kottas y MacEachern, 2005](ref.bib)  
 
 
 ## Modelos
+Los modelos incluyen algunas variantes de los artículos originales. Además, para lograr una implementación computacionalmente eficiente, parte del código se desarrolló en C++, optimizando así el procesamiento.
 
 ### Modelo LSBP
 En el modelo LSBP se utilizaron dos estructuras una basadas en mezclas de normales y otras en mezclas de Laplace, se busco la conjugacion para priorizar la optimizacion del metodo. 
@@ -84,3 +85,70 @@ En el modelo PSBP se utilizaron dos estructuras una basadas en mezclas de normal
 **Modelo con kernel Normal y Probit Stick-Breaking:** 
 
 **Modelo con kernel Laplace y Probit Stick-Breaking:**
+
+### Modelo DDP Lineal
+
+## Estructura del repositorio 
+```
+model_ddp/
+├── model_ddp/
+│   ├── fit/                   # Clases y módulos para evaluar el desempeño
+│   ├── pipelines/             # Clases y módulos para separación de datos, filtros, etc.
+│   ├── graphics/              # Clases y módulos de visualización
+│   ├── models/                # Clases de los modelos DDP
+│   │   ├── LSBP_normal_v1/                 # Ejemplo de Clase Python + C++
+│   │   │   ├── __init__.py                 # Imports de funciones en C++
+│   │   │   ├── LSBP_normal_v1.py           # Wrapper Python (clase pública)
+│   │   │   ├── lsbp_cpp.cp312-win_amd64.pyd  # Módulo C++ compilado (pybind11)
+│   │   │   ├── cpp/                        # Código fuente C++
+│   │   │   │   ├── lsbp_core.cpp           # Implementación C++
+│   │   │   │   ├── lsbp_core.hpp           # Headers
+│   │   │   │   ├── bindings.cpp            # Bindings pybind11
+│   │   │   │   └── CMakeLists.txt          # Configuración de build C++
+│   │   ├── .../
+│   │   ├── __init__.py                     # Imports internos del paquete
+│   ├── simulations/           # Clases y lógica de simulación
+│   ├── utils/                 # Módulos de utilidades
+│   └── __init__.py            # Imports internos del paquete
+│
+├── artefact/
+│   ├── reales/
+│   │   └── models/            # Modelos entrenados (objetos .pkl reutilizables)
+│   └── simulaciones/
+│       └── models/
+│
+├── data/                      # Datos (reales y/o simulados)
+│   ├── reales/
+│   └── simulaciones/
+│
+├── notebooks/
+│   ├── simulaciones/
+│   └── reales/
+│
+├── reports/
+│   ├── simulaciones/
+│   └── reales/
+│
+├── references/                # Documentos de referencia
+│
+├── versioning/                # Control experimental
+│   ├── config.yaml
+│   ├── experiment_registry.md
+│   └── changelog.md
+│
+├── pyproject.toml             # ÚNICO punto de build del proyecto
+├── environment.yml            # Configuración del entorno conda
+├── ref.bib                    # Bibliografía formal
+├── id_model.md                # Documento de ideas
+├── README.md                  # Documento principal del proyecto
+└── __init__.py                # Marca el proyecto como unidad lógica
+```
+
+## Aplicacion real 
+
+
+## Extra
+
+Este repositorio tiene la finalidad de documentar mi proyecto de tesis. No sigue un formato estándar de documentación, por lo que **no se incluyeron módulos de ETL**.  
+
+Se crea un archivo `__init__.py` para permitir la interacción con otras branches en caso de futuras extensiones.
