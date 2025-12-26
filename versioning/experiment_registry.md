@@ -48,3 +48,13 @@ Experimento: 2 Feature Cuadraticos (n=400) -> 1200 (200 burn)
 Experimento: 3 Feature Linear, variar Kernel Mater (n=800) ->2400 (400 burn)
 
 ---
+
+## comparacion_modelos_001_20251225_214401
+- **Nombre**: comparacion_modelos_001
+- **Fecha**: 2025-12-25 21:44:02
+- **Tipo**: simulation
+
+**Descripción**
+Experimento: Comparacion modelos relaciones complejas con altas varianzas, observaciones 500
+
+---
