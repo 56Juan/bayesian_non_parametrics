@@ -9,7 +9,6 @@ Los modelos implementados se basan en los trabajos de:
 - Modelo DDP con dependencia Lineal en Atomos, propuesto en [Iorio et al., 2004 ](ref.bib)
 - Modelo DDP con dependencia Espacial en Atomos, propuesto en [Gelfand, Kottas y MacEachern, 2005](ref.bib)  
 
-
 ## Modelos
 Los modelos incluyen variantes de los artículos originales. Además, para lograr una implementación computacionalmente eficiente, parte del código se desarrolló en C++, optimizando así el procesamiento.
 
@@ -133,17 +132,12 @@ b₀ ~ Gamma(α_b, β_b)
 μ_ψ_j ~ N(m_ψ_j, s²_ψ_j)
 τ_ψ_j ~ Gamma(α_τ_j, β_τ_j)
 ```
-**Modelo con kernel Laplace y Probit Stick-Breaking:**
-
-
 ### Modelo DDP Lineal
 En el modelo DDP Lineal se considero el uso de funciones para poder explicar componentes no lineares. De estas se selecionaron transformaciones Spline 
-
 
 **Modelo con Kernel Normal**
 
 **Modelo con Kernel Laplace** 
-
 
 
 ## Estructura del repositorio 
