@@ -239,9 +239,7 @@ PYBIND11_MODULE(psbp_cpp, m) {
         )pbdoc"
     );
     
-    // ========================================================================
-    // 7. update_psi_gamma (NUEVO - COMBINADO SPIKE-AND-SLAB)
-    // ========================================================================
+// 7. update_psi_gamma
     m.def("update_psi_gamma",
         [](py::array_t<double> psi_current,
            py::array_t<int> gamma_current,
@@ -253,10 +251,11 @@ PYBIND11_MODULE(psbp_cpp, m) {
            py::array_t<double> alpha,
            py::array_t<int> ell,
            py::array_t<double> ell_grid,
+           py::array_t<int> z,  //  AGREGAR
            double mh_scale_psi,
            bool psi_positive,
            int H) {
-            
+
             return psbp::update_psi_gamma(
                 numpy_to_vector_2d<double>(psi_current),
                 numpy_to_vector_2d<int>(gamma_current),
@@ -268,42 +267,21 @@ PYBIND11_MODULE(psbp_cpp, m) {
                 numpy_to_vector_1d<double>(alpha),
                 numpy_to_vector_2d<int>(ell),
                 numpy_to_vector_2d<double>(ell_grid),
+                numpy_to_vector_1d<int>(z),  //  AGREGAR
                 mh_scale_psi,
                 psi_positive,
                 H
             );
         },
-        py::arg("psi_current"),
-        py::arg("gamma_current"),
-        py::arg("mu_psi"),
-        py::arg("tau_psi"),
-        py::arg("kappa"),
-        py::arg("u_latent"),
-        py::arg("X_normalized"),
-        py::arg("alpha"),
-        py::arg("ell"),
-        py::arg("ell_grid"),
-        py::arg("mh_scale_psi"),
-        py::arg("psi_positive"),
-        py::arg("H"),
-        R"pbdoc(
-        Combined update for ψ and γ using spike-and-slab.
-        
-        For each (h, j):
-        1. Update γ_{hj} using Gibbs
-        2. If γ_{hj}=1, update ψ_{hj} using MH
-        3. If γ_{hj}=0, set ψ_{hj}=0
-        
-        Returns
-        -------
-        PsiGammaResult
-            Updated psi, gamma, and acceptance rates
-        )pbdoc"
+        //  AGREGAR ARGUMENTO
+        py::arg("psi_current"), py::arg("gamma_current"), py::arg("mu_psi"),
+        py::arg("tau_psi"), py::arg("kappa"), py::arg("u_latent"),
+        py::arg("X_normalized"), py::arg("alpha"), py::arg("ell"),
+        py::arg("ell_grid"), py::arg("z"), py::arg("mh_scale_psi"),
+        py::arg("psi_positive"), py::arg("H")
     );
-    
-    // ========================================================================
-    // 8. update_alpha_probit (NUEVO - PROBIT)
-    // ========================================================================
+
+    // 8. update_alpha_probit
     m.def("update_alpha_probit",
         [](py::array_t<double> alpha_current,
            py::array_t<double> u_latent,
@@ -312,10 +290,11 @@ PYBIND11_MODULE(psbp_cpp, m) {
            py::array_t<int> gamma,
            py::array_t<int> ell,
            py::array_t<double> ell_grid,
+           py::array_t<int> z,  //  AGREGAR
            double mu_alpha,
            double mh_scale,
            int H) {
-            
+
             return psbp::update_alpha_probit(
                 numpy_to_vector_1d<double>(alpha_current),
                 numpy_to_vector_2d<double>(u_latent),
@@ -324,36 +303,22 @@ PYBIND11_MODULE(psbp_cpp, m) {
                 numpy_to_vector_2d<int>(gamma),
                 numpy_to_vector_2d<int>(ell),
                 numpy_to_vector_2d<double>(ell_grid),
+                numpy_to_vector_1d<int>(z),  //  AGREGAR
                 mu_alpha,
                 mh_scale,
                 H
             );
         },
-        py::arg("alpha_current"),
-        py::arg("u_latent"),
-        py::arg("X_normalized"),
-        py::arg("psi"),
-        py::arg("gamma"),
-        py::arg("ell"),
-        py::arg("ell_grid"),
-        py::arg("mu_alpha"),
-        py::arg("mh_scale"),
-        py::arg("H"),
-        R"pbdoc(
-        Update intercept parameters α_h for probit model.
-        
-        Uses latent variables u_{ih} for likelihood.
-        
-        Returns
-        -------
-        UpdateAlphaResult
-            Updated alpha vector and acceptance info
-        )pbdoc"
+        //  AGREGAR ARGUMENTO
+        py::arg("alpha_current"), py::arg("u_latent"), py::arg("X_normalized"),
+        py::arg("psi"), py::arg("gamma"), py::arg("ell"), py::arg("ell_grid"),
+        py::arg("z"), py::arg("mu_alpha"), py::arg("mh_scale"), py::arg("H")
     );
     
     // ========================================================================
     // 9. update_gamma_psi (ALTERNATIVA - GIBBS PARA ψ)
     // ========================================================================
+    // 9. update_gamma_psi
     m.def("update_gamma_psi",
         [](py::array_t<double> psi_current,
            py::array_t<int> gamma_current,
@@ -362,6 +327,7 @@ PYBIND11_MODULE(psbp_cpp, m) {
            py::array_t<double> alpha,
            py::array_t<int> ell,
            py::array_t<double> ell_grid,
+           py::array_t<int> z,  // ✅ AGREGAR
            py::array_t<double> mu_psi,
            py::array_t<double> tau_psi,
            py::array_t<double> kappa,
@@ -376,6 +342,7 @@ PYBIND11_MODULE(psbp_cpp, m) {
                 numpy_to_vector_1d<double>(alpha),
                 numpy_to_vector_2d<int>(ell),
                 numpy_to_vector_2d<double>(ell_grid),
+                numpy_to_vector_1d<int>(z),  // ✅ AGREGAR
                 numpy_to_vector_1d<double>(mu_psi),
                 numpy_to_vector_1d<double>(tau_psi),
                 numpy_to_vector_1d<double>(kappa),
@@ -390,6 +357,7 @@ PYBIND11_MODULE(psbp_cpp, m) {
         py::arg("alpha"),
         py::arg("ell"),
         py::arg("ell_grid"),
+        py::arg("z"),  // ✅ AGREGAR
         py::arg("mu_psi"),
         py::arg("tau_psi"),
         py::arg("kappa"),
@@ -397,6 +365,9 @@ PYBIND11_MODULE(psbp_cpp, m) {
         py::arg("H"),
         R"pbdoc(
         Update γ and ψ using Gibbs sampling (truncated normal posterior).
+        
+        This is an alternative to update_psi_gamma that uses exact Gibbs
+        sampling for ψ instead of Metropolis-Hastings.
         
         Returns
         -------

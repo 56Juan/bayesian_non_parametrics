@@ -134,7 +134,7 @@ UpdateEllResult update_ell_probit(
     int n_grid
 );
 
-// 7. ψ (MH) y γ (Gibbs)
+// 7. Ψ (MH) y γ (Gibbs) 
 PsiGammaResult update_psi_gamma(
     const std::vector<std::vector<double>>& psi_current,
     const std::vector<std::vector<int>>& gamma_current,
@@ -146,12 +146,13 @@ PsiGammaResult update_psi_gamma(
     const std::vector<double>& alpha,
     const std::vector<std::vector<int>>& ell,
     const std::vector<std::vector<double>>& ell_grid,
+    const std::vector<int>& z,  // ✅ AGREGAR ESTO
     double mh_scale_psi,
     bool psi_positive,
     int H
 );
 
-// 8. α con probit (MH)
+// 8. α con probit (MH) 
 UpdateAlphaResult update_alpha_probit(
     const std::vector<double>& alpha_current,
     const std::vector<std::vector<double>>& u_latent,
@@ -160,12 +161,13 @@ UpdateAlphaResult update_alpha_probit(
     const std::vector<std::vector<int>>& gamma,
     const std::vector<std::vector<int>>& ell,
     const std::vector<std::vector<double>>& ell_grid,
+    const std::vector<int>& z,  
     double mu_alpha,
     double mh_scale,
     int H
 );
 
-// 9. γ y ψ (Gibbs)
+// 9. γ y ψ (Gibbs) - ✅ AGREGAR z
 PsiGammaResult update_gamma_psi_gibbs(
     const std::vector<std::vector<double>>& psi_current,
     const std::vector<std::vector<int>>& gamma_current,
@@ -174,6 +176,7 @@ PsiGammaResult update_gamma_psi_gibbs(
     const std::vector<double>& alpha,
     const std::vector<std::vector<int>>& ell,
     const std::vector<std::vector<double>>& ell_grid,
+    const std::vector<int>& z,  // ✅ AGREGAR
     const std::vector<double>& mu_psi,
     const std::vector<double>& tau_psi,
     const std::vector<double>& kappa,

@@ -196,7 +196,6 @@ std::vector<int> update_assignments_slice(
 
     for (int i = 0; i < n; ++i) {
         std::vector<int> candidates;
-
         for (int h = 0; h < H; ++h) {
             if (w[i][h] > u_slice[i]) {
                 candidates.push_back(h);
@@ -204,29 +203,31 @@ std::vector<int> update_assignments_slice(
         }
 
         if (candidates.empty()) {
-            for (int h = 0; h < H; ++h) {
-                candidates.push_back(h);
-            }
+            for (int h = 0; h < H; ++h) candidates.push_back(h);
         }
 
-        std::vector<double> likes(candidates.size());
+        std::vector<double> probs(candidates.size());
         for (size_t c = 0; c < candidates.size(); ++c) {
             const int h = candidates[c];
             const double sigma = std::sqrt(theta_sigma2[h]);
             const double diff = y_normalized[i] - theta_mu[h];
 
-            likes[c] = std::exp(-0.5 * diff * diff / (sigma * sigma))
-                       / (sigma * sqrt_2pi);
-            likes[c] = std::max(likes[c], 1e-300);
+            // Likelihood
+            double like = std::exp(-0.5 * diff * diff / (sigma * sigma)) / (sigma * sqrt_2pi);
+            like = std::max(like, 1e-300);
+            
+            //  CRÍTICO: Multiplicar por peso
+            probs[c] = w[i][h] * like;  // 
         }
 
-        const double sum_likes =
-            std::accumulate(likes.begin(), likes.end(), 0.0);
-
-        if (sum_likes > 0.0) {
-            for (double& v : likes) v /= sum_likes;
-            z_new[i] = candidates[sample_categorical(likes)];
+        const double sum_probs = std::accumulate(probs.begin(), probs.end(), 0.0);
+        if (sum_probs > 1e-300) {
+            for (double& p : probs) p /= sum_probs;
+        } else {
+            for (double& p : probs) p = 1.0 / probs.size();
         }
+
+        z_new[i] = candidates[sample_categorical(probs)];
     }
 
     return z_new;
@@ -413,6 +414,7 @@ PsiGammaResult update_psi_gamma(
     const std::vector<double>& alpha,
     const std::vector<std::vector<int>>& ell,
     const std::vector<std::vector<double>>& ell_grid,
+    const std::vector<int>& z,  //  AGREGAR
     double mh_scale_psi,
     bool psi_positive,
     int H
@@ -430,49 +432,41 @@ PsiGammaResult update_psi_gamma(
     std::normal_distribution<> proposal_dist(0.0, mh_scale_psi);
     
     for (int h = 0; h < H; ++h) {
-        // Pre-calcular eta base para este cluster
-        std::vector<double> eta_base(n, alpha[h]);
-        for (int i = 0; i < n; ++i) {
-            for (int j = 0; j < p; ++j) {
-                if (gamma_current[h][j] == 1) {
-                    double ell_value = ell_grid[j][ell[h][j]];
-                    double dist = std::abs(X_normalized[i][j] - ell_value);
-                    eta_base[i] -= psi_current[h][j] * dist;
-                }
-            }
-        }
-        
         for (int j = 0; j < p; ++j) {
-            // Paso 1: Actualizar γ_{hj} (Gibbs)
+            // Paso 1: Actualizar γ_{hj}
             double log_prior_1 = std::log(kappa[j] + 1e-10);
             double log_prior_0 = std::log(1.0 - kappa[j] + 1e-10);
             
             double log_like_1 = 0.0;
             double log_like_0 = 0.0;
             
-            // Solo considerar observaciones donde z_i >= h
+            //  CORRECCIÓN: Verificar z_i >= h
             for (int i = 0; i < n; ++i) {
-                // Verificar si z_i >= h (simplificación)
-                if (true) {  // Esto debería ser reemplazado con z real
+                if (z[i] >= h) {  //  USAR z CORRECTAMENTE
                     double ell_value = ell_grid[j][ell[h][j]];
                     double dist = std::abs(X_normalized[i][j] - ell_value);
                     
-                    if (gamma_current[h][j] == 1) {
-                        // η con ψ actual
-                        double eta_with_psi = eta_base[i] - psi_current[h][j] * dist;
-                        log_like_1 -= 0.5 * (u_latent[i][h] - eta_with_psi) * (u_latent[i][h] - eta_with_psi);
+                    // Calcular eta base (sin variable j)
+                    double eta_base = alpha[h];
+                    for (int jj = 0; jj < p; ++jj) {
+                        if (jj != j && gamma_current[h][jj] == 1) {
+                            double ell_jj = ell_grid[jj][ell[h][jj]];
+                            double dist_jj = std::abs(X_normalized[i][jj] - ell_jj);
+                            eta_base -= psi_current[h][jj] * dist_jj;
+                        }
                     }
                     
-                    // η sin ψ (ψ=0)
-                    double eta_without_psi = eta_base[i];
-                    log_like_0 -= 0.5 * (u_latent[i][h] - eta_without_psi) * (u_latent[i][h] - eta_without_psi);
+                    // Con ψ actual (γ=1)
+                    double eta_with = eta_base - psi_current[h][j] * dist;
+                    log_like_1 -= 0.5 * (u_latent[i][h] - eta_with) * (u_latent[i][h] - eta_with);
+                    
+                    // Sin ψ (γ=0)
+                    log_like_0 -= 0.5 * (u_latent[i][h] - eta_base) * (u_latent[i][h] - eta_base);
                 }
             }
             
-            // Calcular probabilidad posterior
             double log_odds = (log_prior_1 + log_like_1) - (log_prior_0 + log_like_0);
             double p_gamma_1 = 1.0 / (1.0 + std::exp(-log_odds));
-            
             result.gamma[h][j] = sample_bernoulli(p_gamma_1);
             
             // Paso 2: Actualizar ψ_{hj} si γ=1
@@ -480,34 +474,41 @@ PsiGammaResult update_psi_gamma(
                 double psi_curr = psi_current[h][j];
                 double psi_prop = psi_curr + proposal_dist(gen);
                 
-                // Rechazar si psi debe ser positivo
                 if (psi_positive && psi_prop < 0) {
                     result.acceptances_psi[h][j] = false;
                     continue;
                 }
                 
-                // Calcular log-likelihood
                 double log_like_curr = 0.0;
                 double log_like_prop = 0.0;
                 
+                //  CORRECCIÓN: Solo z_i >= h
                 for (int i = 0; i < n; ++i) {
-                    if (true) {  // z_i >= h
+                    if (z[i] >= h) {  //  USAR z
                         double ell_value = ell_grid[j][ell[h][j]];
                         double dist = std::abs(X_normalized[i][j] - ell_value);
                         
-                        double eta_curr = eta_base[i] - psi_curr * dist;
-                        double eta_prop = eta_base[i] - psi_prop * dist;
+                        // Calcular eta base
+                        double eta_base = alpha[h];
+                        for (int jj = 0; jj < p; ++jj) {
+                            if (jj != j && result.gamma[h][jj] == 1) {
+                                double ell_jj = ell_grid[jj][ell[h][jj]];
+                                double dist_jj = std::abs(X_normalized[i][jj] - ell_jj);
+                                eta_base -= psi_current[h][jj] * dist_jj;
+                            }
+                        }
+                        
+                        double eta_curr = eta_base - psi_curr * dist;
+                        double eta_prop = eta_base - psi_prop * dist;
                         
                         log_like_curr -= 0.5 * (u_latent[i][h] - eta_curr) * (u_latent[i][h] - eta_curr);
                         log_like_prop -= 0.5 * (u_latent[i][h] - eta_prop) * (u_latent[i][h] - eta_prop);
                     }
                 }
                 
-                // Priors
                 double log_prior_curr = -0.5 * tau_psi[j] * (psi_curr - mu_psi[j]) * (psi_curr - mu_psi[j]);
                 double log_prior_prop = -0.5 * tau_psi[j] * (psi_prop - mu_psi[j]) * (psi_prop - mu_psi[j]);
                 
-                // Razón de aceptación
                 double log_r = (log_like_prop + log_prior_prop) - (log_like_curr + log_prior_curr);
                 
                 bool accept = log_uniform() < log_r;
@@ -517,7 +518,6 @@ PsiGammaResult update_psi_gamma(
                 result.acceptances_psi[h][j] = accept;
             } else {
                 result.psi[h][j] = 0.0;
-                result.acceptances_psi[h][j] = false;
             }
         }
     }
@@ -537,6 +537,7 @@ UpdateAlphaResult update_alpha_probit(
     const std::vector<std::vector<int>>& gamma,
     const std::vector<std::vector<int>>& ell,
     const std::vector<std::vector<double>>& ell_grid,
+    const std::vector<int>& z,  // ✅ AGREGAR
     double mu_alpha,
     double mh_scale,
     int H
@@ -554,35 +555,33 @@ UpdateAlphaResult update_alpha_probit(
         double alpha_curr = alpha_current[h];
         double alpha_prop = alpha_curr + proposal_dist(gen);
         
-        // Pre-calcular contribución de covariables
-        std::vector<double> eta_offset(n, 0.0);
-        for (int i = 0; i < n; ++i) {
-            for (int j = 0; j < static_cast<int>(X_normalized[i].size()); ++j) {
-                if (gamma[h][j] == 1) {
-                    double ell_value = ell_grid[j][ell[h][j]];
-                    double dist = std::abs(X_normalized[i][j] - ell_value);
-                    eta_offset[i] -= psi[h][j] * dist;
-                }
-            }
-        }
-        
-        // Calcular log-likelihoods
         double log_like_curr = 0.0;
         double log_like_prop = 0.0;
         
+        //  CORRECCIÓN: Solo z_i >= h
         for (int i = 0; i < n; ++i) {
-            double eta_curr = alpha_curr + eta_offset[i];
-            double eta_prop = alpha_prop + eta_offset[i];
-            
-            log_like_curr -= 0.5 * (u_latent[i][h] - eta_curr) * (u_latent[i][h] - eta_curr);
-            log_like_prop -= 0.5 * (u_latent[i][h] - eta_prop) * (u_latent[i][h] - eta_prop);
+            if (z[i] >= h) {  //  USAR z
+                // Calcular offset de covariables
+                double eta_offset = 0.0;
+                for (int j = 0; j < static_cast<int>(X_normalized[i].size()); ++j) {
+                    if (gamma[h][j] == 1) {
+                        double ell_value = ell_grid[j][ell[h][j]];
+                        double dist = std::abs(X_normalized[i][j] - ell_value);
+                        eta_offset -= psi[h][j] * dist;
+                    }
+                }
+                
+                double eta_curr = alpha_curr + eta_offset;
+                double eta_prop = alpha_prop + eta_offset;
+                
+                log_like_curr -= 0.5 * (u_latent[i][h] - eta_curr) * (u_latent[i][h] - eta_curr);
+                log_like_prop -= 0.5 * (u_latent[i][h] - eta_prop) * (u_latent[i][h] - eta_prop);
+            }
         }
         
-        // Priors
         double log_prior_curr = -0.5 * (alpha_curr - mu_alpha) * (alpha_curr - mu_alpha);
         double log_prior_prop = -0.5 * (alpha_prop - mu_alpha) * (alpha_prop - mu_alpha);
         
-        // Razón de aceptación
         double log_r = (log_like_prop + log_prior_prop) - (log_like_curr + log_prior_curr);
         
         bool accept = log_uniform() < log_r;
@@ -599,6 +598,10 @@ UpdateAlphaResult update_alpha_probit(
 // 9. UPDATE_GAMMA_PSI_GIBBS (TRUNCADO NORMAL POSTERIOR)
 // ============================================================================
 
+// ============================================================================
+// 9. UPDATE_GAMMA_PSI_GIBBS (TRUNCATED NORMAL POSTERIOR)
+// ============================================================================
+
 PsiGammaResult update_gamma_psi_gibbs(
     const std::vector<std::vector<double>>& psi_current,
     const std::vector<std::vector<int>>& gamma_current,
@@ -607,6 +610,7 @@ PsiGammaResult update_gamma_psi_gibbs(
     const std::vector<double>& alpha,
     const std::vector<std::vector<int>>& ell,
     const std::vector<std::vector<double>>& ell_grid,
+    const std::vector<int>& z,  // ✅ AGREGAR z
     const std::vector<double>& mu_psi,
     const std::vector<double>& tau_psi,
     const std::vector<double>& kappa,
@@ -621,9 +625,143 @@ PsiGammaResult update_gamma_psi_gibbs(
     result.p = p;
     result.psi = psi_current;
     result.gamma = gamma_current;
+    result.acceptances_psi.resize(H, std::vector<bool>(p, false));
     
-    // Para simplificar, omitimos la implementación completa
-    // que sería similar a update_psi_gamma pero con posterior truncado normal
+    for (int h = 0; h < H; ++h) {
+        for (int j = 0; j < p; ++j) {
+            // ============================================================
+            // PASO 1: ACTUALIZAR γ_{hj} (GIBBS)
+            // ============================================================
+            
+            double log_prior_1 = std::log(kappa[j] + 1e-10);
+            double log_prior_0 = std::log(1.0 - kappa[j] + 1e-10);
+            
+            // Calcular log-likelihood para γ=1 vs γ=0
+            double log_like_1 = 0.0;
+            double log_like_0 = 0.0;
+            
+            // Solo observaciones donde z_i >= h
+            for (int i = 0; i < n; ++i) {
+                if (z[i] >= h) {
+                    double ell_value = ell_grid[j][ell[h][j]];
+                    double dist = std::abs(X_normalized[i][j] - ell_value);
+                    
+                    // Calcular η base (sin variable j)
+                    double eta_base = alpha[h];
+                    for (int jj = 0; jj < p; ++jj) {
+                        if (jj != j && gamma_current[h][jj] == 1) {
+                            double ell_jj = ell_grid[jj][ell[h][jj]];
+                            double dist_jj = std::abs(X_normalized[i][jj] - ell_jj);
+                            eta_base -= psi_current[h][jj] * dist_jj;
+                        }
+                    }
+                    
+                    // Con ψ (γ=1)
+                    double eta_with = eta_base - psi_current[h][j] * dist;
+                    log_like_1 -= 0.5 * (u_latent[i][h] - eta_with) * (u_latent[i][h] - eta_with);
+                    
+                    // Sin ψ (γ=0)
+                    log_like_0 -= 0.5 * (u_latent[i][h] - eta_base) * (u_latent[i][h] - eta_base);
+                }
+            }
+            
+            // Prior de ψ cuando γ=1
+            if (psi_current[h][j] != 0.0 || gamma_current[h][j] == 1) {
+                log_like_1 -= 0.5 * tau_psi[j] * std::pow(psi_current[h][j] - mu_psi[j], 2);
+            }
+            
+            // Probabilidad posterior de γ=1
+            double log_odds = (log_prior_1 + log_like_1) - (log_prior_0 + log_like_0);
+            double p_gamma_1 = 1.0 / (1.0 + std::exp(-log_odds));
+            
+            // Samplear γ_{hj}
+            result.gamma[h][j] = sample_bernoulli(p_gamma_1);
+            
+            if (result.gamma[h][j] == 0) {
+                result.psi[h][j] = 0.0;
+                result.acceptances_psi[h][j] = false;
+                continue;
+            }
+            
+            // ============================================================
+            // PASO 2: ACTUALIZAR ψ_{hj} USANDO GIBBS (TRUNCATED NORMAL)
+            // ============================================================
+            
+            // Encontrar observaciones afectadas
+            std::vector<int> affected_idx;
+            for (int i = 0; i < n; ++i) {
+                if (z[i] >= h) {
+                    affected_idx.push_back(i);
+                }
+            }
+            
+            if (affected_idx.empty()) {
+                // Sin datos, samplear desde prior
+                if (psi_positive) {
+                    double sigma_psi = std::sqrt(1.0 / tau_psi[j]);
+                    result.psi[h][j] = sample_truncated_normal(
+                        mu_psi[j], sigma_psi, 0.0, 
+                        std::numeric_limits<double>::infinity()
+                    );
+                } else {
+                    double sigma_psi = std::sqrt(1.0 / tau_psi[j]);
+                    result.psi[h][j] = sample_normal(mu_psi[j], sigma_psi);
+                }
+                result.acceptances_psi[h][j] = true;
+                continue;
+            }
+            
+            // Pre-calcular términos
+            double sum_dist = 0.0;
+            double sum_dist_sq = 0.0;
+            double sum_u_residual_times_dist = 0.0;
+            
+            for (int idx : affected_idx) {
+                int i = idx;
+                
+                // Calcular distancia
+                double ell_value = ell_grid[j][ell[h][j]];
+                double dist = std::abs(X_normalized[i][j] - ell_value);
+                
+                // Calcular residuo (sin contribución de ψ_hj)
+                double u_residual = u_latent[i][h] - alpha[h];
+                for (int jj = 0; jj < p; ++jj) {
+                    if (jj != j && result.gamma[h][jj] == 1) {
+                        double ell_jj = ell_grid[jj][ell[h][jj]];
+                        double dist_jj = std::abs(X_normalized[i][jj] - ell_jj);
+                        u_residual += psi_current[h][jj] * dist_jj;
+                    }
+                }
+                
+                sum_dist += dist;
+                sum_dist_sq += dist * dist;
+                sum_u_residual_times_dist += u_residual * dist;
+            }
+            
+            // Posterior Normal: N(μ_post, σ²_post)
+            // Derivado de:
+            // u_{ih} - [α_h + otros términos] = -ψ_{hj} · dist_i + ε_i
+            // donde ε_i ~ N(0, 1)
+            
+            double tau_post = tau_psi[j] + sum_dist_sq;  // Precisión posterior
+            double mu_post = (tau_psi[j] * mu_psi[j] + sum_u_residual_times_dist) / tau_post;
+            double sigma_post = std::sqrt(1.0 / tau_post);
+            
+            // Samplear desde posterior (truncado si psi_positive)
+            if (psi_positive) {
+                result.psi[h][j] = sample_truncated_normal(
+                    mu_post, sigma_post, 0.0, 
+                    std::numeric_limits<double>::infinity()
+                );
+                // Asegurar que sea positivo
+                result.psi[h][j] = std::max(result.psi[h][j], 1e-6);
+            } else {
+                result.psi[h][j] = sample_normal(mu_post, sigma_post);
+            }
+            
+            result.acceptances_psi[h][j] = true;
+        }
+    }
     
     return result;
 }

@@ -1,8 +1,8 @@
 #  Proceso de Dirichlet Dependientes
 
-Este repositorio implementa la estimación de densidades mediante un **modelos de procesos de dirichlet dependientes**. 
+Este repositorio aborda problemas de regresion mediante **modelos de procesos de dirichlet dependientes**. 
 
-Los modelos implemenentados se basan en los trabajos de:
+Los modelos implementados se basan en los trabajos de:
 
 - Modelo DDP con dependencia en Pesos con Kernel Probit/Logit (LSBP-PSBP), porpuesto en [Chung y Dunson, 2009](ref.bib)
 - Modelo DDP con dependencia en Pesos con Kernel Gaussiano (KSBP), propuesto en  [Ren et al., 2011](ref.bib)
@@ -11,12 +11,12 @@ Los modelos implemenentados se basan en los trabajos de:
 
 
 ## Modelos
-Los modelos incluyen algunas variantes de los artículos originales. Además, para lograr una implementación computacionalmente eficiente, parte del código se desarrolló en C++, optimizando así el procesamiento.
+Los modelos incluyen variantes de los artículos originales. Además, para lograr una implementación computacionalmente eficiente, parte del código se desarrolló en C++, optimizando así el procesamiento.
 
 ### Modelo LSBP
-En el modelo LSBP se utilizaron dos estructuras una basadas en mezclas de normales y otras en mezclas de Laplace, se busco la conjugacion para priorizar la optimizacion del metodo. 
+En el modelo LSBP se utilizaron dos estructuras: una basada en mezclas de normales y otra en mezclas de Laplace. Se buscó la conjugación para priorizar la optimización del método.
 
-**Modelo con kernel Normal y Logit Stick-Breaking: MODELO LISTO - EVALUAR Y COMPARAR CON OTROS** 
+**Modelo con kernel Normal y Logit Stick-Breaking:** 
 ```
 # Likelihood
 y_i | z_i = h, μ_h, σ²_h ~ N(μ_h, σ²_h)

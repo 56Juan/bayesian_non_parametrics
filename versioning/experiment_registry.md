@@ -58,3 +58,43 @@ Experimento: 3 Feature Linear, variar Kernel Mater (n=800) ->2400 (400 burn)
 Experimento: Comparacion modelos relaciones complejas con altas varianzas, observaciones 500
 
 ---
+
+## psbp_001_exp_01_20251226_205106
+- **Nombre**: model_psbp_001
+- **Fecha**: 2025-12-26 20:51:07
+- **Tipo**: simulation
+
+**Descripción**
+Experimento: 1 Feature Linear (n=200) -> 1200 (200 burn)
+
+---
+
+## psbp_001_exp_02_20251226_205410
+- **Nombre**: model_psbp_001
+- **Fecha**: 2025-12-26 20:54:10
+- **Tipo**: simulation
+
+**Descripción**
+Experimento: 2 Feature Linear (n=200) -> 1200 (200 burn)
+
+---
+
+## psbp_001_exp_03_20251226_205802
+- **Nombre**: model_psbp_001
+- **Fecha**: 2025-12-26 20:58:04
+- **Tipo**: simulation
+
+**Descripción**
+Experimento: 2 Feature Cuadraticos (n=400) -> 1200 (200 burn)
+
+---
+
+## psbp_001_exp_04_20251226_210318
+- **Nombre**: model_psbp_001
+- **Fecha**: 2025-12-26 21:03:18
+- **Tipo**: simulation
+
+**Descripción**
+Experimento: 3 Feature Linear, variar Kernel Mater (n=800) ->2400 (400 burn)
+
+---
