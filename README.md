@@ -135,7 +135,61 @@ b₀ ~ Gamma(α_b, β_b)
 ### Modelo DDP Lineal
 En el modelo DDP Lineal se considero el uso de funciones para poder explicar componentes no lineares. De estas se selecionaron transformaciones Spline 
 
-**Modelo con Kernel Normal**
+**Modelo con Kernel Normal DP para Mu_h y Sigma_h**
+
+```
+# Likelihood
+y_i | z_i = h, λ_h, ξ_h ~ N(μ_h(x_i), σ²_h(x_i))
+
+# Funciones dependientes de x (lineales)
+μ_h(x_i) = λ_h0 + λ_h1 x_i1 + ... + λ_hp x_ip = λ_h' x̃_i
+log(σ²_h(x_i)) = ξ_h0 + ξ_h1 x_i1 + ... + ξ_hp x_ip = ξ_h' x̃_i
+
+donde:
+x̃_i = [1, x_i1, ..., x_ip]'  # Vector aumentado (p+1 dimensiones)
+λ_h = [λ_h0, λ_h1, ..., λ_hp]' ∈ ℝ^(p+1)
+ξ_h = [ξ_h0, ξ_h1, ..., ξ_hp]' ∈ ℝ^(p+1)
+
+# Asignaciones a componentes
+z_i | {w_h} ~ Categorical(w_1, w_2, ..., w_T)
+
+# Pesos stick-breaking
+w_h = v_h ∏_{ℓ<h} (1 - v_ℓ)
+v_h ~ Beta(1, M)
+
+# Coeficientes de media por componente
+λ_h | μ_λ, Σ_λ ~ N_K(μ_λ, Σ_λ)
+
+# Coeficientes de log-varianza por componente
+ξ_h | μ_ξ, Σ_ξ ~ N_K(μ_ξ, Σ_ξ)
+
+# Prior conjugado jerárquico para coeficientes de media
+μ_λ | Σ_λ, m_λ, κ_λ ~ N_K(m_λ, Σ_λ/κ_λ)
+Σ_λ ~ Inv-Wishart(ν_λ, Ψ_λ)
+
+# Prior conjugado jerárquico para coeficientes de log-varianza
+μ_ξ | Σ_ξ, m_ξ, κ_ξ ~ N_K(m_ξ, Σ_ξ/κ_ξ)
+Σ_ξ ~ Inv-Wishart(ν_ξ, Ψ_ξ)
+
+# Prior para concentración
+M ~ Gamma(a_M, b_M)
+
+# Hiperparámetros Nivel 1 (para media)
+m_λ ~ N_K(μ_m, Σ_m)  # Media base de μ_λ
+κ_λ ~ Gamma(α_κ, β_κ)  # Escala de μ_λ
+ν_λ ~ Gamma(α_ν, β_ν)  # Grados de libertad de Σ_λ
+Ψ_λ ~ Wishart(ν_Ψ, Ω_Ψ)  # Matriz de escala de Σ_λ
+
+# Hiperparámetros Nivel 1 (para log-varianza)
+m_ξ ~ N_K(μ_m, Σ_m)  # Media base de μ_ξ
+κ_ξ ~ Gamma(α_κ, β_κ)  # Escala de μ_ξ
+ν_ξ ~ Gamma(α_ν, β_ν)  # Grados de libertad de Σ_ξ
+Ψ_ξ ~ Wishart(ν_Ψ, Ω_Ψ)  # Matriz de escala de Σ_ξ
+
+# Hiperparámetros Nivel 1 (para concentración)
+a_M ~ Gamma(α_aM, β_aM)  # Shape de concentración
+b_M ~ Gamma(α_bM, β_bM)  # Rate de concentración
+```
 
 **Modelo con Kernel Laplace** 
 

@@ -98,3 +98,22 @@ Experimento: 2 Feature Cuadraticos (n=400) -> 1200 (200 burn)
 Experimento: 3 Feature Linear, variar Kernel Mater (n=800) ->2400 (400 burn)
 
 ---
+## concrete_Data_20251227_213314
+- **Nombre**: concrete_Data
+- **Fecha**: 2025-12-27 21:33:14
+- **Tipo**: real
+
+**Descripción**
+Experimento: Aplicacion real estimacion de la compresion del concreto
+
+---
+
+## comparacion_modelos_002_20251228_155053
+- **Nombre**: comparacion_modelos_002
+- **Fecha**: 2025-12-28 15:51:09
+- **Tipo**: simulation
+
+**Descripción**
+Experimento: Comparacion modelos relaciones complejas con altas varianzas y heterogeneidad
+
+---
