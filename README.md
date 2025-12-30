@@ -83,7 +83,7 @@ a₀ ~ Gamma(α_a, β_a)
 ```
 
 ### Modelo PSBP
-En el modelo PSBP se utilizaron dos estructuras una basadas en mezclas de normales y otras en mezclas de Laplace, se busco la conjugacion para priorizar la optimizacion del metodo. 
+En el modelo PSBP se utilizaron solo una estructura, pero se considero una extension en la cual se aleatorizan los hiperparametros de la dependencia. 
 
 **Modelo con kernel Normal y Probit Stick-Breaking:**
 ``` 
@@ -95,29 +95,24 @@ z_i | x_i, {w_h(x_i)} ~ Categorical(w_1(x_i), ..., w_T(x_i))
 
 # Pesos dependientes (Probit stick-breaking)
 w_h(x) = v_h(x) ∏_{ℓ<h} (1 - v_ℓ(x))
-v_h(x) = Φ(η_h(x)) donde Φ(·) es la CDF Normal estándar
+v_h(x) = Φ(η_h(x))   donde Φ(·) es la CDF Normal estándar
 
 # Variables latentes de aumentación (Data Augmentation)
 u_{ih} | η_h(x_i), z_i ~ TruncatedNormal(η_h(x_i), 1, truncation)
-  donde truncation = [0, ∞) si z_i = h     (v_h = 1)
-        truncation = (-∞, 0] si z_i > h     (v_h = 0)
+  donde truncation = [0, ∞)   si z_i = h     (v_h = 1)
+        truncation = (-∞, 0]  si z_i > h     (v_h = 0)
 
-# Predictor lineal con kernel de dependencia
-η_h(x) = α_h - Σ_j γ_{hj} · ψ_{hj} · |x_j - ℓ_{hj}|
+# Predictor lineal con kernel de dependencia 
+η_h(x)= α_h - Σ_j ψ_{hj} · |x_j - ℓ_{hj}|
 
 # Priors para parámetros de dependencia
 α_h ~ N(μ_α, σ²_α)
-ψ_{hj} | γ_{hj} = 1 ~ N⁺(μ_ψ_j, τ⁻¹_ψ_j)
-ψ_{hj} | γ_{hj} = 0 = 0
+ψ_{hj} ~ N⁺(μ_ψ_j, τ⁻¹_ψ_j)
 ℓ_{hj} ~ Discrete-Uniform{ℓ*_{jm}}_{m=1}^{M_j}
-
-# Spike-and-slab para selección de variables
-γ_{hj} ~ Bernoulli(κ_j)
-κ_j ~ Beta(a_κ_j, b_κ_j)
 
 # Átomos globales (Normal-Inverse-Gamma)
 σ²_h ~ InvGamma(a₀, b₀)
-μ_h | σ²_h ~ N(μ₀, σ²_h/κ₀)
+μ_h | σ²_h ~ N(μ₀, σ²_h / κ₀)
 
 # Hiperparámetros Nivel 1
 μ_α ~ N(m_α, s²_α)
@@ -133,10 +128,13 @@ b₀ ~ Gamma(α_b, β_b)
 τ_ψ_j ~ Gamma(α_τ_j, β_τ_j)
 ```
 ### Modelo DDP Lineal
-En el modelo DDP Lineal se considero el uso de funciones para poder explicar componentes no lineares. De estas se selecionaron transformaciones Spline 
+Para el modelo DDP Lineal se consideraron dos enfoques:
+
+- Átomos con dependencia lineal: Donde el parametro de ubicación del kernel depende linealmente de las covariables.
+
+- Parámetros con dependencia: Donde el parametro de ubicación como el de varianza dependen de las covariables.
 
 **Modelo con Kernel Normal DP para Mu_h y Sigma_h**
-
 ```
 # Likelihood
 y_i | z_i = h, λ_h, ξ_h ~ N(μ_h(x_i), σ²_h(x_i))
@@ -191,7 +189,7 @@ a_M ~ Gamma(α_aM, β_aM)  # Shape de concentración
 b_M ~ Gamma(α_bM, β_bM)  # Rate de concentración
 ```
 
-**Modelo con Kernel Laplace** 
+**Modelo con Kernel Normal DP para Mu_h y para Sigma_h una prior**
 
 
 ## Estructura del repositorio 
