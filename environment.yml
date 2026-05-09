@@ -1,0 +1,15 @@
+name: psbp_fd
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - numpy>=1.26
+  - scipy>=1.12
+  - matplotlib>=3.8
+  - pyyaml>=6.0
+  - jupyter
+  - pytest
+  - pip
+  - pip:
+      - scikit-fda>=0.9
