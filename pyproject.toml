@@ -1,6 +1,6 @@
 [build-system]
 requires      = ["setuptools>=68", "wheel"]
-build-backend = "setuptools.backends.legacy:build"
+build-backend = "setuptools.build_meta"
 
 [project]
 name        = "model_psbp_fd"
@@ -13,12 +13,30 @@ dependencies = [
     "scipy>=1.12",
     "matplotlib>=3.8",
     "pyyaml>=6.0",
+    "scikit-fda>=0.9",
 ]
 
 [project.optional-dependencies]
-fda  = ["scikit-fda>=0.9"]
-dev  = ["pytest>=8.0", "pytest-cov"]
+dev = ["pytest>=8.0", "pytest-cov"]
 
 [tool.setuptools.packages.find]
-where = ["."]
+where   = ["."]
 include = ["model_psbp_fd*"]
+
+# ── Crear entorno (Python 3.11.2 ya instalado) ────────────────────────────────
+#
+#   python -m venv .venv
+#
+#   # Linux / macOS
+#   source .venv/bin/activate
+#
+#   # Windows
+#   .venv\Scripts\activate
+#
+#   python -m pip install --upgrade pip
+#   pip install -e .          # instala el paquete + todas las dependencias
+#
+#   # Solo si necesitas correr tests:
+#   pip install -e ".[dev]"
+#
+# ─────────────────────────────────────────────────────────────────────────────

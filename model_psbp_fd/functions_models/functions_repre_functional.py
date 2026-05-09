@@ -229,7 +229,6 @@ class FunctionalRepresentation:
     ) -> None:
         try:
             from skfda.representation.basis import BSplineBasis
-            from skfda import FDataGrid
         except ImportError:
             raise ImportError(
                 "skfda es requerido para method='bspline'. "
@@ -243,10 +242,12 @@ class FunctionalRepresentation:
         )
         self.basis_ = basis
 
-        # Evaluar la base en la grilla → phi_ (K, G)
-        phi_raw   = basis(grid)           # skfda devuelve (G, K, 1) o (1, G, K)
-        phi_raw   = np.squeeze(phi_raw)   # → (G, K)
-        self.phi_ = phi_raw.T             # → (K, G)
+        # FIX: normalizar orientación de phi_ independientemente de la versión de skfda.
+        # skfda puede devolver (K, G, 1) o (G, K, 1) según la versión.
+        # Después de squeeze obtenemos (K, G) o (G, K); nos aseguramos de que
+        # el primer eje sea siempre K antes de almacenar en phi_.
+        phi_sq    = np.squeeze(basis(grid))          # (K, G) o (G, K)
+        self.phi_ = phi_sq if phi_sq.shape[0] == self.n_basis else phi_sq.T  # → (K, G)
         self.K_   = self.n_basis
 
     # ── Método "fourier" ──────────────────────────────────────────────
@@ -273,9 +274,9 @@ class FunctionalRepresentation:
         )
         self.basis_ = basis
 
-        phi_raw   = basis(grid)
-        phi_raw   = np.squeeze(phi_raw)   # (G, K)
-        self.phi_ = phi_raw.T             # (K, G)
+        # FIX: misma corrección de orientación que en _fit_bspline.
+        phi_sq    = np.squeeze(basis(grid))          # (K, G) o (G, K)
+        self.phi_ = phi_sq if phi_sq.shape[0] == self.n_basis else phi_sq.T  # → (K, G)
         self.K_   = self.n_basis
 
     # ── Método "fpca" ─────────────────────────────────────────────────
