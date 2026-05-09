@@ -26,6 +26,15 @@ Nota sobre FPCA
   El objeto FPCA ajustado se guarda en self.basis_ para permitir:
     - reconstruct(): proyección inversa
     - varianza explicada: self.fpca_.explained_variance_ratio_
+
+Correcciones aplicadas
+----------------------
+  [FIX-2] reconstruction_error() lanza RuntimeError descriptivo cuando
+          method='precomputed' en lugar de dejar que reconstruct() falle
+          con un mensaje sin contexto.
+  [FIX-3] transform() para bspline/fourier valida que G del nuevo array
+          coincida con G del fit(), produciendo un ValueError claro en
+          lugar del críptico error de matmul de NumPy.
 """
 from __future__ import annotations
 
@@ -142,12 +151,26 @@ class FunctionalRepresentation:
             return np.asarray(Y, dtype=float)
 
         if self.method in ("bspline", "fourier"):
+            # [FIX-3] Validar G antes de la multiplicación matricial.
+            # Sin esta guarda, NumPy lanza un error de matmul con mensaje
+            # sobre gufunc que no indica qué dimensión es incorrecta.
+            G_fit = self.phi_.shape[1]
+            Y_arr = np.asarray(Y)
+            if Y_arr.ndim != 2:
+                raise ValueError(
+                    f"Y debe ser 2D (T, G). Shape recibido: {Y_arr.shape}."
+                )
+            if Y_arr.shape[1] != G_fit:
+                raise ValueError(
+                    f"G inconsistente: ajustado con G={G_fit}, "
+                    f"recibido G={Y_arr.shape[1]}."
+                )
             # Proyección por mínimos cuadrados: THETA = Y @ phi_.T @ inv(phi_ @ phi_.T)
             # phi_ : (K, G)
-            phi = self.phi_   # (K, G)
-            A   = phi @ phi.T           # (K, K)
-            B   = Y @ phi.T             # (T, K)
-            THETA = np.linalg.solve(A, B.T).T  # (T, K)
+            phi   = self.phi_                          # (K, G)
+            A     = phi @ phi.T                        # (K, K)
+            B     = Y_arr @ phi.T                      # (T, K)
+            THETA = np.linalg.solve(A, B.T).T          # (T, K)
             return THETA
 
         elif self.method == "fpca":
@@ -203,11 +226,23 @@ class FunctionalRepresentation:
         """
         Calcula el error de reconstrucción funcional en norma L2 discreta.
 
+        [FIX-2] Se añadió guarda explícita para method='precomputed'.
+        Sin ella, reconstruct() lanzaba RuntimeError sin contexto
+        después de que transform() ya había ejecutado.
+
         Returns
         -------
         dict con claves: "rmse_mean", "rmse_std", "rel_error_mean"
         """
         self._check_fitted()
+
+        # [FIX-2] Guarda explícita antes de cualquier cómputo.
+        if self.method == "precomputed":
+            raise RuntimeError(
+                "reconstruction_error() no disponible para method='precomputed': "
+                "no hay base funcional almacenada con la que reconstruir."
+            )
+
         THETA = self.transform(Y, grid)
         Y_hat = self.reconstruct(THETA)
         residuals = Y - Y_hat
@@ -266,18 +301,37 @@ class FunctionalRepresentation:
                 "Instalar con: pip install scikit-fda"
             )
 
+        # [FIX-4] FourierBasis requiere n_basis IMPAR (1 + 2*n_harmonics).
+        # Si se pasa un valor par, skfda lo expande silenciosamente al siguiente
+        # impar (ej. 12 → 13), lo que hace que phi_.shape[0] != n_basis y la
+        # guarda de orientación original transponía phi_ incorrectamente,
+        # dejando phi_ en (G, K_real) y K_=n_basis (incorrecto).
+        # Solución: forzar impar explícitamente y leer K_ del shape real de phi_.
+        n_basis_used = self.n_basis
+        if n_basis_used % 2 == 0:
+            n_basis_used = n_basis_used + 1
+            import warnings
+            warnings.warn(
+                f"FourierBasis requiere n_basis impar. "
+                f"n_basis={self.n_basis} ajustado a {n_basis_used}.",
+                UserWarning,
+                stacklevel=4,
+            )
+
         period = domain[1] - domain[0]
         basis  = FourierBasis(
             domain_range=domain,
-            n_basis=self.n_basis,
+            n_basis=n_basis_used,
             period=period,
         )
         self.basis_ = basis
 
-        # FIX: misma corrección de orientación que en _fit_bspline.
-        phi_sq    = np.squeeze(basis(grid))          # (K, G) o (G, K)
-        self.phi_ = phi_sq if phi_sq.shape[0] == self.n_basis else phi_sq.T  # → (K, G)
-        self.K_   = self.n_basis
+        # phi_ siempre (K_real, G) para FourierBasis en skfda — la guarda de
+        # orientación se mantiene para compatibilidad con otras versiones.
+        phi_sq    = np.squeeze(basis(grid))                        # (K_real, G) o (G, K_real)
+        phi_      = phi_sq if phi_sq.shape[0] <= phi_sq.shape[1] else phi_sq.T  # → (K, G)
+        self.phi_ = phi_
+        self.K_   = phi_.shape[0]   # leer K_ del shape real, no de n_basis_used
 
     # ── Método "fpca" ─────────────────────────────────────────────────
 

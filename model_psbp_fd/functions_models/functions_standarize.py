@@ -1,7 +1,7 @@
 """
 functions_standarize.py
 ========================
-Clase de estandarización para coeficientes de series de tiempo funcionales. 
+Clase de estandarización para coeficientes de series de tiempo funcionales.
 
 Contrato con el modelo
 ----------------------
@@ -14,9 +14,20 @@ Patrón: fit() / transform() / fit_transform() / inverse_transform()
 Métodos
 -------
   "zscore"  : (x - mean) / std   por columna   [default]
+              Nota: usa ddof=0 (estimador poblacional). Consistente con
+              sklearn.StandardScaler. Para muestras pequeñas (T < 30) la
+              diferencia con ddof=1 puede alcanzar un factor sqrt(T/(T-1)).
   "minmax"  : (x - min) / range  por columna
   "robust"  : (x - mediana) / IQR por columna
   "none"    : identidad
+
+Correcciones aplicadas
+----------------------
+  [FIX-1] inverse_transform() ahora valida shape antes de operar,
+          evitando broadcasting silencioso de NumPy cuando K_input
+          no coincide con K_fit (especialmente K=1 vs K>1).
+  [FIX-2] reconstruction_error() en FunctionalRepresentation guarda
+          contra method='precomputed' (ver functions_repre_functional.py).
 """
 from __future__ import annotations
 import numpy as np
@@ -65,6 +76,8 @@ class FunctionalStandarizer:
 
         if self.method == "zscore":
             self.center_ = THETA.mean(axis=0)
+            # ddof=0: estimador poblacional (consistente con sklearn).
+            # Con T pequeño (T < 30) difiere de ddof=1 por sqrt(T/(T-1)).
             self.scale_  = THETA.std(axis=0, ddof=0)
 
         elif self.method == "minmax":
@@ -104,8 +117,15 @@ class FunctionalStandarizer:
         Invierte la estandarización → escala original.
         Usada en PSBPFunctional.predict() para devolver predicciones
         en la misma escala que los datos de entrada.
+
+        [FIX-1] Se añadió _validate(THETA_s, expected_K=self.K_) para
+        evitar que NumPy haga broadcasting silencioso cuando la forma de
+        THETA_s no coincide con la forma ajustada. Sin esta validación,
+        un array (T, 1) contra scale_ (K,) con K > 1 produce un resultado
+        (T, K) incorrecto sin lanzar ninguna excepción.
         """
         self._check_fitted()
+        self._validate(THETA_s, expected_K=self.K_)   # ← [FIX-1]
         return THETA_s * self.scale_ + self.center_
 
     # ── Serialización ─────────────────────────────────────────────────
