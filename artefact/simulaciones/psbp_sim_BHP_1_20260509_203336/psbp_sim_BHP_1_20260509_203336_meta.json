@@ -1,0 +1,67 @@
+{
+  "experiment_id": "psbp_sim_BHP_1_20260509_203336",
+  "timestamp": "20260509_203336",
+  "seed": 42,
+  "basefname": "BHP",
+  "tt": 1,
+  "data_type": "simulaciones",
+  "path_in": "C:\\Users\\JuanFran\\Desktop\\git_tesis\\model_psbp_fd\\data\\simulaciones\\raw\\BHPin_1.txt",
+  "path_out": "C:\\Users\\JuanFran\\Desktop\\git_tesis\\model_psbp_fd\\data\\simulaciones\\raw\\BHPout_1.txt",
+  "mcmc_config": {
+    "nsim": 2000,
+    "burn": 200,
+    "N": 20,
+    "M": 50
+  },
+  "hyperparams": {
+    "atau": 0.5,
+    "btau": 0.5,
+    "ag": 0.5,
+    "bg": 0.5,
+    "apij": 1.0,
+    "bpij": 5.0,
+    "mumu": 0.0,
+    "taumu": 1.0,
+    "mupsij": 0.0,
+    "taupsij": 1.0,
+    "pwj": 0.5
+  },
+  "metrics": {
+    "inRMSE": 4.9367670245583755,
+    "outRMSE": 4.600225747557784,
+    "gloprob": [
+      0.9816666841506958,
+      0.9872221946716309,
+      0.9811111092567444,
+      0.9738888740539551,
+      0.9816666841506958,
+      0.0,
+      0.9361110925674438,
+      0.9800000190734863,
+      0.9905555844306946,
+      0.9833333492279053,
+      0.9150000214576721,
+      0.9866666793823242,
+      0.5688889026641846
+    ],
+    "inclusion_prob": [
+      0.0183333158493042,
+      0.01277780532836914,
+      0.018888890743255615,
+      0.026111125946044922,
+      0.0183333158493042,
+      1.0,
+      0.06388890743255615,
+      0.019999980926513672,
+      0.00944441556930542,
+      0.016666650772094727,
+      0.08499997854232788,
+      0.013333320617675781,
+      0.43111109733581543
+    ]
+  },
+  "artifacts": {
+    "traces_npz": "C:\\Users\\JuanFran\\Desktop\\git_tesis\\model_psbp_fd\\artefact\\simulaciones\\psbp_sim_BHP_1_20260509_203336\\psbp_sim_BHP_1_20260509_203336_traces.npz",
+    "results_pkl": "C:\\Users\\JuanFran\\Desktop\\git_tesis\\model_psbp_fd\\artefact\\simulaciones\\psbp_sim_BHP_1_20260509_203336\\psbp_sim_BHP_1_20260509_203336_results.pkl"
+  }
+}
