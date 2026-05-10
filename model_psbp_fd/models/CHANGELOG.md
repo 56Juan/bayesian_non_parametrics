@@ -2,4 +2,10 @@
 
 
 ## [0.1.0] — psbp_fd_v1
-Version preliminar para extension posterior a multiples coeficientes. En esta etapa el enfoque es replicar el trabajo de Chung 2009, de tal forma que el modelo ajuste correctamente. Ademas integrar las clases de las funciones de estandarizacion y representacion ene l flujo, por otra aprte pasar optimizaciones en C++ 
+Versión preliminar orientada a la futura extensión hacia múltiples coeficientes funcionales. En esta etapa, el objetivo principal es reproducir y validar el enfoque propuesto por Chung (2009), asegurando que la formulación e implementación del modelo logren un ajuste consistente y estable antes de incorporar generalizaciones más complejas.
+
+## [0.2.0] — psbp_fd_v2
+Versión optimizada mediante integración de componentes en C++, orientada a la futura extensión hacia múltiples coeficientes funcionales. En esta etapa, el objetivo principal es reducir significativamente los tiempos de cómputo, trasladando las secciones más costosas del algoritmo a implementaciones en C++ para mejorar la eficiencia y escalabilidad del modelo.
+
+## [1.0.0] — psbp_fd_v3
+Version con multiples salidas
