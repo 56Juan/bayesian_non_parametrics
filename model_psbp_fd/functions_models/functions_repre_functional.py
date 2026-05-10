@@ -1,40 +1,7 @@
 """
-functions_repre_functional.py
-==============================
-Clase de representación funcional: curvas discretas → coeficientes THETA (T, K).
-
-Contrato con el modelo
-----------------------
-    repre   = FunctionalRepresentation(method="bspline", n_basis=10)
-    THETA   = repre.fit_transform(Y, grid)    # dentro de PSBPFunctional.fit()
-    Y_hat   = repre.reconstruct(THETA)        # reconstrucción para diagnóstico
-
-    # Si los datos ya son coeficientes, usar method="precomputed":
-    repre   = FunctionalRepresentation(method="precomputed")
-    THETA   = repre.fit_transform(THETA_raw)  # paso a través
-
-Métodos soportados
-------------------
-  "bspline"     : B-splines cúbicos (skfda)
-  "fourier"     : base de Fourier (skfda)
-  "fpca"        : FPCA — scores como coeficientes (skfda)
-  "precomputed" : los datos ya son coeficientes (T, K) — identidad
-
-Nota sobre FPCA
----------------
-  En FPCA, n_basis controla n_components (número de FPCs retenidas).
-  El objeto FPCA ajustado se guarda en self.basis_ para permitir:
-    - reconstruct(): proyección inversa
-    - varianza explicada: self.fpca_.explained_variance_ratio_
-
-Correcciones aplicadas
-----------------------
-  [FIX-2] reconstruction_error() lanza RuntimeError descriptivo cuando
-          method='precomputed' en lugar de dejar que reconstruct() falle
-          con un mensaje sin contexto.
-  [FIX-3] transform() para bspline/fourier valida que G del nuevo array
-          coincida con G del fit(), produciendo un ValueError claro en
-          lugar del críptico error de matmul de NumPy.
+functional_representation_extended.py
+========================================
+Clase de representación funcional.
 """
 from __future__ import annotations
 
@@ -71,6 +38,7 @@ class FunctionalRepresentation:
     phi_      : np.ndarray (K, G)   funciones de base evaluadas en grid_
                                     (None para fpca — usar basis_ directamente)
     K_        : int                 número de coeficientes resultantes
+    mean_     : np.ndarray (G,)     media funcional de los datos de ajuste
     is_fitted_: bool
     """
 
@@ -85,6 +53,7 @@ class FunctionalRepresentation:
     basis_:    Any               = field(default=None, repr=False)
     phi_:      np.ndarray | None = field(default=None, repr=False)
     K_:        int | None        = field(default=None, repr=False)
+    mean_:     np.ndarray | None = field(default=None, repr=False)
     is_fitted_: bool             = field(default=False, repr=False)
 
     # ── Interfaz pública ──────────────────────────────────────────────
@@ -129,6 +98,9 @@ class FunctionalRepresentation:
                     "Opciones: bspline, fourier, fpca, precomputed."
                 )
 
+            # Media funcional de los datos de ajuste
+            self.mean_ = Y.mean(axis=0)
+
         self.is_fitted_ = True
         return self
 
@@ -151,9 +123,6 @@ class FunctionalRepresentation:
             return np.asarray(Y, dtype=float)
 
         if self.method in ("bspline", "fourier"):
-            # [FIX-3] Validar G antes de la multiplicación matricial.
-            # Sin esta guarda, NumPy lanza un error de matmul con mensaje
-            # sobre gufunc que no indica qué dimensión es incorrecta.
             G_fit = self.phi_.shape[1]
             Y_arr = np.asarray(Y)
             if Y_arr.ndim != 2:
@@ -165,8 +134,6 @@ class FunctionalRepresentation:
                     f"G inconsistente: ajustado con G={G_fit}, "
                     f"recibido G={Y_arr.shape[1]}."
                 )
-            # Proyección por mínimos cuadrados: THETA = Y @ phi_.T @ inv(phi_ @ phi_.T)
-            # phi_ : (K, G)
             phi   = self.phi_                          # (K, G)
             A     = phi @ phi.T                        # (K, K)
             B     = Y_arr @ phi.T                      # (T, K)
@@ -214,7 +181,6 @@ class FunctionalRepresentation:
             )
 
         if self.method in ("bspline", "fourier"):
-            # Y_hat = THETA @ phi_   →  (T, K) @ (K, G) = (T, G)
             return THETA @ self.phi_
 
         elif self.method == "fpca":
@@ -226,17 +192,12 @@ class FunctionalRepresentation:
         """
         Calcula el error de reconstrucción funcional en norma L2 discreta.
 
-        [FIX-2] Se añadió guarda explícita para method='precomputed'.
-        Sin ella, reconstruct() lanzaba RuntimeError sin contexto
-        después de que transform() ya había ejecutado.
-
         Returns
         -------
         dict con claves: "rmse_mean", "rmse_std", "rel_error_mean"
         """
         self._check_fitted()
 
-        # [FIX-2] Guarda explícita antes de cualquier cómputo.
         if self.method == "precomputed":
             raise RuntimeError(
                 "reconstruction_error() no disponible para method='precomputed': "
@@ -246,13 +207,46 @@ class FunctionalRepresentation:
         THETA = self.transform(Y, grid)
         Y_hat = self.reconstruct(THETA)
         residuals = Y - Y_hat
-        rmse_per_curve = np.sqrt((residuals ** 2).mean(axis=1))  # (T,)
+        rmse_per_curve = np.sqrt((residuals ** 2).mean(axis=1))
         norm_per_curve = np.sqrt((Y ** 2).mean(axis=1))
         return {
             "rmse_mean":      float(rmse_per_curve.mean()),
             "rmse_std":       float(rmse_per_curve.std()),
             "rel_error_mean": float((rmse_per_curve / (norm_per_curve + 1e-12)).mean()),
         }
+
+    # ── Media funcional ───────────────────────────────────────────────
+
+    def mean_functional(self, Y: np.ndarray | None = None) -> np.ndarray:
+        """
+        Devuelve la media funcional.
+
+        Si Y es None, retorna la media calculada durante fit().
+        Si Y se proporciona, calcula la media sobre ese array (T, G).
+
+        Returns
+        -------
+        mean_curve : np.ndarray (G,)
+        """
+        self._check_fitted()
+
+        if self.method == "precomputed":
+            raise RuntimeError(
+                "mean_functional() no disponible para method='precomputed': "
+                "no hay grilla funcional definida."
+            )
+
+        if Y is None:
+            if self.mean_ is None:
+                raise RuntimeError(
+                    "No hay media almacenada. Proporcione Y o re-ajuste el modelo."
+                )
+            return self.mean_
+
+        Y_arr = np.asarray(Y)
+        if Y_arr.ndim != 2:
+            raise ValueError(f"Y debe ser 2D (T, G). Shape: {Y_arr.shape}.")
+        return Y_arr.mean(axis=0)
 
     # ── Método "bspline" ──────────────────────────────────────────────
 
@@ -277,12 +271,8 @@ class FunctionalRepresentation:
         )
         self.basis_ = basis
 
-        # FIX: normalizar orientación de phi_ independientemente de la versión de skfda.
-        # skfda puede devolver (K, G, 1) o (G, K, 1) según la versión.
-        # Después de squeeze obtenemos (K, G) o (G, K); nos aseguramos de que
-        # el primer eje sea siempre K antes de almacenar en phi_.
-        phi_sq    = np.squeeze(basis(grid))          # (K, G) o (G, K)
-        self.phi_ = phi_sq if phi_sq.shape[0] == self.n_basis else phi_sq.T  # → (K, G)
+        phi_sq    = np.squeeze(basis(grid))
+        self.phi_ = phi_sq if phi_sq.shape[0] == self.n_basis else phi_sq.T
         self.K_   = self.n_basis
 
     # ── Método "fourier" ──────────────────────────────────────────────
@@ -301,12 +291,6 @@ class FunctionalRepresentation:
                 "Instalar con: pip install scikit-fda"
             )
 
-        # [FIX-4] FourierBasis requiere n_basis IMPAR (1 + 2*n_harmonics).
-        # Si se pasa un valor par, skfda lo expande silenciosamente al siguiente
-        # impar (ej. 12 → 13), lo que hace que phi_.shape[0] != n_basis y la
-        # guarda de orientación original transponía phi_ incorrectamente,
-        # dejando phi_ en (G, K_real) y K_=n_basis (incorrecto).
-        # Solución: forzar impar explícitamente y leer K_ del shape real de phi_.
         n_basis_used = self.n_basis
         if n_basis_used % 2 == 0:
             n_basis_used = n_basis_used + 1
@@ -326,12 +310,10 @@ class FunctionalRepresentation:
         )
         self.basis_ = basis
 
-        # phi_ siempre (K_real, G) para FourierBasis en skfda — la guarda de
-        # orientación se mantiene para compatibilidad con otras versiones.
-        phi_sq    = np.squeeze(basis(grid))                        # (K_real, G) o (G, K_real)
-        phi_      = phi_sq if phi_sq.shape[0] <= phi_sq.shape[1] else phi_sq.T  # → (K, G)
+        phi_sq    = np.squeeze(basis(grid))
+        phi_      = phi_sq if phi_sq.shape[0] <= phi_sq.shape[1] else phi_sq.T
         self.phi_ = phi_
-        self.K_   = phi_.shape[0]   # leer K_ del shape real, no de n_basis_used
+        self.K_   = phi_.shape[0]
 
     # ── Método "fpca" ─────────────────────────────────────────────────
 
@@ -355,40 +337,31 @@ class FunctionalRepresentation:
         fpca.fit(fd)
 
         self.basis_ = fpca
-        self.phi_   = None    # en FPCA no usamos phi_ directamente
+        self.phi_   = None
         self.K_     = self.n_basis
 
     def _transform_fpca(self, Y: np.ndarray, grid: np.ndarray) -> np.ndarray:
         from skfda import FDataGrid
         domain = self.domain or (float(grid.min()), float(grid.max()))
         fd     = FDataGrid(data_matrix=Y, grid_points=grid, domain_range=domain)
-        return self.basis_.transform(fd)   # (T, K)
+        return self.basis_.transform(fd)
 
     def _reconstruct_fpca(self, THETA: np.ndarray) -> np.ndarray:
-        """
-        Reconstrucción FPCA: Y_hat = mean + THETA @ components
-
-        Los componentes del objeto FPCA de skfda son objetos FDataGrid.
-        Se evalúan en self.grid_ para obtener la matriz de reconstrucción.
-        """
         fpca    = self.basis_
         grid    = self.grid_
         G       = len(grid)
         K       = self.K_
 
-        # Evaluar los K componentes en la grilla → (K, G)
         comps = np.zeros((K, G))
         for k in range(K):
             comps[k] = fpca.components_(grid)[k].squeeze()
 
-        # Media funcional (si FPCA centró)
         if self.center_fpca and hasattr(fpca, "mean_"):
-            mean_curve = fpca.mean_(grid).squeeze()    # (G,)
+            mean_curve = fpca.mean_(grid).squeeze()
         else:
             mean_curve = np.zeros(G)
 
-        # Y_hat = THETA @ comps + mean_curve
-        return THETA @ comps + mean_curve   # (T, G)
+        return THETA @ comps + mean_curve
 
     # ── Método "precomputed" ──────────────────────────────────────────
 
@@ -400,6 +373,241 @@ class FunctionalRepresentation:
         self.K_    = THETA.shape[1]
         self.grid_ = None
         self.phi_  = None
+        self.mean_ = None
+
+    # ── Gráficos complementarios ──────────────────────────────────────
+
+    def plot_basis(
+        self,
+        ax=None,
+        title: str | None = None,
+        alpha: float = 0.8,
+        linewidth: float = 1.5,
+    ):
+        """
+        Grafica las funciones de base evaluadas en la grilla.
+
+        Parameters
+        ----------
+        ax : matplotlib.axes.Axes, optional
+        title : str, optional
+        alpha : float
+        linewidth : float
+
+        Returns
+        -------
+        ax : matplotlib.axes.Axes
+        """
+        self._check_fitted()
+        if self.method == "precomputed":
+            raise RuntimeError("plot_basis() no disponible para 'precomputed'.")
+
+        import matplotlib.pyplot as plt
+        if ax is None:
+            fig, ax = plt.subplots(figsize=(8, 4))
+
+        grid = self.grid_
+        if self.method in ("bspline", "fourier"):
+            for k in range(self.K_):
+                ax.plot(grid, self.phi_[k], alpha=alpha, lw=linewidth,
+                        label=f"Base {k+1}" if self.K_ <= 10 else None)
+            if self.K_ <= 10:
+                ax.legend(loc="upper right", fontsize=7)
+        elif self.method == "fpca":
+            fpca = self.basis_
+            for k in range(self.K_):
+                ax.plot(grid, fpca.components_(grid)[k].squeeze(),
+                        alpha=alpha, lw=linewidth,
+                        label=f"FPC {k+1}" if self.K_ <= 10 else None)
+            if self.K_ <= 10:
+                ax.legend(loc="upper right", fontsize=7)
+
+        ax.set_xlabel("t")
+        ax.set_ylabel("Base / Componente")
+        ax.set_title(title or f"Funciones de base | method='{self.method}' | K={self.K_}")
+        ax.grid(True, ls="--", alpha=0.4)
+        return ax
+
+    def plot_curves(
+        self,
+        Y: np.ndarray,
+        grid: np.ndarray | None = None,
+        n_show: int = 5,
+        ax=None,
+        title: str | None = None,
+    ):
+        """
+        Grafica curvas originales vs reconstruidas.
+
+        Parameters
+        ----------
+        Y : np.ndarray (T, G)
+        grid : np.ndarray (G,), optional
+        n_show : int
+            Número de curvas a mostrar (elegidas aleatoriamente si T > n_show).
+        ax : matplotlib.axes.Axes, optional
+        title : str, optional
+
+        Returns
+        -------
+        ax : matplotlib.axes.Axes
+        """
+        self._check_fitted()
+        if self.method == "precomputed":
+            raise RuntimeError("plot_curves() no disponible para 'precomputed'.")
+
+        import matplotlib.pyplot as plt
+        if ax is None:
+            fig, ax = plt.subplots(figsize=(8, 4))
+
+        Y_arr = np.asarray(Y)
+        T = Y_arr.shape[0]
+        grid_used = grid if grid is not None else self.grid_
+
+        idx = np.random.choice(T, size=min(n_show, T), replace=False)
+        THETA = self.transform(Y_arr, grid_used)
+        Y_hat = self.reconstruct(THETA)
+
+        for i, k in enumerate(idx):
+            color = f"C{i % 10}"
+            ax.plot(grid_used, Y_arr[k], color=color, lw=1.2, alpha=0.7,
+                    label=f"Original {k}" if i == 0 else None)
+            ax.plot(grid_used, Y_hat[k], color=color, lw=1.5, ls="--",
+                    label=f"Reconstruida {k}" if i == 0 else None)
+
+        ax.set_xlabel("t")
+        ax.set_ylabel("Y(t)")
+        ax.set_title(title or f"Curvas originales vs reconstruidas (n={len(idx)})")
+        ax.legend(loc="best", fontsize=7)
+        ax.grid(True, ls="--", alpha=0.4)
+        return ax
+
+    def plot_coefficients(
+        self,
+        THETA: np.ndarray,
+        ax=None,
+        title: str | None = None,
+        cmap: str = "viridis",
+    ):
+        """
+        Heatmap de coeficientes THETA (T, K).
+
+        Parameters
+        ----------
+        THETA : np.ndarray (T, K)
+        ax : matplotlib.axes.Axes, optional
+        title : str, optional
+        cmap : str
+
+        Returns
+        -------
+        ax : matplotlib.axes.Axes
+        """
+        self._check_fitted()
+        import matplotlib.pyplot as plt
+        if ax is None:
+            fig, ax = plt.subplots(figsize=(8, 4))
+
+        im = ax.imshow(np.asarray(THETA), aspect="auto", cmap=cmap,
+                       interpolation="nearest")
+        plt.colorbar(im, ax=ax, label="Valor del coeficiente")
+        ax.set_xlabel("k (índice de coeficiente)")
+        ax.set_ylabel("t (observación)")
+        ax.set_title(title or f"Coeficientes THETA (T={THETA.shape[0]}, K={THETA.shape[1]})")
+        return ax
+
+    def plot_fpca_variance(self, ax=None, title: str | None = None):
+        """
+        Scree plot de varianza explicada por FPCA.
+        Solo disponible para method='fpca'.
+
+        Returns
+        -------
+        ax : matplotlib.axes.Axes
+        """
+        self._check_fitted()
+        if self.method != "fpca":
+            raise RuntimeError("plot_fpca_variance() solo disponible para method='fpca'.")
+
+        import matplotlib.pyplot as plt
+        if ax is None:
+            fig, ax = plt.subplots(figsize=(8, 4))
+
+        evr = self.fpca_explained_variance()
+        cumsum = np.cumsum(evr)
+        x = np.arange(1, len(evr) + 1)
+
+        ax.bar(x, evr * 100, color="steelblue", alpha=0.7, label="Individual")
+        ax.plot(x, cumsum * 100, color="crimson", marker="o", lw=2,
+                label="Acumulada")
+        ax.axhline(90, color="gray", ls="--", lw=1, label="90%")
+        ax.set_xticks(x)
+        ax.set_xlabel("Componente principal funcional")
+        ax.set_ylabel("Varianza explicada (%)")
+        ax.set_title(title or "Varianza explicada por FPCA")
+        ax.legend(loc="best")
+        ax.grid(True, ls="--", alpha=0.4)
+        return ax
+
+    def plot_mean(
+        self,
+        Y: np.ndarray | None = None,
+        ax=None,
+        title: str | None = None,
+        show_ci: bool = True,
+        ci_alpha: float = 0.3,
+    ):
+        """
+        Grafica la media funcional con banda de desviación estándar opcional.
+
+        Parameters
+        ----------
+        Y : np.ndarray (T, G), optional
+            Si se proporciona, calcula media/std sobre Y.
+            Si es None, usa la media almacenada en fit().
+        ax : matplotlib.axes.Axes, optional
+        title : str, optional
+        show_ci : bool
+            Muestra banda de ±1 desviación estándar.
+        ci_alpha : float
+            Transparencia de la banda.
+
+        Returns
+        -------
+        ax : matplotlib.axes.Axes
+        """
+        self._check_fitted()
+        if self.method == "precomputed":
+            raise RuntimeError("plot_mean() no disponible para 'precomputed'.")
+
+        import matplotlib.pyplot as plt
+        if ax is None:
+            fig, ax = plt.subplots(figsize=(8, 4))
+
+        grid = self.grid_
+
+        if Y is not None:
+            Y_arr = np.asarray(Y)
+            mean_curve = Y_arr.mean(axis=0)
+            std_curve = Y_arr.std(axis=0)
+        else:
+            mean_curve = self.mean_
+            if mean_curve is None:
+                raise RuntimeError("No hay media almacenada. Proporcione Y.")
+            std_curve = None
+
+        ax.plot(grid, mean_curve, color="darkblue", lw=2.5, label="Media funcional")
+
+        if show_ci and std_curve is not None:
+            ax.fill_between(grid, mean_curve - std_curve, mean_curve + std_curve,
+                            color="darkblue", alpha=ci_alpha, label="±1 std")
+
+        ax.set_xlabel("t")
+        ax.set_ylabel("Y(t)")
+        ax.set_title(title or "Media funcional")
+        ax.legend(loc="best")
+        ax.grid(True, ls="--", alpha=0.4)
+        return ax
 
     # ── Información ───────────────────────────────────────────────────
 
@@ -429,6 +637,7 @@ class FunctionalRepresentation:
             "center_fpca": self.center_fpca,
             "K_":          self.K_,
             "phi_":        self.phi_.copy() if self.phi_ is not None else None,
+            "mean_":       self.mean_.copy() if self.mean_ is not None else None,
         }
 
     def summary(self) -> None:
@@ -438,6 +647,8 @@ class FunctionalRepresentation:
         if self.grid_ is not None:
             print(f"  grid: {len(self.grid_)} puntos en "
                   f"[{self.grid_.min():.3f}, {self.grid_.max():.3f}]")
+        if self.mean_ is not None:
+            print(f"  media funcional: almacenada (G={len(self.mean_)})")
         if self.method == "fpca":
             try:
                 evr = self.fpca_explained_variance()
