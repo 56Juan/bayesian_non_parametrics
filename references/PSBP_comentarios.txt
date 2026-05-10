@@ -1,0 +1,287 @@
+================================================================================
+  COMENTARIOS DETALLADOS DEL MODELO PSBP (Probit Stick-Breaking Process)
+  Basado en: Case1_01.m — Chung & Dunson (2009)
+================================================================================
+
+--------------------------------------------------------------------------------
+SECCIÓN 0: CONTEXTO GENERAL DEL MODELO
+--------------------------------------------------------------------------------
+El modelo implementado es un PSBP (Probit Stick-Breaking Process), un modelo
+de mezcla bayesiano no paramétrico para regresión. A diferencia de un Dirichlet
+Process Mixture (DPM) estándar, el PSBP permite que los pesos de la mezcla
+dependan de los covariables x_i a través de una estructura probit basada en
+distancias absolutas. Esto permite capturar heterogeneidad local en el espacio
+de covariables.
+
+El modelo también incorpora selección de variables (via indicadores gammajh y
+pesos pij), y el muestreo se realiza completamente vía MCMC (Gibbs sampler).
+
+================================================================================
+SECCIÓN 1: CARGA Y ESTANDARIZACIÓN DE DATOS
+================================================================================
+
+  dt  = datos de entrenamiento (archivo BHPin_1.txt)
+  dt2 = datos de prueba/out-of-sample (archivo BHPout_1.txt)
+
+  - Las columnas se interpretan: columna 1 = variable respuesta y,
+    columnas 2:end = covariables X.
+
+  Estandarización:
+    dt_std = (dt - media_columna) / std_columna
+  
+  IMPORTANTE: dt2 (test set) se estandariza usando las estadísticas de dt
+  (train set), no las propias. Esto es correcto para evitar data leakage.
+
+  Se construye:
+    y       = respuesta estandarizada (n x 1)
+    Xnoint  = covariables sin intercepto (n x p)
+    X       = diseño con intercepto (n x (p+1))
+    outX    = matriz de diseño para predicción out-of-sample
+
+================================================================================
+SECCIÓN 2: PARÁMETROS MCMC
+================================================================================
+
+  nsim = 2000  → número total de iteraciones MCMC
+  nrun = 1999  → iteraciones efectivas del loop (ncur a ncur+nrun)
+  burn = 200   → período de burn-in (primeras 200 iteraciones descartadas
+                 al calcular estimaciones finales)
+  ncur = 1     → iteración de inicio (permite reanudar cadena si se guarda)
+
+================================================================================
+SECCIÓN 3: INICIALIZACIÓN DE HIPERPARÁMETROS Y VALORES INICIALES
+================================================================================
+
+  N = 20   → número máximo de componentes de la mezcla (truncamiento)
+  M = 50   → número de puntos de soporte para Gammajh (locaciones de
+              la función de influencia de distancia)
+
+  Hiperparámetros del modelo:
+    atau, btau = 0.5, 0.5  → parámetros de la prior Gamma para tau_h
+                              (precisión de cada componente)
+    ag, bg     = 0.5, 0.5  → parámetros de la prior Gamma para g
+                              (escala de la prior sobre los coeficientes beta)
+    apij, bpij             → parámetros de la prior Beta para pi_j
+                              (probabilidad de inclusión de la variable j)
+    mumu, taumu            → prior Normal para mu (media del proceso probit)
+    taupsij, mupsij        → prior Normal truncada para psi_jh (ancho de banda
+                              de la función de distancia en cada componente)
+
+  Valores iniciales:
+    betajh  (N x p)   → coeficientes de regresión por componente y covariable
+    beta0h  (N x 1)   → interceptos por componente
+    tauh    (N x 1)   → precisiones por componente, init desde Gamma(atau, btau)
+    Si      (n x 1)   → asignaciones de componente (cluster), init aleatoria
+    alphah  (N-1 x 1) → umbrales del proceso probit stick-breaking
+    psijh   (N-1 x p) → parámetros de ancho de banda (init en 0)
+    gammajh (N x p)   → indicadores de inclusión de variable j en componente h
+    Gloc               → índices de localización inicial de Gammajh
+    Gammajh (N-1 x p) → locaciones de referencia para la función de distancia,
+                         tomadas de Gstar (grilla de M puntos sobre rango de X)
+
+  Contenedores de salida:
+    Se preasignan arrays 3D para almacenar todas las trazas MCMC:
+    betajhout, beta0hout, tauhout, alphahout, psijhout, Gammajhout,
+    gammajhout, pijout, wjout, N1out, Nout, muout, osumout,
+    inEout (predicciones in-sample), outEout (predicciones out-of-sample)
+
+================================================================================
+SECCIÓN 4: LOOP PRINCIPAL MCMC (GIBBS SAMPLER)
+================================================================================
+
+---- PASO 4.1: ACTUALIZACIÓN DE Z_il (Variables auxiliares latentes) ----
+
+  Z_il es la variable latente continua asociada al proceso probit stick-breaking
+  que determina si la observación i fue "rota" en el componente l o no.
+
+  Para cada observación i y cada componente l <= S_i:
+    m_l(x_i) = alpha_h - sum_j [ psi_jh * |x_ij - Gamma_jh| ]
+    (media del proceso probit en el componente l dado x_i)
+
+  Luego se muestrea Z_il desde una Normal truncada:
+    - Si l < S_i:  Z_il ~ N(m, v) truncada en (-inf, 0)
+      [la observación "pasó" este palo sin romperlo]
+    - Si l = S_i:  Z_il ~ N(m, v) truncada en (0, +inf)
+      [la observación "se quedó" en este componente]
+
+  Adicionalmente se computa W_il = Z_il + sum_j psi_jh |x_ij - Gamma_jh|,
+  que es la parte de Z_il sin la influencia de la distancia (utilizado luego
+  para actualizar alpha_h).
+
+---- PASO 4.2: ACTUALIZACIÓN DE S_i (Asignaciones de componente) ----
+
+  Para cada observación i, se calcula el vector de pesos w_h(x_i):
+    v_h(x_i) = Phi(alpha_h - sum_j psi_jh |x_ij - Gamma_jh|)
+    p_1(x_i) = v_1(x_i)
+    p_h(x_i) = v_h(x_i) * prod_{l<h} (1 - v_l(x_i)),  para h = 2,...,N-1
+    p_N(x_i) = prod_{l=1}^{N-1} (1 - v_l(x_i))
+
+  (Esto es la construcción stick-breaking probit)
+
+  Luego se ponderan estos pesos por la verosimilitud Gaussiana del componente h:
+    P(S_i = h | ...) ∝ p_h(x_i) * N(y_i | X_i beta_h, tau_h^{-1})
+
+  Se muestrea S_i desde esta distribución multinomial normalizada.
+
+  Para el out-of-sample también se calculan los pesos phxiout (para predicción).
+
+---- PASO 4.3: CÁLCULO DE PREDICCIONES E_h ----
+
+  Se calculan las contribuciones esperadas de cada componente:
+    inE_{ih}  = p_h(x_i)  * (X_i beta_h)
+    outE_{ih} = p_h(x_i') * (X_i' beta_h)
+
+  La predicción final será sum_h E_{ih} (promedio sobre la posterior).
+
+---- PASO 4.4: ACTUALIZACIÓN DE beta_h (Coeficientes de regresión) ----
+
+  Para cada componente h:
+    - Se considera solo las variables j con gamma_jh = 1 (seleccionadas)
+    - Se construye el subespacio Xh de las covariables activas
+    - Prior sobre beta_h: N(0, S_h) donde S_h = (n/g) * (Xh'Xh)^{-1} / tau_h
+      (prior de Zellner g)
+    - Posterior: Normal multivariada conjugada dado {y_i : S_i = h}
+
+  Se muestrea beta_h desde la posterior Normal exacta (update conjugado).
+
+---- PASO 4.5: ACTUALIZACIÓN DE tau_h (Precisión por componente) ----
+
+  Prior: Gamma(atau, btau)
+  
+  Posterior (conjugada):
+    a_hat = atau + 0.5 * n_h + 0.5 * sum_j gamma_jh + 0.5
+    b_hat = btau + 0.5 * RSS_h + (0.5/n) * g * beta_h' Xh'Xh beta_h
+
+  donde RSS_h = sum_{S_i=h} (y_i - Xh_i beta_h)^2
+  
+  Se muestrea tau_h ~ Gamma(a_hat, b_hat).
+
+---- PASO 4.6: ACTUALIZACIÓN DE g (Escala global de prior) ----
+
+  g controla cuán informativa es la prior sobre beta_h (prior de Zellner g).
+  Prior: Gamma(ag, bg)
+  
+  Posterior (conjugada):
+    ag_hat = ag + 0.5 * (sum_h sum_j gamma_jh + N)
+    bg_hat = bg + (0.5/n) * sum_h tau_h * beta_h' Xh'Xh beta_h
+  
+  Se muestrea g ~ Gamma(ag_hat, bg_hat).
+
+---- PASO 4.7: ACTUALIZACIÓN DE w_j (Indicador global de relevancia) ----
+
+  w_j es un indicador binario: indica si la variable j ES POTENCIALMENTE
+  relevante en ALGÚN componente (es un hiperparámetro del proceso).
+  
+  Si sum_h gamma_jh > 0 → w_j = 1 (variable activa en al menos un componente)
+  Si sum_h gamma_jh = 0 → se muestrea w_j desde una Bernoulli posterior
+    calculando la probabilidad marginal con razón de Bayes entre
+    (w_j=1) y (w_j=0).
+
+---- PASO 4.8: ACTUALIZACIÓN DE alpha_h (Umbrales del proceso probit) ----
+
+  Para cada h = 1, ..., N-1:
+    Se define el conjunto activo: {i : S_i >= h}
+    
+    Posterior conjugada (Normal):
+      v_hat   = 1 / (1 + n_h)  donde n_h = |{i : S_i >= h}|
+      m_hat   = v_hat * (mu + sum_{i: S_i>=h} W_il(h))
+    
+    Se muestrea alpha_h ~ N(m_hat, v_hat).
+
+---- PASO 4.9: ACTUALIZACIÓN DE mu (Media global de alpha) ----
+
+  Prior: N(mumu, 1/taumu)
+  
+  Posterior conjugada:
+    tau_mu_hat = N + taumu
+    mu_mu_hat  = (taumu * mumu + sum_h alpha_h) / tau_mu_hat
+  
+  Se muestrea mu ~ N(mu_mu_hat, 1/tau_mu_hat).
+
+---- PASO 4.10: ACTUALIZACIÓN DE pi_j (Probabilidad de inclusión) ----
+
+  pi_j controla la probabilidad de que la variable j esté activa (gamma_jh=1)
+  en cada componente h.
+
+  Si w_j = 0 → pi_j = 0 (variable globalmente inactiva)
+  Si w_j = 1 → prior Beta(apij, bpij), posterior conjugada:
+    pi_j ~ Beta(apij + sum_h gamma_jh,  bpij + N - sum_h gamma_jh)
+
+---- PASO 4.11: ACTUALIZACIÓN DE Gamma_jh (Locaciones de referencia) ----
+
+  Gamma_jh es el punto de referencia en la dimensión j para el componente h.
+  La función de distancia |x_ij - Gamma_jh| determina cuánto se aleja x_i
+  del centro del cluster h en la dirección j.
+
+  Si gamma_jh = 1 (variable j activa en componente h):
+    Se evalúa la log-verosimilitud en cada punto de la grilla Gstar (M puntos):
+      log p(m) ∝ sum_{i: S_i>=h} log N(Z_ih | alpha_h - sum_j psi_jh |x_ij - Gstar_m|, 1)
+    Se normaliza y se muestrea Gamma_jh desde esta distribución discreta.
+
+---- PASO 4.12: ACTUALIZACIÓN DE psi_jh (Ancho de banda de distancia) ----
+
+  psi_jh >= 0 controla cuán fuertemente la distancia |x_ij - Gamma_jh| afecta
+  los pesos del stick-breaking. Mayor psi_jh → cluster más localizado en j.
+
+  Si gamma_jh = 0 → psi_jh = 0
+  Si gamma_jh = 1:
+    Se define el residual:
+      T_ijh = alpha_h - Z_ih - sum_{j' != j} psi_{j'h} |x_ij' - Gamma_{j'h}|
+
+    Esto conduce a una posterior Normal truncada en (0, +inf):
+      v  = 1 / (tau_psi_j + sum_{i: S_i>=h} (x_ij - Gamma_jh)^2)
+      m  = v * (tau_psi_j * mu_psi_j + sum_i T_ijh * |x_ij - Gamma_jh|)
+    
+    Se muestrea psi_jh ~ N_+(m, v) (Normal truncada positiva via inversion).
+
+---- PASO 4.13: ACTUALIZACIÓN DE gamma_jh (Selección de variables) ----
+
+  gamma_jh in {0,1} indica si la variable j es activa en el componente h.
+  Se muestrea desde una Bernoulli posterior.
+
+  Para h < N:
+    Se calculan log-probabilidades:
+      log P(gamma_jh=0 | ...) ∝ log(1-pi_j) + log L(beta sin j) + log L(Z)
+      log P(gamma_jh=1 | ...) ∝ log(pi_j) + log L_marginalizada(beta con j) + ...
+                                  + contribuciones de psi_jh y Z_ih
+    
+    La marginalización sobre beta_j introduce un factor de normalización de
+    una Gaussiana (Bayes factor analítico).
+    
+    Se muestrea: gamma_jh ~ Bernoulli( 1 / (1 + exp(log_b - log_a)) )
+
+  Para h = N (último componente, sin stick-breaking):
+    El cálculo es análogo pero sin los términos de Z_ih (no hay umbral para h=N).
+    Las log-probabilidades se calculan en escala exponencial directamente.
+
+---- PASO 4.14: ALMACENAMIENTO DE TRAZAS ----
+
+  Cada iteración gt almacena todos los parámetros en los arrays preasignados.
+
+================================================================================
+SECCIÓN 5: POST-PROCESAMIENTO Y MÉTRICAS FINALES
+================================================================================
+
+  Después del loop MCMC, descartando las burn primeras iteraciones:
+
+  1. gloprob = proporción promedio de iteraciones donde cada variable j
+     es globalmente inactiva (gamma_jh = 0 para todos los h activos).
+     → Sirve como medida de selección de variables.
+
+  2. Predicciones in-sample:
+     inPred  = mean(y1) + std(y1) * mean( inEout[burn:,:] )
+     (desnormaliza al espacio original)
+
+  3. Predicciones out-of-sample:
+     outPred = mean(y1) + std(y1) * mean( outEout[burn:,:] )
+     (usa media y std del TRAIN set para desnormalizar)
+
+  4. Métricas:
+     inRMSE  = sqrt(mean((inPred  - y1)^2))
+     outRMSE = sqrt(mean((outPred - y2)^2))
+
+  5. Se guarda todo en un archivo .mat con el nombre BHP_1.mat.
+
+================================================================================
+FIN DEL COMENTARIO
+================================================================================

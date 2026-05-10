@@ -42,6 +42,9 @@ model_psbp_fd/
 │   │   ├── psbp_fd_v1/                   # Primera versión funcional
 │   │   │   ├── __init__.py
 │   │   │   ├── psbp_fd_v1.py             # Clase del modelo completo: __init__, fit(), predict()
+│   │   │   ├── functions/
+│   │   │   │     ├──sampler.py
+│   │   │   │     └──predict.py
 │   │   │   ├── psbp_fd_v1.cp312-win_amd64.pyd  # Binario compilado (Windows)
 │   │   │   └── cpp/                      # Funciones en C++
 │   │   │       ├── psbp_fd_v1.cpp        # Implementación C++
