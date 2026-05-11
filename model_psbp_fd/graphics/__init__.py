@@ -1,2 +1,5 @@
-from .functional_plots import plot_functional_bands
-from .mcmc_plots import trace_plot, marginal_density
+from .plot_functional_series import plot_functional_time_series
+
+__all__ = [
+    "plot_functional_time_series",
+]

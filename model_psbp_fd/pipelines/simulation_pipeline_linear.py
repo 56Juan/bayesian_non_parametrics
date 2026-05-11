@@ -141,6 +141,41 @@ class FARSimulator:
         Tendencia determinística μ_t(s).
         Claves disponibles: 'zero', 'linear', 'sinusoidal', 'bump'.
         Si es Callable: firma (t: int, s: np.ndarray) -> np.ndarray.
+    trend_params : dict, opcional
+        Parámetros específicos de la tendencia seleccionada. Si se omite,
+        se usan los valores por defecto de cada tendencia (comportamiento
+        idéntico a versiones anteriores).
+
+        Parámetros disponibles por tendencia:
+
+        ``'linear'``
+            μ_t(s) = temporal_slope · t̃ + spatial_slope · s + intercept
+            donde t̃ = t / max(n_curves − 1, 1).
+
+            - ``temporal_slope``  (float, default=2.0): amplitud de la rampa
+              temporal. Si es 0, la tendencia no crece con t.
+            - ``spatial_slope``   (float, default=0.0): componente lineal en s.
+            - ``intercept``       (float, default=0.0): constante aditiva global.
+
+        ``'sinusoidal'``
+            μ_t(s) = amplitude · sin(2π · freq_s · s)
+                   + amplitude_t · sin(2π · freq_t · t̃)
+                   + intercept
+
+            - ``amplitude``   (float, default=1.0): amplitud espacial.
+            - ``freq_s``      (float, default=1.0): frecuencia en s (ciclos).
+            - ``amplitude_t`` (float, default=0.5): amplitud temporal.
+            - ``freq_t``      (float, default=1.0): frecuencia en t̃ (ciclos).
+            - ``intercept``   (float, default=0.0): constante aditiva.
+
+        ``'bump'``
+            μ_t(s) = amplitude · (1 + t̃) · exp(−(s − center)² / width_sq)
+
+            - ``amplitude``  (float, default=1.0): altura máxima del bump.
+            - ``center``     (float, default=0.5): posición del pico en s.
+            - ``width_sq``   (float, default=0.02): anchura al cuadrado (σ²).
+
+        ``'zero'`` y callables externos ignoran ``trend_params``.
     noise_std : float
         Desviación estándar efectiva del ruido funcional ε_t.
         [CORRECCIÓN] Para noise_type='smooth', el vector suavizado se
@@ -175,6 +210,7 @@ class FARSimulator:
         n_curves: int,
         Psi: np.ndarray,
         trend: Union[str, Callable] = "zero",
+        trend_params: Optional[dict] = None,
         noise_std: float = 1.0,
         noise_type: str = "smooth",
         burn_in: int = 100,
@@ -209,9 +245,14 @@ class FARSimulator:
                     f"Tendencia '{trend}' no reconocida. "
                     f"Opciones: {list(self.TRENDS.keys())} o un callable."
                 )
-            _base = self.TRENDS[trend]
-            # Envolver para inyectar n_curves automáticamente
-            self.trend_fn: Callable = lambda t, s: _base(t, s, self.n_curves)
+            if trend_params:
+                self.trend_fn: Callable = self._build_parametric_trend(
+                    trend, trend_params
+                )
+            else:
+                _base = self.TRENDS[trend]
+                # Envolver para inyectar n_curves automáticamente
+                self.trend_fn = lambda t, s: _base(t, s, self.n_curves)
         else:
             # Verificar mínimamente la firma del callable
             sig = inspect.signature(trend)
@@ -235,6 +276,86 @@ class FARSimulator:
 
         self.data_: Optional[np.ndarray] = None
         self._max_eigenvalue = max_eig
+
+    # ---- Construcción de tendencia paramétrica ----
+
+    def _build_parametric_trend(self, trend: str, params: dict) -> Callable:
+        """
+        Construye un callable ``trend_fn(t, s)`` a partir de ``trend_params``.
+
+        Los parámetros no especificados usan los valores por defecto de cada
+        tendencia (idénticos al comportamiento sin ``trend_params``).
+
+        Parámetros
+        ----------
+        trend : str
+            Nombre de la tendencia ('linear', 'sinusoidal', 'bump', 'zero').
+        params : dict
+            Diccionario con los parámetros a sobreescribir.
+
+        Retorna
+        -------
+        Callable con firma (t: int, s: np.ndarray) -> np.ndarray.
+        """
+        # Claves reconocidas por tendencia (para advertir sobre typos)
+        _valid_keys: dict[str, set] = {
+            "zero":       set(),
+            "linear":     {"temporal_slope", "spatial_slope", "intercept"},
+            "sinusoidal": {"amplitude", "freq_s", "amplitude_t", "freq_t", "intercept"},
+            "bump":       {"amplitude", "center", "width_sq"},
+        }
+        unknown = set(params) - _valid_keys.get(trend, set())
+        if unknown:
+            import warnings
+            warnings.warn(
+                f"trend_params contiene claves no reconocidas para trend='{trend}': "
+                f"{sorted(unknown)}. Se ignorarán.",
+                UserWarning,
+                stacklevel=3,
+            )
+
+        n = self.n_curves
+
+        def _t_norm(t: int) -> float:
+            return t / max(n - 1, 1)
+
+        if trend == "zero":
+            return lambda t, s: np.zeros_like(s)
+
+        elif trend == "linear":
+            a = float(params.get("temporal_slope", 2.0))
+            b = float(params.get("spatial_slope",  0.0))
+            c = float(params.get("intercept",       0.0))
+            # μ_t(s) = a · t̃ + b · s + c
+            return lambda t, s: a * _t_norm(t) + b * s + c
+
+        elif trend == "sinusoidal":
+            amp   = float(params.get("amplitude",   1.0))
+            fs    = float(params.get("freq_s",       1.0))
+            amp_t = float(params.get("amplitude_t",  0.5))
+            ft    = float(params.get("freq_t",        1.0))
+            c     = float(params.get("intercept",     0.0))
+            # μ_t(s) = amp·sin(2π·fs·s) + amp_t·sin(2π·ft·t̃) + c
+            return lambda t, s: (
+                amp   * np.sin(2 * np.pi * fs * s)
+                + amp_t * np.sin(2 * np.pi * ft * _t_norm(t))
+                + c
+            )
+
+        elif trend == "bump":
+            amp      = float(params.get("amplitude", 1.0))
+            center   = float(params.get("center",    0.5))
+            width_sq = float(params.get("width_sq",  0.02))
+            # μ_t(s) = amp · (1 + t̃) · exp(−(s − center)² / width_sq)
+            return lambda t, s: (
+                amp * (1.0 + _t_norm(t))
+                * np.exp(-((s - center) ** 2) / width_sq)
+            )
+
+        else:
+            raise ValueError(
+                f"_build_parametric_trend: trend='{trend}' no tiene parametrización."
+            )
 
     # ---- Ruido ----
 
