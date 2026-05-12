@@ -1,0 +1,54 @@
+{
+  "experiment_id": "ar1_scores_FAR_lineal_st_1_20260511_023042",
+  "timestamp": "20260511_023042",
+  "seed": 42,
+  "far_params": {
+    "n_curves": 150,
+    "n_points": 100,
+    "bandwidth": 0.05,
+    "decay": 0.6,
+    "temporal_slope": 2.0,
+    "spatial_slope": 2.0,
+    "intercept": 1.0,
+    "noise_std": 0.5,
+    "noise_type": "smooth",
+    "burn_in": 100
+  },
+  "repre_params": {
+    "n_basis": 8,
+    "n_basis_fpca": 3,
+    "order": 5
+  },
+  "mcmc_config": {
+    "nsim": 2000,
+    "burn": 200,
+    "N": 20,
+    "M": 50
+  },
+  "hyperparams": {
+    "atau": 0.5,
+    "btau": 0.5,
+    "ag": 0.5,
+    "bg": 0.5,
+    "apij": 1.0,
+    "bpij": 5.0,
+    "mumu": 0.0,
+    "taumu": 1.0,
+    "mupsij": 0.0,
+    "taupsij": 1.0,
+    "pwj": 0.5
+  },
+  "n_obs_total": 150,
+  "n_obs_lag": 149,
+  "K_fpca": 3,
+  "var_explained": [
+    0.5383030776130557,
+    0.20628051972011852,
+    0.11768479653455595
+  ],
+  "components": [
+    {
+      "fpc": 1,
+      "rmse": 2.7680981408446685,
+      "incl": 1.0,
+      "converged": 
