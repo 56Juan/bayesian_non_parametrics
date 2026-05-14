@@ -6,7 +6,7 @@ Compone los componentes funcionales del paquete:
 
     pd.DataFrame (estandarizado externamente) ──► PSBPSampler ──► PSBPPredictor
 
-CAMBIOS v2 (D3 — opción A):
+CAMBIOS v2 
 ---------------------------
 La clase ya **NO estandariza ni desestandariza**. Recibe datos que el
 usuario debe haber estandarizado externamente. Esto elimina la
@@ -36,9 +36,9 @@ from .functions.predict import PSBPPredictor
 # Clase principal
 # ─────────────────────────────────────────────────────────────────────────────
 
-class PSBP_FD_v1:
+class PSBP_FD_v2:
     """
-    Modelo PSBP-FD versión 1 — orquestador completo (variante D3-A).
+    Modelo PSBP-FD versión 2 — orquestador completo (variante D3-A).
 
     Parámetros
     ----------
