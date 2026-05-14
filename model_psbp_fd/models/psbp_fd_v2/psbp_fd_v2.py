@@ -4,17 +4,21 @@ PSBP_FD_v1 — Clase orquestadora del modelo Probit Stick-Breaking Process
 
 Compone los componentes funcionales del paquete:
 
-    pd.DataFrame ──► estandarización interna ──► PSBPSampler ──► PSBPPredictor
+    pd.DataFrame (estandarizado externamente) ──► PSBPSampler ──► PSBPPredictor
 
-Esta clase ofrece una interfaz estilo sklearn (fit/predict) y oculta los
-detalles de:
-    - Separar y de X.
-    - Estandarizar usando estadísticas del train.
-    - Añadir la columna de intercepto.
-    - Reusar las mismas estadísticas al hacer predict sobre datos nuevos.
+CAMBIOS v2 (D3 — opción A):
+---------------------------
+La clase ya **NO estandariza ni desestandariza**. Recibe datos que el
+usuario debe haber estandarizado externamente. Esto elimina la
+inconsistencia MATLAB (estandarizar con ddof=0, desestandarizar con
+ddof=1) y simplifica radicalmente el contrato.
 
-NOTA: la estandarización vive aquí como código directo. En una versión
-posterior se moverá a `model_psbp_fd/functions_models/functions_standarize.py`.
+El usuario es responsable de:
+    1. Estandarizar X y y antes de llamar a `fit`.
+    2. Estandarizar X usando las MISMAS estadísticas del train antes
+       de llamar a `predict`.
+    3. Desestandarizar las predicciones si las necesita en escala
+       original.
 
 Author: model_psbp_fd
 """
@@ -34,14 +38,17 @@ from .functions.predict import PSBPPredictor
 
 class PSBP_FD_v1:
     """
-    Modelo PSBP-FD versión 1 — orquestador completo.
+    Modelo PSBP-FD versión 1 — orquestador completo (variante D3-A).
 
     Parámetros
     ----------
     mcmc_cfg : dict
         Configuración MCMC (`nsim`, `burn`, `N`, `M`).
     hp : dict
-        Hiperparámetros del modelo. Ver `PSBPSampler` para la lista completa.
+        Hiperparámetros del modelo. Ver `PSBPSampler` para la lista
+        completa. Las claves `apij`, `bpij`, `mupsij`, `taupsij`
+        admiten escalar o array de longitud `p` (priors heterogéneas
+        por variable).
     seed : int, opcional
         Semilla de reproducibilidad.
     verbose_every : int, default=200
@@ -52,22 +59,30 @@ class PSBP_FD_v1:
     sampler_ : PSBPSampler
         Instancia entrenada (acceso directo a `traces`).
     predictor_ : PSBPPredictor
-        Instancia construida con las trazas + parámetros de desestandarización.
+        Instancia construida con las trazas.
     feature_names_ : list[str]
         Nombres de las columnas de X (sin la columna de respuesta).
     target_name_ : str
         Nombre de la columna de respuesta (la primera del DataFrame).
-    x_mean_, x_std_ : ndarray, shape (p,)
-        Estadísticas de estandarización del train para X.
-    y_mean_, y_std_ : float
-        Estadísticas de estandarización del train para y.
     n_samples_ : int
     n_features_ : int
+
+    Contrato sobre los datos
+    ------------------------
+    `df_train` debe contener datos **ya estandarizados externamente**:
+        - Columna 0: respuesta `y` estandarizada.
+        - Columnas 1..p: covariables `X` estandarizadas (SIN columna
+          de intercepto — la clase la añade internamente).
+
+    Para `predict`, el usuario pasa X con las mismas covariables, sin
+    intercepto, **estandarizadas con las MISMAS estadísticas del train**.
+    Las predicciones devueltas están en la misma escala con la que
+    se entrenó (estandarizada).
     """
 
     def __init__(self,
                  mcmc_cfg: Dict[str, int],
-                 hp: Dict[str, float],
+                 hp: Dict[str, Any],
                  seed: Optional[int] = None,
                  verbose_every: int = 200):
         self.mcmc_cfg = dict(mcmc_cfg)
@@ -80,10 +95,6 @@ class PSBP_FD_v1:
         self.predictor_: Optional[PSBPPredictor] = None
         self.feature_names_: Optional[list] = None
         self.target_name_: Optional[str] = None
-        self.x_mean_: Optional[np.ndarray] = None
-        self.x_std_: Optional[np.ndarray] = None
-        self.y_mean_: Optional[float] = None
-        self.y_std_: Optional[float] = None
         self.n_samples_: Optional[int] = None
         self.n_features_: Optional[int] = None
 
@@ -94,9 +105,9 @@ class PSBP_FD_v1:
         """
         Separa el DataFrame en (X, y).
 
-        Convención: la primera columna del DataFrame es y, el resto son las
-        covariables. Replica el formato de los archivos `BHPin_*.txt` /
-        `BHPout_*.txt` del proyecto.
+        Convención: la primera columna del DataFrame es y, el resto son
+        las covariables. Réplica del formato de los archivos
+        `BHPin_*.txt` / `BHPout_*.txt` del proyecto.
         """
         if not isinstance(df, pd.DataFrame):
             raise TypeError(
@@ -113,51 +124,26 @@ class PSBP_FD_v1:
         X = df.iloc[:, 1:].to_numpy(dtype=np.float64)
         return X, y, feature_names, target_name
 
-    def _standardize_train(self,
-                           X: np.ndarray,
-                           y: np.ndarray
-                           ) -> Tuple[np.ndarray, np.ndarray]:
+    def _add_intercept(self, X: np.ndarray) -> np.ndarray:
         """
-        Calcula y guarda estadísticas del train; retorna (X_std, y_std).
+        Añade columna de unos como primera columna (intercepto).
 
-        Usa ddof=0 (consistente con `std(X, 1)` de MATLAB y con el notebook
-        de referencia).
+        NO estandariza. Asume que el usuario ya pasó X estandarizado
+        con las estadísticas del train.
         """
-        self.x_mean_ = X.mean(axis=0)
-        self.x_std_  = X.std(axis=0, ddof=0)
-        self.y_mean_ = float(y.mean())
-        self.y_std_  = float(y.std(ddof=0))
-
-        # Salvaguarda contra columnas constantes
-        if np.any(self.x_std_ == 0):
-            zero_cols = np.where(self.x_std_ == 0)[0]
-            raise ValueError(
-                f"Columnas con varianza cero en X: índices {zero_cols.tolist()}"
-            )
-        if self.y_std_ == 0:
-            raise ValueError("La respuesta y tiene varianza cero")
-
-        X_std = (X - self.x_mean_) / self.x_std_
-        y_std = (y - self.y_mean_) / self.y_std_
-        return X_std, y_std
-
-    def _transform_X(self, X: np.ndarray) -> np.ndarray:
-        """
-        Estandariza X con las estadísticas del train y añade intercepto.
-        """
-        if self.x_mean_ is None:
-            raise RuntimeError(
-                "El modelo no ha sido ajustado. Llama a fit() primero."
-            )
-        X_std = (X - self.x_mean_) / self.x_std_
-        return np.hstack([np.ones((X_std.shape[0], 1)), X_std])
+        if X.ndim != 2:
+            raise ValueError(f"X debe ser 2D; shape recibido {X.shape}")
+        return np.hstack([np.ones((X.shape[0], 1)), X])
 
     def _coerce_input(self,
                       data: Union[pd.DataFrame, np.ndarray]
                       ) -> Tuple[np.ndarray, Optional[np.ndarray]]:
         """
         Acepta un DataFrame (con y en col 0) o un ndarray solo con X.
-        Retorna (X_raw, y_raw_or_None).
+        Retorna (X_estandarizado_sin_intercepto, y_estandarizado_o_None).
+
+        Importante: NO estandariza. Asume que el usuario ya pasó los
+        datos estandarizados con las estadísticas del train.
         """
         if isinstance(data, pd.DataFrame):
             # Si tiene el mismo número de columnas que el train original
@@ -195,41 +181,39 @@ class PSBP_FD_v1:
         Parámetros
         ----------
         df_train : pandas.DataFrame
-            La primera columna es la respuesta y; las restantes son las
-            covariables. Réplica del formato `BHPin_*.txt`.
+            **Datos ya estandarizados externamente.** La primera columna
+            es la respuesta y; las restantes son las covariables. La
+            clase añade internamente la columna de intercepto al
+            construir la matriz de diseño.
 
         Retorna
         -------
         self
         """
         # 1. Separar y, X y guardar nombres
-        X_raw, y_raw, feature_names, target_name = self._split_xy(df_train)
+        X, y, feature_names, target_name = self._split_xy(df_train)
         self.feature_names_ = feature_names
         self.target_name_   = target_name
-        self.n_samples_     = X_raw.shape[0]
-        self.n_features_    = X_raw.shape[1]
+        self.n_samples_     = X.shape[0]
+        self.n_features_    = X.shape[1]
 
-        # 2. Estandarizar (guarda estadísticas en self.*_mean_ / *_std_)
-        X_std, y_std = self._standardize_train(X_raw, y_raw)
+        # 2. Añadir intercepto (SIN estandarizar)
+        X_design = self._add_intercept(X)
 
-        # 3. Añadir intercepto
-        X_design = np.hstack([np.ones((X_std.shape[0], 1)), X_std])
-
-        # 4. Entrenar sampler
+        # 3. Entrenar sampler
         self.sampler_ = PSBPSampler(
             mcmc_cfg      = self.mcmc_cfg,
             hp            = self.hp,
             seed          = self.seed,
             verbose_every = self.verbose_every,
         )
-        self.sampler_.fit(X_design, y_std)
+        self.sampler_.fit(X_design, y)
 
-        # 5. Construir predictor
+        # 4. Construir predictor (sin y_mean/y_std: opera en escala
+        #    estandarizada — D3 opción A)
         self.predictor_ = PSBPPredictor(
             traces = self.sampler_.traces,
             burn   = int(self.mcmc_cfg["burn"]),
-            y_mean = self.y_mean_,
-            y_std  = self.y_std_,
         )
         return self
 
@@ -247,13 +231,17 @@ class PSBP_FD_v1:
                 return_std: bool = False
                 ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray]]:
         """
-        Predicción puntual E[y|x] en escala original.
+        Predicción puntual E[y|x] **en escala estandarizada**.
 
-        Acepta un DataFrame (con o sin columna y) o un ndarray solo con X.
+        Acepta un DataFrame (con o sin columna y, ambos estandarizados)
+        o un ndarray solo con X estandarizado.
+
+        El usuario es responsable de desestandarizar la salida si
+        necesita la predicción en escala original.
         """
         self._check_fitted()
-        X_raw, _ = self._coerce_input(data)
-        X_design = self._transform_X(X_raw)
+        X, _ = self._coerce_input(data)
+        X_design = self._add_intercept(X)
         return self.predictor_.predict(X_design, return_std=return_std)
 
     def predict_density(self,
@@ -262,11 +250,16 @@ class PSBP_FD_v1:
                         return_per_iter: bool = False
                         ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray]]:
         """
-        Densidad condicional posterior f(y|x) sobre `y_grid` (escala original).
+        Densidad condicional posterior f(y|x) sobre `y_grid`
+        **en escala estandarizada**.
+
+        `y_grid` debe estar en la misma escala estandarizada con la que
+        se entrenó (es responsabilidad del usuario aplicar la misma
+        transformación).
         """
         self._check_fitted()
-        X_raw, _ = self._coerce_input(data)
-        X_design = self._transform_X(X_raw)
+        X, _ = self._coerce_input(data)
+        X_design = self._add_intercept(X)
         return self.predictor_.predict_density(
             X_design, y_grid, return_per_iter=return_per_iter
         )
@@ -276,11 +269,11 @@ class PSBP_FD_v1:
                          level: float = 0.95
                          ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
-        Intervalo de credibilidad sobre E[y|x].
+        Intervalo de credibilidad sobre E[y|x] **en escala estandarizada**.
         """
         self._check_fitted()
-        X_raw, _ = self._coerce_input(data)
-        X_design = self._transform_X(X_raw)
+        X, _ = self._coerce_input(data)
+        X_design = self._add_intercept(X)
         return self.predictor_.predict_interval(X_design, level=level)
 
     def inclusion_probs(self,
@@ -302,14 +295,17 @@ class PSBP_FD_v1:
              data: Union[pd.DataFrame, np.ndarray],
              y_obs: Optional[np.ndarray] = None) -> float:
         """
-        RMSE entre predicción puntual y `y_obs`, en escala original.
+        RMSE entre predicción puntual y `y_obs`, **en escala estandarizada**.
 
-        Si `data` es un DataFrame con columna y en la posición 0, `y_obs`
-        se extrae automáticamente. Si es ndarray, debe pasarse `y_obs`
-        explícitamente.
+        Si `data` es un DataFrame con columna y estandarizada en la
+        posición 0, `y_obs` se extrae automáticamente. Si es ndarray,
+        debe pasarse `y_obs` explícitamente (también estandarizado).
+
+        Si el usuario quiere RMSE en escala original, debe desestandarizar
+        las predicciones y `y_obs` fuera de la clase.
         """
         self._check_fitted()
-        X_raw, y_from_df = self._coerce_input(data)
+        X, y_from_df = self._coerce_input(data)
         if y_obs is None:
             if y_from_df is None:
                 raise ValueError(
@@ -317,7 +313,7 @@ class PSBP_FD_v1:
                     "columna de respuesta."
                 )
             y_obs = y_from_df
-        X_design = self._transform_X(X_raw)
+        X_design = self._add_intercept(X)
         return self.predictor_.rmse(X_design, y_obs)
 
     # ─────────────────────────────────────────────────────────────────────
@@ -331,17 +327,24 @@ class PSBP_FD_v1:
 
     def get_config(self) -> Dict[str, Any]:
         """Configuración del modelo (útil para serialización/metadatos)."""
+        # Para hp: serializar arrays como listas si los hay (priors heterogéneas)
+        hp_serializable = {}
+        for k, v in self.hp.items():
+            if isinstance(v, np.ndarray):
+                hp_serializable[k] = v.tolist()
+            else:
+                hp_serializable[k] = v
+
         return {
             "mcmc_cfg":       dict(self.mcmc_cfg),
-            "hp":             dict(self.hp),
+            "hp":             hp_serializable,
             "seed":           self.seed,
             "verbose_every":  self.verbose_every,
             "feature_names":  list(self.feature_names_) if self.feature_names_ else None,
             "target_name":    self.target_name_,
             "n_samples":      self.n_samples_,
             "n_features":     self.n_features_,
-            "x_mean":         self.x_mean_.tolist() if self.x_mean_ is not None else None,
-            "x_std":          self.x_std_.tolist()  if self.x_std_  is not None else None,
-            "y_mean":         self.y_mean_,
-            "y_std":          self.y_std_,
+            # NOTA: las estadísticas de estandarización (y_mean, y_std,
+            # x_mean, x_std) ya NO se almacenan aquí porque la clase no
+            # estandariza. El usuario debe gestionarlas externamente.
         }

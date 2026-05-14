@@ -1,0 +1,53 @@
+{
+  "experiment_id": "convergencia_FAR_lineal_st_2_1_20260512_005512",
+  "timestamp": "20260512_005512",
+  "seed_base": 42,
+  "chain_seeds": [
+    42,
+    142,
+    242
+  ],
+  "n_chains": 3,
+  "n_components": 5,
+  "far_params": {
+    "n_curves": 100,
+    "n_points": 100,
+    "bandwidth": 0.05,
+    "decay": 0.6,
+    "temporal_slope": 2.0,
+    "spatial_slope": 2.0,
+    "intercept": 1.0,
+    "noise_std": 0.5,
+    "noise_type": "smooth",
+    "burn_in": 100
+  },
+  "standarize": {
+    "method": "zscore_column",
+    "ddof": 0,
+    "store_stats": true
+  },
+  "repre_params": {
+    "n_basis": 5,
+    "order": 5
+  },
+  "mcmc_config": {
+    "nsim": 1000,
+    "burn": 300,
+    "N": 30,
+    "M": 50
+  },
+  "hyperparams": {
+    "atau": 0.5,
+    "btau": 0.5,
+    "ag": 0.5,
+    "bg": 0.5,
+    "apij": 1.0,
+    "bpij": 5.0,
+    "mumu": 0.0,
+    "taumu": 1.0,
+    "mupsij": 0.0,
+    "taupsij": 1.0,
+    "pwj": 0.5
+  },
+  "var_retained": 0.7476448269107797
+}

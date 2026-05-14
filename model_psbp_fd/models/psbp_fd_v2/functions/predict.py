@@ -8,16 +8,25 @@ Consume las trazas producidas por `PSBPSampler` y entrega:
     2. Densidad condicional f(y|x) sobre una grilla de y.
     3. Intervalos de credibilidad sobre E[y|x].
     4. Probabilidades de inclusión global por variable.
-    5. Métrica RMSE en escala original.
+    5. Métrica RMSE.
 
-El predictor es agnóstico al sampler: solo necesita el dict de trazas,
-los parámetros de desestandarización (y_mean, y_std) y el burn-in.
+CAMBIOS v2 (D3 — opción A):
+---------------------------
+La estandarización es **totalmente externa**. El predictor opera por
+completo en la escala en la que fueron entrenadas las trazas: si el
+sampler se entrenó con y estandarizado, predict/predict_density/
+predict_interval/rmse devuelven valores en escala estandarizada. Si se
+entrenó con y crudo, devuelven valores en escala cruda. La clase no
+desestandariza nada.
+
+Esto elimina la inconsistencia MATLAB (estandarizar con ddof=0,
+desestandarizar con ddof=1) y simplifica el contrato.
 
 Author: model_psbp_fd
 """
 
 from __future__ import annotations
-from typing import Dict, Tuple, Optional, Union
+from typing import Dict, Tuple, Union
 import numpy as np
 from scipy.stats import norm
 
@@ -40,12 +49,6 @@ class PSBPPredictor:
     burn : int
         Número de iteraciones a descartar como burn-in.
 
-    y_mean : float
-        Media de y usada para estandarizar el train set.
-
-    y_std : float
-        Desviación estándar de y usada para estandarizar el train set.
-
     Atributos
     ---------
     n_post_ : int
@@ -59,21 +62,22 @@ class PSBPPredictor:
 
     Notas
     -----
-    Todas las predicciones que entrega el predictor están en **escala
-    original** (desestandarizadas). El input X debe estar **estandarizado
-    y con columna de intercepto** (consistente con el sampler).
+    El predictor es **agnóstico a la escala**: trabaja en la misma escala
+    en la que se entrenaron las trazas. Las salidas de `predict`,
+    `predict_density`, `predict_interval` y `rmse` están todas en la
+    escala en que el usuario entrenó el sampler. Si el sampler usó
+    datos estandarizados, las salidas están en escala estandarizada;
+    la desestandarización (si se desea) debe hacerse fuera de la clase.
+
+    El input X de los métodos debe estar en la misma escala que el X
+    de entrenamiento y debe incluir columna de intercepto (X[:, 0] == 1).
     """
 
     def __init__(self,
                  traces: Dict[str, np.ndarray],
-                 burn: int,
-                 y_mean: float,
-                 y_std: float):
+                 burn: int):
         self._validate_traces(traces, burn)
-
         self.burn = int(burn)
-        self.y_mean = float(y_mean)
-        self.y_std = float(y_std)
 
         # Slicing post-burn-in (vista, no copia)
         post = slice(self.burn, None)
@@ -201,7 +205,8 @@ class PSBPPredictor:
         Parámetros
         ----------
         X : ndarray, shape (n, p+1)
-            Matriz de diseño con intercepto, en escala estandarizada.
+            Matriz de diseño con intercepto, **en la misma escala que el
+            X de entrenamiento**.
         return_std : bool
             Si True, retorna también la desviación estándar posterior
             de la predicción puntual.
@@ -209,9 +214,9 @@ class PSBPPredictor:
         Retorna
         -------
         y_pred : ndarray, shape (n,)
-            Predicción puntual en escala original.
+            Predicción puntual en la escala de entrenamiento.
         y_std  : ndarray, shape (n,) — solo si return_std=True
-            Desviación estándar posterior en escala original.
+            Desviación estándar posterior en la escala de entrenamiento.
         """
         self._validate_X(X)
         Xnoint = X[:, 1:]
@@ -228,15 +233,11 @@ class PSBPPredictor:
             )                                            # (n, N)
             E_per_iter[t] = np.sum(phx * mu_h, axis=1)   # (n,)
 
-        # Media posterior y, opcionalmente, desv. estándar
-        E_mean_std = E_per_iter.mean(axis=0)             # escala estandarizada
-        y_pred = self.y_mean + self.y_std * E_mean_std   # escala original
-
+        y_pred = E_per_iter.mean(axis=0)
         if not return_std:
             return y_pred
 
-        E_std_std = E_per_iter.std(axis=0, ddof=1)
-        y_std = self.y_std * E_std_std                   # escala original
+        y_std = E_per_iter.std(axis=0, ddof=1)
         return y_pred, y_std
 
     # ─────────────────────────────────────────────────────────────────────
@@ -248,17 +249,15 @@ class PSBPPredictor:
                         return_per_iter: bool = False
                         ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray]]:
         """
-        Densidad condicional posterior f(y|x) en escala original.
+        Densidad condicional posterior f(y|x).
 
-        f(y|x) = Σ_h π_h(x) · N(y_std; μ_h(x), 1/√τ_h) · (1/y_std)
-
-        El factor 1/y_std proviene del cambio de variable y_orig = y_mean + y_std·y_std.
+        f(y|x) = E_post[ Σ_h π_h(x) · N(y; μ_h(x), 1/√τ_h) ]
 
         Parámetros
         ----------
-        X      : (n, p+1) — diseño con intercepto, escala estandarizada
+        X      : (n, p+1) — diseño con intercepto, escala de entrenamiento
         y_grid : (G,)     — valores de y donde evaluar la densidad,
-                            **en escala original**
+                            **en la misma escala** que se usó para entrenar
         return_per_iter : bool
             Si True, retorna también la densidad por iteración (T, n, G).
 
@@ -277,9 +276,6 @@ class PSBPPredictor:
         G = y_grid.shape[0]
         T = self.n_post_
 
-        # y_grid en escala estandarizada
-        y_std_grid = (y_grid - self.y_mean) / self.y_std       # (G,)
-
         if return_per_iter:
             density = np.zeros((T, n, G), dtype=np.float64)
 
@@ -294,16 +290,15 @@ class PSBPPredictor:
             )                                                  # (n, N)
             sigma_h = 1.0 / np.sqrt(self._tauh[t])             # (N,)
 
-            # f_t(y|x_i) = Σ_h phx[i,h] * N(y_std_grid; mu_h[i,h], sigma_h[h])
+            # f_t(y|x_i) = Σ_h phx[i,h] * N(y_grid; mu_h[i,h], sigma_h[h])
             # broadcast: (n, N, G)
-            z      = (y_std_grid[None, None, :] - mu_h[:, :, None]) / sigma_h[None, :, None]
-            comp   = norm.pdf(z) / sigma_h[None, :, None]      # densidad std
-            f_std  = np.sum(phx[:, :, None] * comp, axis=1)    # (n, G)
-            f_orig = f_std / self.y_std                        # cambio de variable
+            z      = (y_grid[None, None, :] - mu_h[:, :, None]) / sigma_h[None, :, None]
+            comp   = norm.pdf(z) / sigma_h[None, :, None]      # densidad por componente
+            f_t    = np.sum(phx[:, :, None] * comp, axis=1)    # (n, G)
 
-            density_sum += f_orig
+            density_sum += f_t
             if return_per_iter:
-                density[t] = f_orig
+                density[t] = f_t
 
         density_mean = density_sum / T
 
@@ -323,14 +318,14 @@ class PSBPPredictor:
 
         Parámetros
         ----------
-        X : (n, p+1) — diseño con intercepto, escala estandarizada
+        X : (n, p+1) — diseño con intercepto, escala de entrenamiento
         level : float ∈ (0, 1) — nivel de credibilidad (default 0.95)
 
         Retorna
         -------
-        y_pred : (n,) — media posterior, escala original
-        y_lo   : (n,) — cuantil inferior, escala original
-        y_hi   : (n,) — cuantil superior, escala original
+        y_pred : (n,) — media posterior, escala de entrenamiento
+        y_lo   : (n,) — cuantil inferior, escala de entrenamiento
+        y_hi   : (n,) — cuantil superior, escala de entrenamiento
         """
         if not (0.0 < level < 1.0):
             raise ValueError(f"level debe estar en (0, 1); recibido {level}")
@@ -349,13 +344,9 @@ class PSBPPredictor:
             E_per_iter[t] = np.sum(phx * mu_h, axis=1)
 
         alpha = (1.0 - level) / 2.0
-        y_mean_std = E_per_iter.mean(axis=0)
-        y_lo_std   = np.quantile(E_per_iter, alpha, axis=0)
-        y_hi_std   = np.quantile(E_per_iter, 1.0 - alpha, axis=0)
-
-        y_pred = self.y_mean + self.y_std * y_mean_std
-        y_lo   = self.y_mean + self.y_std * y_lo_std
-        y_hi   = self.y_mean + self.y_std * y_hi_std
+        y_pred = E_per_iter.mean(axis=0)
+        y_lo   = np.quantile(E_per_iter, alpha, axis=0)
+        y_hi   = np.quantile(E_per_iter, 1.0 - alpha, axis=0)
         return y_pred, y_lo, y_hi
 
     # ─────────────────────────────────────────────────────────────────────
@@ -366,9 +357,18 @@ class PSBPPredictor:
         P(γ_j = 1 | data) por variable, estimada como
         1 − mean_{t ≥ burn}(osumout[t, j]).
 
+        Nota sobre convención:
+        ----------------------
+        En MATLAB el código original guarda `gloprob` que es la
+        probabilidad de **NO inclusión** (P(todos γ_{·,j}=0 entre los
+        clusters activos)). Aquí se devuelve directamente la cantidad
+        más usada en la práctica: P(la variable está incluida en al
+        menos un cluster activo).
+
         Retorna
         -------
         incl : (p,)
+            P(γ_j = 1 | data) por variable.
         """
         gloprob = self._osumout.mean(axis=0)
         return 1.0 - gloprob
@@ -380,12 +380,19 @@ class PSBPPredictor:
              X: np.ndarray,
              y_obs: np.ndarray) -> float:
         """
-        RMSE entre predicción puntual E[y|x] y `y_obs`, en escala original.
+        RMSE entre predicción puntual E[y|x] y `y_obs`, **en la escala
+        de entrenamiento**.
+
+        Si el usuario quiere RMSE en escala original cuando entrenó con
+        datos estandarizados, debe desestandarizar `y_obs` antes de
+        pasarlo aquí, o reescalar la salida después.
 
         Parámetros
         ----------
-        X     : (n, p+1) — diseño con intercepto, escala estandarizada
-        y_obs : (n,)     — respuesta observada en **escala original**
+        X     : (n, p+1) — diseño con intercepto, escala de entrenamiento
+        y_obs : (n,)     — respuesta observada **en la misma escala que se
+                           usó para entrenar** (esto es responsabilidad
+                           del usuario)
 
         Retorna
         -------

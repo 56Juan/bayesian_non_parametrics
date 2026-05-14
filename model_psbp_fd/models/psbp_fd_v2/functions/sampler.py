@@ -1,23 +1,31 @@
 """
-PSBP Sampler — Probit Stick-Breaking Process Mixture
-=====================================================
+PSBP Sampler v2 — Probit Stick-Breaking Process Mixture
+========================================================
 
-Implementación del Gibbs sampler descrito en Chung & Dunson (2009),
+Implementación del Gibbs sampler de Chung & Dunson (2009),
 "Nonparametric Bayes Conditional Distribution Modeling with Variable
 Selection", JASA 104(488).
 
-Esta clase es agnóstica al preprocesamiento de datos (estandarización,
-adición de intercepto) y a la predicción out-of-sample. Solo ejecuta
-la cadena MCMC y almacena las trazas resultantes.
+Cambios respecto a v1 (todos para alinear con el MATLAB de referencia):
+  - A2.1 : `apij`, `bpij`, `mupsij`, `taupsij` aceptan ahora arrays de
+           longitud p (priors heterogéneas por variable). Si se pasa un
+           escalar, se expande como antes.
+  - A2.2 : el peso en el update de Si se computa en log-space, idéntico
+           a la línea 131 del MATLAB (`exp(log(phx) + log(normpdf))`).
+  - A4   : cuando `kh = 0` y `gammajh[h,j] == 1`, se muestrea Gamma_jh
+           uniforme de Gstar (replicando MATLAB).
+  - A4-b : cuando `kh = 0` y `gammajh[h,j] == 1`, se muestrea psi_jh
+           de la prior truncada N(mupsij_j, 1/taupsij_j) I(psi >= 0).
 
-Pipeline esperado:
-    preprocesador → Sampler.fit(X, y) → Predictor(traces)
+NOTA: la nota D3 (ddof inconsistente) NO se modifica aquí porque
+afecta a `psbp_fd_v1.py` (estandarización), no al sampler. El sampler
+es agnóstico a la escala.
 
 Author: model_psbp_fd
 """
 
 from __future__ import annotations
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, Union
 import numpy as np
 from scipy.stats import norm
 from scipy.special import gammaln
@@ -47,8 +55,9 @@ def _truncnorm_upper0_sample(m: float, v: float, rng: np.random.Generator) -> fl
 
     Equivalente a la operación de MATLAB:
         m + sqrt(v) * norminv(u + (1-u) * normcdf((0-m)/sqrt(v)))
-    donde u ~ U(0, 1). Si el resultado es inf/nan (cola extrema), se
-    devuelve 0.01 como salvaguarda numérica (consistente con el MATLAB).
+    donde u ~ U(0, 1). Si el resultado es inf/nan (cola extrema),
+    se devuelve 0.01 como salvaguarda numérica (consistente con MATLAB
+    línea 271-273).
     """
     sv = np.sqrt(v)
     u = rng.uniform(0.0, 1.0)
@@ -62,9 +71,6 @@ def _mvnrnd_safe(mu: np.ndarray, cov: np.ndarray,
     """
     Normal multivariada con jitter adaptativo para garantizar
     covarianza simétrica positiva-definida.
-
-    Corrige los warnings 'covariance is not symmetric positive-semidefinite'
-    que aparecen cuando inv(Sh_inv + tau*Xh'Xh) acumula error numérico.
     """
     cov = 0.5 * (cov + cov.T)
     eig_min = np.linalg.eigvalsh(cov).min()
@@ -73,69 +79,72 @@ def _mvnrnd_safe(mu: np.ndarray, cov: np.ndarray,
     return rng.multivariate_normal(mu.ravel(), cov)
 
 
+def _expand_to_p(value: Union[float, np.ndarray, list], p: int,
+                 name: str) -> np.ndarray:
+    """
+    Expande un valor escalar a un array de longitud p, o valida que
+    un array tenga longitud p.
+
+    Habilita el uso de priors heterogéneas por variable (A2.1).
+    """
+    if np.isscalar(value):
+        return np.full(p, float(value))
+    arr = np.asarray(value, dtype=np.float64).ravel()
+    if arr.shape[0] != p:
+        raise ValueError(
+            f"Hiperparámetro '{name}' tiene longitud {arr.shape[0]}; "
+            f"se esperaba escalar o array de longitud p={p}."
+        )
+    return arr
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Clase principal
 # ─────────────────────────────────────────────────────────────────────────────
 
 class PSBPSampler:
     """
-    Gibbs sampler para el modelo Probit Stick-Breaking Process Mixture.
+    Gibbs sampler para el modelo Probit Stick-Breaking Process Mixture
+    (v2 — alineado con MATLAB de Chung & Dunson, 2009).
 
     Parámetros
     ----------
     mcmc_cfg : dict
         Configuración MCMC con claves:
             - 'nsim' : int — número total de iteraciones
-            - 'burn' : int — iteraciones de burn-in (informativo, no se descarta aquí)
-            - 'N'    : int — nivel de truncamiento del proceso stick-breaking
-            - 'M'    : int — número de puntos de la grilla para Gamma_jh
+            - 'burn' : int — iteraciones de burn-in (informativo)
+            - 'N'    : int — truncamiento stick-breaking
+            - 'M'    : int — tamaño de la grilla para Gamma_jh
 
     hp : dict
-        Hiperparámetros del modelo con claves:
-            - 'atau', 'btau'   : prior Gamma para tau_h
-            - 'ag',   'bg'     : prior Gamma para g (g-prior global)
-            - 'apij', 'bpij'   : prior Beta para pi_j (escalar; se expande a (p,))
-            - 'mumu', 'taumu'  : prior Normal para mu
-            - 'mupsij', 'taupsij' : prior Normal truncada positiva para psi_jh
-                                    (escalares; se expanden a (p,))
-            - 'pwj' : float — prior Bernoulli para w_j
+        Hiperparámetros del modelo. Las siguientes claves admiten **escalar
+        o array de longitud p** (priors heterogéneas por variable):
+            - 'apij', 'bpij'   : Beta para pi_j
+            - 'mupsij', 'taupsij' : Normal-truncada-positiva para psi_jh
+
+        Las siguientes claves siempre son **escalares**:
+            - 'atau', 'btau'   : Gamma para tau_h
+            - 'ag',   'bg'     : Gamma para g
+            - 'mumu', 'taumu'  : Normal para mu
+            - 'pwj'            : Bernoulli para w_j
 
     seed : int, opcional
         Semilla para reproducibilidad.
 
     verbose_every : int, default=200
-        Imprime progreso cada `verbose_every` iteraciones.
-        Si es 0 o None, modo silencioso.
+        Imprime progreso cada `verbose_every` iteraciones. 0/None = silencio.
 
     Atributos post-fit
     ------------------
     traces : dict
-        Diccionario con todas las trazas MCMC. Claves:
-            betajhout  : (nsim, N, p)     — coeficientes pendientes
-            beta0hout  : (nsim, N)        — interceptos
-            tauhout    : (nsim, N)        — precisiones
-            alphahout  : (nsim, N-1)      — interceptos del probit
-            psijhout   : (nsim, N-1, p)   — anchos de banda
-            Gammajhout : (nsim, N-1, p)   — locaciones de referencia
-            gammajhout : (nsim, N, p)     — indicadores de selección
-            pijout     : (nsim, p)        — probs marginales de inclusión
-            wjout      : (nsim, p)        — indicadores globales
-            muout      : (nsim,)          — media global del probit
-            osumout    : (nsim, p)        — indicador 'ninguna comp. usa j'
-            N1out      : (nsim,)          — máximo índice de cluster usado + 1
-            Nout       : (nsim,)          — N (constante, redundante)
-            inEout     : (nsim, n)        — predicción in-sample en escala estandarizada
+        Diccionario con todas las trazas MCMC (ver código).
 
-    n_features_ : int
-        Número de covariables (p), excluyendo intercepto.
-
-    n_samples_ : int
-        Número de observaciones (n).
+    n_features_, n_samples_ : int
     """
 
     def __init__(self,
                  mcmc_cfg: Dict[str, int],
-                 hp: Dict[str, float],
+                 hp: Dict[str, Any],
                  seed: Optional[int] = None,
                  verbose_every: int = 200):
         self.mcmc_cfg = dict(mcmc_cfg)
@@ -143,7 +152,6 @@ class PSBPSampler:
         self.seed = seed
         self.verbose_every = int(verbose_every) if verbose_every else 0
 
-        # Atributos que se llenan en fit()
         self.traces: Optional[Dict[str, np.ndarray]] = None
         self.n_features_: Optional[int] = None
         self.n_samples_: Optional[int] = None
@@ -164,7 +172,6 @@ class PSBPSampler:
             raise ValueError(
                 "X debe incluir columna de intercepto + al menos 1 covariable"
             )
-        # Verifica que la primera columna sea de unos (intercepto)
         if not np.allclose(X[:, 0], 1.0):
             raise ValueError(
                 "Se espera que X[:, 0] sea la columna de unos (intercepto)"
@@ -195,10 +202,6 @@ class PSBPSampler:
             Debe estar **estandarizada** salvo por la columna del intercepto.
         y : ndarray, shape (n,)
             Respuesta **estandarizada**.
-
-        Retorna
-        -------
-        self
         """
         self._validate_inputs(X, y)
         self._run_gibbs(X, y)
@@ -216,7 +219,6 @@ class PSBPSampler:
         n = X.shape[0]
         Xnoint = X[:, 1:]
         p = Xnoint.shape[1]
-
         self.n_samples_ = n
         self.n_features_ = p
 
@@ -226,18 +228,18 @@ class PSBPSampler:
         N    = int(self.mcmc_cfg["N"])
         M    = int(self.mcmc_cfg["M"])
 
-        # ── Hiperparámetros (escalares → vectores cuando aplique) ────────
+        # ── Hiperparámetros (A2.1: aceptan escalares O arrays de long. p) ──
         atau    = float(self.hp["atau"])
         btau    = float(self.hp["btau"])
         ag      = float(self.hp["ag"])
         bg      = float(self.hp["bg"])
-        apij    = np.full(p, float(self.hp["apij"]))
-        bpij    = np.full(p, float(self.hp["bpij"]))
         mumu    = float(self.hp["mumu"])
         taumu   = float(self.hp["taumu"])
-        mupsij  = np.full(p, float(self.hp["mupsij"]))
-        taupsij = np.full(p, float(self.hp["taupsij"]))
         pwj     = float(self.hp["pwj"])
+        apij    = _expand_to_p(self.hp["apij"],    p, "apij")
+        bpij    = _expand_to_p(self.hp["bpij"],    p, "bpij")
+        mupsij  = _expand_to_p(self.hp["mupsij"],  p, "mupsij")
+        taupsij = _expand_to_p(self.hp["taupsij"], p, "taupsij")
 
         # ── Inicialización ───────────────────────────────────────────────
         mu  = 1.0
@@ -248,9 +250,10 @@ class PSBPSampler:
         xmin, xmax = X.min(), X.max()
         Gstar = xmin + (np.arange(1, M + 1) / M) * (xmax - xmin)
 
+        # bjrange: réplica exacta del MATLAB línea 54. MATLAB usa
+        # `unidrnd(7)` que indexa solo los primeros 7 elementos. La
+        # traducción `rng.integers(0, 7)` selecciona los mismos 7.
         bjrange = np.array([-4, -3, -2, -1.5, -1, 0, 1, 1.5, 2, 3, 4, 5])
-        # En MATLAB: unidrnd(7, ...) toma índices 1..7 → primeros 7 valores
-        # de bjrange. En Python con rng.integers(0, 7) tomamos los mismos.
         betajh  = bjrange[rng.integers(0, 7, size=(N, p))].astype(float)
         beta0h  = bjrange[rng.integers(0, 7, size=(N, 1))].astype(float)
         tauh    = rng.gamma(shape=atau, scale=1.0 / btau, size=(N, 1))
@@ -279,19 +282,12 @@ class PSBPSampler:
         # ── Loop MCMC ────────────────────────────────────────────────────
         for gt in range(nsim):
 
-            # PASO 1 — Z_il (variables latentes del probit stick-breaking)
-            # Bug corregido respecto a la implementación previa:
-            # MATLAB itera l = 1..Si(i) (incluyendo Si(i)) cuando Si<N.
-            # En 0-indexado equivale a range(si+1) con la rama
-            # truncada-superior cuando l == si.
+            # PASO 1 — Z_il (variables latentes Albert–Chib)
             Zil = np.zeros((n, N))
             Wil = np.zeros((n, N))
             for i in range(n):
                 si = int(Si[i])
-                if si < N - 1:
-                    n_iter = si + 1
-                else:
-                    n_iter = N - 1
+                n_iter = (si + 1) if si < N - 1 else (N - 1)
                 for l in range(n_iter):
                     m_l = alphah[l] - np.sum(
                         psijh[l] * np.abs(Xnoint[i] - Gammajh[l])
@@ -299,15 +295,18 @@ class PSBPSampler:
                     if si < N - 1:
                         if l < si:
                             Zil[i, l] = _truncnorm_lower0_sample(m_l, 1.0, rng)
-                        else:  # l == si
+                        else:
                             Zil[i, l] = _truncnorm_upper0_sample(m_l, 1.0, rng)
-                    else:  # si == N-1: todas truncadas inferiormente
+                    else:
                         Zil[i, l] = _truncnorm_lower0_sample(m_l, 1.0, rng)
                     Wil[i, l] = Zil[i, l] + np.sum(
                         psijh[l] * np.abs(X[i, 1:] - Gammajh[l])
                     )
 
-            # PASO 2 — S_i (asignaciones de componente)
+            # PASO 2 — S_i (asignaciones de cluster)
+            # A2.2 — cálculo en log-space, replicando MATLAB línea 131:
+            #   phx1 = exp(log(phx + realmin) + log(normpdf(...) + realmin))
+            # Se estabiliza restando el máximo log-peso antes de exponenciar.
             phxi = np.zeros((n, N))
             for i in range(n):
                 vhx = np.array([
@@ -325,8 +324,12 @@ class PSBPSampler:
 
                 mu_h  = beta0h[:, 0] * X[i, 0] + betajh @ X[i, 1:]
                 sig_h = 1.0 / np.sqrt(tauh[:, 0])
-                lik   = norm.pdf(y[i], loc=mu_h, scale=sig_h)
-                w     = (phx + EPS) * (lik + EPS)
+                log_lik = norm.logpdf(y[i], loc=mu_h, scale=sig_h)
+                # log-pesos: log(phx + EPS) + log(normpdf + EPS)
+                log_w = np.log(phx + EPS) + np.log(np.exp(log_lik) + EPS)
+                # estabilización numérica
+                log_w -= log_w.max()
+                w = np.exp(log_w)
                 Si[i] = rng.choice(N, p=w / w.sum())
 
             # PASO 3 — Predicción in-sample esperada por componente
@@ -336,7 +339,7 @@ class PSBPSampler:
                     X[:, 0] * beta0h[h, 0] + X[:, 1:] @ betajh[h]
                 )
 
-            # PASO 4 — beta_h (posterior conjugada Normal multivariada)
+            # PASO 4 — beta_h (posterior Normal multivariada)
             betajh = np.zeros((N, p))
             for h in range(N):
                 active = np.concatenate([[True], gammajh[h] == 1])
@@ -351,9 +354,6 @@ class PSBPSampler:
                     Shhat  = np.linalg.inv(Sh_inv + tauh[h, 0] * XhSi.T @ XhSi)
                     muhhat = Shhat @ (tauh[h, 0] * XhSi.T @ y[idx])
                 else:
-                    # Sin observaciones en la componente: muestreo de la prior.
-                    # Sh ya es la covarianza de la prior; evitamos doble
-                    # inversión que arrastra error numérico.
                     Shhat  = Sh
                     muhhat = np.zeros(pgh)
                 bt = _mvnrnd_safe(muhhat, Shhat, rng)
@@ -364,7 +364,7 @@ class PSBPSampler:
                         betajh[h, j] = bt[cnt]
                         cnt += 1
 
-            # PASO 5 — tau_h (posterior conjugada Gamma)
+            # PASO 5 — tau_h (Gamma)
             for h in range(N):
                 active = np.concatenate([[True], gammajh[h] == 1])
                 Xh     = X[:, active]
@@ -378,7 +378,7 @@ class PSBPSampler:
                       + 0.5 / n * g * betagh @ (Xh.T @ Xh) @ betagh)
                 tauh[h, 0] = rng.gamma(shape=aa, scale=1.0 / bb)
 
-            # PASO 6 — g (escala global de la prior de Zellner)
+            # PASO 6 — g (Zellner)
             aghat = ag + 0.5 * (gammajh.sum() + N)
             temp = 0.0
             for h in range(N):
@@ -391,7 +391,7 @@ class PSBPSampler:
             bghat = bg + 0.5 / n * temp
             g = rng.gamma(shape=aghat, scale=1.0 / bghat)
 
-            # PASO 7 — w_j (indicador global de relevancia)
+            # PASO 7 — w_j (Bernoulli con marginal Beta-Bernoulli)
             for j in range(p):
                 if gammajh[:, j].sum() > 0:
                     wj[j] = 1.0
@@ -403,19 +403,19 @@ class PSBPSampler:
                     pwjhat = pwj * b / ((1.0 - pwj) + pwj * b)
                     wj[j] = float(rng.binomial(1, pwjhat))
 
-            # PASO 8 — alpha_h (posterior conjugada Normal)
+            # PASO 8 — alpha_h (Normal)
             for h in range(N - 1):
                 mask = (Si >= h)
                 v_ah = 1.0 / (1.0 + mask.sum())
                 m_ah = v_ah * (mu + Wil[mask, h].sum())
                 alphah[h] = rng.normal(m_ah, np.sqrt(v_ah))
 
-            # PASO 9 — mu (posterior conjugada Normal)
+            # PASO 9 — mu (Normal)
             taumuhat = N + taumu
             mumuhat  = (taumu * mumu + alphah.sum()) / taumuhat
             mu = rng.normal(mumuhat, np.sqrt(1.0 / taumuhat))
 
-            # PASO 10 — pi_j (posterior conjugada Beta)
+            # PASO 10 — pi_j (Beta)
             for j in range(p):
                 if wj[j] == 0:
                     pij[j] = 0.0
@@ -425,12 +425,16 @@ class PSBPSampler:
                         bpij[j] + N - gammajh[:, j].sum()
                     )
 
-            # PASO 11 — Gamma_jh (locación de referencia)
+            # PASO 11 — Gamma_jh (grilla discreta)
+            # A4 — Cuando kh == 0 y gammajh[h,j] == 1: muestreo uniforme
+            #       de Gstar (replica MATLAB líneas 236-254).
             for h in range(N - 1):
                 mask_h = (Si >= h)
                 kh = mask_h.sum()
                 for j in range(p):
-                    if gammajh[h, j] == 1 and kh > 0:
+                    if gammajh[h, j] != 1:
+                        continue
+                    if kh > 0:
                         pm = np.zeros(M)
                         for m_idx in range(M):
                             od = (
@@ -453,8 +457,15 @@ class PSBPSampler:
                             )
                         pm1 = pm / pm.sum()
                         Gammajh[h, j] = Gstar[rng.choice(M, p=pm1)]
+                    else:
+                        # kh == 0: MATLAB produce uniforme sobre Gstar
+                        # (suma vacía → pm[m] = exp(0)+EPS = constante).
+                        Gammajh[h, j] = Gstar[rng.integers(0, M)]
 
-            # PASO 12 — psi_jh (ancho de banda; Normal truncada positiva)
+            # PASO 12 — psi_jh (Normal truncada positiva)
+            # A4-b — Cuando kh == 0 y gammajh[h,j] == 1: muestreo de la
+            #         prior truncada N(mupsij_j, 1/taupsij_j) I(psi >= 0)
+            #         (replica MATLAB líneas 256-276).
             for h in range(N - 1):
                 mask_h = (Si >= h)
                 kh = mask_h.sum()
@@ -477,6 +488,13 @@ class PSBPSampler:
                         v_psi  = 1.0 / (taupsij[j] + dist_j @ dist_j)
                         m_psi  = v_psi * (taupsij[j] * mupsij[j]
                                           + np.sum(Tijh * dist_j))
+                        psijh[h, j] = _truncnorm_upper0_sample(m_psi, v_psi, rng)
+                    else:
+                        # kh == 0: muestreo de la prior truncada positiva.
+                        # En MATLAB esto equivale a v = 1/taupsij_j, m = mupsij_j
+                        # (las sumas con vector vacío dan 0).
+                        v_psi = 1.0 / taupsij[j]
+                        m_psi = mupsij[j]
                         psijh[h, j] = _truncnorm_upper0_sample(m_psi, v_psi, rng)
 
             # PASO 13 — gamma_jh (selección de variables)
@@ -569,9 +587,6 @@ class PSBPSampler:
                             + prior_psi + post_psi
                         )
 
-                        # Estabilidad numérica del logit:
-                        # 1/(1+exp(b-a)) = sigmoid(a-b). Usamos clip
-                        # del exponente para evitar overflow en exp.
                         diff = np.clip(bjhin - ajhin, -500.0, 500.0)
                         prob1 = 1.0 / (1.0 + np.exp(diff))
                         gammajh[h, j] = float(rng.binomial(1, prob1))
@@ -592,7 +607,6 @@ class PSBPSampler:
                             + norm.logpdf(ystar, 0, 1.0 / np.sqrt(tauh[h, 0])).sum()
                             + mb
                         )
-                        # logsumexp para estabilidad
                         m_log = max(a0_log, b0_log)
                         prob1 = np.exp(a0_log - m_log) / (
                             np.exp(a0_log - m_log) + np.exp(b0_log - m_log)
@@ -638,14 +652,11 @@ class PSBPSampler:
         )
 
     # ─────────────────────────────────────────────────────────────────────
-    # Acceso a configuración (útil para Predictor)
-    # ─────────────────────────────────────────────────────────────────────
     def get_config(self) -> Dict[str, Any]:
-        """Retorna la configuración usada (útil para serialización y predict)."""
         return {
-            "mcmc_cfg": dict(self.mcmc_cfg),
-            "hp": dict(self.hp),
-            "seed": self.seed,
-            "n_samples_": self.n_samples_,
+            "mcmc_cfg":    dict(self.mcmc_cfg),
+            "hp":          dict(self.hp),
+            "seed":        self.seed,
+            "n_samples_":  self.n_samples_,
             "n_features_": self.n_features_,
         }
