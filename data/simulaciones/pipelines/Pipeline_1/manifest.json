@@ -1,0 +1,73 @@
+{
+  "stage": "01_simulation",
+  "experiment_id": "Pipeline_1",
+  "produced_at": "2026-06-04T15:06:04.839163+00:00",
+  "language": "Python",
+  "git_commit": "9c9f819",
+  "environment": {
+    "python": "3.11.2",
+    "numpy": "2.4.4",
+    "pandas": "3.0.2",
+    "platform": "Windows-10-10.0.19045"
+  },
+  "seed": {
+    "simulation": 4123,
+    "fit": null
+  },
+  "paths": {
+    "raw": "data\\simulaciones\\pipelines\\Pipeline_1",
+    "artefact": "artefact\\simulaciones\\Pipeline_1",
+    "report": "reports\\simulaciones\\Pipeline_1"
+  },
+  "params": {
+    "T": 100,
+    "G": 100,
+    "n_points": 100,
+    "n_curves": 100,
+    "burn_in": 100
+  },
+  "artifacts": [
+    {
+      "name": "datos_transform.csv",
+      "sha256": "81192d3a548e54dd55199ffebf54355bef6020d22597737e4279cc2553a73bee",
+      "shape": [
+        100,
+        100
+      ],
+      "dtype": "float64"
+    },
+    {
+      "name": "datos_raw.csv",
+      "sha256": "6d0f17e741ec654942e825952724053e8b92e21b519dd0513682af10d046ae42",
+      "shape": [
+        100,
+        100
+      ],
+      "dtype": "float64"
+    },
+    {
+      "name": "grid.csv",
+      "sha256": "0f1e52bc1b20ae108903bea7bacd384f18fc23796cf746c3ceef611f4b3558a3",
+      "shape": [
+        100,
+        1
+      ],
+      "dtype": "float64"
+    },
+    {
+      "name": "true_params.json",
+      "sha256": "8164957b7fbbd4fe9fa2a15821a30184cb18705e30b446767304721bb571c543"
+    },
+    {
+      "name": "standardization.npz",
+      "root": "artefact",
+      "rel_path": "artefact\\simulaciones\\Pipeline_1\\standardization.npz",
+      "sha256": "da5641aa4445f493c556216787858d492322e06ab4c1ee942766466ea549e9c9"
+    }
+  ],
+  "checks": {
+    "standardization": "zscore_column",
+    "std_max_abs_mean": 2.644551244657123e-15,
+    "std_max_abs_std_minus_1": 4.440892098500626e-16
+  }
+}
