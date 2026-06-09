@@ -1,198 +1,212 @@
-"""
-functions_standarize.py
-========================
-Clase de estandarización para coeficientes de series de tiempo funcionales.
-
-Contrato con el modelo
-----------------------
-    scaler  = FunctionalStandarizer(method="zscore")
-    THETA_s = scaler.fit_transform(THETA)       # dentro de PSBPFunctional.fit()
-    pred    = scaler.inverse_transform(pred_s)  # dentro de PSBPFunctional.predict()
-
-Patrón: fit() / transform() / fit_transform() / inverse_transform()
-
-Métodos
--------
-  "zscore"  : (x - mean) / std   por columna   [default]
-              Nota: usa ddof=0 (estimador poblacional). Consistente con
-              sklearn.StandardScaler. Para muestras pequeñas (T < 30) la
-              diferencia con ddof=1 puede alcanzar un factor sqrt(T/(T-1)).
-  "minmax"  : (x - min) / range  por columna
-  "robust"  : (x - mediana) / IQR por columna
-  "none"    : identidad
-
-Correcciones aplicadas
-----------------------
-  [FIX-1] inverse_transform() ahora valida shape antes de operar,
-          evitando broadcasting silencioso de NumPy cuando K_input
-          no coincide con K_fit (especialmente K=1 vs K>1).
-  [FIX-2] reconstruction_error() en FunctionalRepresentation guarda
-          contra method='precomputed' (ver functions_repre_functional.py).
-"""
-from __future__ import annotations
 import numpy as np
-from dataclasses import dataclass, field
-from typing import Literal
+from pathlib import Path
+import json
+from typing import Dict, Tuple
 
-ScalerMethod = Literal["zscore", "minmax", "robust", "none"]
 
-
-@dataclass
-class FunctionalStandarizer:
+class DataStandardizer:
     """
-    Estandarización de coeficientes funcionales THETA (T, K).
-
-    Parameters
-    ----------
-    method : str  —  método de estandarización (ver módulo docstring)
-
-    Attributes (tras fit())
-    -----------------------
-    center_    : np.ndarray (K,)
-    scale_     : np.ndarray (K,)
-    K_         : int
-    is_fitted_ : bool
+    Estandariza y desestandariza datos manteniendo registro de parámetros.
+    
+    Attributes:
+        method: Método de estandarización ('zscore_column', 'minmax', etc.)
+        mean: Media por columna (para zscore)
+        std: Desv. estándar por columna (para zscore)
+        ddof: Grados de libertad para std
+        n_features: Número de features
     """
-    method: ScalerMethod = "zscore"
-
-    center_:    np.ndarray | None = field(default=None, repr=False)
-    scale_:     np.ndarray | None = field(default=None, repr=False)
-    K_:         int | None        = field(default=None, repr=False)
-    is_fitted_: bool              = field(default=False, repr=False)
-
-    # ── Interfaz pública ──────────────────────────────────────────────
-
-    def fit(self, THETA: np.ndarray) -> "FunctionalStandarizer":
+    
+    SUPPORTED_METHODS = {"zscore_column", "minmax", "robust"}
+    
+    def __init__(self, method: str = "zscore_column", ddof: int = 0):
         """
-        Calcula y almacena los parámetros de estandarización.
-
-        Parameters
-        ----------
-        THETA : (T, K)  —  coeficientes en escala original
+        Args:
+            method: Método de estandarización
+            ddof: Grados de libertad para cálculo de std
         """
-        self._validate(THETA)
-        T, K = THETA.shape
-        self.K_ = K
-
-        if self.method == "zscore":
-            self.center_ = THETA.mean(axis=0)
-            # ddof=0: estimador poblacional (consistente con sklearn).
-            # Con T pequeño (T < 30) difiere de ddof=1 por sqrt(T/(T-1)).
-            self.scale_  = THETA.std(axis=0, ddof=0)
-
+        if method not in self.SUPPORTED_METHODS:
+            raise ValueError(f"Método '{method}' no soportado. Usa: {self.SUPPORTED_METHODS}")
+        
+        self.method = method
+        self.ddof = ddof
+        self.is_fitted = False
+        
+        # Parámetros (se llenan con fit)
+        self.mean = None
+        self.std = None
+        self.min = None
+        self.max = None
+        self.q25 = None
+        self.q75 = None
+        self.n_features = None
+    
+    def fit(self, X: np.ndarray) -> "DataStandardizer":
+        """
+        Calcula parámetros de estandarización.
+        
+        Args:
+            X: Array de datos (n_samples, n_features)
+        
+        Returns:
+            self (para encadenamiento)
+        """
+        if X.ndim != 2:
+            raise ValueError(f"X debe ser 2D, recibido: {X.ndim}D")
+        
+        self.n_features = X.shape[1]
+        
+        if self.method == "zscore_column":
+            self.mean = X.mean(axis=0)
+            self.std = X.std(axis=0, ddof=self.ddof)
+            
+            # Validar varianza nula
+            if np.any(self.std == 0):
+                cols_zero = np.where(self.std == 0)[0].tolist()
+                raise ValueError(f"Columnas con varianza nula: {cols_zero}")
+        
         elif self.method == "minmax":
-            self.center_ = THETA.min(axis=0)
-            self.scale_  = THETA.max(axis=0) - self.center_
-
+            self.min = X.min(axis=0)
+            self.max = X.max(axis=0)
+            
+            if np.any(self.max == self.min):
+                cols_const = np.where(self.max == self.min)[0].tolist()
+                raise ValueError(f"Columnas constantes: {cols_const}")
+        
         elif self.method == "robust":
-            self.center_ = np.median(THETA, axis=0)
-            self.scale_  = np.percentile(THETA, 75, axis=0) \
-                         - np.percentile(THETA, 25, axis=0)
-
-        elif self.method == "none":
-            self.center_ = np.zeros(K)
-            self.scale_  = np.ones(K)
-
-        else:
-            raise ValueError(f"Método '{self.method}' no reconocido. "
-                             "Opciones: zscore, minmax, robust, none.")
-
-        # Columnas constantes → evitar división por cero
-        self.scale_ = np.where(self.scale_ < 1e-12, 1.0, self.scale_)
-        self.is_fitted_ = True
+            self.q25 = np.percentile(X, 25, axis=0)
+            self.q75 = np.percentile(X, 75, axis=0)
+            self.median = np.median(X, axis=0)
+            
+            iqr = self.q75 - self.q25
+            if np.any(iqr == 0):
+                cols_const = np.where(iqr == 0)[0].tolist()
+                raise ValueError(f"Columnas con IQR nulo: {cols_const}")
+        
+        self.is_fitted = True
         return self
-
-    def transform(self, THETA: np.ndarray) -> np.ndarray:
-        """Aplica la estandarización con parámetros de fit(). Devuelve (T, K)."""
-        self._check_fitted()
-        self._validate(THETA, expected_K=self.K_)
-        return (THETA - self.center_) / self.scale_
-
-    def fit_transform(self, THETA: np.ndarray) -> np.ndarray:
-        """fit() + transform() en un paso. Devuelve THETA_s (T, K)."""
-        return self.fit(THETA).transform(THETA)
-
-    def inverse_transform(self, THETA_s: np.ndarray) -> np.ndarray:
-        """
-        Invierte la estandarización → escala original.
-        Usada en PSBPFunctional.predict() para devolver predicciones
-        en la misma escala que los datos de entrada.
-
-        [FIX-1] Se añadió _validate(THETA_s, expected_K=self.K_) para
-        evitar que NumPy haga broadcasting silencioso cuando la forma de
-        THETA_s no coincide con la forma ajustada. Sin esta validación,
-        un array (T, 1) contra scale_ (K,) con K > 1 produce un resultado
-        (T, K) incorrecto sin lanzar ninguna excepción.
-        """
-        self._check_fitted()
-        self._validate(THETA_s, expected_K=self.K_)   # ← [FIX-1]
-        return THETA_s * self.scale_ + self.center_
-
-    # ── Serialización ─────────────────────────────────────────────────
-
-    def get_params(self) -> dict:
-        """
-        Devuelve parámetros como dict para serialización junto con el modelo.
-
-        Example
-        -------
-        >>> saved = {"scaler": scaler.get_params(), "chains": model.chains_}
-        >>> pickle.dump(saved, open("artefact/simulaciones/models/run01.pkl", "wb"))
-        """
-        self._check_fitted()
-        return {
-            "method":  self.method,
-            "center_": self.center_.copy(),
-            "scale_":  self.scale_.copy(),
-            "K_":      self.K_,
-        }
-
-    @classmethod
-    def from_params(cls, params: dict) -> "FunctionalStandarizer":
-        """
-        Reconstruye el scaler desde parámetros guardados.
-        No requiere acceso a los datos originales.
-
-        Example
-        -------
-        >>> scaler = FunctionalStandarizer.from_params(saved["scaler"])
-        >>> pred = scaler.inverse_transform(pred_s)
-        """
-        obj = cls(method=params["method"])
-        obj.center_    = np.asarray(params["center_"])
-        obj.scale_     = np.asarray(params["scale_"])
-        obj.K_         = int(params["K_"])
-        obj.is_fitted_ = True
-        return obj
-
-    def summary(self) -> None:
-        """Imprime un resumen de los parámetros ajustados."""
-        self._check_fitted()
-        print(f"FunctionalStandarizer | method='{self.method}' | K={self.K_}")
-        print(f"  center (primeros 5): {np.round(self.center_[:5], 4)}")
-        print(f"  scale  (primeros 5): {np.round(self.scale_[:5],  4)}")
-
-    def __repr__(self) -> str:
-        s = f"fitted(K={self.K_})" if self.is_fitted_ else "not fitted"
-        return f"FunctionalStandarizer(method='{self.method}', {s})"
-
-    # ── Validaciones ──────────────────────────────────────────────────
-
-    @staticmethod
-    def _validate(THETA: np.ndarray, expected_K: int | None = None) -> None:
-        if not isinstance(THETA, np.ndarray):
-            raise TypeError(f"Se esperaba np.ndarray, recibido: {type(THETA).__name__}.")
-        if THETA.ndim != 2:
-            raise ValueError(f"THETA debe ser 2D (T, K). Shape: {THETA.shape}.")
-        if THETA.shape[0] < 2:
-            raise ValueError("THETA necesita al menos 2 filas.")
-        if expected_K is not None and THETA.shape[1] != expected_K:
+    
+    def transform(self, X: np.ndarray) -> np.ndarray:
+        """Estandariza los datos."""
+        if not self.is_fitted:
+            raise RuntimeError("Debe llamar .fit() primero")
+        
+        if X.shape[1] != self.n_features:
             raise ValueError(
-                f"K inconsistente: ajustado con K={expected_K}, recibido K={THETA.shape[1]}."
+                f"X tiene {X.shape[1]} features, se esperaban {self.n_features}"
             )
-
-    def _check_fitted(self) -> None:
-        if not self.is_fitted_:
-            raise RuntimeError(
-                "Scaler no ajustado. Llamar a fit() o fit_transform() primero."
-            )
+        
+        if self.method == "zscore_column":
+            return (X - self.mean) / self.std
+        elif self.method == "minmax":
+            return (X - self.min) / (self.max - self.min)
+        elif self.method == "robust":
+            iqr = self.q75 - self.q25
+            return (X - self.median) / iqr
+    
+    def inverse_transform(self, X_std: np.ndarray) -> np.ndarray:
+        """Desestandariza los datos (recupera escala original)."""
+        if not self.is_fitted:
+            raise RuntimeError("Debe llamar .fit() primero")
+        
+        if self.method == "zscore_column":
+            return X_std * self.std + self.mean
+        elif self.method == "minmax":
+            return X_std * (self.max - self.min) + self.min
+        elif self.method == "robust":
+            iqr = self.q75 - self.q25
+            return X_std * iqr + self.median
+    
+    def fit_transform(self, X: np.ndarray) -> np.ndarray:
+        """Fit + transform en una llamada."""
+        return self.fit(X).transform(X)
+    
+    def save(self, path: Path) -> None:
+        """Guarda parámetros de estandarización."""
+        if not self.is_fitted:
+            raise RuntimeError("No hay nada que guardar. Llamar .fit() primero")
+        
+        path = Path(path)
+        path.mkdir(parents=True, exist_ok=True)
+        
+        # Guardar parámetros en NPZ
+        save_dict = {
+            "mean": self.mean if self.mean is not None else np.array([]),
+            "std": self.std if self.std is not None else np.array([]),
+            "min": self.min if self.min is not None else np.array([]),
+            "max": self.max if self.max is not None else np.array([]),
+            "q25": self.q25 if self.q25 is not None else np.array([]),
+            "q75": self.q75 if self.q75 is not None else np.array([]),
+            "median": self.median if hasattr(self, 'median') and self.median is not None else np.array([]),
+        }
+        
+        np.savez_compressed(
+            path / "standardizer_params.npz",
+            **save_dict
+        )
+        
+        # Guardar metadatos en JSON
+        metadata = {
+            "method": self.method,
+            "ddof": self.ddof,
+            "n_features": self.n_features,
+        }
+        
+        with open(path / "standardizer_metadata.json", "w") as f:
+            json.dump(metadata, f, indent=2)
+        
+        print(f"✓ Standardizer guardado en: {path}")
+    
+    @classmethod
+    def load(cls, path: Path) -> "DataStandardizer":
+        """Carga parámetros de estandarización guardados."""
+        path = Path(path)
+        
+        # Cargar metadatos
+        with open(path / "standardizer_metadata.json", "r") as f:
+            metadata = json.load(f)
+        
+        # Crear instancia
+        standardizer = cls(
+            method=metadata["method"],
+            ddof=metadata["ddof"]
+        )
+        standardizer.n_features = metadata["n_features"]
+        
+        # Cargar parámetros
+        data = np.load(path / "standardizer_params.npz")
+        
+        if data["mean"].size > 0:
+            standardizer.mean = data["mean"]
+        if data["std"].size > 0:
+            standardizer.std = data["std"]
+        if data["min"].size > 0:
+            standardizer.min = data["min"]
+        if data["max"].size > 0:
+            standardizer.max = data["max"]
+        if data["q25"].size > 0:
+            standardizer.q25 = data["q25"]
+        if data["q75"].size > 0:
+            standardizer.q75 = data["q75"]
+        if data["median"].size > 0:
+            standardizer.median = data["median"]
+        
+        standardizer.is_fitted = True
+        print(f"✓ Standardizer cargado desde: {path}")
+        
+        return standardizer
+    
+    def summary(self) -> str:
+        """Resumen de estadísticas de estandarización."""
+        if not self.is_fitted:
+            return "Standardizer no ajustado"
+        
+        lines = [
+            f"Método: {self.method}",
+            f"Features: {self.n_features}",
+        ]
+        
+        if self.mean is not None:
+            lines.append(f"  Media:     min={self.mean.min():.4f}, max={self.mean.max():.4f}")
+            lines.append(f"  Std:       min={self.std.min():.4f}, max={self.std.max():.4f}")
+        
+        return "\n".join(lines)
