@@ -29,6 +29,17 @@ from .viz_prediction import (
     plot_functional_comparison,
 )
 
+from .viz_preprocessing import (
+    plot_diagnostico_estandarizacion,
+    plot_seleccion_basis,
+)
+
+from .viz_fpca import (
+    plot_fpca_scree,
+    plot_fpca_correlacion_lag0,
+    plot_rezagos_heatmap,
+)
+
 __all__ = [
     # viz_traces
     "plot_traces_bj",
@@ -51,4 +62,11 @@ __all__ = [
     # viz_prediction
     "plot_scatter_theta",
     "plot_functional_comparison",
+    # viz_preprocessing
+    "plot_diagnostico_estandarizacion",
+    "plot_seleccion_basis",
+    # viz_fpca
+    "plot_fpca_scree",
+    "plot_fpca_correlacion_lag0",
+    "plot_rezagos_heatmap",
 ]
