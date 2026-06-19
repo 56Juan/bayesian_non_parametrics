@@ -16,7 +16,7 @@ Después del ajuste PSBP-FD, se obtienen:
     eval_results[k]["y_hat"]  : (T_eff,) scores predichos del componente k
     eval_results[k]["incl_named"] : pd.Series con P(γ=1|data) por variable
 
-La comparativa funcional reconstruye curvas en escala estandarizada usando
+La comparativa funcional reconstruye curvas en la escala de X_true usando
 la instancia FunctionalRepresentation `fr` ajustada.
 """
 
@@ -46,7 +46,11 @@ _COMP_COLORS = ["#1a6faf", "#e07b39", "#3aaa35", "#9b59b6", "#c0392b",
 def plot_scatter_theta(
     eval_results: Dict,
     n_components: int,
-    title: str = r"Ajuste por componente: $\theta_{t,k}$ observado vs predicho",
+    # [FIX] Las cantidades graficadas son scores FPCA (ξ), no coeficientes
+    # B-spline (θ). Se corrige el etiquetado por defecto y se parametriza
+    # el símbolo para usos futuros.
+    title: str = r"Ajuste por componente (in-sample): $\xi_{t,k}$ observado vs predicho",
+    symbol: str = r"\xi",
     n_cols: int = 4,
     figsize_per_panel: Tuple[float, float] = (5.0, 4.5),
     save_path: Optional[str] = None,
@@ -125,8 +129,8 @@ def plot_scatter_theta(
         else:
             incl_str = ""
 
-        ax.set_xlabel(rf"$\theta_{{{k+1}}}$ observado", fontsize=9)
-        ax.set_ylabel(rf"$\hat{{\theta}}_{{{k+1}}}$ predicho", fontsize=9)
+        ax.set_xlabel(rf"${symbol}_{{{k+1}}}$ observado", fontsize=9)
+        ax.set_ylabel(rf"$\hat{{{symbol}}}_{{{k+1}}}$ predicho", fontsize=9)
         ax.set_title(
             rf"Comp {k+1}: RMSE={rmse:.4f}, $R^2$={r2:.3f}, corr={corr:.3f}"
             + (f"\nTop incl: {incl_str}" if incl_str else ""),
@@ -156,7 +160,10 @@ def plot_functional_comparison(
     n_snapshots: int = 5,
     t_indices: Optional[List[int]] = None,
     title: str = (r"Reconstrucción funcional: "
-                  r"$\tilde X_t$ verdadera vs proyección B-spline vs predicción PSBP"),
+                  r"$\tilde X_t$ verdadera vs representación vs predicción PSBP"),
+    # [FIX] La capa intermedia depende del operador `fr` que se pase
+    # (B-spline real o proxy FPCA); la etiqueta debe declararlo.
+    repr_label: str = "representación funcional",
     figsize_per_col: Tuple[float, float] = (3.5, 4.0),
     save_path: Optional[str] = None,
 ) -> Tuple[plt.Figure, dict]:
@@ -164,7 +171,7 @@ def plot_functional_comparison(
     Comparativa visual de la reconstrucción funcional.
 
     Para cada snapshot t muestra tres curvas superpuestas:
-        (negro) X_t verdadera (estandarizada).
+        (negro) X_t verdadera (en la escala de X_true).
         (azul)  Proyección B-spline de X_t (representación funcional).
         (rojo)  Predicción PSBP reconstruida.
 
@@ -173,7 +180,7 @@ def plot_functional_comparison(
     eval_results  : dict {k: {"y_obs": arr, "y_hat": arr}}
     fr            : FunctionalRepresentation ajustada (post fit_transform)
     domain_grid   : (G,) grilla del dominio S
-    X_true        : (T, G) curvas verdaderas estandarizadas (completas, incluyendo lags)
+    X_true        : (T, G) curvas verdaderas (completas, incluyendo lags)
     n_components  : número de componentes K
     n_lags        : número de lags usados en el modelo (para alinear índices)
     n_snapshots   : número de instantes temporales a mostrar
@@ -186,7 +193,7 @@ def plot_functional_comparison(
     Retorna
     -------
     fig     : Figure
-    metrics : dict con RMSE_repr, RMSE_model, RMSE_total (escala estandarizada)
+    metrics : dict con RMSE_repr, RMSE_model, RMSE_total (escala de X_true)
     """
     # ── Construir matrices de scores ─────────────────────────────────────
     THETA_obs  = np.column_stack([eval_results[k]["y_obs"] for k in range(n_components)])
@@ -218,7 +225,7 @@ def plot_functional_comparison(
         "nrmse_total": rmse_total / sd if sd > 0 else np.nan,
     }
 
-    print("── Métricas de reconstrucción (escala estandarizada) ──")
+    print("── Métricas de reconstrucción (escala de X_true) ──")
     print(f"  RMSE representación : {rmse_repr:.6f}   NRMSE={metrics['nrmse_repr']:.3f}")
     print(f"  RMSE modelo         : {rmse_model:.6f}   NRMSE={metrics['nrmse_model']:.3f}")
     print(f"  RMSE total          : {rmse_total:.6f}   NRMSE={metrics['nrmse_total']:.3f}")
@@ -248,7 +255,7 @@ def plot_functional_comparison(
                 label=r"$\tilde X_t$ verdadera" if col_idx == 0 else None)
         ax.plot(domain_grid, X_repr_obs[t_idx],
                 color="steelblue", lw=1.4, ls=":",
-                label="proyección B-spline" if col_idx == 0 else None)
+                label=repr_label if col_idx == 0 else None)
         ax.plot(domain_grid, X_repr_pred[t_idx],
                 color="crimson", lw=1.4, ls="--",
                 label="predicción PSBP" if col_idx == 0 else None)
@@ -257,7 +264,7 @@ def plot_functional_comparison(
         ax.set_xlabel("$s$", fontsize=9)
         ax.grid(True, alpha=0.35)
 
-    axes[0].set_ylabel(r"$\tilde X_t(s)$  [estandarizada]", fontsize=10)
+    axes[0].set_ylabel(r"$X_t(s)$", fontsize=10)
     axes[0].legend(fontsize=8, loc="best")
 
     fig.suptitle(title, fontsize=11, y=1.02)

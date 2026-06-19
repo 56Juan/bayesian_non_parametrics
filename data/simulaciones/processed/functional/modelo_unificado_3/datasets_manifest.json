@@ -1,0 +1,101 @@
+{
+  "scores_scale": "standardized_zscore_ddof0",
+  "n_components": 9,
+  "n_lags": 2,
+  "component_idx": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "cov_names": [
+    "fpc_1_lag1",
+    "fpc_2_lag1",
+    "fpc_3_lag1",
+    "fpc_4_lag1",
+    "fpc_5_lag1",
+    "fpc_6_lag1",
+    "fpc_7_lag1",
+    "fpc_8_lag1",
+    "fpc_9_lag1",
+    "fpc_1_lag2",
+    "fpc_2_lag2",
+    "fpc_3_lag2",
+    "fpc_4_lag2",
+    "fpc_5_lag2",
+    "fpc_6_lag2",
+    "fpc_7_lag2",
+    "fpc_8_lag2",
+    "fpc_9_lag2"
+  ],
+  "datasets": {
+    "dataset_fpc_1.csv": {
+      "response": "fpc_1",
+      "shape": [
+        118,
+        19
+      ]
+    },
+    "dataset_fpc_2.csv": {
+      "response": "fpc_2",
+      "shape": [
+        118,
+        19
+      ]
+    },
+    "dataset_fpc_3.csv": {
+      "response": "fpc_3",
+      "shape": [
+        118,
+        19
+      ]
+    },
+    "dataset_fpc_4.csv": {
+      "response": "fpc_4",
+      "shape": [
+        118,
+        19
+      ]
+    },
+    "dataset_fpc_5.csv": {
+      "response": "fpc_5",
+      "shape": [
+        118,
+        19
+      ]
+    },
+    "dataset_fpc_6.csv": {
+      "response": "fpc_6",
+      "shape": [
+        118,
+        19
+      ]
+    },
+    "dataset_fpc_7.csv": {
+      "response": "fpc_7",
+      "shape": [
+        118,
+        19
+      ]
+    },
+    "dataset_fpc_8.csv": {
+      "response": "fpc_8",
+      "shape": [
+        118,
+        19
+      ]
+    },
+    "dataset_fpc_9.csv": {
+      "response": "fpc_9",
+      "shape": [
+        118,
+        19
+      ]
+    }
+  }
+}

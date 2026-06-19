@@ -360,7 +360,7 @@ def plot_fts_comparison(
 
     rmse_repr = float(np.sqrt(np.mean((X_true_eff - X_repr_eff)    ** 2)))
     rmse_pred = float(np.sqrt(np.mean((X_true_eff - X_pred_repr)   ** 2)))
-    rmse_tot  = float(np.sqrt(np.mean((X_true_eff - X_pred_repr)   ** 2)))
+    # [FIX] rmse_tot eliminado: era una copia exacta de rmse_pred y no se usaba.
     sd        = float(X_true_eff.std())
     metrics   = {
         "rmse_repr":   rmse_repr,
