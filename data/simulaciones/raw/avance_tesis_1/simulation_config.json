@@ -1,0 +1,31 @@
+{
+  "far_params": {
+    "n_curves": 200,
+    "n_points": 100,
+    "p": 2,
+    "bandwidth": 0.05,
+    "decays": [
+      0.9,
+      0.4
+    ],
+    "nonlinearity": "tanh",
+    "temporal_slope": 5.0,
+    "spatial_slope": 2.0,
+    "intercept": 3.0,
+    "noise_std": 0.5,
+    "noise_type": "smooth",
+    "burn_in": 100
+  },
+  "stability": {
+    "module": "PointwiseNonlinearFAR",
+    "g": "tanh",
+    "g_lipschitz": 1.0,
+    "contraction_const": 1.2860342900681458,
+    "likely_stationary": false,
+    "note": "Suficiente (Banach, norma del máximo): L_g·Σ_k||Ψ_k||_2 < 1."
+  },
+  "experiment_id": "avance_tesis_1",
+  "seed": 412389,
+  "T": 200,
+  "G": 100
+}

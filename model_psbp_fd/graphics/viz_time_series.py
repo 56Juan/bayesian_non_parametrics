@@ -3,7 +3,7 @@ viz_time_series.py
 ==================
 Visualizadores de series de tiempo funcionales en formato continuo desplazado.
 
-Cada curva X_t(s) ocupa el intervalo [t-1, t] del eje horizontal, de modo
+Cada curva X_t(\tau) ocupa el intervalo [t-1, t] del eje horizontal, de modo
 que la figura se lee igual que una serie escalar: de izquierda a derecha
 en el tiempo. Las líneas verticales grises separan observaciones funcionales.
 
@@ -19,7 +19,7 @@ plot_fts_comparison     : Comparativa completa en todo T: empírica | repr.
 Convención de datos
 -------------------
 X         : (T, G)  — curvas (empíricas o estandarizadas).
-grid      : (G,)    — puntos del dominio s ∈ [0, 1] (o cualquier intervalo).
+grid      : (G,)    — puntos del dominio τ ∈ [0, 1] (o cualquier intervalo).
 fr        : instancia de FunctionalRepresentation ya ajustada (post fit).
 X_pred_repr : (T, G) — curvas reconstruidas a partir de scores predichos
               por el modelo PSBP (fr.reconstruct(THETA_pred)).
@@ -105,9 +105,9 @@ def _add_labels(
         x_mid = t_offset + t + 0.5
         y_top = X[t].max()
         label = (
-            r"$X_1(s)$"        if t == 0
-            else r"$X_T(s)$"   if t == T - 1
-            else fr"$X_{{{t + 1}}}(s)$"
+            r"$X_1(\tau)$"        if t == 0
+            else r"$X_T(\tau)$"   if t == T - 1
+            else fr"$X_{{{t + 1}}}(\tau)$"
         )
         ax.annotate(
             label,
@@ -149,13 +149,13 @@ def plot_fts_empirical(
     """
     Serie de tiempo funcional con curvas empíricas discretas.
 
-    Cada X_t(s) ocupa el intervalo [t-1, t] del eje horizontal.
+    Cada X_t(\tau) ocupa el intervalo [t-1, t] del eje horizontal.
     Las curvas se grafican tal cual provienen de los datos (sin reconstrucción).
 
     Parámetros
     ----------
     X              : (T, G) curvas empíricas
-    grid           : (G,) dominio s
+    grid           : (G,) dominio τ
     highlight_idx  : índices t (0-based) a etiquetar; default [0, 1, T//2, T-1]
     color          : color de la línea continua
     title          : título (auto si None)
@@ -181,9 +181,9 @@ def plot_fts_empirical(
     _format_time_axis(ax, T)
 
     ax.set_xlabel(
-        r"Tiempo $t$  (intervalo $[t-1,\,t]$ = curva $X_t(s)$)", fontsize=9
+        r"Tiempo $t$  (intervalo $[t-1,\,t]$ = curva $X_t(\tau)$)", fontsize=9
     )
-    ax.set_ylabel(r"$X_t(s)$", fontsize=10)
+    ax.set_ylabel(r"$X_t(\tau)$", fontsize=10)
     ax.set_title(
         title or f"Serie de tiempo funcional — empírica  ($T={T}$)",
         fontsize=11, fontweight="bold", pad=10,
@@ -222,7 +222,7 @@ def plot_fts_functional(
     Parámetros
     ----------
     X              : (T, G) curvas empíricas (input para fr.transform)
-    grid           : (G,) dominio s
+    grid           : (G,) dominio τ
     fr             : instancia FunctionalRepresentation ya ajustada
     highlight_idx  : índices t (0-based) a etiquetar
     color          : color de la línea continua
@@ -254,9 +254,9 @@ def plot_fts_functional(
 
     method_label = getattr(fr, "method", "funcional")
     ax.set_xlabel(
-        r"Tiempo $t$  (intervalo $[t-1,\,t]$ = curva $\hat{X}_t(s)$)", fontsize=9
+        r"Tiempo $t$  (intervalo $[t-1,\,t]$ = curva $\hat{X}_t(\tau)$)", fontsize=9
     )
-    ax.set_ylabel(r"$\hat{X}_t(s)$", fontsize=10)
+    ax.set_ylabel(r"$\hat{X}_t(\tau)$", fontsize=10)
     ax.set_title(
         title or (
             f"Serie de tiempo funcional — representación {method_label}  ($T={T}$)"
@@ -311,7 +311,7 @@ def plot_fts_comparison(
     Parámetros
     ----------
     X              : (T, G) curvas empíricas completas (toda la serie)
-    grid           : (G,) dominio s
+    grid           : (G,) dominio τ
     fr             : instancia FunctionalRepresentation ya ajustada
     X_pred_repr    : (T_eff, G) curvas predichas reconstruidas, donde
                      T_eff = T - n_lags. Obtenidas como:
@@ -419,9 +419,9 @@ def plot_fts_comparison(
 
     _format_time_axis(ax, T)
     ax.set_xlabel(
-        r"Tiempo $t$  (intervalo $[t-1,\,t]$ = curva $X_t(s)$)", fontsize=9
+        r"Tiempo $t$  (intervalo $[t-1,\,t]$ = curva $X_t(\tau)$)", fontsize=9
     )
-    ax.set_ylabel(r"$X_t(s)$", fontsize=10)
+    ax.set_ylabel(r"$X_t(\tau)$", fontsize=10)
 
     method_label = getattr(fr, "method", "funcional")
     ax.set_title(

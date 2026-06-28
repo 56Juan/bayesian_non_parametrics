@@ -15,8 +15,8 @@ clear; clc; close all;
 N_WORKERS = 8;     % workers del pool (ajusta según carga del sistema)
 SEED_BASE = 4123;  % semilla base; cada job usa SEED_BASE + tt*9973 + k*31
 
-TT       = 1;
-BASENAME = "avance_tesis";
+TT       = 3;
+BASENAME = "modelo_unificado";
 paths    = config_paths(BASENAME, TT, SEED_BASE);
 
 % ════════════════════════════════════════════════════════════════════════════
