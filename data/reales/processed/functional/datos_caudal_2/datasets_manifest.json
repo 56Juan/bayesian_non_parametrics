@@ -1,0 +1,29 @@
+{
+  "scores_scale": "standardized_zscore_ddof0",
+  "n_components": 2,
+  "n_lags": 1,
+  "component_idx": [
+    0,
+    1
+  ],
+  "cov_names": [
+    "fpc_1_lag1",
+    "fpc_2_lag1"
+  ],
+  "datasets": {
+    "dataset_fpc_1.csv": {
+      "response": "fpc_1",
+      "shape": [
+        881,
+        3
+      ]
+    },
+    "dataset_fpc_2.csv": {
+      "response": "fpc_2",
+      "shape": [
+        881,
+        3
+      ]
+    }
+  }
+}

@@ -1,0 +1,185 @@
+{
+  "global": {
+    "atau": 2.0,
+    "btau": 0.5,
+    "ag": 2.0,
+    "bg": 0.5,
+    "mumu": 0.0,
+    "taumu": 1.0,
+    "pwj": 0.5
+  },
+  "by_type": {
+    "own_lag1": [
+      9.0,
+      1.0,
+      0.0,
+      1.0
+    ],
+    "cross_lag": [
+      1.0,
+      1.0,
+      0.0,
+      1.0
+    ]
+  },
+  "mcmc_config": {
+    "nsim": 2000,
+    "burn": 400,
+    "N": 50,
+    "M": 70
+  },
+  "n_iter": 2,
+  "seed_scheme": "SEED_BASE + tt*9973 + k*31",
+  "seed_base": 412389,
+  "scores_scale": "standardized_zscore_ddof0",
+  "hyperparams_list": [
+    {
+      "component_k": 0,
+      "fpc_idx": 1,
+      "hyperparams": {
+        "atau": 2.0,
+        "btau": 0.5,
+        "ag": 2.0,
+        "bg": 0.5,
+        "mumu": 0.0,
+        "taumu": 1.0,
+        "pwj": 0.5,
+        "apij": [
+          9.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "bpij": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "mupsij": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "taupsij": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "component_k": 1,
+      "fpc_idx": 2,
+      "hyperparams": {
+        "atau": 2.0,
+        "btau": 0.5,
+        "ag": 2.0,
+        "bg": 0.5,
+        "mumu": 0.0,
+        "taumu": 1.0,
+        "pwj": 0.5,
+        "apij": [
+          1.0,
+          9.0,
+          1.0,
+          1.0
+        ],
+        "bpij": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "mupsij": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "taupsij": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "component_k": 2,
+      "fpc_idx": 3,
+      "hyperparams": {
+        "atau": 2.0,
+        "btau": 0.5,
+        "ag": 2.0,
+        "bg": 0.5,
+        "mumu": 0.0,
+        "taumu": 1.0,
+        "pwj": 0.5,
+        "apij": [
+          1.0,
+          1.0,
+          9.0,
+          1.0
+        ],
+        "bpij": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "mupsij": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "taupsij": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "component_k": 3,
+      "fpc_idx": 4,
+      "hyperparams": {
+        "atau": 2.0,
+        "btau": 0.5,
+        "ag": 2.0,
+        "bg": 0.5,
+        "mumu": 0.0,
+        "taumu": 1.0,
+        "pwj": 0.5,
+        "apij": [
+          1.0,
+          1.0,
+          1.0,
+          9.0
+        ],
+        "bpij": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "mupsij": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "taupsij": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      }
+    }
+  ]
+}
