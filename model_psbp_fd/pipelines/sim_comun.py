@@ -43,6 +43,7 @@ __all__ = [
     "grilla_regular",
     "media_nula",
     "norma_hilbert_schmidt",
+    "pesos_trapezoidales",
     "matriz_operador_ar",
     "matriz_covarianza_innovacion",
     "factor_cholesky",
@@ -177,10 +178,39 @@ class SalidaSimulacion:
 # ==========================================================================
 
 def grilla_regular(L: int) -> np.ndarray:
-    """Grilla regular tau_l = (l - 0.5) / L, l = 1, ..., L, contenida en (0, 1)."""
+    """
+    Grilla regular tau_l = (l - 1) / (L - 1), l = 1, ..., L, que incluye ambos
+    extremos del dominio: tau_1 = 0 y tau_L = 1.
+
+    La grilla es comun a todas las curvas y replicas, de modo que la columna l
+    de la matriz de datos corresponde siempre al mismo punto del dominio; no
+    existe desfase de medicion entre periodos consecutivos por construccion.
+    """
     if L < 2:
         raise ValueError("L debe ser al menos 2.")
-    return (np.arange(1, L + 1) - 0.5) / L
+    return np.linspace(0.0, 1.0, L)
+
+
+def pesos_trapezoidales(tau: np.ndarray) -> np.ndarray:
+    """
+    Pesos de la cuadratura trapezoidal asociada a la grilla:
+
+        int_0^1 f(s) ds ~= sum_l w_l f(tau_l),
+
+    con w_1 = w_L = h/2 y w_l = h en los puntos interiores para una grilla
+    equiespaciada de paso h = 1/(L-1); la formula general por diferencias
+    admite tambien grillas no equiespaciadas. Los pesos suman la longitud del
+    dominio. Esta regla reemplaza a la rectangular de punto medio, que era la
+    natural cuando la grilla no incluia los extremos.
+    """
+    tau = np.asarray(tau, dtype=float)
+    if tau.size < 2:
+        raise ValueError("La grilla debe tener al menos 2 puntos.")
+    w = np.empty_like(tau)
+    w[1:-1] = (tau[2:] - tau[:-2]) / 2.0
+    w[0] = (tau[1] - tau[0]) / 2.0
+    w[-1] = (tau[-1] - tau[-2]) / 2.0
+    return w
 
 
 def media_nula(tau: np.ndarray) -> np.ndarray:
@@ -213,22 +243,21 @@ def evaluar_media(
 # OPERADORES INTEGRALES Y CUADRATURA
 # ==========================================================================
 
-def norma_hilbert_schmidt(Psi: np.ndarray) -> float:
+def norma_hilbert_schmidt(Psi: np.ndarray, pesos: np.ndarray) -> float:
     """
-    Norma de Hilbert-Schmidt del operador continuo asociado a la matriz Psi ya
-    discretizada con el factor de cuadratura 1/L.
+    Norma de Hilbert-Schmidt del operador continuo asociado a la matriz Psi
+    discretizada con cuadratura trapezoidal.
 
-    Si Psi[l, l'] = psi(tau_l, tau_l') / L, entonces
+    Si Psi[l, l'] = psi(tau_l, tau_l') w_{l'}, con w los pesos de cuadratura,
+    entonces el nucleo se recupera como psi(tau_l, tau_l') = Psi[l, l'] / w_{l'}
+    y la norma se aproxima por
 
-        ||Psi||_HS^2 = int int psi^2 ~= sum_{l,l'} psi(tau_l, tau_l')^2 / L^2
-                     = ||Psi||_F^2,
-
-    de modo que la norma de Hilbert-Schmidt del operador coincide con la norma
-    de Frobenius de la matriz discretizada. Esta identidad permite calibrar la
-    constante de escala del nucleo operando directamente sobre la matriz, sin
-    una integracion numerica separada.
+        ||Psi||_HS^2 = int int psi^2(tau, s) dtau ds
+                    ~= sum_{l, l'} psi(tau_l, tau_l')^2 w_l w_{l'}.
     """
-    return float(np.linalg.norm(Psi, "fro"))
+    pesos = np.asarray(pesos, dtype=float)
+    psi_mat = Psi / pesos[None, :]
+    return float(np.sqrt(np.sum((pesos[:, None] * pesos[None, :]) * psi_mat ** 2)))
 
 
 def matriz_operador_ar(
@@ -241,10 +270,11 @@ def matriz_operador_ar(
 
         psi(tau, s) = c exp{ -(tau - s)^2 / (2 gamma^2) },
 
-    discretizado por cuadratura rectangular:
+    discretizado por cuadratura trapezoidal sobre la grilla con extremos:
 
-        (int psi(tau, s) f(s) ds)|_{tau_l} ~= (1/L) sum_{l'} psi(tau_l, tau_l') f(tau_l').
+        (int psi(tau, s) f(s) ds)|_{tau_l} ~= sum_{l'} psi(tau_l, tau_l') w_{l'} f(tau_l'),
 
+    con w los pesos trapezoidales de `pesos_trapezoidales`.
     La constante c se calibra de modo que ||Psi||_HS coincida con `hs_norm`.
     Un valor menor que uno garantiza la existencia de una solucion
     estacionaria para el proceso autorregresivo funcional de orden uno.
@@ -264,14 +294,14 @@ def matriz_operador_ar(
         raise ValueError("gamma debe ser positivo.")
     if hs_norm <= 0:
         raise ValueError("hs_norm debe ser positivo.")
-    L = tau.size
+    w = pesos_trapezoidales(tau)
     dist2 = (tau[:, None] - tau[None, :]) ** 2
-    nucleo = np.exp(-dist2 / (2.0 * gamma ** 2))   # psi sin la constante c
-    Psi = nucleo / L                                # cuadratura rectangular
-    norma_actual = norma_hilbert_schmidt(Psi)
-    if norma_actual <= 0:
+    nucleo = np.exp(-dist2 / (2.0 * gamma ** 2))       # psi sin la constante c
+    hs_nucleo = float(np.sqrt(np.sum((w[:, None] * w[None, :]) * nucleo ** 2)))
+    if hs_nucleo <= 0:
         raise RuntimeError("El nucleo discretizado resulto identicamente nulo.")
-    return Psi * (hs_norm / norma_actual)           # c queda implicito en el escalado
+    c = hs_norm / hs_nucleo                            # calibracion de la constante
+    return (c * nucleo) * w[None, :]                   # cuadratura en la variable s
 
 
 # ==========================================================================

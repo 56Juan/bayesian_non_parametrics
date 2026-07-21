@@ -1,0 +1,66 @@
+{
+  "scores_scale": "standardized_zscore_ddof0",
+  "n_components": 5,
+  "n_lags": 3,
+  "component_idx": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "cov_names": [
+    "fpc_1_lag1",
+    "fpc_2_lag1",
+    "fpc_3_lag1",
+    "fpc_4_lag1",
+    "fpc_5_lag1",
+    "fpc_1_lag2",
+    "fpc_2_lag2",
+    "fpc_3_lag2",
+    "fpc_4_lag2",
+    "fpc_5_lag2",
+    "fpc_1_lag3",
+    "fpc_2_lag3",
+    "fpc_3_lag3",
+    "fpc_4_lag3",
+    "fpc_5_lag3"
+  ],
+  "datasets": {
+    "dataset_fpc_1.csv": {
+      "response": "fpc_1",
+      "shape": [
+        147,
+        16
+      ]
+    },
+    "dataset_fpc_2.csv": {
+      "response": "fpc_2",
+      "shape": [
+        147,
+        16
+      ]
+    },
+    "dataset_fpc_3.csv": {
+      "response": "fpc_3",
+      "shape": [
+        147,
+        16
+      ]
+    },
+    "dataset_fpc_4.csv": {
+      "response": "fpc_4",
+      "shape": [
+        147,
+        16
+      ]
+    },
+    "dataset_fpc_5.csv": {
+      "response": "fpc_5",
+      "shape": [
+        147,
+        16
+      ]
+    }
+  }
+}

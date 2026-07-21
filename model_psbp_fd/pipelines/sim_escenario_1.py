@@ -58,6 +58,7 @@ from .sim_comun import (
     aplicar_ruido_observacion,
     diagnostico_comun,
     norma_hilbert_schmidt,
+    pesos_trapezoidales,
 )
 
 __all__ = [
@@ -174,6 +175,7 @@ def generar_escenario_1(cfg: ConfigEscenario1) -> SalidaSimulacion:
     cfg.validar()
 
     tau = grilla_regular(cfg.L)
+    w_quad = pesos_trapezoidales(tau)
     mu = evaluar_media(cfg.media_fn, tau)
 
     Psi = matriz_operador_ar(tau, cfg.gamma, cfg.hs_norm)
@@ -200,7 +202,8 @@ def generar_escenario_1(cfg: ConfigEscenario1) -> SalidaSimulacion:
         media=mu,
         semillas=registro,
         config=cfg,
-        internos={"operador": Psi, "cov_innovacion": K},
+        internos={"operador": Psi, "cov_innovacion": K,
+                  "pesos_cuadratura": w_quad},
     )
     salida.diagnostico = resumen_escenario_1(salida)
     return salida
@@ -240,7 +243,14 @@ def resumen_escenario_1(salida: SalidaSimulacion) -> dict:
             "no puede verificarse la condicion de estacionariedad."
         )
 
-    hs = norma_hilbert_schmidt(Psi)
+    w_quad = salida.internos.get("pesos_cuadratura")
+    if w_quad is None:
+        raise KeyError(
+            "La salida no contiene los pesos de cuadratura en `internos`; "
+            "no puede evaluarse la norma de Hilbert-Schmidt."
+        )
+
+    hs = norma_hilbert_schmidt(Psi, w_quad)
     radio = float(np.max(np.abs(np.linalg.eigvals(Psi))))
 
     especifico = {
