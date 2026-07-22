@@ -2,32 +2,45 @@
 functions_repre_functional.py
 =============================
 
-Representación funcional de curvas para el pipeline PSBP-FD.
+Representacion funcional de curvas para el pipeline PSBP-FD.
 
 Pipeline conceptual:
-    curvas Y (T, G) ──► FunctionalRepresentation ──► coeficientes THETA (T, K)
-    (T = observaciones, G = puntos de grilla, K = coeficientes finales)
+    curvas Y (T, G) --> FunctionalRepresentation --> coeficientes THETA (T, K)
+    (T = observaciones, G = puntos de grilla, K = coeficientes de base)
 
-Métodos soportados:
-    - "bspline"          : proyección sobre base B-spline.
-    - "fourier"          : proyección sobre base de Fourier.
-    - "fpca"             : Functional PCA directo sobre las curvas.
-    - "bspline+fpca"     : suavizado B-spline → FPCA sobre coeficientes.
-    - "fourier+fpca"     : suavizado Fourier → FPCA sobre coeficientes.
+Metodos soportados:
+    - "bspline" : proyeccion sobre base B-spline.
+    - "fourier" : proyeccion sobre base de Fourier.
 
-Proyección sobre bases (bspline/fourier):
-    - "l2"       : proyección L² con integración (Simpson o trapezoidal).
-                   THETA = G⁻¹ B,  G_jk = ∫φ_j φ_k dt,  B_j = ∫y φ_j dt.
-    - "discrete" : proyección discreta (ignora espaciamiento de la grilla).
-                   THETA = (ΦΦ')⁻¹ Φ Y'.
+Esta clase es exclusivamente un SUAVIZADOR: proyecta curvas discretas sobre un
+sistema de base y las reconstruye. La reduccion de dimension por componentes
+principales NO vive aqui: el FPCA del proyecto es el generalizado en metrica
+L^2 (problema propio C u = lambda W u, con W la matriz de Gram de la base) e
+implementado en `functions_models.functions_fpca.FPCA_L2`, que opera sobre los
+coeficientes THETA que esta clase produce. Las variantes encadenadas
+('bspline+fpca', 'fourier+fpca') de versiones anteriores aplicaban PCA
+euclideo sin la metrica de Gram ---incorrecto para bases no ortonormales--- y
+fueron eliminadas.
 
-Reconstruction error en dos normas (siempre devuelve ambas):
-    - L² integrada : ‖y - ŷ‖²_L² = ∫ (y(t) - ŷ(t))² dt.
-    - Punto a punto: ‖y - ŷ‖²_disc = (1/G) Σ_g (y_g - ŷ_g)².
+Proyeccion sobre bases:
+    - "l2"       : proyeccion en L^2 con cuadratura trapezoidal.
+                   THETA = G^{-1} B,  G_jk = int phi_j phi_k dt,
+                   B_j = int y phi_j dt.
+    - "discrete" : proyeccion discreta (ignora el espaciamiento de la grilla).
+                   THETA = (Phi Phi')^{-1} Phi Y'.
 
-Convención de "frozen": instancias creadas vía `from_coefficients` no
-tienen base subyacente; solo exponen los coeficientes y la información
-mínima. Operaciones de reconstrucción y plot de bases no están disponibles.
+Cuadratura: se emplea UNICAMENTE la regla trapezoidal, que es la regla comun a
+todo el proyecto (`utils.quadrature`). Mezclar reglas entre el suavizado y la
+FPCA degrada la ortonormalidad de las autofunciones sin producir error alguno,
+por lo que la opcion de Simpson de versiones anteriores fue eliminada.
+
+Error de reconstruccion en dos normas (siempre devuelve ambas):
+    - L^2 integrada : ||y - y_hat||_L2 = sqrt(int (y(t) - y_hat(t))^2 dt).
+    - Punto a punto : RMSE sobre la grilla.
+
+Convencion de "frozen": instancias creadas via `from_coefficients` no tienen
+base subyacente; solo exponen los coeficientes y la informacion minima.
+Operaciones de reconstruccion y graficos de base no estan disponibles.
 
 Author: model_psbp_fd
 """
@@ -38,17 +51,16 @@ from typing import Literal, Any, Optional, Dict, Tuple
 import warnings
 
 import numpy as np
-from scipy.integrate import simpson
+
+from ..utils.quadrature import pesos_trapezoidales
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Tipos
 # ─────────────────────────────────────────────────────────────────────────────
 
-RepreMethod      = Literal["bspline", "fourier", "fpca",
-                           "bspline+fpca", "fourier+fpca"]
+RepreMethod      = Literal["bspline", "fourier"]
 ProjectionMethod = Literal["l2", "discrete"]
-QuadratureMethod = Literal["trapezoid", "simpson"]
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -58,64 +70,51 @@ QuadratureMethod = Literal["trapezoid", "simpson"]
 @dataclass
 class FunctionalRepresentation:
     """
-    Representación funcional de curvas discretas para PSBP-FD.
+    Representacion funcional de curvas discretas para PSBP-FD.
 
-    Parámetros
+    Parametros
     ----------
-    method : RepreMethod
-        Método de representación. Ver módulo docstring para detalles.
+    method : {'bspline', 'fourier'}
+        Sistema de base de la proyeccion.
 
     n_basis : int, default=20
-        Número de funciones de base de la primera etapa.
-            - Para 'bspline' y 'fourier': K final.
-            - Para 'fpca' puro: ignorado.
-            - Para 'bspline+fpca' / 'fourier+fpca': K intermedio (suavizado).
-
-    n_basis_fpca : int, default=3
-        Número de componentes FPCA finales.
-            - Solo aplica si `method` contiene 'fpca'.
-            - Para 'fpca' puro: K final.
-            - Para encadenados: K final tras la reducción FPCA.
+        Numero de funciones de base (K final). Para 'fourier' se ajusta al
+        impar superior si se entrega par.
 
     order : int, default=4
-        Orden del spline (4 = cúbico). Solo aplica a 'bspline'.
+        Orden del spline (4 = cubico). Solo aplica a 'bspline'.
 
     domain : tuple[float, float], opcional
         Dominio de las curvas. Si None, se infiere de `grid` en `fit`.
 
     projection : {'l2', 'discrete'}, default='l2'
-        Tipo de proyección para 'bspline' y 'fourier'.
-
-    quadrature : {'trapezoid', 'simpson'}, default='trapezoid'
-        Regla de cuadratura para integrales L². Simpson requiere G impar.
+        Tipo de proyeccion. La proyeccion 'l2' emplea la cuadratura
+        trapezoidal comun del proyecto.
 
     center : bool, default=False
-        Si True, centra las curvas (resta la media funcional) antes de
-        proyectar/aplicar FPCA. FPCA siempre centra internamente; este
-        flag solo afecta la representación de salida.
+        Si True, centra las curvas (resta la media funcional del bloque de
+        ajuste) antes de proyectar, y la vuelve a sumar en `reconstruct`.
 
     Atributos post-fit
     ------------------
-    grid_      : (G,)         grilla de evaluación
-    domain_    : (a, b)       dominio efectivo
-    K_         : int          dimensión final de los coeficientes
-    mean_      : (G,)         media funcional de las curvas de fit
-    phi_       : (K_first, G) base inicial evaluada en grid (None si FPCA puro)
-    gram_      : (K_first, K_first)  matriz de Gram L² (solo si projection='l2')
-    basis_     : objeto skfda      base de la primera etapa
-    fpca_      : objeto FPCA       (None si no hay FPCA)
+    grid_      : (G,)     grilla de evaluacion
+    domain_    : (a, b)   dominio efectivo
+    K_         : int      dimension de los coeficientes
+    mean_      : (G,)     media funcional de las curvas de fit
+    phi_       : (K, G)   base evaluada en la grilla
+    gram_      : (K, K)   matriz de Gram L^2 (solo si projection='l2')
+    w_quad_    : (G,)     pesos de la cuadratura trapezoidal
+    basis_     : objeto skfda de la base
     is_fitted_ : bool
     """
 
-    # ── Configuración (input del usuario) ────────────────────────────────────
-    method:        RepreMethod        = "bspline"
-    n_basis:       int                = 20
-    n_basis_fpca:  int                = 3
-    order:         int                = 4
-    domain:        Optional[Tuple[float, float]] = None
-    projection:    ProjectionMethod   = "l2"
-    quadrature:    QuadratureMethod   = "trapezoid"
-    center:        bool               = False
+    # ── Configuracion (input del usuario) ────────────────────────────────────
+    method:     RepreMethod      = "bspline"
+    n_basis:    int              = 20
+    order:      int              = 4
+    domain:     Optional[Tuple[float, float]] = None
+    projection: ProjectionMethod = "l2"
+    center:     bool             = False
 
     # ── Estado interno (post-fit) ────────────────────────────────────────────
     grid_:      Optional[np.ndarray] = field(default=None, repr=False)
@@ -124,96 +123,76 @@ class FunctionalRepresentation:
     mean_:      Optional[np.ndarray] = field(default=None, repr=False)
     phi_:       Optional[np.ndarray] = field(default=None, repr=False)
     gram_:      Optional[np.ndarray] = field(default=None, repr=False)
+    w_quad_:    Optional[np.ndarray] = field(default=None, repr=False)
     basis_:     Any                  = field(default=None, repr=False)
-    fpca_:      Any                  = field(default=None, repr=False)
     is_fitted_: bool                 = field(default=False, repr=False)
     is_frozen_: bool                 = field(default=False, repr=False)
 
     # ─────────────────────────────────────────────────────────────────────
-    # Validación de configuración (al construir)
+    # Validacion de configuracion (al construir)
     # ─────────────────────────────────────────────────────────────────────
     def __post_init__(self) -> None:
-        valid_methods = {"bspline", "fourier", "fpca",
-                         "bspline+fpca", "fourier+fpca"}
+        valid_methods = {"bspline", "fourier"}
         if self.method not in valid_methods:
+            extra = ""
+            if isinstance(self.method, str) and "fpca" in self.method:
+                extra = (
+                    " Las variantes con FPCA interna fueron eliminadas: la "
+                    "FPCA del proyecto es el problema propio generalizado en "
+                    "metrica L^2 y vive en functions_models.FPCA_L2, aplicado "
+                    "sobre los coeficientes que esta clase produce."
+                )
             raise ValueError(
-                f"method='{self.method}' inválido. Opciones: {sorted(valid_methods)}"
+                f"method='{self.method}' invalido. Opciones: "
+                f"{sorted(valid_methods)}.{extra}"
             )
         if self.projection not in {"l2", "discrete"}:
             raise ValueError(
-                f"projection='{self.projection}' inválido. Use 'l2' o 'discrete'."
+                f"projection='{self.projection}' invalido. Use 'l2' o 'discrete'."
             )
-        if self.quadrature not in {"trapezoid", "simpson"}:
-            raise ValueError(
-                f"quadrature='{self.quadrature}' inválido. "
-                "Use 'trapezoid' o 'simpson'."
-            )
-        if self.n_basis < 1:
-            raise ValueError(f"n_basis debe ser ≥ 1; recibido {self.n_basis}")
-        if "fpca" in self.method and self.n_basis_fpca < 1:
-            raise ValueError(
-                f"n_basis_fpca debe ser ≥ 1; recibido {self.n_basis_fpca}"
-            )
+        if self.n_basis < 2:
+            raise ValueError(f"n_basis debe ser >= 2; recibido {self.n_basis}")
+        if self.method == "bspline" and self.order < 1:
+            raise ValueError(f"order debe ser >= 1; recibido {self.order}")
 
     # ─────────────────────────────────────────────────────────────────────
-    # API pública: fit / transform / fit_transform
+    # API principal: fit / transform / reconstruct
     # ─────────────────────────────────────────────────────────────────────
     def fit(self, Y: np.ndarray, grid: np.ndarray) -> "FunctionalRepresentation":
         """
-        Ajusta la representación funcional a `Y` evaluado en `grid`.
+        Ajusta la base sobre la grilla y calcula la media funcional del
+        bloque de ajuste.
 
-        Parámetros
-        ----------
-        Y : ndarray, shape (T, G)
-            Curvas discretas. T = observaciones, G = puntos de grilla.
-        grid : ndarray, shape (G,)
-            Puntos de evaluación.
-
-        Retorna
-        -------
-        self
+        Bajo el esquema de retencion temporal, `Y` debe contener unicamente
+        las curvas del bloque de entrenamiento; `transform` puede aplicarse
+        despues a cualquier bloque.
         """
         Y = np.asarray(Y, dtype=float)
         grid = np.asarray(grid, dtype=float)
         self._validate_Y_grid(Y, grid)
 
-        self.grid_   = grid
+        self.grid_ = grid
         self.domain_ = self.domain or (float(grid.min()), float(grid.max()))
-        self.mean_   = Y.mean(axis=0)
+        self.mean_ = Y.mean(axis=0)
+        self.w_quad_ = pesos_trapezoidales(grid)
 
-        # Curvas a usar (centradas o no) para la etapa de base
-        Y_work = (Y - self.mean_) if self.center else Y
-
-        # Etapa 1: base (B-spline, Fourier o nada si FPCA puro)
-        if self.method in ("bspline", "bspline+fpca"):
+        if self.method == "bspline":
             self._fit_bspline(grid)
-        elif self.method in ("fourier", "fourier+fpca"):
+        elif self.method == "fourier":
             self._fit_fourier(grid)
-        elif self.method == "fpca":
-            self._fit_fpca_direct(Y, grid)
-        else:
+        else:  # pragma: no cover - bloqueado en __post_init__
             raise ValueError(f"method='{self.method}' no implementado.")
 
-        # Etapa 2: FPCA encadenado, si aplica
-        if self.method in ("bspline+fpca", "fourier+fpca"):
-            theta_smooth = self._project_to_base(Y_work)   # (T, K_base)
-            self._fit_fpca_on_coefs(theta_smooth)
-
-        # Dimensión final
-        if "fpca" in self.method:
-            self.K_ = self.n_basis_fpca
-        else:
-            self.K_ = self.phi_.shape[0]
-
+        self.K_ = self.phi_.shape[0]
         self.is_fitted_ = True
         return self
 
     def transform(self, Y: np.ndarray,
                   grid: Optional[np.ndarray] = None) -> np.ndarray:
         """
-        Proyecta nuevas curvas en la base ajustada → THETA (T, K).
+        Proyecta nuevas curvas en la base ajustada -> THETA (T, K).
 
-        Parámetros
+        Parametros
         ----------
         Y    : (T_new, G)
         grid : (G,), opcional. Si None, usa la grilla del fit.
@@ -225,16 +204,16 @@ class FunctionalRepresentation:
         self._check_fitted()
         if self.is_frozen_:
             raise RuntimeError(
-                "Instancia frozen (creada vía from_coefficients). "
-                "transform() no aplica; los coeficientes ya son la representación."
+                "Instancia frozen (creada via from_coefficients). "
+                "transform() no aplica; los coeficientes ya son la representacion."
             )
 
         Y = np.asarray(Y, dtype=float)
         grid_used = self.grid_ if grid is None else np.asarray(grid, dtype=float)
         if grid is not None and not np.allclose(grid_used, self.grid_):
             warnings.warn(
-                "grid distinto al usado en fit(); los coeficientes pueden no ser "
-                "comparables a los del entrenamiento.",
+                "La grilla entregada difiere de la usada en fit(); la base "
+                "evaluada corresponde a la grilla original.",
                 UserWarning,
             )
 
@@ -244,35 +223,23 @@ class FunctionalRepresentation:
             )
 
         Y_work = (Y - self.mean_) if self.center else Y
-
-        if self.method == "fpca":
-            return self._transform_fpca_direct(Y_work, grid_used)
-
-        theta_base = self._project_to_base(Y_work)        # (T, K_base)
-
-        if self.method in ("bspline+fpca", "fourier+fpca"):
-            # Proyecta los coeficientes de la base sobre los autovectores FPCA
-            # Centrado interno de FPCA-on-coefs ya manejado en _fit_fpca_on_coefs.
-            theta_centered = theta_base - self._fpca_mean_coefs
-            return theta_centered @ self._fpca_components_coefs.T  # (T, K_fpca)
-
-        return theta_base
+        return self._project_to_base(Y_work)
 
     def fit_transform(self, Y: np.ndarray, grid: np.ndarray) -> np.ndarray:
         """Atajo: fit(Y, grid).transform(Y, grid)."""
         return self.fit(Y, grid).transform(Y, grid)
 
     # ─────────────────────────────────────────────────────────────────────
-    # Reconstrucción y error
+    # Reconstruccion y error
     # ─────────────────────────────────────────────────────────────────────
     def reconstruct(self, THETA: np.ndarray) -> np.ndarray:
         """
         Reconstruye curvas en escala original a partir de los coeficientes.
 
         Si `center=True` fue usado en fit, la media funcional se vuelve a
-        sumar automáticamente.
+        sumar automaticamente.
 
-        Parámetros
+        Parametros
         ----------
         THETA : (T, K_)
 
@@ -285,16 +252,7 @@ class FunctionalRepresentation:
             raise RuntimeError("reconstruct() no disponible para instancias frozen.")
 
         THETA = np.asarray(THETA, dtype=float)
-
-        if self.method == "fpca":
-            Y_hat = self._reconstruct_fpca_direct(THETA)
-        elif self.method in ("bspline+fpca", "fourier+fpca"):
-            # THETA (T, K_fpca) → coeficientes en base intermedia → curvas
-            theta_base = THETA @ self._fpca_components_coefs + self._fpca_mean_coefs
-            Y_hat = theta_base @ self.phi_                # (T, G)
-        else:
-            # B-spline o Fourier puro
-            Y_hat = THETA @ self.phi_                     # (T, G)
+        Y_hat = THETA @ self.phi_                          # (T, G)
 
         if self.center:
             Y_hat = Y_hat + self.mean_
@@ -305,17 +263,17 @@ class FunctionalRepresentation:
                              grid: Optional[np.ndarray] = None
                              ) -> Dict[str, float]:
         """
-        Error de reconstrucción en dos normas:
+        Error de reconstruccion en dos normas:
 
-            - 'l2'       : ‖y - ŷ‖_L² = √(∫ (y(t) - ŷ(t))² dt)
-            - 'pointwise': ‖y - ŷ‖_2 / √G  (RMSE punto a punto)
+            - 'l2'       : ||y - y_hat||_L2 = sqrt(int (y(t) - y_hat(t))^2 dt)
+            - 'pointwise': RMSE punto a punto sobre la grilla
 
         Retorna
         -------
         dict con:
-            'rmse_l2_mean',     'rmse_l2_std'
-            'rmse_pw_mean',     'rmse_pw_std'
-            'rel_l2_mean',      'rel_l2_std'
+            'rmse_l2_mean',  'rmse_l2_std'
+            'rmse_pw_mean',  'rmse_pw_std'
+            'rel_l2_mean',   'rel_l2_std'
         """
         self._check_fitted()
         Y = np.asarray(Y, dtype=float)
@@ -325,68 +283,23 @@ class FunctionalRepresentation:
         Y_hat = self.reconstruct(THETA)
         residuals = Y - Y_hat                              # (T, G)
 
-        # L² integrada
-        l2_sq = self._integrate_L2(residuals ** 2, grid_used)  # (T,)
-        l2_norm_y = np.sqrt(self._integrate_L2(Y ** 2, grid_used))
+        # L^2 integrada (cuadratura trapezoidal comun)
+        l2_sq = self._integrate_L2(residuals ** 2)         # (T,)
+        l2_norm_y = np.sqrt(self._integrate_L2(Y ** 2))
         rmse_l2 = np.sqrt(l2_sq)
-        rel_l2  = rmse_l2 / (l2_norm_y + 1e-12)
+        rel_l2 = rmse_l2 / (l2_norm_y + 1e-12)
 
         # Punto a punto
         rmse_pw = np.sqrt((residuals ** 2).mean(axis=1))
 
         return {
-            "rmse_l2_mean":  float(rmse_l2.mean()),
-            "rmse_l2_std":   float(rmse_l2.std()),
-            "rmse_pw_mean":  float(rmse_pw.mean()),
-            "rmse_pw_std":   float(rmse_pw.std()),
-            "rel_l2_mean":   float(rel_l2.mean()),
-            "rel_l2_std":    float(rel_l2.std()),
+            "rmse_l2_mean": float(rmse_l2.mean()),
+            "rmse_l2_std":  float(rmse_l2.std()),
+            "rmse_pw_mean": float(rmse_pw.mean()),
+            "rmse_pw_std":  float(rmse_pw.std()),
+            "rel_l2_mean":  float(rel_l2.mean()),
+            "rel_l2_std":   float(rel_l2.std()),
         }
-
-    # ─────────────────────────────────────────────────────────────────────
-    # FPCA: información de varianza y componentes
-    # ─────────────────────────────────────────────────────────────────────
-    def fpca_explained_variance(self) -> np.ndarray:
-        """
-        Varianza explicada por cada FPC.
-
-        Para 'fpca' puro: viene del FPCA de skfda.
-        Para encadenados: viene del PCA hecho sobre los coeficientes.
-        """
-        self._check_fitted()
-        if "fpca" not in self.method:
-            raise RuntimeError(
-                f"fpca_explained_variance() no aplica a method='{self.method}'."
-            )
-        if self.method == "fpca":
-            return np.asarray(self.fpca_.explained_variance_ratio_)
-        return self._fpca_explained_variance_coefs
-
-    def fpca_components(self, grid: Optional[np.ndarray] = None) -> np.ndarray:
-        """
-        Componentes principales funcionales evaluadas en una grilla.
-
-        Retorna
-        -------
-        comps : (K_fpca, G)
-            Las K_fpca componentes en la grilla solicitada.
-        """
-        self._check_fitted()
-        if "fpca" not in self.method:
-            raise RuntimeError(
-                f"fpca_components() no aplica a method='{self.method}'."
-            )
-        grid_used = self.grid_ if grid is None else np.asarray(grid, dtype=float)
-
-        if self.method == "fpca":
-            # Componentes funcionales directos de skfda
-            comps_fd = self.fpca_.components_(grid_used)   # shape variable
-            return np.asarray(comps_fd).squeeze().reshape(self.K_, -1)
-
-        # Encadenado: cada componente es combinación lineal de phi_
-        # comps_funcionales[k](t) = Σ_j eigvec[k,j] · phi_j(t)
-        # → en grilla: comps[k, :] = eigvec[k, :] @ phi_
-        return self._fpca_components_coefs @ self.phi_     # (K_fpca, G)
 
     # ─────────────────────────────────────────────────────────────────────
     # Constructor alternativo: from_coefficients (instancia "frozen")
@@ -397,53 +310,43 @@ class FunctionalRepresentation:
         Crea una instancia 'frozen' sin base subyacente, a partir de
         coeficientes ya proyectados externamente.
 
-        Útil cuando el usuario tiene coeficientes calculados en R/fda u otro
+        Util cuando el usuario tiene coeficientes calculados en R/fda u otro
         software y solo quiere usarlos como entrada al modelo PSBP.
 
-        Parámetros
+        Parametros
         ----------
         THETA : (T, K)
 
         Retorna
         -------
-        instancia con `is_frozen_=True`. Métodos de reconstrucción, plots
-        de bases y `transform` no estarán disponibles.
+        instancia con `is_frozen_=True`. Metodos de reconstruccion, graficos
+        de bases y `transform` no estaran disponibles.
         """
         THETA = np.asarray(THETA, dtype=float)
         if THETA.ndim != 2:
             raise ValueError(f"THETA debe ser 2D; shape={THETA.shape}")
         obj = cls(method="bspline")  # placeholder
-        obj.K_         = THETA.shape[1]
+        obj.K_ = THETA.shape[1]
         obj.is_fitted_ = True
         obj.is_frozen_ = True
         obj._frozen_THETA = THETA
         return obj
 
     # ═════════════════════════════════════════════════════════════════════
-    # Implementación interna
+    # Implementacion interna
     # ═════════════════════════════════════════════════════════════════════
 
-    # ── Cuadratura L² ────────────────────────────────────────────────────
-    def _integrate_L2(self, F: np.ndarray,
-                      grid: Optional[np.ndarray] = None) -> np.ndarray:
+    # ── Cuadratura L^2 ───────────────────────────────────────────────────
+    def _integrate_L2(self, F: np.ndarray) -> np.ndarray:
         """
-        Integra F sobre la grilla con la regla de cuadratura configurada.
-
-        F: (T, G) o (G,). Retorna (T,) o escalar.
+        Integra F (T, G) o (G,) sobre la grilla con la cuadratura trapezoidal
+        del proyecto. F @ w equivale a np.trapezoid(F, x=grid) sobre la misma
+        grilla, pero deja explicitos los pesos que comparten la matriz de
+        Gram, la proyeccion y la FPCA generalizada.
         """
-        grid_used = self.grid_ if grid is None else grid
-        if self.quadrature == "simpson":
-            if len(grid_used) % 2 == 0:
-                warnings.warn(
-                    "Simpson requiere número impar de puntos. "
-                    "Cayendo a trapezoidal para esta llamada.",
-                    UserWarning,
-                )
-                return np.trapezoid(F, x=grid_used, axis=-1)
-            return simpson(F, x=grid_used, axis=-1)
-        return np.trapezoid(F, x=grid_used, axis=-1)
+        return np.asarray(F, dtype=float) @ self.w_quad_
 
-    # ── Etapa 1: B-spline ────────────────────────────────────────────────
+    # ── Ajuste de bases ──────────────────────────────────────────────────
     def _fit_bspline(self, grid: np.ndarray) -> None:
         try:
             from skfda.representation.basis import BSplineBasis
@@ -458,11 +361,7 @@ class FunctionalRepresentation:
             order=self.order,
         )
         self.basis_ = basis
-        phi = np.asarray(basis(grid)).squeeze()
-        # Asegurar shape (K, G)
-        if phi.shape[0] != self.n_basis:
-            phi = phi.T
-        self.phi_ = phi
+        self.phi_ = self._eval_basis(basis, grid, self.n_basis)
 
         if self.projection == "l2":
             self._compute_gram()
@@ -491,122 +390,75 @@ class FunctionalRepresentation:
             period=period,
         )
         self.basis_ = basis
-        phi = np.asarray(basis(grid)).squeeze()
-        if phi.shape[0] != n_basis_used:
-            phi = phi.T
-        self.phi_ = phi
+        self.phi_ = self._eval_basis(basis, grid, n_basis_used)
 
         if self.projection == "l2":
             self._compute_gram()
 
+    @staticmethod
+    def _eval_basis(basis, grid: np.ndarray, n_basis: int) -> np.ndarray:
+        """
+        Evalua la base en la grilla garantizando la forma (K, G).
+
+        La orientacion se decide contra la longitud de la grilla y no contra
+        `n_basis`: cuando K == G ambas dimensiones coinciden y una comparacion
+        contra `n_basis` no puede detectar una matriz transpuesta. skfda
+        retorna la evaluacion con las funciones en el primer eje, de modo que
+        en el caso cuadrado la forma ya es la correcta y no debe transponerse.
+        """
+        phi = np.asarray(basis(grid)).squeeze()
+        G = len(grid)
+        if phi.ndim != 2:
+            raise RuntimeError(
+                f"La evaluacion de la base retorno forma {phi.shape}; se "
+                "esperaba una matriz 2D."
+            )
+        if phi.shape == (n_basis, G):
+            return phi
+        if phi.shape == (G, n_basis):
+            return phi.T
+        raise RuntimeError(
+            f"La evaluacion de la base tiene forma {phi.shape}, incompatible "
+            f"con (K={n_basis}, G={G})."
+        )
+
+    # ── Matriz de Gram y proyeccion ──────────────────────────────────────
     def _compute_gram(self) -> None:
         """
-        Matriz de Gram L²: G_jk = ∫ φ_j(t) φ_k(t) dt, con la cuadratura
-        configurada.
+        Matriz de Gram L^2: G_jk = int phi_j(t) phi_k(t) dt, con la cuadratura
+        trapezoidal del proyecto, vectorizada:
+
+            gram = (phi * w) phi',
+
+        y simetrizada para eliminar la asimetria numerica residual.
         """
-        K, G = self.phi_.shape
-        # phi_outer[j, k, g] = phi_[j, g] * phi_[k, g]
-        # Para evitar el array 3D (memoria), iteramos sobre k.
-        gram = np.zeros((K, K))
-        for k in range(K):
-            integrand = self.phi_ * self.phi_[k][None, :]      # (K, G)
-            gram[:, k] = self._integrate_L2(integrand)
-        # Simetrizar por numérica
+        Phi_w = self.phi_ * self.w_quad_[None, :]          # (K, G)
+        gram = Phi_w @ self.phi_.T                          # (K, K)
         self.gram_ = 0.5 * (gram + gram.T)
 
-    # ── Proyección a la base inicial ─────────────────────────────────────
     def _project_to_base(self, Y: np.ndarray) -> np.ndarray:
         """
-        Proyecta Y (T, G) sobre phi_ → coeficientes (T, K_base).
+        Proyecta Y (T, G) sobre phi_ -> coeficientes (T, K).
+
+        Proyeccion 'l2' vectorizada:
+            B[t, j] = int y_t(s) phi_j(s) ds = (Y * w) phi'[:, j]
+            THETA   = solve(gram, B')'.
         """
         if self.projection == "discrete":
-            # THETA' = (Φ Φ')⁻¹ Φ Y'  →  THETA = Y Φ' (Φ Φ')⁻¹
-            A = self.phi_ @ self.phi_.T                   # (K, K)
-            B = Y @ self.phi_.T                            # (T, K)
+            # THETA' = (Phi Phi')^{-1} Phi Y'  ->  THETA = Y Phi' (Phi Phi')^{-1}
+            A = self.phi_ @ self.phi_.T                     # (K, K)
+            B = Y @ self.phi_.T                             # (T, K)
             return np.linalg.solve(A.T, B.T).T
 
-        # L²: THETA = G⁻¹ B,  B_j = ∫ y(t) φ_j(t) dt
-        # B[t, j] = ∫ Y[t,:] · phi_[j, :] dt
-        # Vectorizado: B = ∫ Y[t,g] phi_[j,g] dg  → (T, K)
-        B = np.zeros((Y.shape[0], self.phi_.shape[0]))
-        for j in range(self.phi_.shape[0]):
-            integrand = Y * self.phi_[j][None, :]          # (T, G)
-            B[:, j] = self._integrate_L2(integrand)
-        # Resolver gram_ @ THETA' = B'  → THETA = (gram⁻¹ B')'
+        B = (Y * self.w_quad_[None, :]) @ self.phi_.T       # (T, K)
         return np.linalg.solve(self.gram_, B.T).T
 
-    # ── Etapa 2: FPCA directo sobre curvas ───────────────────────────────
-    def _fit_fpca_direct(self, Y: np.ndarray, grid: np.ndarray) -> None:
-        try:
-            from skfda import FDataGrid
-            from skfda.preprocessing.dim_reduction import FPCA
-        except ImportError as e:
-            raise ImportError(
-                "skfda es requerido. Instalar con: pip install scikit-fda"
-            ) from e
-
-        fd = FDataGrid(data_matrix=Y, grid_points=grid,
-                       domain_range=self.domain_)
-        fpca = FPCA(n_components=self.n_basis_fpca)
-        fpca.fit(fd)
-        self.fpca_ = fpca
-        # phi_ no aplica en FPCA directo; mantenemos None.
-
-    def _transform_fpca_direct(self, Y: np.ndarray,
-                               grid: np.ndarray) -> np.ndarray:
-        from skfda import FDataGrid
-        fd = FDataGrid(data_matrix=Y, grid_points=grid,
-                       domain_range=self.domain_)
-        return np.asarray(self.fpca_.transform(fd))
-
-    def _reconstruct_fpca_direct(self, THETA: np.ndarray) -> np.ndarray:
-        """
-        Reconstrucción para 'fpca' puro: Y_hat = scores @ components + mean.
-        """
-        fpca = self.fpca_
-        comps_grid = self.fpca_components(self.grid_)      # (K_fpca, G)
-        mean_curve = np.asarray(fpca.mean_(self.grid_)).squeeze()
-        return THETA @ comps_grid + mean_curve
-
-    # ── Etapa 2: FPCA encadenado sobre coeficientes ──────────────────────
-    def _fit_fpca_on_coefs(self, THETA_base: np.ndarray) -> None:
-        """
-        PCA estándar sobre los coeficientes de la base intermedia.
-
-        THETA_base : (T, K_base)
-        Genera:
-            self._fpca_mean_coefs       : (K_base,)
-            self._fpca_components_coefs : (K_fpca, K_base)
-            self._fpca_explained_variance_coefs : (K_fpca,)
-        """
-        K_base = THETA_base.shape[1]
-        if self.n_basis_fpca > K_base:
-            raise ValueError(
-                f"n_basis_fpca={self.n_basis_fpca} > n_basis={K_base}. "
-                "El número de componentes FPCA no puede exceder K_base."
-            )
-
-        mean_c = THETA_base.mean(axis=0)
-        Xc = THETA_base - mean_c                            # (T, K_base)
-
-        # SVD: Xc = U S Vt → componentes son las filas de Vt
-        U, S, Vt = np.linalg.svd(Xc, full_matrices=False)
-        var_total = (S ** 2).sum()
-        if var_total <= 0:
-            raise ValueError(
-                "Varianza nula en los coeficientes; no se puede aplicar FPCA."
-            )
-
-        self._fpca_mean_coefs            = mean_c
-        self._fpca_components_coefs      = Vt[:self.n_basis_fpca, :]   # (K_fpca, K_base)
-        self._fpca_explained_variance_coefs = (S ** 2 / var_total)[:self.n_basis_fpca]
-
     # ─────────────────────────────────────────────────────────────────────
-    # Plots (mantenidos en la clase para uso del orquestador)
+    # Graficos (mantenidos en la clase para uso del orquestador)
     # ─────────────────────────────────────────────────────────────────────
     def plot_basis(self, ax=None, title: Optional[str] = None,
                    alpha: float = 0.8, linewidth: float = 1.5):
-        """Funciones de base (o FPCs) evaluadas en la grilla."""
+        """Funciones de base evaluadas en la grilla."""
         self._check_fitted()
         if self.is_frozen_:
             raise RuntimeError("plot_basis() no disponible para frozen.")
@@ -615,19 +467,11 @@ class FunctionalRepresentation:
         if ax is None:
             _, ax = plt.subplots(figsize=(8, 4))
 
-        if "fpca" in self.method:
-            comps = self.fpca_components(self.grid_)       # (K_fpca, G)
-            for k in range(self.K_):
-                ax.plot(self.grid_, comps[k], alpha=alpha, lw=linewidth,
-                        label=f"FPC {k+1}" if self.K_ <= 10 else None)
-            ax.set_title(title or
-                         f"FPCs | method='{self.method}' | K={self.K_}")
-        else:
-            for k in range(self.K_):
-                ax.plot(self.grid_, self.phi_[k], alpha=alpha, lw=linewidth,
-                        label=f"Base {k+1}" if self.K_ <= 10 else None)
-            ax.set_title(title or
-                         f"Base | method='{self.method}' | K={self.K_}")
+        for k in range(self.K_):
+            ax.plot(self.grid_, self.phi_[k], alpha=alpha, lw=linewidth,
+                    label=f"Base {k+1}" if self.K_ <= 10 else None)
+        ax.set_title(title or
+                     f"Base | method='{self.method}' | K={self.K_}")
 
         if self.K_ <= 10:
             ax.legend(loc="upper right", fontsize=7)
@@ -638,7 +482,7 @@ class FunctionalRepresentation:
     def plot_curves(self, Y: np.ndarray, grid: Optional[np.ndarray] = None,
                     n_show: int = 5, ax=None,
                     title: Optional[str] = None, seed: Optional[int] = None):
-        """Curvas originales vs reconstruidas."""
+        """Curvas originales vs reconstruidas (muestra aleatoria)."""
         self._check_fitted()
         if self.is_frozen_:
             raise RuntimeError("plot_curves() no disponible para frozen.")
@@ -647,32 +491,32 @@ class FunctionalRepresentation:
         if ax is None:
             _, ax = plt.subplots(figsize=(8, 4))
 
-        Y_arr = np.asarray(Y)
-        grid_used = self.grid_ if grid is None else grid
-
+        Y_arr = np.asarray(Y, dtype=float)
+        grid_used = self.grid_ if grid is None else np.asarray(grid, dtype=float)
         rng = np.random.default_rng(seed)
-        T = Y_arr.shape[0]
-        idx = rng.choice(T, size=min(n_show, T), replace=False)
+        idx = rng.choice(Y_arr.shape[0], size=min(n_show, Y_arr.shape[0]),
+                         replace=False)
 
-        THETA = self.transform(Y_arr, grid_used)
+        THETA = self.transform(Y_arr[idx], grid_used)
         Y_hat = self.reconstruct(THETA)
 
-        for i, k in enumerate(idx):
-            color = f"C{i % 10}"
-            ax.plot(grid_used, Y_arr[k], color=color, lw=1.2, alpha=0.7,
-                    label="Original" if i == 0 else None)
+        colors = plt.cm.tab10(np.linspace(0, 1, len(idx)))
+        for k, (i, color) in enumerate(zip(idx, colors)):
+            ax.plot(grid_used, Y_arr[i], color=color, lw=1.2, alpha=0.7,
+                    label=f"obs {i}" if len(idx) <= 8 else None)
             ax.plot(grid_used, Y_hat[k], color=color, lw=1.5, ls="--",
-                    label="Reconstruida" if i == 0 else None)
-        ax.set_xlabel("t"); ax.set_ylabel("Y(t)")
-        ax.set_title(title or f"Originales vs reconstruidas (n={len(idx)})")
-        ax.legend(loc="best", fontsize=8)
+                    alpha=0.9)
+        ax.set_title(title or
+                     f"Original (solida) vs reconstruida (punteada) | K={self.K_}")
+        if len(idx) <= 8:
+            ax.legend(loc="upper right", fontsize=7)
+        ax.set_xlabel("t")
         ax.grid(True, ls="--", alpha=0.4)
         return ax
 
     def plot_mean(self, Y: Optional[np.ndarray] = None, ax=None,
-                  title: Optional[str] = None, show_ci: bool = True,
-                  ci_alpha: float = 0.3):
-        """Media funcional con banda ±1 std."""
+                  title: Optional[str] = None):
+        """Media funcional +- 1 desviacion estandar puntual."""
         self._check_fitted()
         if self.is_frozen_:
             raise RuntimeError("plot_mean() no disponible para frozen.")
@@ -682,86 +526,50 @@ class FunctionalRepresentation:
             _, ax = plt.subplots(figsize=(8, 4))
 
         if Y is not None:
-            Y_arr = np.asarray(Y)
+            Y_arr = np.asarray(Y, dtype=float)
             mean_curve = Y_arr.mean(axis=0)
             std_curve = Y_arr.std(axis=0)
+            ax.fill_between(self.grid_, mean_curve - std_curve,
+                            mean_curve + std_curve, alpha=0.25,
+                            label="+- 1 std")
         else:
             mean_curve = self.mean_
-            std_curve  = None
-
         ax.plot(self.grid_, mean_curve, color="darkblue", lw=2.5,
-                label="Media funcional")
-        if show_ci and std_curve is not None:
-            ax.fill_between(self.grid_, mean_curve - std_curve,
-                            mean_curve + std_curve,
-                            color="darkblue", alpha=ci_alpha, label="±1 std")
-        ax.set_xlabel("t"); ax.set_ylabel("Y(t)")
+                label="media")
         ax.set_title(title or "Media funcional")
-        ax.legend(loc="best", fontsize=8)
+        ax.legend(loc="upper right", fontsize=8)
+        ax.set_xlabel("t")
         ax.grid(True, ls="--", alpha=0.4)
         return ax
 
     def plot_coefficients(self, THETA: np.ndarray, ax=None,
-                          title: Optional[str] = None,
-                          cmap: str = "viridis"):
-        """Heatmap (T, K) de coeficientes."""
-        self._check_fitted()
+                          title: Optional[str] = None):
+        """Mapa de calor de los coeficientes (T x K)."""
         import matplotlib.pyplot as plt
         if ax is None:
             _, ax = plt.subplots(figsize=(8, 4))
 
-        im = ax.imshow(np.asarray(THETA), aspect="auto", cmap=cmap,
-                       interpolation="nearest")
-        plt.colorbar(im, ax=ax, label="Coeficiente")
-        ax.set_xlabel("k"); ax.set_ylabel("t (observación)")
-        ax.set_title(title or
-                     f"Coeficientes (T={THETA.shape[0]}, K={THETA.shape[1]})")
+        im = ax.imshow(np.asarray(THETA, dtype=float).T, aspect="auto",
+                       origin="lower", cmap="RdBu_r")
+        plt.colorbar(im, ax=ax, shrink=0.85)
+        ax.set_xlabel("t (observacion)")
+        ax.set_ylabel("coeficiente k")
+        ax.set_title(title or f"Coeficientes THETA' ({self.K_} x T)")
         return ax
 
-    def plot_fpca_variance(self, ax=None, title: Optional[str] = None):
-        """Scree plot de varianza explicada FPCA."""
-        self._check_fitted()
-        if "fpca" not in self.method:
-            raise RuntimeError(
-                f"plot_fpca_variance() no aplica a method='{self.method}'."
-            )
-
-        import matplotlib.pyplot as plt
-        if ax is None:
-            _, ax = plt.subplots(figsize=(8, 4))
-
-        evr = self.fpca_explained_variance()
-        cumsum = np.cumsum(evr)
-        x = np.arange(1, len(evr) + 1)
-
-        ax.bar(x, evr * 100, color="steelblue", alpha=0.7, label="Individual")
-        ax.plot(x, cumsum * 100, color="crimson", marker="o", lw=2,
-                label="Acumulada")
-        ax.axhline(90, color="gray", ls="--", lw=1, label="90%")
-        ax.set_xticks(x)
-        ax.set_xlabel("FPC"); ax.set_ylabel("Varianza explicada (%)")
-        ax.set_title(title or "Varianza explicada por FPCA")
-        ax.legend(loc="best", fontsize=8)
-        ax.grid(True, ls="--", alpha=0.4)
-        return ax
-
-    # ─────────────────────────────────────────────────────────────────────
-    # Mini-reporte (combina plots para el orquestador)
-    # ─────────────────────────────────────────────────────────────────────
-    def report(self, Y: np.ndarray,
-               grid: Optional[np.ndarray] = None,
-               save_path: Optional[str] = None,
-               n_curves_show: int = 8) -> Dict[str, Any]:
+    def report(self, Y: np.ndarray, grid: Optional[np.ndarray] = None,
+               n_curves_show: int = 5,
+               save_path: Optional[str] = None) -> Dict[str, Any]:
         """
-        Genera figura de diagnóstico con 4 paneles (2x2):
-            (a) Base / FPCs.
-            (b) Media funcional ± 1 std.
+        Genera figura de diagnostico con 4 paneles (2x2):
+            (a) Base.
+            (b) Media funcional +- 1 std.
             (c) Curvas originales vs reconstruidas.
-            (d) Varianza explicada (si FPCA) o coeficientes (heatmap, si no).
+            (d) Coeficientes (mapa de calor).
 
         Retorna
         -------
-        dict con métricas de reconstrucción y, si `save_path`, ruta de la figura.
+        dict con metricas de reconstruccion y, si `save_path`, ruta de la figura.
         """
         self._check_fitted()
         if self.is_frozen_:
@@ -775,8 +583,7 @@ class FunctionalRepresentation:
         fig.suptitle(
             f"FunctionalRepresentation — method='{self.method}' "
             f"| n_basis={self.n_basis}"
-            + (f", n_basis_fpca={self.n_basis_fpca}" if "fpca" in self.method else "")
-            + f" | projection='{self.projection}'",
+            f" | projection='{self.projection}'",
             fontsize=11,
         )
 
@@ -784,11 +591,8 @@ class FunctionalRepresentation:
         self.plot_mean(Y=Y, ax=axes[0, 1])
         self.plot_curves(Y=Y, grid=grid_used, n_show=n_curves_show, ax=axes[1, 0])
 
-        if "fpca" in self.method:
-            self.plot_fpca_variance(ax=axes[1, 1])
-        else:
-            THETA = self.transform(Y, grid_used)
-            self.plot_coefficients(THETA, ax=axes[1, 1])
+        THETA = self.transform(Y, grid_used)
+        self.plot_coefficients(THETA, ax=axes[1, 1])
 
         plt.tight_layout()
         result: Dict[str, Any] = {
@@ -801,7 +605,7 @@ class FunctionalRepresentation:
         return result
 
     # ─────────────────────────────────────────────────────────────────────
-    # Información y serialización
+    # Informacion y serializacion
     # ─────────────────────────────────────────────────────────────────────
     def summary(self) -> None:
         if not self.is_fitted_:
@@ -810,45 +614,33 @@ class FunctionalRepresentation:
             return
         print(f"FunctionalRepresentation | method='{self.method}' | K={self.K_}")
         print(f"  n_basis      : {self.n_basis}")
-        if "fpca" in self.method:
-            print(f"  n_basis_fpca : {self.n_basis_fpca}")
         print(f"  projection   : {self.projection}")
-        print(f"  quadrature   : {self.quadrature}")
+        print(f"  quadrature   : trapezoidal (regla comun del proyecto)")
         print(f"  center       : {self.center}")
         if self.grid_ is not None:
             print(f"  grid         : {len(self.grid_)} pts en "
                   f"[{self.grid_.min():.3f}, {self.grid_.max():.3f}]")
-        if "fpca" in self.method:
-            try:
-                evr = self.fpca_explained_variance()
-                print(f"  var. acumul. : {np.cumsum(evr)[-1]*100:.2f}%")
-            except Exception:
-                pass
 
     def get_config(self) -> Dict[str, Any]:
-        """Configuración serializable (no incluye objetos skfda)."""
+        """Configuracion serializable (no incluye objetos skfda)."""
         return {
-            "method":        self.method,
-            "n_basis":       self.n_basis,
-            "n_basis_fpca":  self.n_basis_fpca,
-            "order":         self.order,
-            "domain":        self.domain,
-            "projection":    self.projection,
-            "quadrature":    self.quadrature,
-            "center":        self.center,
-            "K_":            self.K_,
-            "is_fitted":     self.is_fitted_,
-            "is_frozen":     self.is_frozen_,
+            "method":     self.method,
+            "n_basis":    self.n_basis,
+            "order":      self.order,
+            "domain":     self.domain,
+            "projection": self.projection,
+            "quadrature": "trapezoidal",
+            "center":     self.center,
+            "K_":         self.K_,
+            "is_fitted":  self.is_fitted_,
+            "is_frozen":  self.is_frozen_,
         }
 
     def __repr__(self) -> str:
         status = (f"frozen(K={self.K_})" if self.is_frozen_
                   else (f"fitted(K={self.K_})" if self.is_fitted_ else "not fitted"))
         return (f"FunctionalRepresentation(method='{self.method}', "
-                f"n_basis={self.n_basis}, "
-                + (f"n_basis_fpca={self.n_basis_fpca}, "
-                   if "fpca" in self.method else "")
-                + f"{status})")
+                f"n_basis={self.n_basis}, {status})")
 
     # ─────────────────────────────────────────────────────────────────────
     # Validaciones internas

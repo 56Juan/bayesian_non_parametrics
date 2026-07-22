@@ -26,41 +26,86 @@
     "fpc_4_lag3",
     "fpc_5_lag3"
   ],
+  "T": 150,
+  "T0": 120,
+  "prop_train": 0.8,
+  "n_train_eff": 117,
+  "n_test_eff": 30,
+  "ajuste_en": "train",
   "datasets": {
-    "dataset_fpc_1.csv": {
-      "response": "fpc_1",
-      "shape": [
-        147,
-        16
-      ]
+    "train": {
+      "dataset_fpc_1_train.csv": {
+        "response": "fpc_1",
+        "shape": [
+          117,
+          16
+        ]
+      },
+      "dataset_fpc_2_train.csv": {
+        "response": "fpc_2",
+        "shape": [
+          117,
+          16
+        ]
+      },
+      "dataset_fpc_3_train.csv": {
+        "response": "fpc_3",
+        "shape": [
+          117,
+          16
+        ]
+      },
+      "dataset_fpc_4_train.csv": {
+        "response": "fpc_4",
+        "shape": [
+          117,
+          16
+        ]
+      },
+      "dataset_fpc_5_train.csv": {
+        "response": "fpc_5",
+        "shape": [
+          117,
+          16
+        ]
+      }
     },
-    "dataset_fpc_2.csv": {
-      "response": "fpc_2",
-      "shape": [
-        147,
-        16
-      ]
-    },
-    "dataset_fpc_3.csv": {
-      "response": "fpc_3",
-      "shape": [
-        147,
-        16
-      ]
-    },
-    "dataset_fpc_4.csv": {
-      "response": "fpc_4",
-      "shape": [
-        147,
-        16
-      ]
-    },
-    "dataset_fpc_5.csv": {
-      "response": "fpc_5",
-      "shape": [
-        147,
-        16
-      ]
+    "test": {
+      "dataset_fpc_1_test.csv": {
+        "response": "fpc_1",
+        "shape": [
+          30,
+          16
+        ]
+      },
+      "dataset_fpc_2_test.csv": {
+        "response": "fpc_2",
+        "shape": [
+          30,
+          16
+        ]
+      },
+      "dataset_fpc_3_test.csv": {
+        "response": "fpc_3",
+        "shape": [
+          30,
+          16
+        ]
+      },
+      "dataset_fpc_4_test.csv": {
+        "response": "fpc_4",
+        "shape": [
+          30,
+          16
+        ]
+      },
+      "dataset_fpc_5_test.csv": {
+        "response": "fpc_5",
+        "shape": [
+          30,
+          16
+        ]
+      }
     }
   }
 }
