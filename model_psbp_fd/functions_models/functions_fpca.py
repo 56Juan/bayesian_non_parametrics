@@ -273,8 +273,21 @@ class FPCA_L2:
           bloque de entrenamiento; su desviacion en el bloque de prueba es
           diagnostica de deriva del proceso, no un error.
         - Si se entrega `fr`: linealidad de `reconstruct` como mapa Theta Phi^T.
+
+        Puede invocarse antes de fijar el numero de componentes: en ese caso la
+        verificacion emplea la base completa (M = K), lo que corresponde a un
+        diagnostico del ajuste con independencia del truncamiento posterior.
         """
-        self._check_M()
+        self._check_fitted()
+        M_previo = self.n_components
+        if self.n_components is None:
+            self.n_components = int(self.evals.size)
+        try:
+            return self._verificar_impl(THETA_train, fr, tol)
+        finally:
+            self.n_components = M_previo
+
+    def _verificar_impl(self, THETA_train, fr, tol) -> dict:
         w = pesos_trapezoidales(self.tau)
         Psi = self.Psi_grid
         M = self.M

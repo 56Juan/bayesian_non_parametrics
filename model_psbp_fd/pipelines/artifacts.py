@@ -232,6 +232,38 @@ class ArtefactosFPCA:
         S = np.atleast_2d(np.asarray(SCORES, dtype=float))
         return S @ self.B.T + self.mu_theta[None, :]
 
+    def transform(self, THETA: np.ndarray) -> np.ndarray:
+        """
+        Coeficientes de la base -> scores (T, M), en escala original.
+
+        Replica `FPCA_L2.transform` sobre los artefactos leidos desde disco:
+
+            xi = (theta - mu_theta) W B,
+
+        donde `mu_theta`, `W` y `B` fueron estimados exclusivamente con el
+        bloque de entrenamiento. Por construccion, proyectar coeficientes de
+        prueba con este metodo no introduce fuga de informacion: el centrado
+        emplea siempre la media del bloque de ajuste.
+
+        Parametros
+        ----------
+        THETA : (T, K) coeficientes de las curvas en la base B-spline
+                (salida de `FunctionalRepresentation.transform`).
+
+        Retorna
+        -------
+        SCORES : (T, M) scores FPCA en escala original (NO estandarizados;
+                 aplicar despues el `DataStandardizer` persistido si el
+                 modelo consume scores estandarizados).
+        """
+        TH = np.atleast_2d(np.asarray(THETA, dtype=float))
+        if TH.shape[1] != self.K:
+            raise ValueError(
+                f"THETA tiene {TH.shape[1]} columnas y la base persistida "
+                f"tiene K={self.K}: no corresponden al mismo sistema."
+            )
+        return (TH - self.mu_theta[None, :]) @ (self.W @ self.B)
+
     def verificar(self, tol: float = 1e-8) -> dict:
         """Ortonormalidad y equivalencia de las dos rutas de reconstruccion."""
         err_orto = float(np.abs(self.B.T @ self.W @ self.B - np.eye(self.M)).max())

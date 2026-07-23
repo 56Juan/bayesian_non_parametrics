@@ -67,8 +67,12 @@ fpc_idx_vec    = zeros(n_components, 1);  % índice fpc (base-1)
 for k = 1:n_components
     fpc_idx          = component_idx(k) + 1;
     fpc_idx_vec(k)   = fpc_idx;
+    % [FIX] La particion holdout escribe datasets con sufijo de bloque
+    % (dataset_fpc_<idx>_train.csv / _test.csv). MATLAB entrena con el
+    % bloque de entrenamiento; el bloque de prueba se reserva para el
+    % flujo de evaluacion en Python.
     fpath            = fullfile(paths.functional, ...
-                           sprintf("dataset_fpc_%d.csv", fpc_idx));
+                           sprintf("dataset_fpc_%d_train.csv", fpc_idx));
     assert(isfile(fpath), "No se encontró dataset: %s", fpath);
 
     Tbl              = readtable(fpath);
