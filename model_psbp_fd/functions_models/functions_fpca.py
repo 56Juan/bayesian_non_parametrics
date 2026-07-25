@@ -58,16 +58,26 @@ def base_en_grilla(fr, K: Optional[int] = None) -> np.ndarray:
     """
     Evalua el sistema de base de una `FunctionalRepresentation` en su grilla.
 
-    Se obtiene aplicando `reconstruct` a la matriz identidad: la columna k del
-    resultado es la k-esima funcion base evaluada en la grilla. El
-    procedimiento presupone que `reconstruct` es el mapa lineal Theta Phi^T,
-    lo que `FPCA_L2.verificar` comprueba de forma explicita.
+    La k-esima funcion base se obtiene por diferencia,
+
+        phi_k = reconstruct(e_k) - reconstruct(0),
+
+    y no como `reconstruct(e_k)` directamente. La razon no es cosmetica: si la
+    representacion se ajusto con `center=True`, `reconstruct` es el mapa AFIN
+    Theta Phi^T + media y no el lineal Theta Phi^T, de modo que aplicarlo a la
+    identidad devuelve cada funcion base CONTAMINADA con la media funcional.
+    La contaminacion se propaga entonces a la matriz de Gram, a las
+    autofunciones y a los scores sin producir error alguno. Restar
+    `reconstruct(0)` cancela el termino constante y devuelve la base correcta
+    tanto si la representacion centra como si no.
 
     Retorna Phi de forma (G, K).
     """
     if K is None:
         K = int(getattr(fr, "K_", None) or getattr(fr, "n_basis"))
-    return np.asarray(fr.reconstruct(np.eye(K)), dtype=float).T
+    base = np.asarray(fr.reconstruct(np.eye(K)), dtype=float)
+    origen = np.asarray(fr.reconstruct(np.zeros((1, K))), dtype=float)
+    return (base - origen).T
 
 
 @dataclass
@@ -84,6 +94,13 @@ class FPCA_L2:
     Atributos tras `fit`
     --------------------
     W          : (K, K) matriz de Gram de la base en metrica L^2.
+    cond_W     : float  numero de condicion de W. Se registra porque la raiz
+                 inversa W^{-1/2} amplifica el ruido de las direcciones
+                 asociadas a los autovalores menores de W; con bases muy
+                 solapadas o K grande esa amplificacion degrada las
+                 componentes de menor varianza, que son justamente las que se
+                 truncan. Tener el valor permite auditar el efecto al comparar
+                 escenarios con distinto K en lugar de descubrirlo tarde.
     mu_theta   : (K,)   media de los coeficientes del bloque de ajuste.
     B_full     : (K, K) coeficientes de todas las autofunciones.
     evals      : (K,)   autovalores en orden decreciente.
@@ -97,6 +114,7 @@ class FPCA_L2:
     Phi: np.ndarray = field(default=None, repr=False)
     tau: np.ndarray = field(default=None, repr=False)
     W: np.ndarray = field(default=None, repr=False)
+    cond_W: Optional[float] = field(default=None, repr=False)
     mu_theta: np.ndarray = field(default=None, repr=False)
     B_full: np.ndarray = field(default=None, repr=False)
     evals: np.ndarray = field(default=None, repr=False)
@@ -141,9 +159,15 @@ class FPCA_L2:
         Tc = THETA_train - self.mu_theta
         S = (Tc.T @ Tc) / (n - 1)
 
-        # Raices de la matriz de Gram por descomposicion espectral
+        # Raices de la matriz de Gram por descomposicion espectral.
+        # El recorte de autovalores es RELATIVO al mayor de ellos y no
+        # absoluto: un umbral fijo como 1e-12 es severo si W esta escalada en
+        # 1e-6 e inocuo si lo esta en 1e+6, de modo que su efecto dependeria
+        # de las unidades del dominio y no del condicionamiento real.
         evW, VW = np.linalg.eigh(self.W)
-        evW = np.clip(evW, 1e-12, None)
+        self.cond_W = float(evW.max() / evW.min()) if evW.min() > 0 else np.inf
+        piso = float(np.finfo(float).eps * max(evW.max(), 0.0) * self.W.shape[0])
+        evW = np.clip(evW, max(piso, 1e-300), None)
         W_half = VW @ np.diag(np.sqrt(evW)) @ VW.T
         W_half_inv = VW @ np.diag(1.0 / np.sqrt(evW)) @ VW.T
 
@@ -260,7 +284,7 @@ class FPCA_L2:
     # VERIFICACION
     # ------------------------------------------------------------------
     def verificar(self, THETA_train: Optional[np.ndarray] = None,
-                  fr=None, tol: float = 1e-8) -> dict:
+                  fr=None, tol: float = 1e-10) -> dict:
         """
         Comprueba las identidades que sostienen la construccion.
 
@@ -291,11 +315,13 @@ class FPCA_L2:
         w = pesos_trapezoidales(self.tau)
         Psi = self.Psi_grid
         M = self.M
+        K = int(self.evals.size)
 
         d = {
             "M": M,
-            "K": int(self.evals.size),
+            "K": K,
             "n_ajuste": self.n_ajuste,
+            "cond_W": self.cond_W,
             "err_ortonormalidad_L2": float(
                 np.abs(Psi.T @ (w[:, None] * Psi) - np.eye(M)).max()),
             "err_ortonormalidad_gram": float(
@@ -309,25 +335,63 @@ class FPCA_L2:
         ).max())
 
         if fr is not None:
-            Th = np.eye(self.evals.size)
-            d["err_linealidad_reconstruct"] = float(np.abs(
-                np.asarray(fr.reconstruct(Th)) - Th @ self.Phi.T).max())
+            # Se emplea un THETA generico y no la identidad. Con Theta = I el
+            # chequeo era una TAUTOLOGIA: `base_en_grilla` define Phi como la
+            # imagen de la identidad bajo `reconstruct`, de modo que
+            # `fr.reconstruct(I)` e `I @ Phi^T` coinciden por construccion aun
+            # cuando `reconstruct` sea afin y no lineal. Con un Theta arbitrario
+            # el termino constante deja de cancelarse y la violacion se detecta.
+            rng = np.random.default_rng(0)
+            Th = rng.standard_normal((max(3, min(8, K)), K))
+            escala = float(np.abs(self.Phi).max()) or 1.0
+            err_lin = float(np.abs(
+                np.asarray(fr.reconstruct(Th), dtype=float) - Th @ self.Phi.T
+            ).max())
+            d["err_linealidad_reconstruct"] = err_lin
+            d["err_linealidad_reconstruct_rel"] = err_lin / escala
 
         if THETA_train is not None:
             Sc = self.transform(THETA_train)
-            d["err_media_scores"] = float(np.abs(Sc.mean(axis=0)).max())
-            d["err_var_scores_vs_lambda"] = float(
-                np.abs(Sc.var(axis=0, ddof=1) - self.lambdas).max())
+            sd_scores = np.sqrt(np.clip(self.lambdas, 1e-300, None))
+            # Las dos cantidades siguientes tienen las unidades de los scores y
+            # de su varianza respectivamente, de modo que no pueden compararse
+            # contra la misma tolerancia que los errores adimensionales de
+            # ortonormalidad: se reportan tambien en forma relativa, que es la
+            # que decide `todo_ok`.
+            err_media = float(np.abs(Sc.mean(axis=0)).max())
+            err_var = float(np.abs(Sc.var(axis=0, ddof=1) - self.lambdas).max())
+            d["err_media_scores"] = err_media
+            d["err_media_scores_rel"] = float(
+                np.max(np.abs(Sc.mean(axis=0)) / sd_scores))
+            d["err_var_scores_vs_lambda"] = err_var
+            d["err_var_scores_vs_lambda_rel"] = float(np.max(
+                np.abs(Sc.var(axis=0, ddof=1) - self.lambdas)
+                / np.clip(self.lambdas, 1e-300, None)))
             if M > 1:
                 R = np.corrcoef(Sc, rowvar=False)
-                d["err_correlacion_lag0"] = float(
-                    np.abs(R - np.eye(M)).max())
+                d["err_correlacion_lag0"] = float(np.abs(R - np.eye(M)).max())
             else:
                 d["err_correlacion_lag0"] = 0.0
 
-        d["todo_ok"] = bool(
-            max(v for k, v in d.items() if k.startswith("err_")) < tol
+        # `todo_ok` se evalua UNICAMENTE sobre cantidades adimensionales o
+        # relativas. Incluir errores en las unidades de los datos hacia que el
+        # veredicto dependiera de la amplitud de las curvas: con scores de
+        # varianza grande un error relativo despreciable podia superar la
+        # tolerancia, y con curvas de amplitud pequena un error relativo
+        # inaceptable podia pasar inadvertido.
+        adimensionales = (
+            "err_ortonormalidad_L2",
+            "err_ortonormalidad_gram",
+            "err_rutas_reconstruccion",
+            "err_correlacion_lag0",
+            "err_linealidad_reconstruct_rel",
+            "err_media_scores_rel",
+            "err_var_scores_vs_lambda_rel",
         )
+        evaluados = [d[k] for k in adimensionales if k in d]
+        d["criterios_evaluados"] = list(
+            k for k in adimensionales if k in d)
+        d["todo_ok"] = bool(max(evaluados) < tol)
         return d
 
     def resumen_componentes(self):
