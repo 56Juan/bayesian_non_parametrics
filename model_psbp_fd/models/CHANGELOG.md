@@ -8,4 +8,6 @@ Versión preliminar orientada a la futura extensión hacia múltiples coeficient
 Versión revisada y refinada, orientada a reproducir con mayor fidelidad y precisión los resultados obtenidos bajo el enfoque propuesto por Chung (2009). En esta etapa, se prioriza la validación metodológica y la consistencia del ajuste del modelo respecto a la formulación original.
 
 ## [1.0.0] — psbp_fd_v3
-Versión optimizada mediante integración de componentes en C++, orientada a la futura extensión hacia múltiples coeficientes funcionales. En esta etapa, el objetivo principal es reducir significativamente los tiempos de cómputo, trasladando las secciones más costosas del algoritmo a implementaciones en C++ para mejorar la eficiencia y escalabilidad del modelo.
+
+Versión orientada a la **inferencia predictiva funcional**. Abandona el muestreador en Python —el ajuste se realiza en MATLAB con `psbp_train.m`, que es la implementación de referencia del estudio— y se concentra en construir la distribución predictiva completa y transportarla del espacio de los scores FPCA al de las curvas.
+

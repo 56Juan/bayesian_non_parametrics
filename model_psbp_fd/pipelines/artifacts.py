@@ -325,6 +325,13 @@ def guardar_fpca(paths: dict, fpca, SCORES: np.ndarray,
         "K": int(fpca.evals.size),
         "var_explained": float(fpca.var_cum[fpca.M - 1]),
         "n_ajuste": int(fpca.n_ajuste),
+        # Condicionamiento de la matriz de Gram. Se persiste porque la raiz
+        # inversa W^{-1/2} empleada en el ajuste amplifica el ruido de las
+        # direcciones asociadas a los autovalores menores de W; sin este
+        # registro, comparar escenarios con distinto K no permite distinguir
+        # una diferencia sustantiva de un artefacto numerico.
+        "cond_W": (float(fpca.cond_W)
+                   if getattr(fpca, "cond_W", None) is not None else None),
         "lambdas": [float(x) for x in fpca.lambdas],
     }
     if meta_extra:
@@ -542,6 +549,29 @@ def verificar_contrato(paths: dict, estricto: bool = True) -> dict:
     ver = fpca.verificar()
     if not ver["todo_ok"]:
         problemas.append(f"identidades FPCA no se cumplen: {ver}")
+
+    # Retencion temporal del estandarizador. Se lee el metadato directamente y
+    # no via `cargar_estandarizador` para no acoplar este modulo a la clase de
+    # preprocesamiento. La comprobacion existe porque la correccion del estudio
+    # depende de que los momentos de estandarizacion provengan solo del bloque
+    # de entrenamiento, y ese hecho no es observable en los scores resultantes:
+    # un ajuste sobre la serie completa produce numeros perfectamente
+    # plausibles y resultados fuera de muestra invalidos.
+    T0_man = manifest.get("T0")
+    meta_std = Path(paths["functional"]) / ARCHIVOS["estandarizador"] / \
+        "standardizer_metadata.json"
+    if meta_std.exists() and T0_man is not None:
+        n_aj = _leer_json(meta_std).get("n_ajuste")
+        informe["estandarizador_n_ajuste"] = n_aj
+        if n_aj is None:
+            problemas.append(
+                "el estandarizador no registra 'n_ajuste' (artefacto anterior "
+                "al registro del bloque de ajuste): la retencion temporal no "
+                "puede verificarse y debe regenerarse")
+        elif int(n_aj) != int(T0_man):
+            problemas.append(
+                f"el estandarizador se ajusto con {n_aj} filas y T0={T0_man}: "
+                "los momentos de estandarizacion vieron el bloque de prueba")
 
     p_prev = len(manifest.get("cov_names", []))
     p_esp = n_man * int(manifest.get("n_lags", 0))
