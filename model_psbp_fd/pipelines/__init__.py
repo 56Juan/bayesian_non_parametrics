@@ -27,6 +27,12 @@ El paquete agrupa tres responsabilidades:
 3. Verificacion cruzada (`verificar_contrato`).
    Comprueba la consistencia entre manifest, hiperparametros y artefactos FPCA
    antes de que el analisis comience.
+
+Nota de estado: `sim_escenario_5` (proceso combinado, Algoritmo 5 del anexo)
+aun no esta implementado; su condicion de estacionariedad bajo innovacion
+skew-normal no constituye un resultado establecido y requiere verificacion
+empirica antes de incorporarse al contrato (ver docstring de
+`sim_escenario_4` y el Algoritmo 5 del anexo).
 """
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -70,6 +76,27 @@ from .sim_escenario_2 import (
     construir_operadores_garch,
     matriz_kernel_no_negativo,
     radio_espectral,
+)
+
+# --- Escenario 3: FAR con cambio de regimen (multimodalidad condicional) ---
+from .sim_escenario_3 import (
+    ConfigEscenario3,
+    generar_escenario_3,
+    resumen_escenario_3,
+    simular_trayectoria_far_regimen,
+    direccion_constante,
+)
+
+# --- Escenario 4: innovaciones skew-normal (SMSN) ---
+from .sim_escenario_4 import (
+    ConfigEscenario4,
+    generar_escenario_4,
+    resumen_escenario_4,
+    simular_trayectoria_far_smsn,
+    momentos_mezcla_escala,
+    extraer_factor_escala,
+    construir_componentes_smsn,
+    generador_innovacion_smsn,
 )
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -134,8 +161,21 @@ __all__ = [
     "simular_trayectoria_fgarch",
     "construir_operadores_garch",
     # ── Escenario 3: FAR con cambio de regimen ──
+    "ConfigEscenario3",
+    "generar_escenario_3",
+    "resumen_escenario_3",
+    "simular_trayectoria_far_regimen",
+    "direccion_constante",
     # ── Escenario 4: innovaciones skew-normal (SMSN) ──
-    # ── Escenario 5: proceso combinado ──
+    "ConfigEscenario4",
+    "generar_escenario_4",
+    "resumen_escenario_4",
+    "simular_trayectoria_far_smsn",
+    "momentos_mezcla_escala",
+    "extraer_factor_escala",
+    "construir_componentes_smsn",
+    "generador_innovacion_smsn",
+    # ── Escenario 5: proceso combinado (pendiente de implementacion) ──
     # ── Contrato de artefactos ──
     "ARCHIVOS",
     "ArtefactosFPCA",
