@@ -316,6 +316,14 @@ def guardar_fpca(paths: dict, fpca, SCORES: np.ndarray,
     }
     if SCORES_STD is not None:
         tablas["fpca_scores_std"] = np.atleast_2d(SCORES_STD)
+    else:
+        # Sin esta limpieza, un archivo de una corrida anterior sobrevive al
+        # reescribir la FPCA y `cargar_fpca` lo devolveria emparejado con
+        # scores nuevos, posiblemente con otro M. La inconsistencia no produce
+        # error: solo resultados en la escala equivocada.
+        obsoleto = d / ARCHIVOS["fpca_scores_std"]
+        if obsoleto.exists():
+            obsoleto.unlink()
 
     for clave, arr in tablas.items():
         np.savetxt(d / ARCHIVOS[clave], np.asarray(arr, dtype=float), delimiter=",")
