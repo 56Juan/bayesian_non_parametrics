@@ -200,6 +200,14 @@ class ArtefactosFPCA:
     mu_theta : (K,)   media de los coeficientes
     Phi      : (G, K) base evaluada en la grilla
     SCORES   : (T, M) scores en escala original
+    SCORES_STD : (T, M) scores estandarizados, si fueron persistidos; None en
+               caso contrario. Se declara explicitamente porque `guardar_fpca`
+               los escribe de forma opcional: sin este campo el artefacto se
+               producia en disco pero no se recuperaba, y un consumidor que
+               esperara scores estandarizados obtenia silenciosamente los de
+               escala original ---confusion de escalas sin error visible, y
+               justo en la frontera que el esquema de retencion temporal exige
+               mantener nitida.
     evals    : (K,)   autovalores
     meta     : metadatos (M, K, var_explicada, ...)
     """
@@ -211,6 +219,7 @@ class ArtefactosFPCA:
     mu_theta: np.ndarray
     Phi: np.ndarray
     SCORES: np.ndarray
+    SCORES_STD: Optional[np.ndarray] = None
     evals: Optional[np.ndarray] = None
     meta: dict = field(default_factory=dict)
 
@@ -264,8 +273,17 @@ class ArtefactosFPCA:
             )
         return (TH - self.mu_theta[None, :]) @ (self.W @ self.B)
 
-    def verificar(self, tol: float = 1e-8) -> dict:
-        """Ortonormalidad y equivalencia de las dos rutas de reconstruccion."""
+    def verificar(self, tol: float = 1e-10) -> dict:
+        """
+        Ortonormalidad y equivalencia de las dos rutas de reconstruccion.
+
+        La tolerancia por defecto se fijo en 1e-10 y no en 1e-8. Con la FPCA
+        generalizada en metrica L^2 el error de ortonormalidad es de orden
+        1e-14 a 1e-13 incluso con matrices de Gram mal condicionadas, de modo
+        que una tolerancia de 1e-8 admitiria una regresion de cuatro ordenes de
+        magnitud sin senalarla. El margen que queda sigue siendo amplio
+        respecto del piso numerico real.
+        """
         err_orto = float(np.abs(self.B.T @ self.W @ self.B - np.eye(self.M)).max())
         S = np.eye(self.M)
         err_rutas = float(np.abs(
@@ -333,6 +351,7 @@ def cargar_fpca(paths: dict) -> ArtefactosFPCA:
 
     evals_p = d / ARCHIVOS["fpca_evals"]
     meta_p = d / ARCHIVOS["fpca_meta"]
+    scores_std_p = d / ARCHIVOS["fpca_scores_std"]
     return ArtefactosFPCA(
         Psi_grid=leer("fpca_eigenfun"),
         mu_grid=np.ravel(leer("fpca_mean")),
@@ -341,6 +360,8 @@ def cargar_fpca(paths: dict) -> ArtefactosFPCA:
         mu_theta=np.ravel(leer("fpca_mu_theta")),
         Phi=leer("basis_phi"),
         SCORES=leer("fpca_scores"),
+        SCORES_STD=(_leer_matriz(scores_std_p, True)
+                    if scores_std_p.exists() else None),
         evals=np.ravel(np.loadtxt(evals_p, delimiter=",")) if evals_p.exists() else None,
         meta=_leer_json(meta_p) if meta_p.exists() else {},
     )

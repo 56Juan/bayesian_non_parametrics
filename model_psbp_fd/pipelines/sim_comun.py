@@ -19,6 +19,15 @@ especificas (norma de Hilbert-Schmidt para el Algoritmo 1, radio espectral de
 B + Gamma para el Algoritmo 2, acotamiento de la varianza condicional para el
 Algoritmo 5), que corresponden a cada modulo `sim_escenario_k.py`.
 
+Tampoco viven aqui la cuadratura ni la factorizacion de Cholesky. Ambas son
+transversales a todo el proyecto y su definicion canonica esta en `utils`:
+`pesos_trapezoidales` en `utils.quadrature` y `safe_chol` en `utils.linalg`.
+Este modulo las RE-EXPORTA para que los cuatro modulos de escenario puedan
+seguir importandolas desde `.sim_comun` sin cambios, pero no las redefine:
+mantener una copia local significaba que la cuadratura de los generadores y la
+de la FPCA podian divergir sin producir error, degradando la ortonormalidad de
+las autofunciones de forma silenciosa.
+
 Convencion de la salida
 -----------------------
 El unico objeto que debe entregarse a los metodos de estimacion es
@@ -36,6 +45,11 @@ from dataclasses import dataclass, field, asdict
 from typing import Callable, Optional
 
 import numpy as np
+
+# Definiciones canonicas del proyecto. Se importan y re-exportan; no se
+# redefinen (ver nota en el encabezado del modulo).
+from ..utils.linalg import safe_chol
+from ..utils.quadrature import pesos_trapezoidales
 
 __all__ = [
     "ConfigObservacion",
@@ -191,28 +205,6 @@ def grilla_regular(L: int) -> np.ndarray:
     return np.linspace(0.0, 1.0, L)
 
 
-def pesos_trapezoidales(tau: np.ndarray) -> np.ndarray:
-    """
-    Pesos de la cuadratura trapezoidal asociada a la grilla:
-
-        int_0^1 f(s) ds ~= sum_l w_l f(tau_l),
-
-    con w_1 = w_L = h/2 y w_l = h en los puntos interiores para una grilla
-    equiespaciada de paso h = 1/(L-1); la formula general por diferencias
-    admite tambien grillas no equiespaciadas. Los pesos suman la longitud del
-    dominio. Esta regla reemplaza a la rectangular de punto medio, que era la
-    natural cuando la grilla no incluia los extremos.
-    """
-    tau = np.asarray(tau, dtype=float)
-    if tau.size < 2:
-        raise ValueError("La grilla debe tener al menos 2 puntos.")
-    w = np.empty_like(tau)
-    w[1:-1] = (tau[2:] - tau[:-2]) / 2.0
-    w[0] = (tau[1] - tau[0]) / 2.0
-    w[-1] = (tau[-1] - tau[-2]) / 2.0
-    return w
-
-
 def media_nula(tau: np.ndarray) -> np.ndarray:
     """Funcion media por defecto: mu(tau) = 0."""
     return np.zeros_like(tau)
@@ -333,30 +325,16 @@ def matriz_covarianza_innovacion(
 
 def factor_cholesky(K: np.ndarray, jitter: float = 1e-10) -> np.ndarray:
     """
-    Factor triangular de K, con jitter incremental sobre la diagonal.
+    Factor A tal que A A^T ~= K, empleado para generar la innovacion mediante
+    A z con z ~ N(0, I).
 
-    El nucleo exponencial cuadratico es notoriamente mal condicionado para
-    grillas finas o longitudes de correlacion grandes, de modo que la
-    factorizacion directa puede fallar. Se escala el jitter progresivamente
-    hasta lograr la factorizacion y, si aun asi falla, se recurre a la
-    descomposicion espectral truncando los valores propios negativos
-    atribuibles a error numerico.
-
-    El factor retornado A satisface A A^T ~= K, que es lo unico que se requiere
-    para generar realizaciones mediante A z con z ~ N(0, I).
+    Alias de dominio sobre `utils.linalg.safe_chol`, que es la unica
+    factorizacion del proyecto. El nombre se conserva porque describe el rol
+    que cumple dentro de los generadores ---factorizar la covarianza de la
+    innovacion--- y porque los cuatro modulos de escenario lo importan desde
+    aqui; la logica de regularizacion, en cambio, no se duplica.
     """
-    L = K.shape[0]
-    escala = float(np.mean(np.diag(K)))
-    if escala <= 0:
-        raise ValueError("K tiene diagonal no positiva; revise la especificacion.")
-    for k in range(12):
-        try:
-            return np.linalg.cholesky(K + (jitter * (10.0 ** k) * escala) * np.eye(L))
-        except np.linalg.LinAlgError:
-            continue
-    valores, vectores = np.linalg.eigh(K)
-    valores = np.clip(valores, 0.0, None)
-    return vectores @ np.diag(np.sqrt(valores))
+    return safe_chol(K, jitter=jitter)
 
 
 def generador_innovacion(

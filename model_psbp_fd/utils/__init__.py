@@ -7,7 +7,10 @@ Utilidades transversales del proyecto.
                    unica del proyecto): pesos, integracion, producto interno,
                    matriz de Gram y norma L2.
     linalg.py      Algebra lineal numericamente estable: simetrizacion y
-                   factorizacion de Cholesky con jitter incremental.
+                   factorizacion de Cholesky con jitter incremental RELATIVO a
+                   la escala de la matriz, con fallback espectral opcional.
+                   Es la unica factorizacion del proyecto: `pipelines.sim_comun`
+                   la re-exporta bajo el nombre de dominio `factor_cholesky`.
     raiz.py        Localizacion de la raiz del proyecto.
 """
 
@@ -18,7 +21,7 @@ from .quadrature import (
     gram,
     norma_L2,
 )
-from .linalg import sym, safe_chol
+from .linalg import sym, safe_chol, es_triangular_inferior
 from .raiz import get_project_root
 
 __all__ = [
@@ -31,6 +34,7 @@ __all__ = [
     # Algebra lineal estable
     "sym",
     "safe_chol",
+    "es_triangular_inferior",
     # Infraestructura
     "get_project_root",
 ]
