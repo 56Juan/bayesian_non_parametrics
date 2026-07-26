@@ -38,7 +38,7 @@ porque es la version que el estudio utiliza.
 from typing import Dict
 
 # ── Version en uso: importacion estricta ─────────────────────────────────
-from .psbp_fd_v3 import PSBP_FD_v3
+from .pspb_fd_v3 import PSBP_FD_v3
 
 # ── Versiones heredadas: importacion tolerante y trazable ────────────────
 VERSIONES_NO_DISPONIBLES: Dict[str, str] = {}

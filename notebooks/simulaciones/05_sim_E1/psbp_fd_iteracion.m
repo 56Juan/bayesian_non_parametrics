@@ -33,7 +33,7 @@ SEED_BASE = 4123;  % semilla base; cada job usa SEED_BASE + chain*9973 + k*31
 
 ESCENARIO_ID = 1;                      % escenario/experimento (Algoritmo del anexo)
 REPLICA_ID   = 1;                      % replica Monte Carlo (eje futuro del barrido)
-BASENAME     = "modelo_experimento_1";
+BASENAME     = "modelo_experimento_2";
 paths        = config_paths(BASENAME, ESCENARIO_ID, SEED_BASE);
 
 % ════════════════════════════════════════════════════════════════════════════
