@@ -1,0 +1,179 @@
+\chapter{Anexo}
+\label{ane_00_00_anexo}
+
+\section{Algoritmos de simulación de datos}
+\label{ane_01_00_00_algoritmos}
+Esta sección presenta los algoritmos empleados para generar los datos del estudio de simulación del Capítulo~\ref{03_00_00_mezclas_ddp_series_tiempo_funcionales}. Cada algoritmo define un proceso estocástico funcional en forma genérica, especificando su mecanismo de generación y el rol de cada uno de sus parámetros; los valores numéricos empleados en cada escenario particular, así como el tamaño de la grilla, el tamaño muestral y el número de réplicas, se fijan en el Capítulo~\ref{03_00_00_mezclas_ddp_series_tiempo_funcionales}. El producto de cada algoritmo es, exclusivamente, una matriz de observaciones discretas contaminadas con ruido de medición, análoga a la que entregaría un registro real de alta frecuencia.\\
+
+Todos los algoritmos comparten el mismo esquema de observación. Dada una trayectoria de curvas $\{X_t\}_{t=1}^{T}$ generada por el proceso correspondiente sobre el dominio $\mathcal{T}=[0,1]$, las observaciones disponibles se obtienen discretizando cada curva sobre una grilla regular de $L$ puntos que incluye ambos extremos del dominio, de modo que $\tau_1 = 0$ y $\tau_L = 1$, y agregando ruido de medición,
+\begin{equation}\label{eq:ane_observacion}
+    \mathsf{x}_{tl} = X_t(\tau_l) + \epsilon_{tl},
+    \qquad
+    \epsilon_{tl} \overset{\mathrm{iid}}{\sim} \mathcal{N}(0,\, \sigma_\epsilon^2),
+    \qquad
+    \tau_l = \frac{l - 1}{L - 1},
+    \quad l = 1, \dots, L,
+\end{equation}
+donde $L$ y $\sigma_\epsilon^2$ se especifican en cada aplicación del esquema. La grilla es común a todas las curvas y réplicas, por lo que la $l$-ésima observación de cada período corresponde siempre al mismo punto del dominio y no existe desfase de medición entre períodos consecutivos.\\
+
+Cada proceso se genera con un tamaño muestral $T$, precedido de un período de calentamiento que se descarta con el fin de que la serie retenida provenga de la distribución estacionaria del proceso cuando esta existe, y se producen $R$ réplicas independientes por combinación de algoritmo y tamaño muestral, cada una con semilla registrada. El valor de $T$, la longitud del período de calentamiento y el valor de $R$ se especifican en cada aplicación del esquema.\\
+
+Los algoritmos se ordenan en dos bloques según lo que someten a prueba. El primer bloque interviene la ley condicional del proceso manteniendo intactos los supuestos de la representación:
+\begin{itemize}
+    \item El Algoritmo~1 genera una dinámica lineal gaussiana homogénea mediante un proceso autorregresivo funcional.
+    \item El Algoritmo~2 introduce heterocedasticidad condicional mediante un proceso funcional de tipo GARCH.
+    \item El Algoritmo~3 introduce multimodalidad condicional al estado mediante un proceso autorregresivo funcional con cambio de régimen.
+    \item El Algoritmo~4 introduce asimetría en las innovaciones mediante distribuciones skew-normal.
+\end{itemize}
+El segundo bloque deja la ley condicional dentro de lo que el modelo puede representar y compromete en cambio la reducción de dimensión sobre la que este opera:
+\begin{itemize}
+    \item El Algoritmo~5 desalinea el orden de las varianzas respecto del orden de la predictibilidad, de manera que la dirección informativa sobre el futuro del proceso es una de las que el truncamiento descarta.
+    \item El Algoritmo~6 hace variar el operador de covarianza a lo largo de la serie, con lo que la base ajustada sobre el entrenamiento pierde vigencia sobre el período evaluado.
+\end{itemize}
+Cada subsección especifica el proceso generador, el rol de sus parámetros y los pasos de generación.\\
+
+Los generadores del primer bloque operan necesariamente sobre la grilla, ya que sus operadores actúan sobre la curva completa. Los del segundo se especifican en cambio sobre los coeficientes de un sistema ortonormal fijo y la curva se obtiene al final mediante un único producto matricial.
+
+\subsection{Algoritmo 1: Proceso autorregresivo funcional lineal}
+\label{ane_01_01_00_alg1}
+Este algoritmo genera curvas desde un proceso autorregresivo funcional de orden uno (Sección~\ref{02_02_02_modelos_funcionales_clasicos}),
+\begin{equation}\label{eq:ane_alg1_far}
+    X_t(\tau) = \mu(\tau) + \int_{0}^{1} \psi(\tau, s)\,
+    \bigl(X_{t-1}(s) - \mu(s)\bigr)\, ds + \varepsilon_t(\tau),
+\end{equation}
+con función media $\mu(\tau)$ y núcleo autorregresivo gaussiano
+\begin{equation}\label{eq:ane_alg1_kernel}
+    \psi(\tau, s) = c \exp\!\left\{
+    -\frac{(\tau - s)^2}{2\gamma^2}\right\},
+\end{equation}
+donde $\gamma > 0$ controla el alcance de la dependencia entre puntos del dominio, de modo que valores pequeños concentran la influencia de $X_{t-1}$ en un entorno estrecho de cada $\tau$ y valores grandes la distribuyen sobre todo el dominio, y la constante $c$ se calibra de modo que la norma de Hilbert--Schmidt del operador, $\|\Psi\|_{\mathcal{HS}} = \bigl(\int_0^1\!\int_0^1 \psi^2(\tau,s)\, d\tau\, ds\bigr)^{1/2}$, alcance un valor prefijado menor que uno, condición que garantiza la existencia de una solución estacionaria y determina la persistencia temporal del proceso, \cite{02_02_bosq2000linear}. Las innovaciones $\{\varepsilon_t\}$ son trayectorias independientes de un proceso gaussiano de media cero con núcleo de covarianza exponencial cuadrático,
+\begin{equation}\label{eq:ane_alg1_innovacion}
+    \mathrm{Cov}\bigl(\varepsilon_t(\tau),\, \varepsilon_t(s)\bigr)
+    = \sigma_\varepsilon^2 \exp\!\left\{
+    -\frac{(\tau - s)^2}{2\ell^2}\right\},
+\end{equation}
+donde $\sigma_\varepsilon^2$ escala la magnitud de la innovación y $\ell > 0$ es su longitud de correlación, que determina la suavidad de las trayectorias generadas: valores pequeños de $\ell$ producen innovaciones más rugosas y valores grandes producen innovaciones más suaves.\\
+
+La generación procede de la siguiente forma:
+\begin{enumerate}
+    \item Se discretizan el núcleo $\psi(\tau,s)$ y el núcleo de covarianza de la innovación sobre la grilla $\{\tau_l\}_{l=1}^{L}$, obteniendo las matrices $\boldsymbol{\Psi} \in \mathbb{R}^{L \times L}$, con entradas $\psi(\tau_l, \tau_{l'})/L$ para aproximar la integral, y $\mathbf{K}_\varepsilon \in \mathbb{R}^{L \times L}$, con entradas $\mathrm{Cov}(\varepsilon_t(\tau_l), \varepsilon_t(\tau_{l'}))$.
+    \item Se inicializa $X_0$ como una trayectoria del proceso de innovación y se itera la versión discretizada de \eqref{eq:ane_alg1_far} durante el período de calentamiento y los $T$ períodos retenidos, generando en cada paso la innovación como $\boldsymbol{\varepsilon}_t \sim \mathcal{N}_L(\mathbf{0}, \mathbf{K}_\varepsilon)$ mediante la factorización de Cholesky de $\mathbf{K}_\varepsilon$.
+    \item Se aplica el esquema de observación \eqref{eq:ane_observacion} a las $T$ curvas retenidas, obteniendo la matriz de datos que se entrega a los métodos.
+\end{enumerate}
+
+\subsection{Algoritmo 2: Proceso funcional GARCH}
+\label{ane_01_02_00_alg2}
+Este algoritmo genera curvas con varianza condicional dependiente del estado, extendiendo al caso funcional el mecanismo GARCH escalar de Engle mediante la especificación FGARCH(1,1) de \citet{02_02_aue2015prediction} sobre la base del proceso ARCH funcional de \citet{03_04_horman2013arch}. La curva se define como:
+\begin{equation}\label{eq:ane_alg2_garch}
+    X_t(\tau) = \mu(\tau) + \sigma_t(\tau)\, \eta_t(\tau),
+\end{equation}
+donde $\{\eta_t\}$ es un proceso de innovación funcional independiente e idénticamente distribuido, de media cero y varianza puntual unitaria, $\mathbb{E}[\eta_t(\tau)] = 0$, $\mathbb{E}[\eta_t^2(\tau)] = 1$ para todo $\tau$, y la varianza condicional $\sigma_t^2(\tau)$ sigue la recursión
+\begin{equation}\label{eq:ane_alg2_recursion}
+    \sigma_t^2(\tau) = \delta(\tau)
+    + \int_{0}^{1} \beta(\tau, s)\, \bigl(X_{t-1}(s) - \mu(s)\bigr)^2\, ds
+    + \int_{0}^{1} \gamma(\tau, s)\, \sigma_{t-1}^2(s)\, ds,
+\end{equation}
+con $\delta(\tau) > 0$ una función de nivel base y $\beta(\tau,s) \geq 0$, $\gamma(\tau,s) \geq 0$ núcleos no negativos que garantizan $\sigma_t^2(\tau) > 0$ para toda trayectoria. El núcleo $\beta$ gobierna la sensibilidad de la varianza futura a la magnitud de la curva más reciente, en analogía directa con el parámetro ARCH escalar, mientras que $\gamma$ gobierna la persistencia de la varianza condicional pasada, en analogía con el parámetro GARCH escalar. La existencia de una solución estrictamente estacionaria requiere que el operador conjunto con núcleo $\beta(\tau,s)+\gamma(\tau,s)$ tenga radio espectral menor que uno, condición análoga a $\alpha+\beta<1$ en el caso escalar y que, en la implementación discretizada, se verifica sobre la matriz resultante de evaluar dicho núcleo en la grilla $\{\tau_l\}_{l=1}^L$.\\
+
+La generación procede de la siguiente forma:
+\begin{enumerate}
+    \item Se discretizan los núcleos $\delta(\tau)$, $\beta(\tau,s)$ y $\gamma(\tau,s)$ sobre la grilla $\{\tau_l\}_{l=1}^{L}$, obteniendo el vector $\boldsymbol{\delta}\in\mathbb{R}^L$ y las matrices $\mathbf{B},\mathbf{\Gamma}\in\mathbb{R}^{L\times L}$, y se verifica que el radio espectral de $\mathbf{B}+\mathbf{\Gamma}$ sea menor que uno.
+    \item Se inicializan $X_0$ y $\boldsymbol{\sigma}_0^2$ en un valor consistente con el nivel estacionario del proceso, y se itera la recursión \eqref{eq:ane_alg2_recursion} en su versión discretizada durante el período de calentamiento y los $T$ períodos retenidos.
+    \item En cada período $t$ se genera la innovación $\boldsymbol{\eta}_t\in\mathbb{R}^L$ como una trayectoria discretizada del proceso de innovación especificado, normalizada de modo que su varianza puntual empírica sea unitaria, y se construye la curva mediante $\mathbf{X}_t = \boldsymbol{\mu} + \boldsymbol{\sigma}_t \odot \boldsymbol{\eta}_t$, con $\odot$ el producto elemento a elemento.
+    \item Se aplica el esquema de observación \eqref{eq:ane_observacion} a las $T$ curvas retenidas, obteniendo la matriz de datos que se entrega a los métodos.
+\end{enumerate}
+
+\subsection{Algoritmo 3: Proceso autorregresivo funcional con cambio de régimen}
+\label{ane_01_03_00_alg3}
+Este algoritmo genera curvas cuya dinámica alterna entre dos operadores autorregresivos según el estado del proceso, con el fin de inducir una ley condicional multimodal. Sea $\Psi^{(1)}$ y $\Psi^{(2)}$ dos operadores integrales de la forma \eqref{eq:ane_alg1_kernel}, con núcleos $\psi^{(1)}(\tau,s)$ y $\psi^{(2)}(\tau,s)$ que difieren en su constante de escala o en su alcance $\gamma$, y sea $\phi:\mathbb{R}\to[0,1]$ una función de enlace monótona. La curva se define como:
+\begin{align}
+    X_t(\tau) = {}& \mu(\tau)
+    + \int_0^1 \psi^{(1)}(\tau,s)\,\bigl(X_{t-1}(s)-\mu(s)\bigr)\,ds\; \mathbf{1}(R_t=1) \notag \\
+    &+ \int_0^1 \psi^{(2)}(\tau,s)\,\bigl(X_{t-1}(s)-\mu(s)\bigr)\,ds\;\mathbf{1}(R_t=2)
+    + \varepsilon_t(\tau). \label{eq:ane_alg3_regimen}
+\end{align}
+donde $R_t\in\{1,2\}$ es el régimen activo en el período $t$ y $\{\varepsilon_t\}$ es el proceso de innovación funcional especificado en \eqref{eq:ane_alg1_innovacion}. El régimen se determina mediante una variable latente dependiente del estado rezagado de la propia curva, y no de un mecanismo exógeno o de un reloj calendario, de modo que la multimodalidad resultante es genuinamente condicional a la historia del proceso:
+\begin{equation}\label{eq:ane_alg3_proyeccion}
+    p_t = \phi\bigl(\langle X_{t-1}-\mu,\, e\rangle\bigr),
+    \qquad
+    R_t \mid p_t \sim \mathrm{Bernoulli}(p_t) + 1,
+\end{equation}
+donde $e\in L^2(\mathcal{T})$ es una dirección de referencia fija sobre la cual se proyecta la curva rezagada centrada, y $\langle\cdot,\cdot\rangle$ es el producto interno de $L^2(\mathcal{T})$. La elección de $e$ determina qué aspecto de la forma de la curva pasada gobierna el cambio de régimen; en particular, $e$ puede coincidir con una función propia de la covarianza estacionaria del proceso, de modo que el régimen responda al modo de variación dominante. Esta construcción evita el uso de generadores de multimodalidad en la forma de una única curva sobre su propio dominio, los cuales no inducen dependencia entre la distribución condicional de $X_t$ y la historia del proceso.\\
+
+La generación procede de la siguiente forma:
+\begin{enumerate}
+    \item Se discretizan los núcleos $\psi^{(1)}$, $\psi^{(2)}$ y la dirección $e$ sobre la grilla $\{\tau_l\}_{l=1}^{L}$, obteniendo las matrices $\boldsymbol{\Psi}^{(1)}, \boldsymbol{\Psi}^{(2)}\in\mathbb{R}^{L\times L}$ y el vector $\mathbf{e}\in\mathbb{R}^L$.
+    \item En cada período $t$, se calcula la proyección discretizada $\langle \mathbf{X}_{t-1}-\boldsymbol{\mu}, \mathbf{e}\rangle$, se obtiene $p_t$ evaluando la función de enlace y se extrae $R_t$ de la distribución \eqref{eq:ane_alg3_proyeccion}.
+    \item Se aplica el operador correspondiente al régimen extraído sobre $\mathbf{X}_{t-1}-\boldsymbol{\mu}$, se agrega la innovación generada como en el Algoritmo~1 y se obtiene $\mathbf{X}_t$.
+    \item Se repiten los pasos 2 y 3 durante el período de calentamiento y los $T$ períodos retenidos, y se aplica el esquema de observación \eqref{eq:ane_observacion} a las curvas retenidas, obteniendo la matriz de datos que se entrega a los métodos.
+\end{enumerate}
+
+\subsection{Algoritmo 4: Proceso con innovaciones asimétricas}
+\label{ane_01_04_00_alg4}
+Este algoritmo genera curvas con una dinámica autorregresiva lineal idéntica a la del Algoritmo~1, reemplazando la innovación gaussiana simétrica por un proceso funcional cuya distribución puntual es asimétrica, mediante una mezcla de escala skew-normal (SMSN), \citet{03_04_lachos2011heteroscedastic}. La curva se define como en \eqref{eq:ane_alg1_far}, con innovación
+\begin{equation}\label{eq:ane_alg4_innovacion}
+    \varepsilon_t(\tau) = \varsigma(\tau)\, Z_t(\tau),
+\end{equation}
+donde $\varsigma(\tau)>0$ escala la magnitud de la innovación en cada punto del dominio, y $\{Z_t\}$ es un proceso funcional cuyas evaluaciones puntuales se construyen, coordenada a coordenada sobre la grilla de discretización, mediante la representación de mezcla de escala,
+\begin{equation}\label{eq:ane_alg4_smsn}
+    Z_t(\tau_l) = U_t^{-1/2}\, W_t(\tau_l),
+    \qquad
+    W_t(\tau_l) \sim \mathrm{SN}(0, 1, \lambda),
+    \qquad
+    U_t \sim \pi(u),
+\end{equation}
+con $W_t$ un proceso skew-normal de parámetro de forma $\lambda$, compartido por todos los puntos del dominio para preservar la coherencia de la asimetría a lo largo de la curva, y $U_t$ una variable de mezcla positiva independiente de $W_t$, cuya distribución $\pi(u)$ determina el comportamiento de colas de la innovación resultante; en particular, $U_t\equiv 1$ produce una innovación skew-normal pura y $U_t\sim\mathrm{Gamma}(\nu/2,\nu/2)$ produce una innovación skew-$t$ con $\nu$ grados de libertad. El parámetro $\lambda$ controla la dirección y magnitud de la asimetría, con $\lambda=0$ recuperando el caso simétrico del Algoritmo~1. Dado que $\mathbb{E}[Z_t(\tau)^2]$ depende de $\lambda$ y difiere de uno salvo en el caso simétrico, la varianza puntual de $Z_t$ se normaliza dividiendo por su desviación estándar teórica antes de escalar por $\varsigma(\tau)$, de modo que la magnitud de la innovación sea comparable entre valores de $\lambda$ y no quede confundida con el grado de asimetría introducido.\\
+
+La generación procede de la siguiente forma:
+\begin{enumerate}
+    \item Se fija $\lambda$ y la distribución de $U_t$, y se calcula la varianza teórica de $Z_t(\tau)$ bajo dicha especificación para determinar la constante de normalización.
+    \item En cada período $t$, se genera $U_t$ desde $\pi(u)$ y una trayectoria discretizada del proceso skew-normal $W_t$ sobre la grilla $\{\tau_l\}_{l=1}^L$, preservando su estructura de dependencia entre puntos del dominio mediante la misma construcción de proceso gaussiano subyacente del Algoritmo~1, transformada marginalmente a skew-normal.
+    \item Se construye $Z_t(\tau_l) = U_t^{-1/2} W_t(\tau_l)$, se normaliza por la constante obtenida en el paso 1 y se escala por $\varsigma(\tau_l)$ para obtener $\varepsilon_t(\tau_l)$.
+    \item Se itera la recursión \eqref{eq:ane_alg1_far} en su versión discretizada, reemplazando la innovación gaussiana por la innovación construida en el paso anterior, durante el período de calentamiento y los $T$ períodos retenidos.
+    \item Se aplica el esquema de observación \eqref{eq:ane_observacion} a las curvas retenidas, obteniendo la matriz de datos que se entrega a los métodos.
+\end{enumerate}
+
+\subsection{Algoritmo 5: Proceso con predictibilidad en componente subordinada}
+\label{ane_01_05_00_alg5}
+Este algoritmo genera curvas cuyo modo de variación predecible no coincide con el de mayor varianza, con el fin de someter a prueba el criterio con que se fija el número $M$ de componentes retenidas. Sea $\{\varphi_j\}_{j=1}^{J}$ un sistema ortonormal fijo sobre $\mathcal{T}$, por ejemplo la base de Fourier, y sean $\lambda_1 > \dots > \lambda_J > 0$ varianzas prefijadas en orden decreciente. El proceso se define directamente sobre los coeficientes,
+\begin{equation}\label{eq:ane_alg5_scores}
+    a_{tj} = \phi_j\, a_{t-1,j} + e_{tj},
+    \qquad
+    e_{tj} \overset{\mathrm{ind}}{\sim} \mathcal{N}\bigl(0,\, \lambda_j(1-\phi_j^2)\bigr),
+    \qquad j = 1, \dots, J,
+\end{equation}
+y la curva se obtiene por reconstrucción,
+\begin{equation}\label{eq:ane_alg5_curva}
+    X_t(\tau) = \mu(\tau) + \sum_{j=1}^{J} a_{tj}\,\varphi_j(\tau).
+\end{equation}
+La parametrización de la varianza de la innovación en \eqref{eq:ane_alg5_scores} garantiza que la varianza marginal estacionaria de la $j$-ésima componente sea exactamente $\lambda_j$ con independencia de su coeficiente autorregresivo, de modo que el espectro del proceso queda fijado por construcción y es separable de la dinámica. Los coeficientes $\{\phi_j\}$, con $|\phi_j|<1$, determinan la predictibilidad de cada componente, y su elección es el mecanismo del escenario: fijando $\phi_j = 0$ para las primeras componentes y $\phi_j \neq 0$ para alguna posterior, la varianza y la predictibilidad quedan ordenadas de forma inversa.\\
+
+Conviene precisar qué supuesto se viola y cuál no. La covarianza marginal del proceso es exactamente diagonal en $\{\varphi_j\}$, de modo que la descomposición espectral recupera la base correcta y los autovalores poblacionales son los $\lambda_j$ prefijados. Lo que falla es el criterio de selección de $M$, ya que este ordena por varianza marginal, cantidad que no incorpora información sobre la dinámica, y descarta por tanto la única dirección que el modelo podría predecir. La pérdida ocurre antes de que el modelo dinámico se ajuste y ninguna especificación de este la remedia.\\
+
+La generación procede de la siguiente forma:
+\begin{enumerate}
+    \item Se fijan el sistema $\{\varphi_j\}_{j=1}^{J}$, el espectro $\{\lambda_j\}_{j=1}^{J}$ y los coeficientes $\{\phi_j\}_{j=1}^{J}$, y se evalúan las funciones base sobre la grilla $\{\tau_l\}_{l=1}^{L}$, obteniendo la matriz $\boldsymbol{\Phi}\in\mathbb{R}^{L\times J}$.
+    \item Se inicializa $\mathbf{a}_0$ desde la distribución estacionaria, esto es, $a_{0j}\sim\mathcal{N}(0,\lambda_j)$, y se itera \eqref{eq:ane_alg5_scores} durante el período de calentamiento y los $T$ períodos retenidos, obteniendo la matriz de coeficientes $\mathbf{A}\in\mathbb{R}^{T\times J}$.
+    \item Se construyen las curvas discretizadas mediante el producto $\mathbf{X} = \mathbf{1}\boldsymbol{\mu}^\top + \mathbf{A}\boldsymbol{\Phi}^\top$, con $\mathbf{X}\in\mathbb{R}^{T\times L}$.
+    \item Se aplica el esquema de observación \eqref{eq:ane_observacion} a las curvas retenidas, obteniendo la matriz de datos que se entrega a los métodos.
+\end{enumerate}
+
+\subsection{Algoritmo 6: Proceso con covarianza no estacionaria}
+\label{ane_01_06_00_alg6}
+Este algoritmo genera curvas cuya estructura de covarianza cambia a lo largo de la serie, con el fin de someter a prueba el tratamiento de la función media y las autofunciones como cantidades conocidas, estimadas una única vez sobre el bloque de entrenamiento. Sobre la misma construcción del Algoritmo~5, se permite que el espectro varíe con el período,
+\begin{equation}\label{eq:ane_alg6_espectro}
+    a_{tj} = \phi_j\, a_{t-1,j} + e_{tj},
+    \qquad
+    e_{tj} \overset{\mathrm{ind}}{\sim}
+    \mathcal{N}\bigl(0,\, \lambda_j(t)\,(1-\phi_j^2)\bigr),
+\end{equation}
+con $\lambda_j(t)$ una trayectoria determinista de varianzas que interpola entre un espectro inicial $\{\lambda_j^{(0)}\}$ y uno final $\{\lambda_j^{(1)}\}$. La forma de la interpolación distingue dos mecanismos: un cambio abrupto en un instante $t^*$ del bloque de prueba representa un quiebre estructural, mientras que una interpolación lineal a lo largo de la serie representa una deriva gradual. Cuando el reordenamiento entre $\{\lambda_j^{(0)}\}$ y $\{\lambda_j^{(1)}\}$ altera el orden de las varianzas, la base estimada sobre el entrenamiento deja de estar ordenada según la variabilidad del bloque de prueba.\\
+
+Este escenario incumple el supuesto de estacionariedad de segundo orden sobre el que descansa el tratamiento de la base como fija. Cabe precisar que dicho supuesto no es relajado por el modelo dinámico, que flexibiliza la forma de la ley condicional y no la estructura de covarianza que sostiene la representación, de modo que la degradación esperada afecta por igual a todos los métodos que operan sobre la misma reducción.\\
+
+La generación procede de la siguiente forma:
+\begin{enumerate}
+    \item Se fijan el sistema $\{\varphi_j\}_{j=1}^{J}$, los espectros inicial y final, los coeficientes $\{\phi_j\}_{j=1}^{J}$ y la forma de la trayectoria $\lambda_j(t)$, y se evalúan las funciones base sobre la grilla, obteniendo $\boldsymbol{\Phi}\in\mathbb{R}^{L\times J}$.
+    \item Se inicializa $\mathbf{a}_0$ desde la distribución estacionaria asociada al espectro inicial y se itera \eqref{eq:ane_alg6_espectro} durante el período de calentamiento y los $T$ períodos retenidos, evaluando $\lambda_j(t)$ en cada paso.
+    \item Se construyen las curvas discretizadas como en el paso 3 del Algoritmo~5 y se aplica el esquema de observación \eqref{eq:ane_observacion}, obteniendo la matriz de datos que se entrega a los métodos.
+\end{enumerate}

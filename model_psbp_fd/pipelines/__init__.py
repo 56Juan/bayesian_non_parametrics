@@ -28,11 +28,14 @@ El paquete agrupa tres responsabilidades:
    Comprueba la consistencia entre manifest, hiperparametros y artefactos FPCA
    antes de que el analisis comience.
 
-Nota de estado: `sim_escenario_5` (proceso combinado, Algoritmo 5 del anexo)
-aun no esta implementado; su condicion de estacionariedad bajo innovacion
-skew-normal no constituye un resultado establecido y requiere verificacion
-empirica antes de incorporarse al contrato (ver docstring de
-`sim_escenario_4` y el Algoritmo 5 del anexo).
+Los seis algoritmos del anexo estan implementados. Los Algoritmos 1 a 4
+(primer bloque) intervienen la ley condicional y operan sobre la grilla
+mediante operadores integrales. Los Algoritmos 5 y 6 (segundo bloque) dejan la
+ley condicional dentro de lo representable y comprometen la reduccion de
+dimension; se definen sobre los coeficientes de un sistema ortonormal fijo, de
+modo que comparten con los anteriores el esquema de observacion, las replicas y
+las semillas, pero NO la maquinaria de operadores integrales, cuadratura de la
+dinamica ni factorizacion de la innovacion funcional.
 """
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -97,6 +100,29 @@ from .sim_escenario_4 import (
     extraer_factor_escala,
     construir_componentes_smsn,
     generador_innovacion_smsn,
+)
+
+# --- Escenario 5: predictibilidad en componente subordinada ---
+from .sim_escenario_5 import (
+    ConfigEscenario5,
+    generar_escenario_5,
+    resumen_escenario_5,
+    simular_coeficientes_ar1,
+    base_fourier,
+    frecuencia_maxima_base,
+    espectro_geometrico,
+    phis_componente_predecible,
+    media_senoidal,
+)
+
+# --- Escenario 6: covarianza no estacionaria ---
+from .sim_escenario_6 import (
+    ConfigEscenario6,
+    generar_escenario_6,
+    resumen_escenario_6,
+    simular_coeficientes_ar1_no_estacionario,
+    trayectoria_espectro,
+    espectro_intercambiado,
 )
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -175,7 +201,23 @@ __all__ = [
     "extraer_factor_escala",
     "construir_componentes_smsn",
     "generador_innovacion_smsn",
-    # ── Escenario 5: proceso combinado (pendiente de implementacion) ──
+    # ── Escenario 5: predictibilidad en componente subordinada ──
+    "ConfigEscenario5",
+    "generar_escenario_5",
+    "resumen_escenario_5",
+    "simular_coeficientes_ar1",
+    "base_fourier",
+    "frecuencia_maxima_base",
+    "espectro_geometrico",
+    "phis_componente_predecible",
+    "media_senoidal",
+    # ── Escenario 6: covarianza no estacionaria ──
+    "ConfigEscenario6",
+    "generar_escenario_6",
+    "resumen_escenario_6",
+    "simular_coeficientes_ar1_no_estacionario",
+    "trayectoria_espectro",
+    "espectro_intercambiado",
     # ── Contrato de artefactos ──
     "ARCHIVOS",
     "ArtefactosFPCA",

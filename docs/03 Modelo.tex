@@ -1,0 +1,546 @@
+\chapter{Mezclas DDP para Series de Tiempo Funcionales}
+\label{03_00_00_mezclas_ddp_series_tiempo_funcionales}
+ 
+ 
+\section{Motivación}
+\label{03_01_00_motivacion}
+ 
+Al igual que en el contexto escalar y multivariado, donde la dependencia temporal se captura mediante la distribución condicional de $X_t$ dado su historia $\{X_{t-1}, X_{t-2}, \ldots\}$, en las series de tiempo funcionales el objetivo es análogo, es decir, caracterizar la ley condicional de la curva $X_t(\tau)$ dado el conjunto de curvas pasadas $\{X_{t-1}(\tau), X_{t-2}(\tau), \ldots\}$. Así como en el caso clásico existen múltiples metodologías para modelar dicha dependencia, en el contexto funcional el abanico de estrategias se amplía aún más, precisamente porque cada observación ya no es un escalar o un vector de dimensión finita sino una curva que vive en un espacio funcional de dimensión infinita.\\
+ 
+La estrategia más común consiste en extender los modelos clásicos de series de tiempo al contexto funcional, es decir, utilizar los modelos funcionales FAR, FMA y FARMA, los cuales postulan una dinámica lineal gobernada por un operador acotado sobre el espacio de funciones, \cite{02_02_bosq2000linear}. Otra estrategia recurre a esquemas de reducción de dimensión, en los cuales se proyectan las curvas sobre una base de componentes principales funcionales y se modelan por separado las series de scores resultantes mediante técnicas clásicas univariadas, \cite{03_00_hyndman2007robust,03_00_hyndman2009forecasting}, o bien mediante un modelo vectorial autorregresivo sobre el vector de scores, \cite{02_02_aue2015prediction}. Ambos enfoques incorporan explícitamente la dependencia temporal entre observaciones funcionales y permiten cuantificar la incertidumbre predictiva; sin embargo, heredan limitaciones estructurales. En primer lugar, la dinámica se restringe a un operador lineal actuando sobre la curva (o el vector de scores) rezagado, de modo que la distribución condicional de $X_t$ dado su pasado queda completamente determinada por una única ley de innovación homogénea en el tiempo, es decir, el modelo no admite multimodalidad condicional, asimetrías dependientes del estado ni regímenes dinámicos cambiantes. En segundo lugar, la teoría de estimación y predicción descansa en supuestos de estacionariedad, \cite{03_00_hormann2010weakly,02_02_aue2015prediction} cuya violación ha sido documentada empíricamente en aplicaciones prácticas como las curvas de precios intradiarios, \citet{03_00_horvath2014testing}, y las curvas de temperatura, \citet{03_00_aue2018detecting}, donde la hipótesis de estacionariedad resulta rechazada y motiva por tanto el estudio de otras metodologías.\\
+ 
+Paralelamente, los avances en aprendizaje automático han dado lugar a modelos altamente flexibles, como redes neuronales, random forest y máquinas de soporte vectorial, con aplicaciones directas al pronóstico de series de tiempo funcionales, típicamente operando sobre los scores de una descomposición en componentes principales funcionales, \cite{03_00_forecast4010022}. Estos métodos relajan la restricción de linealidad en la media condicional y exhiben, en general, un elevado poder predictivo puntual. No obstante, sus limitaciones para el problema que aquí interesa son de naturaleza distribucional. Primero, estos métodos producen pronósticos puntuales sin medida de incertidumbre asociada, de modo que su cuantificación debe añadirse externamente al modelo, como ocurre con los intervalos de predicción construidos mediante remuestreo bootstrap de residuos, \cite{03_00_forecast4010022}, un procedimiento que no se deriva de una verosimilitud y que hereda nuevamente el supuesto de una población de errores homogénea. Segundo, los intentos de dotar a estas arquitecturas de un marco probabilístico, como las redes neuronales bayesianas, los deep ensembles y los procesos neuronales, enfrentan dificultades reconocidas por sus propios proponentes, entre ellas inferencia exacta intratable, especificación problemática de distribuciones a priori sobre los pesos, subestimación sistemática de la incertidumbre y costos computacionales elevados, \cite{03_00_kamarthi2021doubt}. El esfuerzo más reciente en esta dirección, específico para series de tiempo funcionales, es la red neuronal probabilística de \citet{03_00_wang2025profnet}, que confirma el diagnóstico anterior pero lo resuelve dentro de una verosimilitud gaussiana paramétrica, la cual produce nuevamente una distribución predictiva unimodal y de forma fija, incapaz de representar heterogeneidad distribucional en la ley condicional de la curva.\\
+ 
+Se configura así una disyuntiva entre dos familias de métodos que excede la simple oposición entre rigor y flexibilidad. Los enfoques funcionales de base estadística ofrecen un marco probabilístico coherente al precio de supuestos estructurales que la evidencia empírica contradice en los dominios de alta frecuencia que motivan esta tesis; los enfoques de aprendizaje automático flexibilizan la media condicional, pero su cuantificación de incertidumbre es ad hoc, en el sentido de ser externa al modelo, paramétrica de forma fija bajo verosimilitudes gaussianas, o mal calibrada por efecto de la inferencia variacional sobre pesos de redes. En ninguna de las dos familias el objeto de modelamiento es la distribución condicional completa de la observación funcional dada su historia, ambas la reducen a una media condicional más una ley de error rígida. Superar esta disyuntiva exige tratar dicha distribución como el parámetro infinito-dimensional de interés, dotándola de un prior flexible que acomode multimodalidad, asimetría y regímenes cambiantes, motivación que conduce naturalmente a la estadística bayesiana no paramétrica y a los modelos de mezclas infinitas inducidos por procesos de Dirichlet y sus generalizaciones dependientes, \cite{02_06_quintana2022dependent}, los cuales proporcionan priors con soporte total sobre espacios de densidades y, mediante dependencia en covariables, permiten que la densidad completa evolucione con el estado rezagado del proceso.
+ 
+\section{Estado del Arte}
+\label{03_02_00_estado_arte}
+ 
+La aplicación de métodos bayesianos no paramétricos al modelamiento de series de tiempo cuenta con una literatura consolidada para el caso univariado, organizada en torno al proceso de Dirichlet dependiente y sistematizada en la revisión de \citet{02_06_quintana2022dependent}.\\
+ 
+Una primera línea introduce la dependencia temporal en los átomos de la mezcla, manteniendo los pesos fijos. \citet{03_01_rodriguez2008dynamic} definen la distribución en cada instante como una mezcla de gaussianas cuyos átomos evolucionan según un modelo dinámico lineal, lo que permite capturar colas pesadas, multimodalidad y clusters de volatilidad en fenómenos financieros con la maquinaria computacional de un DPM estándar, precisamente porque los pesos no requieren actualización. \citet{03_01_dilucca2013simple} dan un paso conceptual decisivo al indexar el DDP no por el tiempo sino por la covariable rezagada $y_{t-1}$, con átomos afines de la forma $\theta_h(y)=\beta_h+\gamma_h y$, demostrando que un DDP puede operar directamente como motor de un modelo autorregresivo de regresión de densidad. Estos trabajos aportan la plantilla de ``mezcla condicionada al estado del proceso'', pero con dos restricciones compartidas: la covariable es escalar y la dependencia recae únicamente en los átomos, de modo que los pesos de mezcla permanecen constantes y no responden al estado rezagado.\\
+ 
+Una segunda línea introduce la dependencia temporal en los pesos, de modo que lo que cambia en el tiempo no es la ubicación de los componentes sino cuánta probabilidad recibe cada uno. \citet{03_01_griffin2011stick} lo consiguen mediante una recursión estocástica sobre las fracciones stick-breaking que preserva, en cada instante, la forma stick-breaking de los pesos, permitiendo que la probabilidad de cada régimen crezca o decaiga sin comprometer la coherencia del prior. En la representación de particiones, donde los pesos quedan integrados y solo se modela la regla de asignación a grupos, se han propuesto urnas de Pólya variantes en el tiempo \cite{03_01_caron2007urna} y, en el caso multivariado, \citet{03_01_saad2018temporally} reponderan la asignación de un proceso de restaurante chino según la recencia de las observaciones de cada grupo, logrando pronosticar, imputar y agrupar simultáneamente cientos de series heterogéneas y no estacionarias. Frente al problema de esta tesis, estos mecanismos presentan dos limitaciones. Ninguno ha sido aplicado a datos funcionales: las observaciones son escalares o vectores, nunca curvas. Y su extensión al escenario aquí requerido no ha sido establecida: la reponderación opera sobre recencia y no sobre una covariable de estado continua, la partición no expone pesos explícitos a los cuales acoplar un vector rezagado, y la recursión sobre fracciones no admite generalización natural a covariables en $\mathbb{R}^M$. Son de hecho notablemente escasos los trabajos que transitan del caso escalar al vectorial dentro de la familia DDP.\\
+ 
+En el frente de los datos funcionales, la literatura bayesiana no paramétrica ha producido construcciones dependientes genuinas, pero con la dependencia orientada a ejes distintos del temporal. \citet{03_01_petrone2009hybrid} formalizan los priors Dirichlet híbridos, en los que cada curva se recombina localmente a partir de unas pocas curvas canónicas mediante un proceso de etiquetas oculto gobernado por una cópula gaussiana sobre el propio dominio funcional; el aporte es un mecanismo de heterogeneidad local dentro de la curva, pero no existe estructura temporal entre curvas sucesivas. \citet{03_01_rodriguez2009functional} estiman colecciones de curvas compartiendo información mediante mezclas DDP de gaussianas, con una aplicación a perfiles oceanográficos de alta frecuencia directamente análoga a los datos que motivan esta tesis y con garantías de consistencia en el espacio de funciones integrables; la dependencia, sin embargo, es entre curvas de una muestra y no una estructura autorregresiva sobre la ley de mezcla. \citet{03_01_scarpa2014enriched} enriquecen el stick-breaking funcional con una jerarquía de dos niveles que agrupa las curvas primero por atributos globales conocidos y luego por características finas, mecanismo valioso para incorporar información previa sobre regímenes pero atemporal por construcción. Más cerca del objetivo de esta tesis, \citet{03_01_gamasaee2017mining} combinan un DDP con mezclas de regresión por tramos para clustering dinámico, segmentación y pronóstico de funciones, con clusters que nacen, persisten y transitan en el tiempo; no obstante, su representación por tramos no se articula con expansiones FPCA ni con una covariable de scores rezagados. El balance de esta literatura funcional es claro: existen mezclas dependientes para curvas, pero en ninguna de ellas la distribución de la curva presente está indexada por el estado funcional rezagado de la serie.\\
+ 
+Finalmente, dentro de la familia stick-breaking dependiente, \citet{03_01_rodriguez2011probit} proponen el proceso probit stick-breaking, que sustituye las fracciones Beta de la representación de Sethuraman por transformaciones probit de procesos gaussianos; con ello, la dependencia de los pesos respecto de una covariable (escalar, vectorial, temporal o espacial) se obtiene especificando la estructura de covarianza del proceso subyacente, y la inferencia se reduce, vía la representación de razón de continuación, a una secuencia de regresiones probit resolubles con el aumento de datos de Albert y Chib, preservando esquemas de Gibbs estándar. En esta misma familia, \citet{03_02_chung2009nonparametric} habían empleado mezclas probit stick-breaking con pesos indexados por un vector de predictores para la estimación de distribuciones condicionales con selección de variables, demostrando la viabilidad del mecanismo con covariables escalares; su contexto, sin embargo, es el de regresión con observaciones intercambiables, donde los predictores son exógenos y no existe estructura temporal alguna. Las aplicaciones de \citet{03_01_rodriguez2011probit}, por su parte, se limitan a ilustraciones en finanzas y ecología con átomos euclidianos, y los desarrollos posteriores de la familia han avanzado hacia índices espacio-temporales conjuntos, incluyendo un test de separabilidad entre ambas fuentes de dependencia \cite{03_01_grazian2025spatiotemporal}, sin abordar hasta ahora observaciones funcionales ni covariables construidas a partir de la propia historia del proceso.
+ 
+\subsection{Discusión y brecha de investigación}
+\label{03_02_01_discusion_brecha}
+La revisión anterior muestra que un modelo para el problema de esta tesis necesita dos propiedades: que la ley de mezcla dependa del estado rezagado del proceso, y que las observaciones sean funcionales. Ninguna de las dos literaturas revisadas reúne ambas.
+\begin{itemize}
+    \item Los trabajos de series de tiempo logran la primera propiedad, sea moviendo los átomos con pesos fijos, \cite{03_01_rodriguez2008dynamic,03_01_dilucca2013simple}, sea desplazando los pesos mediante recursiones temporales, \cite{03_01_griffin2011stick}, sea reponderando la partición por recencia, \cite{03_01_caron2007urna,03_01_saad2018temporally}, pero ninguno trabaja con observaciones funcionales.
+    \item Los trabajos funcionales logran la segunda, con dependencia local, jerárquica o entre curvas, \cite{03_01_petrone2009hybrid,03_01_rodriguez2009functional,03_01_scarpa2014enriched,03_01_gamasaee2017mining}, pero ninguno hace que la mezcla dependa de los rezagos de la serie.
+\end{itemize}
+La mezcla probit stick-breaking permite conectar ambas propiedades, pues sus pesos pueden depender de covariables vectoriales con inferencia sencilla; sin embargo, tampoco ha sido aplicada a datos funcionales ni a covariables construidas con los rezagos del proceso, \cite{03_01_rodriguez2011probit,03_01_grazian2025spatiotemporal}. En consecuencia, no existe en la literatura una mezcla stick-breaking cuyos pesos dependan del estado funcional rezagado de la serie.\\
+ 
+Por tanto, la brecha de investigación que este trabajo busca cubrir consiste en desarrollar un modelo bayesiano no paramétrico que opere directamente sobre los scores de la representación funcional. En concreto, la curva $X_t(\tau)$ se proyecta sobre la base de componentes principales funcionales y el vector de scores resultante, $\boldsymbol{\xi}_t\in\mathbb{R}^M$, se modela mediante una mezcla probit stick-breaking cuyos pesos dependen del estado rezagado $\boldsymbol{\xi}_{t-1}$. \\
+
+El valor de esta construcción es triple. Primero, el objeto estimado es la ley condicional completa de la curva dada su historia y no su media condicional más un error de forma fija, de modo que multimodalidad, asimetría y cambios de régimen quedan representados dentro del modelo y no como desviaciones respecto de él; es esta propiedad, y no la reducción de dimensión en sí, la que responde a la evidencia de no estacionariedad y heterogeneidad distribucional que motiva el capítulo. Segundo, la dependencia se introduce en los pesos y no en los átomos, de modo que no solo la ubicación de cada régimen sino su probabilidad responde al estado del proceso, y se conserva al mismo tiempo la tratabilidad computacional del PSBPM, que las recursiones y las particiones no ofrecen para covariables vectoriales. Tercero, al operar sobre los scores de la descomposición funcional, permite identificar qué direcciones de variación de la curva gobiernan los cambios de régimen y propagar la incertidumbre desde los scores hasta la curva pronosticada, algo que ni los operadores del enfoque FAR ni los métodos de aprendizaje automático permiten, aun cuando esta interpretación sea menos inmediata que la de un modelo funcional lineal.
+ 
+\section{Probit Stick-Breaking Process Mixture}
+\label{03_03_00_psbp}
+Esta sección presenta el Probit Stick-Breaking Process (PSBP) y el modelo de mezcla construido sobre él, el PSBP Mixture (PSBPM), siguiendo el desarrollo de \citet{03_02_chung2009nonparametric}; salvo indicación en contrario, las definiciones, resultados y el esquema de inferencia expuestos a continuación provienen de dicho trabajo. El PSBP define una colección de distribuciones dependientes del predictor $\mathcal{P}_{\mathcal{X}} = \{P_x : x \in \mathcal{X}\}$ mediante una modificación del proceso stick-breaking estándar en la que las variables de quiebre se construyen a través de un modelo probit. La motivación de esta construcción parte de la representación estándar del DP:
+\begin{equation}
+    P = \sum_{h=1}^{\infty} \pi_h\, \delta_{\theta_h},
+    \qquad \pi_h = V_h \prod_{l < h}(1 - V_l),
+    \qquad V_h \overset{\mathrm{iid}}{\sim} \mathrm{Beta}(1, c),
+\end{equation}
+y propone reemplazar las variables Beta por variables latentes normales transformadas mediante la función de distribución acumulada $\Phi(\cdot)$ de la normal estándar:
+\begin{equation}\label{eq:psbp_base}
+    \pi_h = \Phi(\eta_h) \prod_{l < h}\bigl\{1 - \Phi(\eta_l)\bigr\},
+    \qquad \eta_h \overset{\mathrm{iid}}{\sim} \mathcal{N}(\mu, 1).
+\end{equation}
+En el caso particular $c = 1$ y $\mu = 0$, ambas formulaciones producen variables de quiebre con distribución $\mathrm{Uniform}(0,1)$, de modo que los dos priors son idénticos. En general, $\mu$ desempeña un rol análogo al del parámetro de concentración $c$ del DP, es decir, valores grandes de $\mu$ concentran la masa en los primeros componentes de la mezcla, mientras que valores pequeños producen una distribución más difusa sobre el espacio de componentes.\\
+ 
+Para construir una colección de distribuciones dependientes del predictor, la ecuación~\eqref{eq:psbp_base} se generaliza permitiendo que el predictor lineal $\eta_h$ dependa de $x$:
+\begin{equation}\label{eq:psbp_dependiente}
+    P_x = \sum_{h=1}^{\infty} \pi_h(x)\, \delta_{\theta_h},
+    \qquad \pi_h(x) = \Phi\bigl(\eta_h(x)\bigr)
+    \prod_{l < h}\bigl\{1 - \Phi\bigl(\eta_l(x)\bigr)\bigr\},
+\end{equation}
+donde los átomos $\theta_h \sim P_0$ son independientes del predictor y compartidos entre todas las distribuciones de la colección. El predictor lineal se especifica como $\eta_h(x) = \alpha_h + f_h(x)$, con $\alpha_h \sim \mathcal{N}(\mu, 1)$ y $f_h : \mathbb{R}^p \to \mathbb{R}$ una función de regresión desconocida de los predictores. La notación compacta $\mathcal{P}_{\mathcal{X}} \sim \mathrm{PSBP}(\mu, H, P_0)$ designa que la colección sigue esta distribución con hiperparámetros $\mu$, $H$ y medida base $P_0$, donde $H$ caracteriza la distribución de los parámetros que definen $f_h(\cdot)$. El Lema~1 de \citet{03_02_chung2009nonparametric} establece que los pesos definidos en \eqref{eq:psbp_dependiente} satisfacen $\sum_{h=1}^{\infty}\pi_h(x) = 1$ casi seguramente para todo $x \in \mathcal{X}$, garantizando la coherencia del prior.\\
+ 
+Para la función de regresión $f_h(\cdot)$, los autores proponen la forma basada en distancias absolutas ponderadas:
+\begin{equation}\label{eq:fh_kernel}
+    f_h(x) = -\sum_{j=1}^{p} \rho_{hj}\, |x_j - \Gamma_{hj}|,
+\end{equation}
+donde $\rho_{hj} \geq 0$ controla la tasa de decaimiento de la dependencia para el $j$-ésimo predictor en el $h$-ésimo componente, y $\Gamma_{hj}$ es una localización de referencia en el espacio del predictor. Las distribuciones a priori sobre los parámetros $\boldsymbol{\phi}_h = \{\rho_{hj}, \Gamma_{hj}\}_{j=1}^{p}$ se especifican como:
+\begin{equation}\label{eq:prior_phi}
+    H \equiv \prod_{j=1}^{p} \left\{
+        \mathcal{N}^+\!\left(\rho_{hj};\, \mu_{\rho_j},
+        \nu_{\rho_j}^{-1}\right)
+        \times \sum_{l=1}^{L_j} \frac{1}{L_j}\,
+        \delta_{\Gamma_{jl}^*}(\Gamma_{hj})
+    \right\},
+\end{equation}
+donde $\mathcal{N}^+$ denota una distribución normal truncada en cero por abajo, garantizando $\rho_{hj} \geq 0$, y $\{\Gamma_{jl}^*\}_{l=1}^{L_j}$ es una grilla discreta de puntos de referencia para el $j$-ésimo predictor. La interpretación geométrica es directa: si $x$ se encuentra lejos del centro $\boldsymbol{\Gamma}_h = \{\Gamma_{hj}\}_{j=1}^{p}$, entonces $f_h(x)$ toma valores negativos de gran magnitud, $\Phi(\eta_h(x)) \approx 0$, y el $h$-ésimo componente contribuye con peso reducido en $x$, favoreciendo a los componentes cuyos centros son más próximos al punto de evaluación.
+ 
+\subsection{Especificación del modelo de mezclas}
+\label{03_03_01_especificacion_modelo_mezclas}
+Para el modelamiento de la densidad condicional $f(y \mid x)$, el PSBP se emplea como prior sobre la distribución mezcladora en un modelo de mezcla infinita de regresiones normales lineales, denominado PSBP Mixture (PSBPM):
+\begin{equation}\label{eq:psbpm}
+    f(y \mid x) = \int \mathcal{N}(y;\, \mathbf{x}_0^\top \boldsymbol{\beta},\,
+    \nu^{-1})\, dP_x(\boldsymbol{\beta}, \nu),
+    \qquad
+    \mathcal{P}_{\mathcal{X}} \sim \mathrm{PSBP}(\mu, H, P_0),
+\end{equation}
+donde $\mathbf{x}_0 = (1, x^\top)^\top$ es el vector predictor incluyendo un intercepto y $\boldsymbol{\beta} = (\beta_0, \dots, \beta_p)^\top$ es el vector de coeficientes de regresión. Aplicando la forma stick-breaking de la ecuación~\eqref{eq:dpm_sb}, y considerando además $\theta_h = (\boldsymbol{\beta}_h^*, \nu_h^*)$, se obtiene la representación equivalente como mezcla infinita:
+\begin{equation}\label{eq:psbpm_mezcla}
+    f(y \mid x) = \sum_{h=1}^{\infty}
+    \pi_h(x)\, \mathcal{N}\!\left(y;\, \mathbf{x}_0^\top
+    \boldsymbol{\beta}_h^*,\, \nu_h^{*-1}\right),
+\end{equation}
+que corresponde a una mezcla infinita de regresiones lineales normales con pesos dependientes de los predictores.\\
+ 
+De forma análoga al modelo de Mezcla de Procesos de Dirichlet (Sección~\ref{02_05_01_dpm}), el PSBPM admite una representación jerárquica en tres niveles. La diferencia esencial reside en que la distribución de la cual se extraen los parámetros de cada observación depende ahora de su covariable, por lo que los parámetros dejan de ser idénticamente distribuidos:
+\begin{equation}\label{eq:psbpm_jerarquico}
+\begin{aligned}
+    y_i \mid \theta_i, x_i &\overset{\mathrm{ind}}{\sim}
+    \mathcal{N}\!\left(y_i;\, \mathbf{x}_{i0}^\top \boldsymbol{\beta}_i,\,
+    \nu_i^{-1}\right),
+    \qquad i = 1, \dots, n, \\
+    \theta_i = (\boldsymbol{\beta}_i, \nu_i) \mid P_{x_i}
+    &\overset{\mathrm{ind}}{\sim} P_{x_i}, \\
+    \mathcal{P}_{\mathcal{X}} = \{P_x : x \in \mathcal{X}\}
+    &\sim \mathrm{PSBP}(\mu, H, P_0),
+\end{aligned}
+\end{equation}
+donde, fijada la covariable $x_i$, cada $P_{x_i}$ es marginalmente un Proceso de Dirichlet, de modo que el esquema recupera el del DPM cuando la distribución mezcladora no depende del predictor.\\
+ 
+Para incorporar selección de variables, se introduce un indicador $\gamma_{hj} \in \{0,1\}$ que controla la inclusión del $j$-ésimo predictor en el $h$-ésimo componente. Cuando $\gamma_{hj} = 0$, se tiene simultáneamente $\rho_{hj} = 0$ y $\beta_{hj}^* = 0$, de modo que el $j$-ésimo predictor queda excluido tanto de los pesos $\pi_h(x)$ como de la media condicional del componente. Si $\gamma_{hj} = 0$ para todo $h$, el $j$-ésimo predictor queda globalmente excluido del modelo. Para modelar la incertidumbre sobre la inclusión se especifica:
+\begin{align}
+    \gamma_{hj} &\sim \mathrm{Bernoulli}(\kappa_j), \label{eq:gamma_prior}\\
+    \kappa_j &\sim (1 - w_j)\,\delta_0
+    + w_j\,\mathrm{Beta}(a_{\kappa_j}, b_{\kappa_j}), \label{eq:kappa_prior}\\
+    w_j &\sim \mathrm{Bernoulli}(0.5), \label{eq:wj_prior}
+\end{align}
+donde $w_j$ es un indicador global de inclusión del $j$-ésimo predictor en el modelo completo. Los priors sobre los parámetros de los átomos se especifican mediante:
+\begin{equation}\label{eq:prior_theta}
+    \boldsymbol{\beta}_{\gamma_h, h}^* \mid \nu_h^*
+    \sim \mathcal{N}\!\left(\boldsymbol{\beta}_{\gamma_h,h}^*;\,
+    \mathbf{0},\, \boldsymbol{\Sigma}_{\gamma_h,h}\right),
+    \qquad
+    \nu_h^* \sim \mathrm{Gamma}(\nu_h^*;\, a_\nu, b_\nu),
+\end{equation}
+\begin{equation}\label{eq:sigma_gprior}
+    \boldsymbol{\Sigma}_{\gamma_h,h} = ng^{-1}
+    \left(\mathbf{X}_{\gamma_h,h}^\top
+    \mathbf{X}_{\gamma_h,h}\right)^{-1}/\nu_h^*,
+    \qquad
+    g \sim \mathrm{Gamma}(g;\, a_g, b_g),
+\end{equation}
+donde la especificación de $\boldsymbol{\Sigma}_{\gamma_h,h}$ corresponde al g-prior de Zellner~\cite{02_03_zellner1986gprior}, que ajusta la escala de los coeficientes en función de los predictores y la precisión residual del componente.
+ 
+\subsection{Esquema de inferencia bayesiana}
+\label{03_03_02_esquema_inferencia_bayesiana}
+La inferencia en el PSBPM se realiza mediante un muestreador de Gibbs que combina aumento de datos con condicionales completas conjugadas. Para obtener una aproximación tratable, el proceso infinito se trunca al nivel $N$, fijando $\Phi(\eta_N(x)) = 1$ de modo que $\sum_{h=1}^{N}\pi_h(x) = 1$ para todo $x$.\\
+ 
+El aumento de datos introduce variables latentes $Z_{il}^*$ que transforman el problema de actualización de los parámetros del predictor lineal en una regresión normal conjugada. Para cada observación $i$ con asignación $S_i = h$, se define:
+\begin{equation}\label{eq:augmentation}
+    Z_{il} = \mathbf{1}(Z_{il}^* > 0),
+    \qquad
+    Z_{il}^* \sim \mathcal{N}\!\left(Z_{il}^*;\,
+    \alpha_h - \sum_{j=1}^{p}\rho_{hj}|x_{ij} - \Gamma_{hj}|,\,
+    1\right),
+\end{equation}
+con $Z_{il} = 0$ para $l = 1, \dots, S_i - 1$ y $Z_{il} = 1$ para $l = S_i$. Dado $Z_{il}^*$, todos los parámetros de los pesos y de los átomos admiten distribuciones condicionales completas de forma cerrada. Los pasos de actualización del muestreador son los siguientes.
+ 
+\begin{enumerate}
+ 
+    \item \textbf{Actualización de asignaciones $S_i$:} Para cada
+    $i = 1, \dots, n$,
+    \begin{equation}
+        \Pr(S_i = h) = \frac{\pi_h(x_i)\,
+        \mathcal{N}(y_i;\, \mathbf{x}_{i0}^\top
+        \boldsymbol{\beta}_h^*,\, \nu_h^{*-1})}
+        {\sum_{h=1}^{N}\pi_h(x_i)\,
+        \mathcal{N}(y_i;\, \mathbf{x}_{i0}^\top
+        \boldsymbol{\beta}_h^*,\, \nu_h^{*-1})}.
+    \end{equation}
+ 
+    \item \textbf{Actualización de variables latentes $Z_{il}^*$:}
+    Para cada $i$ con $S_i = h$, se muestrean variables normales
+    truncadas:
+    \begin{align*}
+        Z_{il}^* &\sim \mathcal{N}\!\left(\eta_l(x_i),\, 1\right)
+        \mathbf{1}_{(-\infty,\, 0)}, \quad l = 1, \dots, h-1,\\
+        Z_{ih}^* &\sim \mathcal{N}\!\left(\eta_h(x_i),\, 1\right)
+        \mathbf{1}_{(0,\, \infty)}.
+    \end{align*}
+ 
+    \item \textbf{Actualización de interceptos probit $\alpha_h$:}
+    Para $h = 1, \dots, N-1$, con $n_h = \sum_{i=1}^n \mathbf{1}(S_i
+    \geq h)$,
+    \begin{equation}
+        \alpha_h \sim \mathcal{N}\!\left(\alpha_h;\,
+        [n_h + 1]^{-1}\!\left[\sum_{i:\, S_i \geq h} W_{ih}^*
+        + \mu\right],\, [n_h + 1]^{-1}\right),
+    \end{equation}
+    donde $W_{ih}^* = Z_{ih}^* + \sum_{j=1}^{p}\rho_{hj}
+    |x_{ij} - \Gamma_{hj}|$.
+ 
+    \item \textbf{Actualización de coeficientes de decaimiento $\rho_{hj}$:}
+    Para $j = 1, \dots, p$ y $h = 1, \dots, N-1$: si $\gamma_{hj} = 0$,
+    entonces $\rho_{hj} = 0$; si $\gamma_{hj} = 1$, definiendo
+    $U_{ih}^* = \alpha_h - Z_{ih}^* - \sum_{k \neq j}\rho_{hk}
+    |x_{ik} - \Gamma_{hk}|$ y $D_{ihj} = |x_{ij} - \Gamma_{hj}|$,
+    \begin{align}
+    \rho_{hj} &\sim \mathcal{N}^+\!\left(m_{\rho_{hj}},\,
+    v_{\rho_{hj}}\right), \notag\\
+    v_{\rho_{hj}} &= \left[\nu_{\rho_j}
+    + \sum_{i:\,S_i \geq h} D_{ihj}^2\right]^{-1}, \notag\\
+    m_{\rho_{hj}} &= v_{\rho_{hj}}\left[\nu_{\rho_j}\mu_{\rho_j}
+    + \sum_{i:\,S_i \geq h} D_{ihj}\, U_{ih}^*\right].
+    \end{align}
+ 
+    \item \textbf{Actualización de centros de referencia $\Gamma_{hj}$:}
+    Para $j = 1, \dots, p$ y $h = 1, \dots, N-1$: si $\gamma_{hj} = 0$,
+    no se actualiza; si $\gamma_{hj} = 1$, definiendo
+    $R_{ih}^{(j)} = \alpha_h - \sum_{k \neq j}\rho_{hk}|x_{ik} - \Gamma_{hk}|$,
+    \begin{equation}
+        \Pr(\Gamma_{hj} = \Gamma_{jl}^*) \propto
+        \frac{1}{L_j} \prod_{i:\,S_i \geq h}
+        \mathcal{N}\!\left(Z_{ih}^*;\,
+        R_{ih}^{(j)} - \rho_{hj}|x_{ij} - \Gamma_{jl}^*|,\, 1\right).
+    \end{equation}
+ 
+    \item \textbf{Actualización de coeficientes de regresión
+    $\boldsymbol{\beta}_h^*$:} Para $h = 1, \dots, N$, con
+    $\boldsymbol{\beta}_{\bar{\gamma}_h,h}^* = \mathbf{0}$,
+    \begin{align}
+        \boldsymbol{\beta}_{\gamma_h,h}^* &\sim
+        \mathcal{N}\!\left(\mathbf{m}_{\beta_h},\,
+        \mathbf{V}_{\beta_h}\right), \notag\\
+        \mathbf{V}_{\beta_h} &= \left[\nu_h^*
+        \mathbf{X}_{\gamma_h,h}^\top \mathbf{X}_{\gamma_h,h}
+        + \boldsymbol{\Sigma}_{\gamma_h,h}^{-1}\right]^{-1}, \notag\\
+        \mathbf{m}_{\beta_h} &= \mathbf{V}_{\beta_h}\,
+        \nu_h^*\, \mathbf{X}_{\gamma_h,h}^\top \mathbf{y}_h.
+    \end{align}
+ 
+    \item \textbf{Actualización de precisiones $\nu_h^*$:} Para
+    $h = 1, \dots, N$, con $k_h = \sum_{i=1}^n \mathbf{1}(S_i = h)$,
+    $p_{\gamma_h} = \sum_{j=1}^p \gamma_{hj}$,
+    $\mathbf{r}_h = \mathbf{y}_h -
+    \mathbf{X}_{\gamma_h,h}\boldsymbol{\beta}_{\gamma_h,h}^*$ y
+    $Q_h = \boldsymbol{\beta}_{\gamma_h,h}^{*\top}
+    (\mathbf{X}_{\gamma_h,h}^\top\mathbf{X}_{\gamma_h,h})
+    \boldsymbol{\beta}_{\gamma_h,h}^*$,
+    \begin{align}
+        \nu_h^* &\sim \mathrm{Gamma}\!\left(a_\nu^*, b_\nu^*\right),
+        \notag\\
+        a_\nu^* &= a_\nu + \frac{k_h}{2} +
+        \frac{p_{\gamma_h}+1}{2}, \notag\\
+        b_\nu^* &= b_\nu + \frac{1}{2}\mathbf{r}_h^\top\mathbf{r}_h
+        + \frac{g}{2n}Q_h.
+    \end{align}
+ 
+    \item \textbf{Actualización de $g$, $\kappa_j$, $w_j$ y $\mu$:}
+    Estos hiperparámetros se actualizan desde sus distribuciones
+    condicionales completas conjugadas. En particular, $\mu$ se
+    actualiza como:
+    \begin{equation}
+        \mu \sim \mathcal{N}\!\left(\mu;\,
+        [N - 1 + \nu_\mu]^{-1}\!
+        \left[\sum_{h=1}^{N-1}\alpha_h +
+        \nu_\mu\mu_\mu\right],\,
+        [N - 1 + \nu_\mu]^{-1}\right).
+    \end{equation}
+ 
+    \item \textbf{Actualización de indicadores de inclusión
+    $\gamma_{hj}$:} Para $j = 1, \dots, p$ y $h = 1, \dots, N$,
+    \begin{equation}
+        \Pr(\gamma_{hj} = 1) = \frac{a_{hj}}{a_{hj} + b_{hj}},
+    \end{equation}
+    donde $a_{hj}$ y $b_{hj}$ se calculan marginalizando $\rho_{hj}$
+    y $\beta_{hj}^*$ de la verosimilitud conjunta de $(y, S)$. Esta
+    marginalización es posible gracias a la conjugación obtenida por
+    la estructura probit de los pesos, y generaliza el paso de
+    búsqueda estocástica para selección de variables (SSVS, por sus
+    siglas en inglés) propio de la regresión lineal.
+ 
+\end{enumerate}
+ 
+Los autores recomiendan estandarizar $y$ y $x$ antes del análisis y proponen los siguientes valores por defecto para los hiperparámetros: $\mu_{\rho_j} = 0$, $\nu_{\rho_j} = 100$, grilla $\{\Gamma_{jl}^*\}_{l=1}^{50}$ de 50 puntos igualmente espaciados en $(-3.5,\, 3.5)$, $a_g = b_g = a_\nu = b_\nu = 0.5$, $a_{\kappa_j} = b_{\kappa_j} = 0.5$, $\mu_\mu = 0$, $\nu_\mu = 1$, y nivel de truncamiento $N = 20$.
+ 
+\subsection{Propiedades}
+\label{03_03_03_propiedades}
+El PSBP y el modelo de mezcla construido sobre él presentan un conjunto de propiedades que los distinguen de otras formulaciones de procesos stick-breaking dependientes y que justifican su adopción en problemas de modelamiento de distribuciones condicionales.\\
+ 
+La primera propiedad es la conjugación del PSBPM. La estructura probit de las variables de quiebre, combinada con el aumento de datos mediante las variables latentes $Z_{il}^*$, produce condicionales completas de forma cerrada para todos los parámetros del modelo. Esto contrasta con formulaciones alternativas como el KSBP \cite{02_06_dunson2008kernel}, cuya inferencia requiere pasos de Metropolis--Hastings. La conjugación es especialmente relevante para el cálculo de probabilidades de inclusión de variables, ya que permite marginalizar analíticamente $\rho_{hj}$ y $\beta_{hj}^*$ en el paso de actualización de $\gamma_{hj}$.\\
+ 
+La segunda propiedad es la adaptación local del PSBP al espacio de predictores. Los pesos $\pi_h(x)$ concentran su masa en torno al centro $\boldsymbol{\Gamma}_h$, de modo que cada componente de la mezcla domina en una región distinta del espacio $\mathcal{X}$. La tasa de decaimiento $\rho_{hj}$ controla cuán rápidamente decrece la influencia del $h$-ésimo componente al alejarse de su centro, permitiendo que la estructura de mezcla se adapte a la heterogeneidad local de los datos sin imponer una forma global paramétrica.\\
+ 
+La tercera propiedad es la selección de variables en dos niveles del PSBPM. El indicador $\gamma_{hj}$ actúa simultáneamente sobre los pesos $\pi_h(x)$ ---a través de $\rho_{hj}$--- y sobre la media condicional del componente a través de $\beta_{hj}^*$. Esto permite distinguir entre predictores que afectan la forma de la distribución condicional de manera local (en ciertas regiones de $\mathcal{X}$) y predictores con efectos globales sobre toda la distribución, mediante el indicador de inclusión global $w_j$.\\
+ 
+La cuarta propiedad es la coherencia del prior. El Lema~1 de \citet{03_02_chung2009nonparametric} garantiza que $\sum_{h=1}^{\infty}\pi_h(x) = 1$ casi seguramente para todo $x \in \mathcal{X}$, condición necesaria para que $P_x$ sea una distribución de probabilidad válida para cada valor del predictor. Esta propiedad no es automática en procesos stick-breaking dependientes y requiere verificación explícita para cada elección del proceso de quiebre en la ecuación~\eqref{eq:ddp_sb_general}.\\
+ 
+En conjunto, estas propiedades hacen del PSBPM una herramienta adecuada para el modelamiento no paramétrico de distribuciones condicionales en contextos donde la forma de la distribución, y no solo su media, varía con los predictores, y donde la selección parsimoniosa de variables es parte integral del análisis.
+\section{Modelo PSBPM-FD}
+\label{03_04_00_modelo_propuesto_psbpm_fd}
+
+El modelo PSBPM-FD traslada la construcción de la Sección~\ref{03_03_00_psbp} al espacio de los scores funcionales obtenidos mediante la descomposición B-spline + FPCA descrita en el Capítulo~2.\\
+
+Sea $\{X_t\}$ una serie de tiempo funcional con valores en $L^2(\mathcal{T})$ y sea
+\begin{equation}\label{eq:expansion_kl_truncada}
+    X_t^{(M)}(\tau) = \mu(\tau)
+    + \sum_{m=1}^{M} \xi_{tm}\,\psi_m(\tau),
+    \qquad \tau \in \mathcal{T},
+\end{equation}
+su expansión truncada en $M$ términos, donde $\mu(\tau)$ denota la función media, $\{\psi_m\}_{m=1}^{K}$ las autofunciones del operador de covarianza ordenadas según sus autovalores $\lambda_1 \geq \dots \geq \lambda_K$, de las que se retienen las $M \leq K$ primeras, y $\xi_{tm} = \langle X_t - \mu,\, \psi_m\rangle$ el $m$-ésimo score de la curva observada en el instante $t$. Las cantidades $\mu(\tau)$ y $\{\psi_m\}$ se obtienen del bloque de entrenamiento y se tratan como conocidas en lo sucesivo, de modo que la totalidad de la aleatoriedad del proceso reside en la sucesión de vectores de scores $\{\boldsymbol{\xi}_t\}$, con $\boldsymbol{\xi}_t = (\xi_{t1},\dots,\xi_{tM})^\top \in \mathbb{R}^{M}$.\\
+
+Se adopta un supuesto markoviano de orden $q$, de modo que la historia relevante queda resumida en el vector $\mathbf{z}_t = (\boldsymbol{\xi}_{t-1}^\top, \dots, \boldsymbol{\xi}_{t-q}^\top)^\top$, de dimensión $p = qM$, y se postula sobre él la independencia condicional entre componentes,
+\begin{equation}\label{eq:factorizacion}
+    f\bigl(\boldsymbol{\xi}_t \mid \mathbf{z}_t\bigr)
+    = \prod_{m=1}^{M} f\bigl(\xi_{tm} \mid \mathbf{z}_t\bigr).
+\end{equation}
+La factorización no restringe el condicionante sino sólo la dependencia contemporánea entre componentes. Cada factor admite la historia completa del proceso, de manera que el rezago de cualquier componente puede influir sobre la ley de cualquier otra, e incluso permite incorporar covariables exógenas a $\mathbf{z}_t$ sin alterar la estructura de \eqref{eq:factorizacion}.\\
+
+Bajo este supuesto cada factor de \eqref{eq:factorizacion} puede especificarse por separado. Se emplea para ello un proceso de Dirichlet dependiente indexado por $\mathbf{z}_t$, esto es, una colección de medidas de probabilidad aleatorias $\{P_{\mathbf{z}}\}$ con representación stick-breaking
+\begin{equation}\label{eq:ddp_autoregresivo}
+    P_{\mathbf{z}} = \sum_{h=1}^{\infty} \pi_h(\mathbf{z})\,\delta_{\theta_h},
+    \qquad \theta_h \overset{\mathrm{iid}}{\sim} P_0,
+\end{equation}
+cuyos pesos se construyen según el mecanismo probit de la ecuación~\eqref{eq:psbp_dependiente} y cuyos átomos son independientes del índice y compartidos por toda la colección. El carácter autorregresivo de orden $q$ reside en que dicho índice no es una covariable exógena sino el estado rezagado del propio proceso, de manera que la medida que gobierna la distribución de $\boldsymbol{\xi}_t$ queda seleccionada por la historia reciente de la serie. Esta es la diferencia esencial respecto del uso original del PSBP en \citet{03_02_chung2009nonparametric}, donde las observaciones son intercambiables y los predictores externos, y la que permite que no sólo la ubicación de cada régimen sino su probabilidad de ocurrencia responda al estado del sistema.\\
+
+La construcción anterior se instancia por separado para cada componente, con átomos $\theta_{hm} = (\beta_{0,hm}^*, \boldsymbol{\beta}_{hm}^*, \nu_{hm}^*)$ y núcleo de regresión lineal normal, de donde cada factor de \eqref{eq:factorizacion} resulta una mezcla de regresiones normales con pesos dependientes del estado rezagado,
+\begin{equation}\label{eq:psbpm_fd_componente}
+    f(\xi_{tm} \mid \mathbf{z}_{t}) = \sum_{h=1}^{N}
+    \pi_{hm}(\mathbf{z}_{t})\,
+    \mathcal{N}\!\left(\xi_{tm};\,
+    \beta_{0,hm}^* + \mathbf{z}_{t}^\top \boldsymbol{\beta}_{hm}^*,\,
+    \nu_{hm}^{*-1}\right),
+    \qquad m = 1, \dots, M,
+\end{equation}
+donde el score presente juega el rol de la variable respuesta $y$ de la Sección~\ref{03_03_01_especificacion_modelo_mezclas} y el vector $\mathbf{z}_t$ el del predictor $x$, y los pesos se obtienen del predictor lineal
+\begin{equation}\label{eq:eta_psbpm_fd}
+    \eta_{hm}(\mathbf{z}_t) = \alpha_{hm}
+    - \sum_{j=1}^{p} \rho_{hmj}\,\bigl|z_{tj} - \Gamma_{hmj}\bigr|,
+\end{equation}
+donde $\alpha_{hm}$ denota el intercepto probit del $h$-ésimo componente de la $m$-ésima mezcla, en la notación de la Sección~\ref{03_03_00_psbp}. El nivel de truncamiento $N$ reemplaza a la suma infinita de \eqref{eq:ddp_autoregresivo}, en los mismos términos descritos en la Sección~\ref{03_03_02_esquema_inferencia_bayesiana}.\\
+
+La variabilidad del proceso queda así contenida en la propia mezcla, tanto en la precisión $\nu_{hm}^*$ de cada componente como en la dispersión de sus medias, sin que la especificación requiera un término de error aditivo externo como el de una formulación autorregresiva lineal. Como los pesos varían con $\mathbf{z}_t$, la densidad condicional puede alterar su número de modos, su asimetría y su dispersión al desplazarse el estado del proceso, sin que ninguno de esos rasgos deba fijarse de antemano. El mecanismo de selección de variables de la ecuación~\eqref{eq:gamma_prior} determina además, mediante las probabilidades posteriores de inclusión, cuáles de los $p$ rezagos resultan relevantes para cada componente, lo que permite identificar qué modos de variación anteceden a cuáles.
+
+\subsection{Esquema de inferencia}
+\label{03_04_01_esquema_inferencia}
+
+La especificación anterior se enunció sobre los scores tal como los entrega la descomposición, mientras que la implementación opera sobre su versión estandarizada. La razón es que la grilla de referencia $\{\Gamma_{jl}^*\}$ de la Sección~\ref{03_03_02_esquema_inferencia_bayesiana} está definida sobre un rango fijo y el prior sobre los coeficientes de decaimiento $\rho_{hj}$ se calibra en esa misma escala, de modo que ambos presuponen predictores en escala comparable, condición que los scores no satisfacen, ya que $\mathrm{Var}(\xi_{tm}) = \lambda_m$ decrece con el orden de la componente. Cada serie se estandariza mediante $\tilde{\xi}_{tm} = (\xi_{tm} - c_m)/d_m$, con los momentos $(c_m, d_m)$ calculados sobre el bloque de entrenamiento y aplicados sin recalcular al bloque de prueba, de modo que la evaluación fuera de muestra no incorpore información del período evaluado, siguiendo la recomendación de \citet{03_02_chung2009nonparametric}.\\
+
+Al ser la estandarización una transformación afín e invertible, la forma funcional de \eqref{eq:psbpm_fd_componente} y \eqref{eq:eta_psbpm_fd} se preserva, y ambas escrituras designan por tanto la misma especificación con parámetros reexpresados. En lo sucesivo se entiende que el modelo se ajusta sobre $\tilde{\xi}_{tm}$ y sobre el predictor $\mathbf{z}_t = (\tilde{\boldsymbol{\xi}}_{t-1}^\top, \dots, \tilde{\boldsymbol{\xi}}_{t-q}^\top)^\top$, común a las $M$ mezclas, según ilustra la Figura~\ref{fig:esquema_inferencia_psbpm_fd}. La invariancia atañe únicamente a la forma del modelo y no al prior, que no es invariante a la escala y es precisamente lo que fija la estandarización como requisito y no como conveniencia. La escala original se recupera al reconstruir.\\
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{IMG/03_04/esquema_inferencia_psbpm_fd.png}
+    \caption[Esquema de inferencia del PSBPM-FD]{Esquema de inferencia del
+    PSBPM-FD. Cada mezcla toma como respuesta el score estandarizado
+    $\tilde{\xi}_{tm}$ de su componente y como predictor el vector común
+    $\mathbf{z}_t$, de modo que el rezago de cualquier componente puede influir
+    sobre la ley de cualquier otra. Su salida son $S$ extracciones de la
+    predictiva a posteriori.}
+    \label{fig:esquema_inferencia_psbpm_fd}
+\end{figure}
+
+Sobre estos datos se aplica sin modificación el muestreador de Gibbs descrito en la Sección~\ref{03_03_02_esquema_inferencia_bayesiana}, sustituyendo $y_i$ por $\tilde{\xi}_{tm}$ y $x_i$ por $\mathbf{z}_t$, sobre los $T_0 - q$ pares disponibles en un bloque de entrenamiento de longitud $T_0$. La factorización \eqref{eq:factorizacion} descompone la verosimilitud en el producto de las $M$ verosimilitudes individuales, de manera que los muestreadores son mutuamente independientes.\\
+
+Cada uno entrega una colección de extracciones $\boldsymbol{\vartheta}_m^{(s)}$, con $s = 1, \dots, S$, provenientes de la distribución a posteriori $p(\boldsymbol{\vartheta}_m \mid \mathcal{D})$ tras descartar el período de calentamiento, donde $\boldsymbol{\vartheta}_m$ agrupa los parámetros de pesos y átomos de la $m$-ésima mezcla y $\mathcal{D}$ denota el bloque de entrenamiento. Las extracciones de varias cadenas se agrupan por concatenación. Estas colecciones constituyen la única representación disponible del posterior y son, en consecuencia, el insumo del que se derivan todas las cantidades desconocidas del análisis, que quedan así definidas como funcionales de las extracciones y no como estimaciones puntuales.\\
+
+La primera de dichas cantidades es la distribución predictiva del score estandarizado, obtenida marginalizando la incertidumbre sobre los parámetros,
+\begin{equation}\label{eq:predictiva_posteriori_score}
+    f\bigl(\tilde{\xi}_{tm} \mid \mathbf{z}_t, \mathcal{D}\bigr)
+    = \int f\bigl(\tilde{\xi}_{tm} \mid \mathbf{z}_t, \boldsymbol{\vartheta}_m\bigr)\,
+      p\bigl(\boldsymbol{\vartheta}_m \mid \mathcal{D}\bigr)\, d\boldsymbol{\vartheta}_m
+    \;\approx\; \frac{1}{S} \sum_{s=1}^{S}
+      f\bigl(\tilde{\xi}_{tm} \mid \mathbf{z}_t, \boldsymbol{\vartheta}_m^{(s)}\bigr),
+\end{equation}
+donde el integrando es la mezcla \eqref{eq:psbpm_fd_componente} en la escala estandarizada, evaluada en cada extracción. La predictiva es una mezcla de mezclas y no la evaluación de \eqref{eq:psbpm_fd_componente} en una estimación puntual de $\boldsymbol{\vartheta}_m$, distinción que resulta determinante para la incertidumbre reportada.\\
+
+La aproximación~\eqref{eq:predictiva_posteriori_score} admite dos usos. Evaluada sobre una grilla del soporte entrega la densidad predictiva en forma cerrada, mientras que su versión muestral se obtiene simulando en cada iteración el índice de componente desde la ley de pesos y a continuación la respuesta desde el átomo seleccionado, procedimiento cuya marginal es precisamente~\eqref{eq:predictiva_posteriori_score} y que basta ejecutar una vez por iteración. Ambas quedan expresadas en la escala estandarizada en que operó el muestreador.
+
+\section{Reconstrucción Funcional}
+\label{03_05_00_reconstruccion_funcional}
+
+El objeto de interés del estudio no es el score sino la curva, de modo que la predictiva de $\boldsymbol{\xi}_t$ dado $\mathbf{z}_t$, obtenida en $\mathbb{R}^{M}$, debe transportarse al espacio funcional. La descomposición que dio origen a los scores provee ese transporte, ya que la expansión \eqref{eq:expansion_kl_truncada} es un mapa lineal que asigna a cada vector de $\mathbb{R}^{M}$ una curva del subespacio generado por las autofunciones retenidas, y basta recorrerla en sentido inverso al empleado para construir la representación. Revirtiendo la estandarización mediante $\xi_{tm} = d_m\,\tilde{\xi}_{tm} + c_m$ y proyectando sobre dichas autofunciones, la curva queda escrita como
+\begin{equation}\label{eq:reconstruccion_fpca}
+    X_t^{(M)}(\tau_g) = \mu(\tau_g)
+    + \sum_{m=1}^{M} \bigl(d_m\,\tilde{\xi}_{tm} + c_m\bigr)\,\psi_m(\tau_g),
+    \qquad g = 1, \dots, G,
+\end{equation}
+donde $\mu(\tau_g)$ y $\psi_m(\tau_g)$ denotan la función media y las autofunciones evaluadas en la grilla del dominio, y $(c_m, d_m)$ los momentos de estandarización de la $m$-ésima componente.\\
+
+La expresión \eqref{eq:reconstruccion_fpca} es una identidad entre el vector de scores y la curva que representa, y adquiere carácter predictivo al evaluarla en el vector aleatorio cuya ley es la predictiva del modelo. Sustituyendo en ella $\tilde{\boldsymbol{\xi}}_t \mid \mathbf{z}_t, \mathcal{D}$ se induce la distribución predictiva de $X_t^{(M)}$ dado el estado rezagado, que es el objeto de interés del pronóstico. Como $\mu(\tau_g)$, $\{\psi_m\}$ y $(c_m, d_m)$ se tratan como conocidas, el mapa es determinista y afín, propiedad de la que se sigue que los momentos condicionales de la curva se obtengan en forma cerrada a partir de los momentos condicionales de los scores y que cada extracción predictiva de los scores, transportada por el mapa, sea una extracción exacta de la predictiva funcional condicional.\\
+
+Ese mismo objeto es el que se toma como objetivo de evaluación, de modo que predicción y objetivo viven en el subespacio generado por las $M$ autofunciones retenidas y toda discrepancia entre ellos proviene de la dinámica sobre los scores. No interviene por tanto ningún término adicional de incertidumbre, en correspondencia con la ausencia de error aditivo externo en la especificación de la Sección~\ref{03_04_00_modelo_propuesto_psbpm_fd}. Las expresiones de esta sección se desarrollan bajo ese objetivo; el contraste contra la curva suavizada, que incorpora además las direcciones descartadas por el truncamiento, se define en la Sección~\ref{03_06_04_objetivos_evaluacion}.
+
+\subsection{Esperanza predictiva}
+\label{03_05_01_esperanza}
+
+Aplicando el operador esperanza condicional a \eqref{eq:reconstruccion_fpca}, y observando que $\mu(\tau_g)$ y los términos $c_m\psi_m(\tau_g)$ son constantes que salen del operador, su linealidad entrega
+\begin{equation}\label{eq:esperanza_curva}
+    \mathbb{E}\bigl[X_t^{(M)}(\tau_g) \mid \mathbf{z}_t, \mathcal{D}\bigr]
+    = \mu(\tau_g)
+    + \sum_{m=1}^{M} \Bigl(d_m\,\mathbb{E}\bigl[\tilde{\xi}_{tm} \mid \mathbf{z}_t, \mathcal{D}\bigr] + c_m\Bigr)\psi_m(\tau_g).
+\end{equation}
+La esperanza predictiva de la curva queda determinada por las $M$ esperanzas predictivas de los scores, sin aproximación adicional.\\
+
+La esperanza de cada score se obtiene de \eqref{eq:predictiva_posteriori_score}. Para una extracción $\boldsymbol{\vartheta}_m^{(s)}$, la media de la mezcla es la suma de las medias de sus átomos ponderada por los pesos,
+\begin{equation}\label{eq:momento1_iteracion}
+    m_{ms} = \sum_{h=1}^{N} \pi_{hm}^{(s)}\,\mu_{hm}^{(s)},
+    \qquad
+    \pi_{hm}^{(s)} = \pi_{hm}\bigl(\mathbf{z}_t; \boldsymbol{\vartheta}_m^{(s)}\bigr),
+    \quad
+    \mu_{hm}^{(s)} = \beta_{0,hm}^{*(s)} + \mathbf{z}_t^\top\boldsymbol{\beta}_{hm}^{*(s)},
+\end{equation}
+y la esperanza predictiva es el promedio de dichas medias sobre las $S$ extracciones,
+\begin{equation}\label{eq:esperanza_score_estimada}
+    \widehat{\mathbb{E}}\bigl[\tilde{\xi}_{tm} \mid \mathbf{z}_t, \mathcal{D}\bigr]
+    = \frac{1}{S}\sum_{s=1}^{S} m_{ms}.
+\end{equation}
+El orden de las operaciones no es intercambiable, ya que $m_{ms}$ es un funcional de la mezcla completa e invariante a permutaciones de las etiquetas $h$, mientras que los parámetros individuales de cada átomo no lo son, de modo que promediarlos entre iteraciones y evaluar después la mezcla en el promedio carecería de sentido.
+
+\subsection{Varianza predictiva}
+\label{03_05_02_varianza}
+
+Conviene partir de la desviación respecto de la media, donde las constantes se cancelan. Escribiendo $a_m(\tau_g) = d_m\,\psi_m(\tau_g)$,
+\begin{equation}\label{eq:desviacion_curva}
+    X_t^{(M)}(\tau_g) - \mathbb{E}\bigl[X_t^{(M)}(\tau_g)\bigr]
+    = \sum_{m=1}^{M} a_m(\tau_g)\Bigl(\tilde{\xi}_{tm} - \mathbb{E}\bigl[\tilde{\xi}_{tm}\bigr]\Bigr).
+\end{equation}
+Elevando al cuadrado se obtiene una suma doble sobre pares de componentes, y al tomar esperanza los términos diagonales entregan varianzas y los restantes covarianzas, cada par de índices distintos contado dos veces,
+\begin{equation}\label{eq:varianza_curva_exacta}
+    \mathrm{Var}\bigl[X_t^{(M)}(\tau_g) \mid \mathbf{z}_t, \mathcal{D}\bigr]
+    = \sum_{m=1}^{M} a_m(\tau_g)^2\,\mathrm{Var}\bigl[\tilde{\xi}_{tm}\bigr]
+    + 2\!\!\sum_{m < m'}\!\! a_m(\tau_g)\,a_{m'}(\tau_g)\,
+      \mathrm{Cov}\bigl[\tilde{\xi}_{tm}, \tilde{\xi}_{tm'}\bigr],
+\end{equation}
+donde todos los momentos se entienden condicionales a $\mathbf{z}_t$ y $\mathcal{D}$. Aplicando ahora la ley de covarianza total sobre la distribución a posteriori de los parámetros,
+\begin{equation}\label{eq:covarianza_total_scores}
+    \mathrm{Cov}\bigl[\tilde{\xi}_{tm}, \tilde{\xi}_{tm'}\bigr]
+    = \mathbb{E}_{\boldsymbol{\vartheta}}\!\Bigl[
+      \mathrm{Cov}\bigl(\tilde{\xi}_{tm}, \tilde{\xi}_{tm'} \mid \boldsymbol{\vartheta}\bigr)\Bigr]
+    + \mathrm{Cov}_{\boldsymbol{\vartheta}}\!\Bigl[
+      \mathbb{E}\bigl(\tilde{\xi}_{tm} \mid \boldsymbol{\vartheta}_m\bigr),\,
+      \mathbb{E}\bigl(\tilde{\xi}_{tm'} \mid \boldsymbol{\vartheta}_{m'}\bigr)\Bigr],
+\end{equation}
+el término cruzado se anula por dos razones de naturaleza distinta. El primer sumando es nulo por el supuesto de factorización \eqref{eq:factorizacion} y el segundo lo es porque la distribución a posteriori factoriza entre componentes, consecuencia de que la verosimilitud se descomponga en el producto de las verosimilitudes individuales y las distribuciones a priori sean independientes entre mezclas. Sólo el primer sumando constituye un supuesto sustantivo; el segundo se deriva de la especificación y justifica formalmente ejecutar los muestreadores por separado.\\
+
+La varianza predictiva de la curva resulta entonces aditiva sobre las componentes,
+\begin{equation}\label{eq:varianza_curva}
+    \mathrm{Var}\bigl[X_t^{(M)}(\tau_g) \mid \mathbf{z}_t, \mathcal{D}\bigr]
+    = \sum_{m=1}^{M} a_m(\tau_g)^{2}\,
+      \mathrm{Var}\bigl[\tilde{\xi}_{tm} \mid \mathbf{z}_t, \mathcal{D}\bigr].
+\end{equation}
+El factor $\psi_m(\tau_g)^2$ contenido en $a_m(\tau_g)^2$ implica que la incertidumbre no se distribuya de manera uniforme sobre el dominio, sino que se concentre en las regiones donde la autofunción correspondiente presenta mayor amplitud, lo que permite atribuir la amplitud del intervalo en cada zona de la curva a componentes específicas.\\
+
+Resta la varianza predictiva de cada score, que a su vez se descompone por la ley de varianza total en
+\begin{equation}\label{eq:varianza_total_score}
+    \mathrm{Var}\bigl[\tilde{\xi}_{tm} \mid \mathbf{z}_t, \mathcal{D}\bigr]
+    = \underbrace{\mathbb{E}_{\boldsymbol{\vartheta}_m}\!\bigl[
+        \mathrm{Var}\bigl(\tilde{\xi}_{tm} \mid \mathbf{z}_t, \boldsymbol{\vartheta}_m\bigr)\bigr]}
+        _{\text{dispersión de la mezcla}}
+    + \underbrace{\mathrm{Var}_{\boldsymbol{\vartheta}_m}\!\bigl[
+        \mathbb{E}\bigl(\tilde{\xi}_{tm} \mid \mathbf{z}_t, \boldsymbol{\vartheta}_m\bigr)\bigr]}
+        _{\text{incertidumbre sobre el centro}},
+\end{equation}
+donde el primer término recoge la variabilidad irreducible del proceso y el segundo la incertidumbre a posteriori sobre los parámetros, que se reduce al aumentar la información disponible. Ambos son cantidades agregadas y no componentes separadamente identificables de la mezcla, razón por la cual la descomposición se obtiene por la ley de varianza total y no atribuyendo dispersión a los átomos por un lado y a los pesos por otro. Emplear una estimación puntual de $\boldsymbol{\vartheta}_m$ anula el segundo término por construcción y produce intervalos sistemáticamente demasiado angostos.\\
+
+Para la estimación se evalúa en cada iteración la varianza de la mezcla en forma cerrada,
+\begin{equation}\label{eq:momento2_iteracion}
+    v_{ms} = \sum_{h=1}^{N} \pi_{hm}^{(s)}
+    \Bigl[\bigl(\mu_{hm}^{(s)}\bigr)^{2} + \bigl(\nu_{hm}^{*(s)}\bigr)^{-1}\Bigr]
+    - m_{ms}^{2},
+\end{equation}
+y se agregan ambos términos de \eqref{eq:varianza_total_score} sobre las $S$ extracciones,
+\begin{equation}\label{eq:varianza_score_estimada}
+    \widehat{\mathrm{Var}}\bigl[\tilde{\xi}_{tm} \mid \mathbf{z}_t, \mathcal{D}\bigr]
+    = \frac{1}{S}\sum_{s=1}^{S} v_{ms}
+    + \frac{1}{S-1}\sum_{s=1}^{S}\bigl(m_{ms} - \bar{m}_m\bigr)^{2},
+\end{equation}
+donde el primer sumando es un promedio de varianzas y el segundo la varianza de las medias, en correspondencia con los dos términos de la descomposición. La varianza funcional se obtiene finalmente sustituyendo \eqref{eq:varianza_score_estimada} en \eqref{eq:varianza_curva}, operación que sólo recombina $M$ escalares por punto de la grilla.
+
+\subsection{Intervalos de credibilidad predictivos}
+\label{03_05_03_intervalos_predictivos}
+
+Los momentos anteriores no determinan la predictiva, ya que una mezcla no queda caracterizada por sus dos primeros momentos, de modo que la construcción de intervalos requiere la vía muestral. El objeto que se cubre es una curva futura y no la curva media condicional, por lo que los intervalos se construyen sobre extracciones de la predictiva. Para cada iteración $s$ se extrae de la predictiva de cada score, primero el índice de componente y a continuación la respuesta desde el átomo seleccionado,
+\begin{equation}\label{eq:extraccion_score}
+    h_m^{(s)} \sim \text{Categórica}\Bigl(\pi_{1m}^{(s)}, \dots, \pi_{Nm}^{(s)}\Bigr),
+    \qquad
+    \tilde{\xi}_{tm}^{(s)} \sim \mathcal{N}\Bigl(\mu_{h_m^{(s)}m}^{(s)},\,
+    \bigl(\nu_{h_m^{(s)}m}^{*(s)}\bigr)^{-1}\Bigr),
+\end{equation}
+extracciones que se apilan entre componentes bajo la factorización \eqref{eq:factorizacion} y se transportan a la curva mediante \eqref{eq:reconstruccion_fpca},
+\begin{equation}\label{eq:extraccion_curva}
+    \widehat{X}_{t}^{(s)}(\tau_g) = \mu(\tau_g)
+    + \sum_{m=1}^{M} \bigl(d_m\,\tilde{\xi}_{tm}^{(s)} + c_m\bigr)\,\psi_m(\tau_g),
+    \qquad s = 1, \dots, S.
+\end{equation}
+Al ser \eqref{eq:reconstruccion_fpca} un mapa determinista, las curvas así construidas son extracciones exactas de la predictiva funcional.\\
+
+Los intervalos se construyen a partir de los cuantiles empíricos de las extracciones y no como intervalos simétricos en torno a la media, que impondrían por construcción la simetría y unimodalidad que el modelo existe para no suponer. Denotando por $\widehat{F}_{t,g}$ la función de distribución empírica de la muestra funcional en el punto $\tau_g$,
+\begin{equation}\label{eq:fdist_empirica}
+    \widehat{F}_{t,g}(u) = \frac{1}{S}\sum_{s=1}^{S}
+    \mathbf{1}\bigl\{\widehat{X}_{t}^{(s)}(\tau_g) \leq u\bigr\},
+\end{equation}
+el intervalo de credibilidad de nivel $1-\alpha$ queda definido por los cuantiles equi-colas
+\begin{equation}\label{eq:intervalo_puntual}
+    \Bigl[\,\widehat{F}_{t,g}^{-1}(\alpha/2),\;
+    \widehat{F}_{t,g}^{-1}(1-\alpha/2)\,\Bigr],
+    \qquad g = 1, \dots, G.
+\end{equation}
+El intervalo así construido es puntual y no simultáneo, esto es, satisface el nivel nominal en cada punto del dominio por separado, mientras que la probabilidad de que la curva completa quede contenida en toda su extensión es estrictamente menor.
+
+\section{Diseño del Estudio de Simulación}
+\label{03_06_00_diseno_estudio_simulacion}
+El estudio evalúa el desempeño predictivo del PSBPM-FD sobre procesos generadores conocidos, con el fin de determinar bajo qué rasgos de la ley condicional la flexibilidad de la construcción se traduce en ganancia efectiva y bajo cuáles no. La evaluación se organiza en tres ejes:
+\begin{itemize}
+    \item Desempeño puntual y sensibilidad a $M$: Se reportan sobre el bloque de prueba las métricas de la Sección~\ref{02_02_03_criterios_evaluacion} para distintos valores del número de componentes retenidas, contrastando el modelo con los de referencia sobre la misma representación. El barrido en $M$ es informativo porque esta cantidad interviene dos veces, como número de mezclas y como dimensión $p = qM$ del predictor. Se acompaña de la evolución del error sobre una ventana móvil que recorre entrenamiento y prueba, lo que permite localizar los períodos en que los métodos se separan.
+    \item Calibración condicional: Se evalúa si los intervalos de credibilidad cubren el valor observado, estratificando los orígenes según el estado verdadero del generador. La cobertura marginal no distingue un modelo calibrado de uno cuyos intervalos son demasiado anchos en calma y demasiado angostos en estrés, ya que ambos errores se compensan al promediar.
+    \item Interpretabilidad: Se contrastan las probabilidades posteriores de inclusión de \eqref{eq:gamma_prior} contra la estructura de dependencia empleada por el generador, conocida en cada escenario.
+\end{itemize}
+Los diagnósticos de convergencia del muestreador y la verificación de los generadores se reportan en el Anexo~\ref{ane_01_00_00_algoritmos}.
+
+\subsection{Escenarios}
+\label{03_06_01_escenarios}
+Se emplean los seis procesos generadores del Anexo~\ref{ane_01_00_00_algoritmos}, organizados en dos bloques. Los Algoritmos~1 a 4 intervienen la ley condicional dejando intactos los supuestos de la representación, y los Algoritmos~5 y 6 comprometen la reducción de dimensión sin salir de lo que el modelo puede representar. El Cuadro~\ref{tab:escenarios} resume el rasgo que introduce cada uno y los parámetros empleados.\\
+
+Todos los escenarios comparten la configuración del esquema de observación y de la muestra: grilla de $L = 48$ puntos, ruido de medición $\sigma_\epsilon = 0.1$, tamaño muestral $T = 300$ con $200$ períodos de calentamiento, $R = 50$ réplicas por escenario y bloque de entrenamiento $T_0 = 240$, esto es, el ochenta por ciento de la serie. La función media es común, $\mu(\tau) = \sin(2\pi\tau)$, y las innovaciones gaussianas emplean $\sigma_\varepsilon = 1$ con longitud de correlación $\ell = 0.2$, valor que produce trayectorias suaves sin agotar la variabilidad en el primer modo. En los Algoritmos~5 y 6 el sistema ortonormal es la base de Fourier truncada en $J = 10$ términos.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{p{1.4cm} p{3.2cm} p{3.4cm} p{5.4cm}}
+\hline
+\textbf{Alg.} & \textbf{Rasgo estructural} & \textbf{Supuesto comprometido} & \textbf{Parámetros} \\
+\hline
+1 & Dinámica lineal gaussiana homogénea & Ninguno (control) &
+$\|\Psi\|_{\mathcal{HS}} = 0.6$, $\gamma = 0.3$ \\[2pt]
+2 & Heterocedasticidad condicional & Homogeneidad de la varianza condicional &
+$\delta(\tau) = 0.1$, núcleos $\beta$ y $\gamma$ gaussianos de alcance $0.3$ con masas $0.25$ y $0.60$, radio espectral $0.85$ \\[2pt]
+3 & Multimodalidad condicional al estado & Unimodalidad de la ley condicional &
+$\|\Psi^{(1)}\|_{\mathcal{HS}} = 0.3$, $\|\Psi^{(2)}\|_{\mathcal{HS}} = 0.8$, enlace $\phi = \Phi$, dirección $e = \psi_1$ \\[2pt]
+4 & Asimetría en las innovaciones & Simetría de la ley condicional &
+$\delta = 0.8$, $U_t \equiv 1$ \\[2pt]
+5 & Predictibilidad en componente subordinada & Orden de varianza igual a orden de predictibilidad &
+$\lambda_j = 2^{-(j-1)}$, $\phi_1 = \phi_2 = 0$, $\phi_3 = 0.9$, $\phi_j = 0$ para $j \geq 4$ \\[2pt]
+6 & Covarianza no estacionaria & Estacionariedad de segundo orden &
+$\phi_j = 0.7$ para todo $j$; espectro inicial $\lambda_j^{(0)} = 2^{-(j-1)}$ y final con las dos primeras componentes intercambiadas, quiebre abrupto en $t^* = 270$ \\
+\hline
+\end{tabular}
+\caption{Escenarios del estudio de simulación.}
+\label{tab:escenarios}
+\end{table}
+
+La lectura de ambos bloques es distinta. En el primero la comparación relevante es entre el PSBPM-FD y los modelos de referencia. En el segundo la degradación alcanza por igual a todo método que opere sobre la misma representación, de modo que el resultado no discrimina entre especificaciones dinámicas sino que acota el alcance de la reducción sobre la que todas descansan.
+
+\section{Resultados}
+\label{03_07_00_resultados}
+
+% [PENDIENTE] Organización propuesta:
+%   1. Verificación de los generadores (diagnósticos del Anexo).
+%   2. Diagnósticos de convergencia del muestreador.
+%   3. Desempeño puntual por escenario y componente.
+%   4. Desempeño distribucional y calibración.
+%   5. Descomposición de la incertidumbre: peso relativo de la dispersión de la
+%      mezcla, la incertidumbre sobre el centro y el truncamiento.
+%   6. Comparación con los modelos de referencia.
