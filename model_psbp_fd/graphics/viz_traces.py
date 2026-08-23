@@ -12,11 +12,9 @@ plot_convergence_pj  : Convergencia + posterior p_j con métricas.
 
 Dependencias
 ------------
-numpy, matplotlib
-Las funciones de diagnóstico (autocorr, ess_geyer, geweke_z, gelman_rubin,
-aggregate_trace, extract_var_trace) deben ser importadas o definidas en el
-notebook. Este módulo las recibe como argumentos opcionales o las redefine
-internamente si no se pasan.
+numpy, matplotlib y `fit.diagnostics_mcmc`, que es donde viven los estadísticos
+(ACF, ESS de Geyer, z de Geweke, R̂). Este módulo solo dibuja: para obtener la
+tabla de diagnósticos sin generar figuras, usar `fit.tabla_diagnosticos`.
 
 Convención de trazas
 --------------------
@@ -36,75 +34,19 @@ import matplotlib.gridspec as gridspec
 # Diagnósticos estadísticos (autocontenidos)
 # ─────────────────────────────────────────────────────────────────────────────
 
-def _autocorr(x: np.ndarray, max_lag: int = 100) -> np.ndarray:
-    """ACF muestral hasta max_lag (lag 0 = 1.0). Implementación FFT."""
-    x = np.asarray(x, dtype=np.float64).ravel()
-    n = len(x)
-    x_c = x - x.mean()
-    nfft = 1 << (2 * n - 1).bit_length()
-    f = np.fft.rfft(x_c, n=nfft)
-    acf_full = np.fft.irfft(f * np.conj(f), n=nfft)[:n]
-    acf_full /= acf_full[0]
-    return acf_full[: max_lag + 1]
-
-
-def _ess_geyer(x: np.ndarray) -> float:
-    """Effective Sample Size con regla de truncamiento de Geyer (1992)."""
-    x = np.asarray(x, dtype=np.float64).ravel()
-    n = len(x)
-    rho = _autocorr(x, max_lag=min(n - 1, 1000))
-    s = 0.0
-    for k in range(1, len(rho) - 1, 2):
-        pair = rho[k] + rho[k + 1]
-        if pair < 0:
-            break
-        s += pair
-    tau_int = 1.0 + 2.0 * s
-    return float(n / tau_int) if tau_int > 0 else float(n)
-
-
-def _geweke_z(x: np.ndarray, first: float = 0.1, last: float = 0.5) -> float:
-    """Diagnóstico de Geweke: test z entre segmentos de la cadena."""
-    x = np.asarray(x, dtype=np.float64).ravel()
-    n = len(x)
-    n_a, n_b = int(first * n), int(last * n)
-    if n_a < 2 or n_b < 2:
-        return np.nan
-    x_a, x_b = x[:n_a], x[-n_b:]
-    var_a = x_a.var(ddof=1) / max(_ess_geyer(x_a), 1.0)
-    var_b = x_b.var(ddof=1) / max(_ess_geyer(x_b), 1.0)
-    denom = np.sqrt(var_a + var_b)
-    if denom == 0 or not np.isfinite(denom):
-        return np.nan
-    return float((x_a.mean() - x_b.mean()) / denom)
-
-
-def _gelman_rubin(chains: np.ndarray) -> float:
-    """R̂ de Gelman-Rubin. chains shape: (m, n)."""
-    chains = np.asarray(chains, dtype=np.float64)
-    if chains.ndim != 2:
-        raise ValueError("chains debe ser 2D (m_chains, n_iter)")
-    m, n = chains.shape
-    if m < 2 or n < 2:
-        return np.nan
-    chain_means = chains.mean(axis=1)
-    chain_vars  = chains.var(axis=1, ddof=1)
-    B = n * chain_means.var(ddof=1)
-    W = chain_vars.mean()
-    if W == 0:
-        return np.nan
-    var_hat = (n - 1) / n * W + (1.0 / n) * B
-    return float(np.sqrt(var_hat / W))
-
-
-def _extract_var_trace(trace: np.ndarray, j: int, burn: int) -> np.ndarray:
-    """Extrae traza post-burn para variable j. Admite (nsim,p) y (nsim,N,p)."""
-    if trace.ndim == 3:
-        return trace[burn:, :, j].mean(axis=1).astype(np.float64)
-    elif trace.ndim == 2:
-        return trace[burn:, j].astype(np.float64)
-    else:
-        raise ValueError(f"ndim={trace.ndim} no soportado")
+# Los estadisticos viven en `fit.diagnostics_mcmc`: una sola definicion de la
+# ACF, el ESS de Geyer, el z de Geweke y R-hat en todo el proyecto. Aqui solo
+# se les pone nombre local para no tocar el resto del modulo. Antes estaban
+# definidos aqui, de modo que obtener la tabla de diagnosticos obligaba a
+# generar las figuras.
+from ..fit.diagnostics_mcmc import (
+    autocorr as _autocorr,
+    ess_geyer as _ess_geyer,
+    geweke_z as _geweke_z,
+    gelman_rubin as _gelman_rubin,
+    extraer_traza_variable as _extract_var_trace,
+    diagnostico_variable as _compute_diag,
+)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -132,21 +74,6 @@ def _build_chains_matrix(
         tr = models_chains[k][c].traces[trace_key]
         rows.append(_extract_var_trace(tr, j, burn))
     return np.vstack(rows)
-
-
-def _compute_diag(chains_mat: np.ndarray) -> dict:
-    """Calcula ESS, Geweke y R̂ sobre (n_chains, n_post)."""
-    ess_c    = [_ess_geyer(chains_mat[c]) for c in range(chains_mat.shape[0])]
-    geweke_c = [_geweke_z(chains_mat[c])  for c in range(chains_mat.shape[0])]
-    rhat     = _gelman_rubin(chains_mat)
-    return {
-        "ess_min":      float(np.min(ess_c)),
-        "ess_mean":     float(np.mean(ess_c)),
-        "geweke_max":   float(np.max(np.abs(geweke_c))),
-        "rhat":         rhat,
-        "converge":     (rhat < 1.1 and np.min(ess_c) > 100
-                         and np.max(np.abs(geweke_c)) < 2.0),
-    }
 
 
 # ─────────────────────────────────────────────────────────────────────────────

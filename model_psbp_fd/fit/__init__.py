@@ -19,6 +19,12 @@ Organizacion, alineada con la Seccion 2.2.3 del marco teorico:
                               (CRPS, puntaje de energia, puntaje logaritmico),
                               cobertura de intervalos y transformada integral
                               de probabilidad.
+    rolling.py                Evolucion de las metricas sobre una ventana
+                              movil que recorre entrenamiento y prueba, sin
+                              reentrenar el modelo.
+    inclusion.py              Probabilidades posteriores de inclusion (PIP) y
+                              su contraste con la estructura del generador.
+    diagnostics_mcmc.py       ESS, Geweke y R-hat separados del dibujo.
     pooling.py                Agrupacion de cadenas MCMC independientes en una
                               unica distribucion predictiva.
     baselines.py              Lineas base sobre el bloque de prueba: media
@@ -59,6 +65,31 @@ from .metrics_distribucional import (
     lps_desde_log_densidad,
 )
 
+from .rolling import (
+    indices_ventanas,
+    ventana_movil,
+    ventana_movil_scores,
+    ventana_movil_funcional,
+)
+
+from .inclusion import (
+    pip_global,
+    pip_por_componente,
+    matriz_pip,
+    contraste_con_verdad,
+)
+
+from .diagnostics_mcmc import (
+    autocorr,
+    ess_geyer,
+    geweke_z,
+    gelman_rubin,
+    extraer_traza_variable,
+    diagnostico_variable,
+    tabla_diagnosticos,
+    resumen_convergencia,
+)
+
 from .pooling import (
     agrupar_momentos,
     agrupar_muestras,
@@ -92,6 +123,25 @@ __all__ = [
     "diagnostico_pit",
     "lps_gaussiano",
     "lps_desde_log_densidad",
+    # ── Ventana movil (§03_06 eje 1) ──
+    "indices_ventanas",
+    "ventana_movil",
+    "ventana_movil_scores",
+    "ventana_movil_funcional",
+    # ── Probabilidades de inclusion (§03_06 eje 3) ──
+    "pip_global",
+    "pip_por_componente",
+    "matriz_pip",
+    "contraste_con_verdad",
+    # ── Diagnosticos MCMC ──
+    "autocorr",
+    "ess_geyer",
+    "geweke_z",
+    "gelman_rubin",
+    "extraer_traza_variable",
+    "diagnostico_variable",
+    "tabla_diagnosticos",
+    "resumen_convergencia",
     # ── Agrupacion de cadenas MCMC ──
     "agrupar_momentos",
     "agrupar_muestras",
@@ -100,8 +150,4 @@ __all__ = [
     "prediccion_persistencia",
     "evaluar_baseline",
     "tabla_baselines",
-    # ── Diagnosticos MCMC (pendiente) ──
-    # ESS, Geweke y R-hat viven hoy dentro de las funciones plot_convergence_*
-    # de `graphics/`. Separar el calculo del dibujo permitiria reportar la
-    # tabla de diagnosticos sin generar figuras; queda como `diagnostics_mcmc.py`.
 ]

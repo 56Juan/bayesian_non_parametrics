@@ -40,6 +40,13 @@ from .viz_fpca import (
     plot_rezagos_heatmap,
 )
 
+from .viz_evaluacion import (
+    plot_ventana_movil,
+    plot_bandas_serie,
+    plot_extractos_curvas,
+    plot_calibracion_pit,
+)
+
 __all__ = [
     # viz_traces
     "plot_traces_bj",
@@ -69,4 +76,9 @@ __all__ = [
     "plot_fpca_scree",
     "plot_fpca_correlacion_lag0",
     "plot_rezagos_heatmap",
+    # viz_evaluacion
+    "plot_ventana_movil",
+    "plot_bandas_serie",
+    "plot_extractos_curvas",
+    "plot_calibracion_pit",
 ]
