@@ -31,6 +31,7 @@ __all__ = [
     "ArtefactosFPCA",
     "guardar_curvas",
     "cargar_curvas",
+    "cargar_curvas_true",
     "guardar_representacion",
     "cargar_representacion",
     "guardar_fpca",
@@ -49,6 +50,7 @@ __all__ = [
 # Nombres canonicos: unica definicion de la convencion de archivos.
 ARCHIVOS = {
     "curvas":            "X_curves.npy",
+    "curvas_true":       "X_curves_true.npy",
     "grilla":            "domain_grid.npy",
     "fr_pickle":         "functional_representation.pkl",
     "fr_config":         "fr_config.json",
@@ -112,16 +114,38 @@ def _leer_json(path: Path) -> dict:
 # CURVAS Y GRILLA
 # ==========================================================================
 
-def guardar_curvas(paths: dict, X: np.ndarray, grilla: np.ndarray) -> dict:
-    """Persiste las curvas observadas en escala original y la grilla."""
+def guardar_curvas(paths: dict, X: np.ndarray, grilla: np.ndarray,
+                   X_true: Optional[np.ndarray] = None) -> dict:
+    """
+    Persiste las curvas del experimento y la grilla.
+
+    X       : (T, G) curvas OBSERVADAS, con ruido de medicion. Es el unico
+              objeto que puede alimentar la estimacion (base, FPCA,
+              estandarizador, scores).
+    X_true  : (T, G) curvas VERDADERAS del generador, sin ruido de medicion.
+              Opcional porque los datos reales no la tienen. En simulacion es
+              el objetivo de evaluacion: el error se mide contra la curva y no
+              contra los datos, de modo que sigma_obs no contamina ambos lados
+              de la comparacion. Nunca debe entrar a la estimacion.
+    """
     d = Path(paths["functional"])
     np.save(d / ARCHIVOS["curvas"], np.asarray(X, dtype=float))
     np.save(d / ARCHIVOS["grilla"], np.asarray(grilla, dtype=float))
-    return {"curvas": d / ARCHIVOS["curvas"], "grilla": d / ARCHIVOS["grilla"]}
+    salida = {"curvas": d / ARCHIVOS["curvas"], "grilla": d / ARCHIVOS["grilla"]}
+
+    if X_true is not None:
+        Xt = np.atleast_2d(np.asarray(X_true, dtype=float))
+        if Xt.shape != np.atleast_2d(np.asarray(X, dtype=float)).shape:
+            raise ValueError(
+                f"X_true tiene forma {Xt.shape} y X {np.shape(X)}: deben "
+                "provenir de la misma replica y la misma grilla.")
+        np.save(d / ARCHIVOS["curvas_true"], Xt)
+        salida["curvas_true"] = d / ARCHIVOS["curvas_true"]
+    return salida
 
 
 def cargar_curvas(paths: dict) -> tuple[np.ndarray, np.ndarray]:
-    """Retorna (X, grilla). X es (T, G) en escala original, sin estandarizar."""
+    """Retorna (X, grilla). X es (T, G) OBSERVADA, en escala original."""
     d = Path(paths["functional"])
     for clave in ("curvas", "grilla"):
         p = d / ARCHIVOS[clave]
@@ -132,6 +156,25 @@ def cargar_curvas(paths: dict) -> tuple[np.ndarray, np.ndarray]:
     X = np.load(d / ARCHIVOS["curvas"])
     tau = np.load(d / ARCHIVOS["grilla"])
     return np.atleast_2d(X), np.asarray(tau, dtype=float).ravel()
+
+
+def cargar_curvas_true(paths: dict, estricto: bool = True) -> Optional[np.ndarray]:
+    """
+    Retorna (T, G) las curvas VERDADERAS sin ruido, o None si no se persistieron.
+
+    Con `estricto=True` la ausencia es un error: en un experimento de
+    simulacion evaluar contra los datos observados en lugar de contra la curva
+    infla el error y la cobertura por una razon ajena al modelo, y ese sesgo no
+    es visible en los numeros resultantes.
+    """
+    p = Path(paths["functional"]) / ARCHIVOS["curvas_true"]
+    if not p.exists():
+        if estricto:
+            raise FileNotFoundError(
+                f"No se encontro {p}. El flujo de preprocesamiento debe llamar "
+                "guardar_curvas(..., X_true=salida.curvas[REPLICA_IDX]).")
+        return None
+    return np.atleast_2d(np.load(p))
 
 
 # ==========================================================================

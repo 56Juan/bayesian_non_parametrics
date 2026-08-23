@@ -1,0 +1,155 @@
+{
+  "global": {
+    "atau": 2.0,
+    "btau": 0.5,
+    "ag": 2.0,
+    "bg": 0.5,
+    "mumu": 0.0,
+    "taumu": 1.0,
+    "pwj": 0.5
+  },
+  "by_type": {
+    "own_lag1": [
+      9.0,
+      1.0,
+      0.0,
+      1.0
+    ],
+    "cross_lag": [
+      1.0,
+      1.0,
+      0.0,
+      1.0
+    ]
+  },
+  "mcmc_config": {
+    "nsim": 2000,
+    "burn": 500,
+    "N": 50,
+    "M": 50
+  },
+  "n_iter": 3,
+  "seed_scheme": "SEED_BASE + chain*9973 + k*31",
+  "escenario_id": 4,
+  "replica_id": 1,
+  "seed_base": 41232,
+  "scores_scale": "standardized_zscore_ddof0",
+  "partition": {
+    "T": 400,
+    "T0": 280,
+    "prop_train": 0.7,
+    "n_train_eff": 279,
+    "n_test_eff": 120,
+    "train_files": [
+      "dataset_fpc_1_train.csv",
+      "dataset_fpc_2_train.csv",
+      "dataset_fpc_3_train.csv"
+    ],
+    "test_files": [
+      "dataset_fpc_1_test.csv",
+      "dataset_fpc_2_test.csv",
+      "dataset_fpc_3_test.csv"
+    ]
+  },
+  "hyperparams_list": [
+    {
+      "component_k": 0,
+      "fpc_idx": 1,
+      "hyperparams": {
+        "atau": 2.0,
+        "btau": 0.5,
+        "ag": 2.0,
+        "bg": 0.5,
+        "mumu": 0.0,
+        "taumu": 1.0,
+        "pwj": 0.5,
+        "apij": [
+          9.0,
+          1.0,
+          1.0
+        ],
+        "bpij": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "mupsij": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "taupsij": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "component_k": 1,
+      "fpc_idx": 2,
+      "hyperparams": {
+        "atau": 2.0,
+        "btau": 0.5,
+        "ag": 2.0,
+        "bg": 0.5,
+        "mumu": 0.0,
+        "taumu": 1.0,
+        "pwj": 0.5,
+        "apij": [
+          1.0,
+          9.0,
+          1.0
+        ],
+        "bpij": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "mupsij": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "taupsij": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "component_k": 2,
+      "fpc_idx": 3,
+      "hyperparams": {
+        "atau": 2.0,
+        "btau": 0.5,
+        "ag": 2.0,
+        "bg": 0.5,
+        "mumu": 0.0,
+        "taumu": 1.0,
+        "pwj": 0.5,
+        "apij": [
+          1.0,
+          1.0,
+          9.0
+        ],
+        "bpij": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "mupsij": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "taupsij": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      }
+    }
+  ]
+}
