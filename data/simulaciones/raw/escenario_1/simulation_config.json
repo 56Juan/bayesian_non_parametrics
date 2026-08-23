@@ -1,7 +1,7 @@
 {
   "sim_params": {
-    "L": 50,
-    "T": 300,
+    "L": 75,
+    "T": 400,
     "burn_in": 200,
     "sigma_obs": 0.5,
     "R": 1,
@@ -15,26 +15,26 @@
   },
   "diagnostico": {
     "n_replicas": 1,
-    "n_curvas": 300,
-    "n_puntos_grilla": 50,
+    "n_curvas": 400,
+    "n_puntos_grilla": 75,
     "todo_finito": true,
-    "media_empirica_global": 4.8830662532462945,
+    "media_empirica_global": 4.958068759510554,
     "media_ee_montecarlo": NaN,
-    "var_puntual_media": 1.2397563235728597,
-    "var_puntual_min": 1.0630628893237128,
-    "var_puntual_max": 1.4746884641582236,
-    "acf1_media": 0.4009671562467566,
+    "var_puntual_media": 1.3793612307343188,
+    "var_puntual_min": 1.0313801284009358,
+    "var_puntual_max": 1.5750470588165837,
+    "acf1_media": 0.45724202279425014,
     "acf1_ee_montecarlo": NaN,
-    "razon_senal_ruido": 4.959025294291439,
+    "razon_senal_ruido": 5.517444922937275,
     "hs_norm_objetivo": 0.7,
     "hs_norm_efectiva": 0.7,
     "hs_norm_error_absoluto": 0.0,
-    "radio_espectral_operador": 0.6215281202598987,
+    "radio_espectral_operador": 0.6215249564437708,
     "estacionariedad_garantizada": true
   },
   "replica_idx": 0,
   "experiment_id": "escenario_1",
   "seed": 41232,
-  "T": 300,
-  "G": 50
+  "T": 400,
+  "G": 75
 }

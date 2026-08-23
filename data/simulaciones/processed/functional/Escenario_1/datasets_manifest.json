@@ -14,39 +14,39 @@
     "fpc_3_lag1",
     "fpc_4_lag1"
   ],
-  "T": 300,
-  "T0": 210,
+  "T": 400,
+  "T0": 280,
   "prop_train": 0.7,
-  "n_train_eff": 209,
-  "n_test_eff": 90,
+  "n_train_eff": 279,
+  "n_test_eff": 120,
   "ajuste_en": "train",
   "datasets": {
     "train": {
       "dataset_fpc_1_train.csv": {
         "response": "fpc_1",
         "shape": [
-          209,
+          279,
           5
         ]
       },
       "dataset_fpc_2_train.csv": {
         "response": "fpc_2",
         "shape": [
-          209,
+          279,
           5
         ]
       },
       "dataset_fpc_3_train.csv": {
         "response": "fpc_3",
         "shape": [
-          209,
+          279,
           5
         ]
       },
       "dataset_fpc_4_train.csv": {
         "response": "fpc_4",
         "shape": [
-          209,
+          279,
           5
         ]
       }
@@ -55,28 +55,28 @@
       "dataset_fpc_1_test.csv": {
         "response": "fpc_1",
         "shape": [
-          90,
+          120,
           5
         ]
       },
       "dataset_fpc_2_test.csv": {
         "response": "fpc_2",
         "shape": [
-          90,
+          120,
           5
         ]
       },
       "dataset_fpc_3_test.csv": {
         "response": "fpc_3",
         "shape": [
-          90,
+          120,
           5
         ]
       },
       "dataset_fpc_4_test.csv": {
         "response": "fpc_4",
         "shape": [
-          90,
+          120,
           5
         ]
       }
