@@ -1,0 +1,90 @@
+{
+  "sim_params": {
+    "L": 75,
+    "T": 400,
+    "burn_in": 200,
+    "sigma_obs": 0.5,
+    "R": 1,
+    "seed": 41232,
+    "media_fn": "media_senoidal",
+    "jitter": 1e-10,
+    "gammas": [
+      0.3,
+      0.3
+    ],
+    "hs_norms": [
+      0.3,
+      0.85
+    ],
+    "sigmas_eps": [
+      1.0,
+      1.0
+    ],
+    "desplazamientos": [
+      -1.5,
+      1.5
+    ],
+    "forma_desplazamiento_fn": null,
+    "ell": 0.2,
+    "mecanismo": "probit",
+    "umbrales": [
+      0.0
+    ],
+    "nitidez": 2.0,
+    "direccion_fn": null,
+    "matriz_transicion": null,
+    "fracciones_quiebre": [
+      0.5
+    ]
+  },
+  "diagnostico": {
+    "n_replicas": 1,
+    "n_curvas": 400,
+    "n_puntos_grilla": 75,
+    "todo_finito": true,
+    "media_empirica_global": 5.859871443764846,
+    "media_ee_montecarlo": NaN,
+    "var_puntual_media": 4.22630413207052,
+    "var_puntual_min": 3.462206678982921,
+    "var_puntual_max": 4.85229815143754,
+    "acf1_media": 0.521384110461424,
+    "acf1_ee_montecarlo": NaN,
+    "razon_senal_ruido": 16.90521652828208,
+    "mecanismo": "probit",
+    "n_regimenes": 2,
+    "hs_norm_objetivo": [
+      0.3,
+      0.85
+    ],
+    "hs_norm_efectiva": [
+      0.29999999999999993,
+      0.85
+    ],
+    "hs_norm_error_absoluto_max": 5.551115123125783e-17,
+    "hs_norm_maxima": 0.85,
+    "radio_espectral_operadores": [
+      0.2663678384759019,
+      0.7547088756817207
+    ],
+    "contractividad_todos_los_regimenes": true,
+    "estacionariedad_garantizada": true,
+    "proporcion_regimen": [
+      0.33,
+      0.67
+    ],
+    "proporcion_regimen_minima": 0.33,
+    "n_transiciones_media": 127.0,
+    "duracion_media_racha": 3.125,
+    "duracion_media_por_regimen": [
+      2.0625,
+      4.1875
+    ],
+    "separacion_niveles_L2_max": 3.0,
+    "separacion_en_sd_puntual": 1.459287564234236
+  },
+  "replica_idx": 0,
+  "experiment_id": "escenario_3",
+  "seed": 41232,
+  "T": 400,
+  "G": 75
+}

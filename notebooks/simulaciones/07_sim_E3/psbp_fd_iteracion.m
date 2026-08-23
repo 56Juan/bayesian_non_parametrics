@@ -1,12 +1,6 @@
 % psbp_fd_iteracion.m
 % Script principal con parfor plano sobre todos los jobs (cadena x componente).
-%
-% CONVENCION DE INDICES  [FIX 12]
-% -------------------------------
-% La version anterior usaba TT para el experimento y tt para la cadena MCMC:
-% dos variables distintas que se escriben igual salvo por la caja. Al incorporar
-% el eje de replicas Monte Carlo el alfabeto quedaba agotado y la confusion era
-% inevitable, de modo que los tres ejes pasan a nombrarse sin abreviar:
+
 %
 %   ESCENARIO_ID : identifica el escenario/experimento (Algoritmo k del anexo).
 %   REPLICA_ID   : identifica la replica Monte Carlo de la trayectoria simulada.
@@ -25,15 +19,12 @@ clear; clc; close all;
 % 1. CONFIGURACIÓN
 % ════════════════════════════════════════════════════════════════════════════
 
-% [FIX] N_ITER y la configuración MCMC ya NO se definen aquí: se leen de
-% hyperparameters.json (generado por 02_01_simulaciones), que es la única
-% fuente de verdad del contrato Python ↔ MATLAB.
 N_WORKERS = 8;     % workers del pool (ajusta según carga del sistema)
 SEED_BASE = 4123;  % semilla base; cada job usa SEED_BASE + chain*9973 + k*31
 
 ESCENARIO_ID = 3;                      % escenario/experimento (Algoritmo del anexo)
 REPLICA_ID   = 1;                      % replica Monte Carlo (eje futuro del barrido)
-BASENAME     = "modelo_experimento_1";
+BASENAME     = "escenario";
 paths        = config_paths(BASENAME, ESCENARIO_ID, SEED_BASE);
 
 % ════════════════════════════════════════════════════════════════════════════
@@ -183,11 +174,6 @@ end
 elapsed = toc(t_total);
 fprintf("\n════════════════════════════════════════════════════════\n");
 fprintf("✅ Entrenamiento completo\n");
-% [FIX 11] elapsed/N_WORKERS no es el tiempo por job: solo coincide si cada
-% worker procesa exactamente un job. Con n_jobs repartidos entre N_WORKERS el
-% costo medio por job es (elapsed * N_WORKERS) / n_jobs, y el tiempo de pared
-% por job es elapsed / n_jobs. Se reportan ambos porque el primero es el que
-% permite proyectar el costo del barrido completo sobre replicas y escenarios.
 min_pared_por_job = (elapsed / 60) / n_jobs;
 min_cpu_por_job   = (elapsed / 60) * N_WORKERS / n_jobs;
 fprintf("   Jobs: %d   Tiempo total: %.1f min\n", n_jobs, elapsed/60);

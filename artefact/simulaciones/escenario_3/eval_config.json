@@ -1,0 +1,25 @@
+{
+  "scheme": "holdout_temporal",
+  "T": 400,
+  "T0": 280,
+  "prop_train": 0.7,
+  "horizons": [
+    1
+  ],
+  "n_lags": 1,
+  "metrics_scores": [
+    "RMSE",
+    "R2"
+  ],
+  "metrics_curvas": [
+    "MISE",
+    "RMSE_funcional"
+  ],
+  "metrics_dist": [
+    "LPS",
+    "CRPS",
+    "cobertura_95",
+    "PIT"
+  ],
+  "scores_scale": "standardized_zscore_ddof0"
+}
