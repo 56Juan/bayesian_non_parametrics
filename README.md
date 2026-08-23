@@ -5,6 +5,72 @@
 
 Este paquete implementa una extensión funcional del modelo **Product of Stick-Breaking Process (PSBP)** para series de tiempo, permitiendo trabajar con curvas funcionales discretas mediante representación en bases (B-splines, Fourier), FPCA y estandarización de datos.
 
+## ⚙️ Instalación del entorno (`.venv`)
+
+Requiere **Python ≥ 3.11** ya instalado. Todos los comandos se ejecutan desde la raíz del proyecto.
+
+**1. Crear el entorno virtual**
+
+```bash
+python -m venv .venv
+```
+
+**2. Activarlo**
+
+```bash
+# Windows — PowerShell
+.venv\Scripts\Activate.ps1
+
+# Windows — CMD
+.venv\Scripts\activate.bat
+
+# Windows — Git Bash
+source .venv/Scripts/activate
+
+# Linux / macOS
+source .venv/bin/activate
+```
+
+Si PowerShell bloquea el script de activación, habilitar la ejecución solo para la sesión actual:
+
+```bash
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+```
+
+**3. Instalar el paquete en modo editable**
+
+```bash
+python -m pip install --upgrade pip
+pip install -e .
+```
+
+`-e` (editable) instala `model_psbp_fd` enlazado al código fuente: los cambios en los módulos se reflejan sin reinstalar. El comando arrastra además todas las dependencias declaradas en `pyproject.toml` (`numpy`, `scipy`, `pandas`, `matplotlib`, `seaborn`, `scikit-fda`, `pyyaml`, `jinja2`, `openpyxl`).
+
+Para las dependencias de desarrollo (`pytest`, `pytest-cov`):
+
+```bash
+pip install -e ".[dev]"
+```
+
+**4. Verificar la instalación**
+
+```bash
+python -c "import model_psbp_fd; from model_psbp_fd.models import estado_versiones; print(model_psbp_fd.__version__); print(estado_versiones())"
+```
+
+`estado_versiones()` reporta qué versiones del modelo quedaron disponibles. `psbp_fd_v3` —la que usa el estudio— debe aparecer como `disponible`; `psbp_fd_v1` puede figurar como no disponible si la extensión compilada (`.pyd`) no corresponde a la plataforma actual, lo que **no** afecta el flujo de trabajo vigente.
+
+**5. Registrar el kernel para los notebooks** (opcional)
+
+```bash
+pip install ipykernel
+python -m ipykernel install --user --name psbp_fd --display-name "Python (psbp_fd)"
+```
+
+> **Nota.** El muestreo MCMC ocurre en MATLAB, no en Python. El entorno `.venv` cubre la generación de datos, el preprocesamiento y la evaluación; para ejecutar los `.m` se requiere MATLAB por separado.
+>
+> Existe también una alternativa con conda en `environment.yml` (entorno `psbp_fd`). Usar una u otra, no ambas.
+
 ## 🏗️ Estructura del proyecto
 
 ```
