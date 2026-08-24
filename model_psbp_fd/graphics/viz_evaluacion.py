@@ -257,9 +257,12 @@ def plot_extractos_curvas(X_true: np.ndarray, X_pred: np.ndarray,
         manijas.append(plt.Line2D([], [], color="0.65", marker=".", ls="",
                                   label="datos observados (con ruido)"))
     fig.legend(handles=manijas, loc="lower center", ncol=len(manijas),
-               fontsize=9, frameon=False, bbox_to_anchor=(0.5, -0.02))
+               fontsize=9, frameon=False, bbox_to_anchor=(0.5, -0.01))
     fig.suptitle(f"{title} — un extracto cada {cada} períodos", fontsize=12)
-    fig.tight_layout()
+    # `rect` reserva la franja superior: con muchas filas el título de la
+    # primera se solapa con el suptitle si se deja el tight_layout por defecto.
+    margen = min(0.06, 1.2 / max(n_fil, 1))
+    fig.tight_layout(rect=[0, 0.01, 1, 1 - margen])
     _guardar(fig, save_path)
     return fig
 

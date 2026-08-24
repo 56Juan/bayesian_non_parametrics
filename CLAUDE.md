@@ -47,7 +47,7 @@ Los dos directorios no son intercambiables y el `.m` depende de la distinción:
 
 ## Gotchas
 
-- **La semilla registrada no reproduce la que MATLAB usó.** Todos los `psbp_fd_iteracion.m` tienen `SEED_BASE = 4123` hardcodeado y **no** leen `seed_base` del JSON, mientras los `hyperparameters.json` de los experimentos recientes registran `41232`. El notebook de resultados lee el valor del JSON. Los seeds reales por job son `4123 + chain*9973 + k*31`.
+- **La semilla registrada no reproduce la que MATLAB usó, salvo en la corrida 11.** Los `psbp_fd_iteracion.m` de `03`–`10` tienen `SEED_BASE = 4123` hardcodeado y **no** leen `seed_base` del JSON, mientras sus `hyperparameters.json` registran `41232`; los seeds reales por job son `4123 + chain*9973 + k*31` y ningún resultado de esas corridas es reproducible desde sus artefactos. **`11_sim_E1/psbp_fd_iteracion.m` lo corrige**: lee `hp_json.seed_base` y falla si falta. Propagar esa corrección al resto al regenerarlos.
 - **`M` significa dos cosas.** En FPCA es el número de componentes retenidas; en `mcmc_config` es el tamaño de la grilla de localización G\* del stick-breaking (`N` ahí es el truncamiento del número de átomos).
 - **Índices base-0 vs base-1.** `component_idx` del manifest es base-0; los nombres de archivo usan `fpc_idx = component_idx[k] + 1`. Las trazas se llaman `chain_fpc_<fpc_idx>_iter<chain a 2 dígitos>.mat` (p. ej. `chain_fpc_2_iter03.mat`) — no cambiar, el flujo de resultados los busca por nombre.
 - **Cuadratura y Cholesky tienen una sola definición.** `utils.quadrature.pesos_trapezoidales` y `utils.linalg.safe_chol`; `pipelines.sim_comun` las re-exporta (`factor_cholesky`) sin redefinirlas. Duplicarlas degrada en silencio la ortonormalidad FPCA o cambia las trayectorias ante la misma semilla.
@@ -59,11 +59,41 @@ Los dos directorios no son intercambiables y el `.m` depende de la distinción:
 - **`versioning/changelog.md` está obsoleto**: describe un Gibbs de 8 pasos con prior MNIW y un directorio `configs/` que no existen en el diseño actual (stick-breaking probit, muestreador en MATLAB). `versioning/experiment_registry.md` está vacío.
 - Los comentarios `% [FIX]` / `% [FIX N]` en los `.m` documentan correcciones deliberadas contra la implementación original (grid G\* sobre `Xnoint` sin el intercepto, `randi` que ignoraba parte del rango, factores `exp(1.2*·)` eliminados). No revertirlos sin entender el motivo.
 
+## Parámetros fijos del estudio
+
+**Decididos y cerrados a partir de la corrida 11.** No se cambian entre escenarios: solo así las comparaciones entre los Algoritmos 1–6 son entre generadores y no entre diseños de observación. Divergen del Cuadro `tab:escenarios` y esa divergencia es deliberada (ver la tabla de §Divergencias).
+
+| Cantidad | Valor | Dónde |
+|---|---|---|
+| `L` (grilla) | **75** | `ConfigEscenario*.L`, constante `L_GRILLA` del `_01` |
+| `T` (curvas) | **400** | constante `T_CURVAS` |
+| `PROP_TRAIN` | **0.70** ⇒ `T0 = 280`, test = 120 | constante `PROP_TRAIN` |
+| `sigma_obs` | 0.5 | `SIGMA_OBS` |
+| `mu(tau)` | `5 + 2 sin(2 pi tau)` | `media_senoidal` |
+| `burn_in` | 200 | `ConfigEscenario*.burn_in` |
+
+Se evaluó subir `T` a 500 y **se descartó**: la resolución de la ventana móvil la da el deslizamiento (con test = 120 y `w = 20` hay 101 posiciones), no el tamaño del test, mientras que `T = 500` sube `n_train` de 280 a 350 y con ello ~25 % el tiempo de MCMC de cada job. Si en algún momento hace falta más test, sale más barato bajar `PROP_TRAIN` que crecer `T`.
+
+## El error se mide contra la curva verdadera
+
+**Decisión de la corrida 11, y cambia el significado de toda la evaluación.** `SalidaSimulacion` distingue `observaciones` (con ruido `sigma_obs`) de `curvas` (la curva verdadera `X_t(tau)`). Hasta la corrida 10 solo se persistía la primera y todas las métricas funcionales — MISE, RMSE funcional, cobertura, energy score — se calculaban **contra los datos ruidosos**, atribuyéndole `sigma_eps` al modelo.
+
+- `guardar_curvas(paths, X, grilla, X_true=...)` persiste las dos por separado: `X_curves.npy` (observada) y `X_curves_true.npy` (verdadera). `cargar_curvas_true()` la lee y **falla si no existe**.
+- La observada es el **único** objeto que alimenta la estimación: base, FPCA, estandarizador, scores. La verdadera entra **solo** como objetivo de evaluación.
+- Se combina con `modo_residuo="ninguno"`: la banda cubre la curva **proyectada** sobre las `M` autofunciones y se contrasta con `X_t(tau)`, de modo que lo que queda fuera es truncamiento FPCA puro, cantidad interpretable y acotable subiendo `M`. Declararlo al reportar.
+- **Las cifras de la corrida 11 no son comparables con las de 05–10**, que incorporaban el residuo empírico y evaluaban contra los datos.
+
+`objetivo_evaluacion` y `modo_residuo` se registran en `eval_config.json` desde el notebook `_01`, no se deciden en el de evaluación.
+
 ## Convenciones
 
-- **Ejes del estudio**, nombrados sin abreviar tras el `[FIX 12]`: `ESCENARIO_ID` (Algoritmo *k* del anexo), `REPLICA_ID` (réplica Monte Carlo), `chain` (cadena MCMC), `k` (componente FPCA). Los notebooks/`.m` de `05_sim_E1`, `06_sim_E2` y `07_sim_E3` ya usan esta convención; `03_Modelo`, `04_sim_E1` y `notebooks/reales/*` siguen con el `tt` antiguo.
-- `EXPERIMENT_ID = f"{BASENAME}_{ESCENARIO_ID}"` (p. ej. `modelo_experimento_1_3`) nombra por igual `data/`, `artefact/` y `reports/`. Debe coincidir **exactamente** entre el notebook `_01`, el `.m` y el `_03`.
-- Numeración de notebooks: `NN_01_simulaciones` (preprocesamiento) y `NN_03_resultados` (evaluación), con `NN` compartido con la carpeta.
+- **Ejes del estudio**, nombrados sin abreviar tras el `[FIX 12]`: `ESCENARIO_ID` (Algoritmo *k* del anexo), `REPLICA_ID` (réplica Monte Carlo), `chain` (cadena MCMC), `k` (componente FPCA). Los notebooks/`.m` de `05_sim_E1` a `08_sim_E4` y la corrida `11_sim_E1` usan esta convención; los archivados en `notebooks/simulaciones/01_Inicio_Formato/` (`03_Modelo`, `04_sim_E1_version_preliminar`, `09_sim_E5`, `10_sim_E6`) y `notebooks/reales/*` siguen con el `tt` antiguo.
+- `EXPERIMENT_ID` nombra por igual `data/`, `artefact/` y `reports/`, y debe coincidir **exactamente** entre el notebook `_01`, el `.m` y los de evaluación. Hay dos convenciones vivas:
+  - `03`–`10`: `f"{BASENAME}_{ESCENARIO_ID}"` (p. ej. `escenario_3`).
+  - **`11` en adelante: `f"{BASENAME}_{ESCENARIO_ID}_r{REPLICA_ID:02d}"`** (p. ej. `escenario_1_r01`). Incluye la réplica para que el barrido Monte Carlo de la Etapa D no obligue a cambiar la convención —replicada a mano en cada `config_paths.m`— cuando llegue. `psbp_fd_iteracion.m` de la 11 llama `config_paths(EXPERIMENT_ID)` con el id ya construido en vez de `config_paths(basename, tt, seed)`.
+- Numeración de notebooks. El paso `_02` es siempre MATLAB y no tiene notebook:
+  - `03`–`10`: `NN_01_simulaciones` y `NN_03_resultados` (evaluación completa en un solo notebook).
+  - **`11` en adelante: `NN_01_simulaciones`, `NN_03_convergencia`, `NN_04_evaluacion`.** La evaluación se partió en dos porque son preguntas distintas y con distinta condición de parada: si las cadenas no convergen, los números de `_04` no significan nada. `_03` no toca el bloque de prueba.
 - Retención temporal: `T0` marca el corte train/test y se registra en el manifest. El estandarizador se ajusta **solo** con el bloque de entrenamiento y guarda `n_ajuste` / `etiqueta_ajuste` para que eso sea auditable. `scores_scale` debe ser `"standardized_zscore_ddof0"`.
 - FPCA con patrón `fit`/`transform`: `fit` recibe solo el bloque de entrenamiento, de modo que la ausencia de fuga es una propiedad de la clase y no una disciplina del notebook.
 - `.gitignore` excluye `*.npy` y los compilados; los `.mat` y las figuras `.png` **sí** se versionan.
@@ -117,19 +147,19 @@ El anexo los ordena por **qué someten a prueba**, y la lectura de los resultado
 
 ### Divergencias de parámetros entre código y anexo
 
-Los defaults actuales de las dataclasses **no** son los del Cuadro `tab:escenarios`, y las últimas corridas tampoco. Revisar antes de generar nada definitivo:
+Los defaults de las dataclasses **no** son los del Cuadro `tab:escenarios`. Parte de esa divergencia ya es una **decisión tomada** (fila «decidido» abajo) y parte sigue pendiente de revisar. Lo decidido está en §Parámetros fijos del estudio y hay que **declararlo en la tesis** como desviación deliberada del anexo, no dejarlo como discrepancia silenciosa.
 
-| Cantidad | `docs/` | Código / última corrida |
-|---|---|---|
-| `L` (grilla) | 48 | `ConfigObservacion.L = 48`; la corrida de E3 usó `G = 75` |
-| `sigma_obs` | 0.1 | `0.5` en la dataclass y en los notebooks `_01` |
-| `T` / `T0` | 300 / 240 | `T = 200` default; E3 corrió `T = 250`, `T0 = 200` |
-| `R` | 50 | `R = 50` default, pero los notebooks fijan `R = 1` |
-| `mu(tau)` | `sin(2*pi*tau)` | `media_nula` default; los notebooks pasan `media_senoidal` |
-| Alg. 1 `||Psi||_HS` | 0.6 | `hs_norm = 0.7` |
-| Alg. 2 alcance de `beta` | 0.3 | `alcance_beta = 0.15` (`alcance_gamma = 0.30` sí coincide) |
-| Alg. 3 `||Psi^(2)||_HS`, dirección `e` | 0.8, `e = psi_1` | `hs_norms = (0.30, 0.85)`, `direccion_fn` constante |
-| Alg. 4 familia, `delta`, `||Psi||_HS` | `U = 1` (⇒ `sn` puro), `delta = 0.8`, dinámica igual al Alg. 1 | `familia = "st"`, `nu = 5`, `delta_skew = 0.85`, `hs_norm = 0.5` |
+| Cantidad | `docs/` | Estudio (corrida 11) | Estado |
+|---|---|---|---|
+| `L` (grilla) | 48 | **75** | decidido |
+| `T` / `T0` | 300 / 240 | **400 / 280** (`PROP_TRAIN = 0.7`) | decidido |
+| `sigma_obs` | 0.1 | **0.5** | decidido |
+| `mu(tau)` | `sin(2*pi*tau)` | **`5 + 2 sin(2*pi*tau)`** | decidido |
+| `R` | 50 | 1 por corrida, `REPLICA_ID` en el `EXPERIMENT_ID` | pendiente (Etapa D) |
+| Alg. 1 `||Psi||_HS` | 0.6 | `hs_norm = 0.7` | revisar |
+| Alg. 2 alcance de `beta` | 0.3 | `alcance_beta = 0.15` (`alcance_gamma = 0.30` sí coincide) | revisar |
+| Alg. 3 `||Psi^(2)||_HS`, dirección `e` | 0.8, `e = psi_1` | `hs_norms = (0.30, 0.85)`, `direccion_fn` constante | revisar |
+| Alg. 4 familia, `delta`, `||Psi||_HS` | `U = 1` (⇒ `sn` puro), `delta = 0.8`, dinámica igual al Alg. 1 | `familia = "st"`, `nu = 5`, `delta_skew = 0.85`, `hs_norm = 0.5` | revisar |
 
 `ConfigEscenario3` además agrega `desplazamientos` (corrimiento de nivel por régimen) que **el anexo no contempla**: allí los regímenes difieren solo por el operador. Con `desplazamientos = (0, 0)`, `nitidez = 1`, `umbrales = (0,)` y `direccion_fn = psi_1` el código reproduce el Algoritmo 3 tal como está escrito; conviene decidir explícitamente si el estudio usa la versión del anexo o la extendida, y declararlo.
 
@@ -140,7 +170,10 @@ Existe y sirve tal cual:
 - **Ciclo Python → MATLAB → Python** completo y probado (ver arriba), con `artifacts.py` como capa de E/S y `verificar_contrato()`.
 - **Predictiva funcional** (`models/pspb_fd_v3`): `PSBPPredictor` → `muestrear_scores` → `PropagadorFuncional` → muestras `(S, n, G)`.
 - **Métricas**: `fit/metrics_puntual` (RMSE, MSE/R² por coeficiente, MISE, razón de dispersión) y `fit/metrics_distribucional` (CRPS muestral, energy score, cobertura, PIT muestral, LPS). Cubren el eje 1 y la parte marginal del eje 2.
-- **Diagnóstico MCMC**: ESS/Geweke/R-hat, hoy **dentro** de `graphics/viz_traces.py` (`plot_convergence_*`), no como cálculo separable.
+- **Diagnóstico MCMC**: `fit/diagnostics_mcmc.py` — `ess_geyer`, `geweke_z`, `gelman_rubin`, `tabla_diagnosticos`, `resumen_convergencia`. `graphics/viz_traces.py` los **importa** en vez de redefinirlos, de modo que hay una sola definición. Los diagnósticos se calculan sobre cantidades invariantes a la permutación de etiquetas de la mezcla (`extraer_traza_variable` promedia sobre átomos): con un `h` fijo, R-hat mide el etiquetado y no la convergencia.
+- **Ventana móvil**: `fit/rolling.py` — `ventana_movil_scores` y `ventana_movil_funcional`. No reentrena: desliza la ventana de *evaluación* sobre una serie de predicciones a `h=1` con rezagos reales, etiqueta cada ventana por bloque y marca las que cruzan `T0`. `w` es configurable y el notebook superpone varios anchos.
+- **Probabilidades de inclusión**: `fit/inclusion.py` — `matriz_pip` (PIP global desde `osumout`, media y sd entre cadenas) y `contraste_con_verdad` (VP/FP/FN/VN, sensibilidad, AUC contra la estructura declarada del generador). Distingue la PIP **global** de la **promedio por átomo**, que no son la misma cantidad.
+- **Figuras de evaluación**: `graphics/viz_evaluacion.py` — `plot_ventana_movil` (train y test en el mismo eje, corte marcado, varios `w`), `plot_bandas_serie` (bandas por score en ambos bloques), `plot_extractos_curvas` (intervalos sobre la curva, un extracto cada `cada` períodos) y `plot_calibracion_pit` (PIT train vs test).
 - **Trazas de selección de variables**: `psbp_train.m` **sí guarda** `gammajhout (nsim, N, p)`, `pijout`, `wjout`, `osumout`, y `cargar_trazas_mat` los lee. La materia prima del eje 3 ya está en disco.
 
 Falta para poder cerrar el capítulo:
@@ -148,9 +181,9 @@ Falta para poder cerrar el capítulo:
 1. **Orquestación Monte Carlo (`R = 50`)**. Hoy todo el flujo — notebooks, `EXPERIMENT_ID`, `hyperparameters.json`, nombres `.mat` — está construido para **una** réplica; `REPLICA_ID` existe como campo pero siempre vale 1. Es el cambio estructural más grande: 6 escenarios × 50 réplicas × cadenas × componentes no cabe en el patrón "un notebook por experimento".
 2. **Barrido en `M`**. No hay ningún mecanismo para ajustar y evaluar el mismo escenario con varios `M`; `M` se fija una vez en el notebook `_01` y se propaga al manifest.
 3. **Modelos de referencia**. `fit/baselines.py` tiene solo `prediccion_media_incondicional` y `prediccion_persistencia`. No hay FAR(1), ni VAR sobre scores (Aue et al.), ni ARIMA por score (Hyndman) — que es lo que el capítulo entiende por "los de referencia sobre la misma representación".
-4. **Calibración condicional estratificada**. `cobertura()` es marginal. Falta cruzar la cobertura con el estado verdadero del generador, que **sí** está disponible: los generadores lo dejan en `SalidaSimulacion.internos` (`regimenes` en el Alg. 3, varianzas condicionales en el Alg. 2).
-5. **Error sobre ventana móvil** a lo largo de entrenamiento y prueba.
-6. **Probabilidades posteriores de inclusión como cantidad reportable**. Existe la traza y existen gráficos en `graphics/`, pero no una función que devuelva la matriz PIP por componente lista para contrastarla con la estructura del generador.
+4. **Calibración condicional estratificada por el estado del generador**. `cobertura()` es marginal; la ventana móvil da la estratificación por *tiempo*, que no es lo mismo. Falta cruzarla con el estado verdadero, que **sí** está disponible en `SalidaSimulacion.internos` (`regimenes` en el Alg. 3, varianzas condicionales en el Alg. 2). En el Escenario 1 no hay régimen ni volatilidad variable, así que esto solo rinde desde el Escenario 2.
+5. ~~**Error sobre ventana móvil**~~ — hecho: `fit/rolling.py`.
+6. ~~**Probabilidades posteriores de inclusión como cantidad reportable**~~ — hecho: `fit/inclusion.py`.
 7. **Agregación entre réplicas** (media, error estándar Monte Carlo por escenario/métrica/`M`) y las tablas del capítulo.
 8. ~~**Escenarios 5 y 6** completos, incluidos sus diagnósticos~~ — hecho (ver Etapa B). Queda pendiente el notebook `_01` que los ejecute y escriba artefactos.
 
@@ -167,11 +200,13 @@ No inventarlas: preguntar antes de codificar contra ellas.
 
 Orden pensado para que cada etapa sea utilizable antes de empezar la siguiente.
 
-**Etapa A — alinear lo que ya existe con `docs/`.** Llevar los defaults de los cuatro escenarios y de `ConfigObservacion` al Cuadro `tab:escenarios`, decidir el caso del `desplazamientos` del Alg. 3 y del `familia`/`delta` del Alg. 4, y dejar los valores del anexo como default de la dataclass en vez de como argumento del notebook — el notebook debería poder no pasar nada y obtener el escenario del anexo.
+**Etapa A — alinear lo que ya existe con `docs/`.** El esquema de observación ya está decidido (§Parámetros fijos del estudio) y difiere del Cuadro `tab:escenarios` a propósito. Queda decidir el caso del `desplazamientos` del Alg. 3 y del `familia`/`delta` del Alg. 4, y dejar los valores del anexo como default de la dataclass en vez de como argumento del notebook — el notebook debería poder no pasar nada y obtener el escenario del anexo.
 
 **Etapa B — Escenarios 5 y 6. HECHA.** `sim_escenario_5.py` y `sim_escenario_6.py` implementan la generación sobre coeficientes + base de Fourier `J = 10` (`base_fourier`, ortonormal en L² continuo; la cuadratura trapezoidal sobre grilla regular la reproduce con error de máquina si `2*k_max < L-1`, condición que `validar()` verifica). Los defaults de ambas dataclasses son los del Cuadro `tab:escenarios` — `ConfigEscenario5()` / `ConfigEscenario6()` sin argumentos son el escenario del anexo, incluida `media_fn=media_senoidal` y `sigma_obs=0.1`. Ambos exportan por `pipelines/__init__.py`. Falta el notebook `_01` que los consuma. Nota de diagnóstico: `resumen_escenario_6` compara varianzas en la ventana posterior a `t*=270`, que tiene 30 períodos; con `R=1` el reordenamiento no se separa del ruido Monte Carlo y `reordenamiento_detectado` puede dar False sin que el generador falle (con `R≥20` se detecta).
 
-**Etapa C — evaluación que hoy falta**, en `fit/`: baselines de referencia, cobertura condicional estratificada, ventana móvil, extracción de PIP, y separar los diagnósticos MCMC de sus gráficos (el `diagnostics_mcmc.py` que el propio `fit/__init__.py` anota como pendiente).
+**Etapa C — evaluación. PARCIALMENTE HECHA.** Listos y verificados sobre trazas reales: `fit/rolling.py` (ventana móvil), `fit/inclusion.py` (PIP y contraste con la verdad), `fit/diagnostics_mcmc.py` (ESS/Geweke/R-hat separados del dibujo) y `graphics/viz_evaluacion.py`. **Queda pendiente**: los modelos de referencia de `fit/baselines.py` (FAR(1), VAR sobre scores, ARIMA por score) y la cobertura condicional estratificada por el estado del generador.
+
+**La corrida 11 (`notebooks/simulaciones/11_sim_E1/`) es la plantilla de referencia** para regenerar los escenarios 2–6: parámetros fijos del estudio, evaluación contra la curva verdadera, `seed_base` leída del JSON, `EXPERIMENT_ID` con réplica y la evaluación partida en convergencia + predicción. Lo que cambia por escenario es el generador del `_01`, el `ESCENARIO_ID` y el diccionario `VERDAD` de `_03` §6.1, que declara qué covariables usó realmente el generador.
 
 **Etapa D — barrido en `M` y réplicas.** Es donde el diseño actual de un-notebook-por-experimento deja de escalar. Requiere decidir la convención de nombres e `EXPERIMENT_ID` para `(escenario, réplica, M)` antes de escribir código, porque esa convención está replicada a mano en cada `config_paths.m`.
 
