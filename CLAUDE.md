@@ -47,7 +47,7 @@ Los dos directorios no son intercambiables y el `.m` depende de la distinción:
 
 ## Gotchas
 
-- **La semilla registrada no reproduce la que MATLAB usó, salvo en la corrida 11.** Los `psbp_fd_iteracion.m` de `03`–`10` tienen `SEED_BASE = 4123` hardcodeado y **no** leen `seed_base` del JSON, mientras sus `hyperparameters.json` registran `41232`; los seeds reales por job son `4123 + chain*9973 + k*31` y ningún resultado de esas corridas es reproducible desde sus artefactos. **`11_sim_E1/psbp_fd_iteracion.m` lo corrige**: lee `hp_json.seed_base` y falla si falta. Propagar esa corrección al resto al regenerarlos.
+- **La semilla registrada no reproduce la que MATLAB usó, salvo en las corridas 11 y 12.** Los `psbp_fd_iteracion.m` de `03`–`10` tienen `SEED_BASE = 4123` hardcodeado y **no** leen `seed_base` del JSON, mientras sus `hyperparameters.json` registran `41232`; los seeds reales por job son `4123 + chain*9973 + k*31` y ningún resultado de esas corridas es reproducible desde sus artefactos. **`11_sim_E1/` y `12_sim_E2/psbp_fd_iteracion.m` lo corrigen**: lee `hp_json.seed_base` y falla si falta. Propagar esa corrección al resto al regenerarlos.
 - **`M` significa dos cosas.** En FPCA es el número de componentes retenidas; en `mcmc_config` es el tamaño de la grilla de localización G\* del stick-breaking (`N` ahí es el truncamiento del número de átomos).
 - **Índices base-0 vs base-1.** `component_idx` del manifest es base-0; los nombres de archivo usan `fpc_idx = component_idx[k] + 1`. Las trazas se llaman `chain_fpc_<fpc_idx>_iter<chain a 2 dígitos>.mat` (p. ej. `chain_fpc_2_iter03.mat`) — no cambiar, el flujo de resultados los busca por nombre.
 - **Cuadratura y Cholesky tienen una sola definición.** `utils.quadrature.pesos_trapezoidales` y `utils.linalg.safe_chol`; `pipelines.sim_comun` las re-exporta (`factor_cholesky`) sin redefinirlas. Duplicarlas degrada en silencio la ortonormalidad FPCA o cambia las trayectorias ante la misma semilla.
@@ -68,9 +68,11 @@ Los dos directorios no son intercambiables y el `.m` depende de la distinción:
 | `L` (grilla) | **75** | `ConfigEscenario*.L`, constante `L_GRILLA` del `_01` |
 | `T` (curvas) | **400** | constante `T_CURVAS` |
 | `PROP_TRAIN` | **0.70** ⇒ `T0 = 280`, test = 120 | constante `PROP_TRAIN` |
-| `sigma_obs` | 0.5 | `SIGMA_OBS` |
-| `mu(tau)` | `5 + 2 sin(2 pi tau)` | `media_senoidal` |
+| `sigma_obs` | **0.25** | `SIGMA_OBS` |
+| `mu(tau)` | **`sin(2 pi tau)`** | `media_senoidal` |
 | `burn_in` | 200 | `ConfigEscenario*.burn_in` |
+
+**Ojo con la corrida 11 ya ejecutada.** Sus artefactos (`data/simulaciones/raw/escenario_1_r01/simulation_config.json`) registran `sigma_obs = 0.25` pero `mu(tau) = 5 + 2 sin(2 pi tau)`. La decisión vigente, tomada al construir la corrida 12, es `mu(tau) = sin(2 pi tau)` —el Cuadro `tab:ane_esquema` del anexo— con `sigma_obs = 0.25`, que **no** es el 0.5 que ese mismo cuadro declara. Consecuencias: (a) hay que corregir `sigma_epsilon` a 0.25 en `docs/01 Anexo.tex`; (b) para que la comparación 1 vs 2 sea limpia conviene regenerar la corrida 11 con la media del anexo. El efecto práctico de la media es menor —el FPCA centra con la media empírica— pero la divergencia no debe quedar sin declarar.
 
 Se evaluó subir `T` a 500 y **se descartó**: la resolución de la ventana móvil la da el deslizamiento (con test = 120 y `w = 20` hay 101 posiciones), no el tamaño del test, mientras que `T = 500` sube `n_train` de 280 a 350 y con ello ~25 % el tiempo de MCMC de cada job. Si en algún momento hace falta más test, sale más barato bajar `PROP_TRAIN` que crecer `T`.
 
@@ -87,7 +89,7 @@ Se evaluó subir `T` a 500 y **se descartó**: la resolución de la ventana móv
 
 ## Convenciones
 
-- **Ejes del estudio**, nombrados sin abreviar tras el `[FIX 12]`: `ESCENARIO_ID` (Algoritmo *k* del anexo), `REPLICA_ID` (réplica Monte Carlo), `chain` (cadena MCMC), `k` (componente FPCA). Los notebooks/`.m` de `05_sim_E1` a `08_sim_E4` y la corrida `11_sim_E1` usan esta convención; los archivados en `notebooks/simulaciones/01_Inicio_Formato/` (`03_Modelo`, `04_sim_E1_version_preliminar`, `09_sim_E5`, `10_sim_E6`) y `notebooks/reales/*` siguen con el `tt` antiguo.
+- **Ejes del estudio**, nombrados sin abreviar tras el `[FIX 12]`: `ESCENARIO_ID` (Algoritmo *k* del anexo), `REPLICA_ID` (réplica Monte Carlo), `chain` (cadena MCMC), `k` (componente FPCA). Los notebooks/`.m` de `05_sim_E1` a `08_sim_E4` y las corridas `11_sim_E1` y `12_sim_E2` usan esta convención; los archivados en `notebooks/simulaciones/01_Inicio_Formato/` (`03_Modelo`, `04_sim_E1_version_preliminar`, `09_sim_E5`, `10_sim_E6`) y `notebooks/reales/*` siguen con el `tt` antiguo.
 - `EXPERIMENT_ID` nombra por igual `data/`, `artefact/` y `reports/`, y debe coincidir **exactamente** entre el notebook `_01`, el `.m` y los de evaluación. Hay dos convenciones vivas:
   - `03`–`10`: `f"{BASENAME}_{ESCENARIO_ID}"` (p. ej. `escenario_3`).
   - **`11` en adelante: `f"{BASENAME}_{ESCENARIO_ID}_r{REPLICA_ID:02d}"`** (p. ej. `escenario_1_r01`). Incluye la réplica para que el barrido Monte Carlo de la Etapa D no obligue a cambiar la convención —replicada a mano en cada `config_paths.m`— cuando llegue. `psbp_fd_iteracion.m` de la 11 llama `config_paths(EXPERIMENT_ID)` con el id ya construido en vez de `config_paths(basename, tt, seed)`.
@@ -147,19 +149,17 @@ El anexo los ordena por **qué someten a prueba**, y la lectura de los resultado
 
 ### Divergencias de parámetros entre código y anexo
 
-Los defaults de las dataclasses **no** son los del Cuadro `tab:escenarios`. Parte de esa divergencia ya es una **decisión tomada** (fila «decidido» abajo) y parte sigue pendiente de revisar. Lo decidido está en §Parámetros fijos del estudio y hay que **declararlo en la tesis** como desviación deliberada del anexo, no dejarlo como discrepancia silenciosa.
+**`docs/01 Anexo.tex` fue reescrito** (cambios sin commitear al 2026-08-25): ya no remite al Capítulo 3 para los valores numéricos, sino que trae un cuadro por algoritmo —`tab:ane_esquema` para el esquema de observación y `tab:ane_alg1`…`tab:ane_alg6`— y esos cuadros **ya recogen los defaults del código**. La tabla de divergencias quedó por tanto casi vacía; lo que sigue es lo que aún no coincide.
 
-| Cantidad | `docs/` | Estudio (corrida 11) | Estado |
+| Cantidad | `docs/01 Anexo.tex` | Estudio | Estado |
 |---|---|---|---|
-| `L` (grilla) | 48 | **75** | decidido |
-| `T` / `T0` | 300 / 240 | **400 / 280** (`PROP_TRAIN = 0.7`) | decidido |
-| `sigma_obs` | 0.1 | **0.5** | decidido |
-| `mu(tau)` | `sin(2*pi*tau)` | **`5 + 2 sin(2*pi*tau)`** | decidido |
+| `sigma_epsilon` | 0.5 (`tab:ane_esquema`) | **0.25** | decidido; **corregir el cuadro del anexo** |
+| `mu(tau)` | `sin(2*pi*tau)` | `sin(2*pi*tau)` desde la corrida 12; la 11 corrió con `5 + 2 sin(2*pi*tau)` | regenerar la 11 |
 | `R` | 50 | 1 por corrida, `REPLICA_ID` en el `EXPERIMENT_ID` | pendiente (Etapa D) |
-| Alg. 1 `||Psi||_HS` | 0.6 | `hs_norm = 0.7` | revisar |
-| Alg. 2 alcance de `beta` | 0.3 | `alcance_beta = 0.15` (`alcance_gamma = 0.30` sí coincide) | revisar |
-| Alg. 3 `||Psi^(2)||_HS`, dirección `e` | 0.8, `e = psi_1` | `hs_norms = (0.30, 0.85)`, `direccion_fn` constante | revisar |
-| Alg. 4 familia, `delta`, `||Psi||_HS` | `U = 1` (⇒ `sn` puro), `delta = 0.8`, dinámica igual al Alg. 1 | `familia = "st"`, `nu = 5`, `delta_skew = 0.85`, `hs_norm = 0.5` | revisar |
+| `q` (orden markoviano) | no aparece | `n_lags = 1` en las corridas 11–12 | declarar en la tesis |
+| Alg. 3 `desplazamientos` | no contempla el corrimiento de nivel | `ConfigEscenario3.desplazamientos` | decidir antes de la corrida 13 |
+
+`L = 75`, `T = 400`, `T0 = 280`, `burn_in = 200`, y los parámetros de los Algoritmos 1 y 2 (`gamma = 0.3`, `||Psi||_HS = 0.7`; `persistencia = 0.85`, `prop_arch = 0.25`, `var_objetivo = 1.0`, `alcance_beta = 0.15`, `alcance_gamma = 0.30`, `ell = 0.2`) **ya coinciden** entre código y anexo. Verificar lo mismo para los Algoritmos 3–6 antes de montar sus corridas.
 
 `ConfigEscenario3` además agrega `desplazamientos` (corrimiento de nivel por régimen) que **el anexo no contempla**: allí los regímenes difieren solo por el operador. Con `desplazamientos = (0, 0)`, `nitidez = 1`, `umbrales = (0,)` y `direccion_fn = psi_1` el código reproduce el Algoritmo 3 tal como está escrito; conviene decidir explícitamente si el estudio usa la versión del anexo o la extendida, y declararlo.
 
@@ -181,7 +181,7 @@ Falta para poder cerrar el capítulo:
 1. **Orquestación Monte Carlo (`R = 50`)**. Hoy todo el flujo — notebooks, `EXPERIMENT_ID`, `hyperparameters.json`, nombres `.mat` — está construido para **una** réplica; `REPLICA_ID` existe como campo pero siempre vale 1. Es el cambio estructural más grande: 6 escenarios × 50 réplicas × cadenas × componentes no cabe en el patrón "un notebook por experimento".
 2. **Barrido en `M`**. No hay ningún mecanismo para ajustar y evaluar el mismo escenario con varios `M`; `M` se fija una vez en el notebook `_01` y se propaga al manifest.
 3. **Modelos de referencia**. `fit/baselines.py` tiene solo `prediccion_media_incondicional` y `prediccion_persistencia`. No hay FAR(1), ni VAR sobre scores (Aue et al.), ni ARIMA por score (Hyndman) — que es lo que el capítulo entiende por "los de referencia sobre la misma representación".
-4. **Calibración condicional estratificada por el estado del generador**. `cobertura()` es marginal; la ventana móvil da la estratificación por *tiempo*, que no es lo mismo. Falta cruzarla con el estado verdadero, que **sí** está disponible en `SalidaSimulacion.internos` (`regimenes` en el Alg. 3, varianzas condicionales en el Alg. 2). En el Escenario 1 no hay régimen ni volatilidad variable, así que esto solo rinde desde el Escenario 2.
+4. ~~**Calibración condicional estratificada por el estado del generador**~~ — hecho en la corrida 12: `fit/metrics_distribucional.py` aporta `estratos_por_cuantil` y `cobertura_condicional` (cobertura, ancho medio, `desvio` respecto de la marginal y el puntaje propio del estrato —CRPS para un score, energía para la curva—), y `12_04 §9` los consume con `sigma2` como estado verdadero. Para el Alg. 3 el estrato es el régimen y se pasa directo, sin cuantilizar. En el Escenario 1 no rinde: no hay estado que estratificar.
 5. ~~**Error sobre ventana móvil**~~ — hecho: `fit/rolling.py`.
 6. ~~**Probabilidades posteriores de inclusión como cantidad reportable**~~ — hecho: `fit/inclusion.py`.
 7. **Agregación entre réplicas** (media, error estándar Monte Carlo por escenario/métrica/`M`) y las tablas del capítulo.
@@ -194,7 +194,7 @@ No inventarlas: preguntar antes de codificar contra ellas.
 - **`03 Modelo.tex` referencia `\ref{03_06_04_objetivos_evaluacion}` (línea 374) y ese label no existe.** Las subsecciones de §03_06 sobre modelos de referencia, métricas y objetivo de evaluación (curva proyectada vs. curva suavizada) están pendientes de escribir. De ahí sale el punto 3 de la lista anterior.
 - **`§03_07 Resultados` es un bloque `% [PENDIENTE]`** con la organización propuesta en seis puntos. Esa lista es la mejor guía disponible de qué debe producir el código.
 - Los criterios de evaluación se citan como `§02_02_03` del Capítulo 2, que **no está en `docs/`**.
-- `q` (orden markoviano) no aparece en el Cuadro de escenarios; las corridas actuales usan `n_lags = 2`.
+- `q` (orden markoviano) no aparece en los cuadros del anexo; las corridas 03–10 usaban `n_lags = 2` y las 11–12 usan `n_lags = 1`. Hay que declararlo en la tesis.
 
 ## Plan de trabajo
 
@@ -207,6 +207,13 @@ Orden pensado para que cada etapa sea utilizable antes de empezar la siguiente.
 **Etapa C — evaluación. PARCIALMENTE HECHA.** Listos y verificados sobre trazas reales: `fit/rolling.py` (ventana móvil), `fit/inclusion.py` (PIP y contraste con la verdad), `fit/diagnostics_mcmc.py` (ESS/Geweke/R-hat separados del dibujo) y `graphics/viz_evaluacion.py`. **Queda pendiente**: los modelos de referencia de `fit/baselines.py` (FAR(1), VAR sobre scores, ARIMA por score) y la cobertura condicional estratificada por el estado del generador.
 
 **La corrida 11 (`notebooks/simulaciones/11_sim_E1/`) es la plantilla de referencia** para regenerar los escenarios 2–6: parámetros fijos del estudio, evaluación contra la curva verdadera, `seed_base` leída del JSON, `EXPERIMENT_ID` con réplica y la evaluación partida en convergencia + predicción. Lo que cambia por escenario es el generador del `_01`, el `ESCENARIO_ID` y el diccionario `VERDAD` de `_03` §6.1, que declara qué covariables usó realmente el generador.
+
+**La corrida 12 (`notebooks/simulaciones/12_sim_E2/`) es la instancia de esa plantilla para el Algoritmo 2**, y fija lo que hay que replicar en las siguientes:
+
+- Sólo cambia el generador. Base B-spline (8, 3), `M_FPCA = 4`, `N_LAGS = 1`, priors, `mcmc_config` y `N_CHAINS` son idénticos a los de la 11 **a propósito**: cambiarlos convertiría la comparación entre escenarios en una comparación entre ajustes. El prior `E[pi] = 0.90` sobre el propio rezago se mantiene aunque en este escenario esté mal orientado —no hay dependencia en la media—, y que el modelo tenga que desmentirlo es parte de la prueba del eje 3.
+- **El estado verdadero se persiste.** `_01` guarda con `incluir_internos=True` (deja `interno_sigma2` en el `.npz`) y además escribe `reports/.../10_estado_volatilidad.csv`, que es lo que `_04 §9` lee; `eval_config.json` gana un bloque `estratificacion` que declara variable, fuente, número de estratos y etiquetas. Replicar el patrón en el Alg. 3 con `regimenes`.
+- **La lectura cambia con el escenario.** En el Algoritmo 2 la media condicional es constante, de modo que RMSE y R² **no discriminan** (R² ≈ 0 es el resultado correcto y la media incondicional es la predicción puntual óptima); lo que separa modelos es CRPS, energía y la cobertura estratificada. `VERDAD` de `_03 §6.1` es `{FPC k: []}` —ninguna covariable activa en la media— y por eso la cifra reportable es `pip_media_inactivas`, leída como cuánta señal recogen los rezagos por el canal de varianza, no como falsos positivos.
+- Diagnóstico: con los parámetros del anexo el generador da `cv(sigma^2) ≈ 0.24`, `acf1(residuo^2) ≈ 0.11` y `radio_espectral_BG ≈ 0.75`, pero el **exceso de curtosis sale ligeramente negativo** con `R = 1`. Es esperable —momento de cuarto orden sobre una sola trayectoria y coeficiente ARCH efectivo ~0.21— y por eso `_01` lo reporta como informativo y no como criterio de aceptación.
 
 **Etapa D — barrido en `M` y réplicas.** Es donde el diseño actual de un-notebook-por-experimento deja de escalar. Requiere decidir la convención de nombres e `EXPERIMENT_ID` para `(escenario, réplica, M)` antes de escribir código, porque esa convención está replicada a mano en cada `config_paths.m`.
 

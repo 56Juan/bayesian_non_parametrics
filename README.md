@@ -19,13 +19,13 @@ python -m venv .venv
 
 ```bash
 # Windows — PowerShell
-.venv\Scripts\Activate.ps1
+.v_2\Scripts\Activate.ps1
 
 # Windows — CMD
-.venv\Scripts\activate.bat
+.v_2\Scripts\activate.bat
 
 # Windows — Git Bash
-source .venv/Scripts/activate
+source .v_2/Scripts/activate
 
 # Linux / macOS
 source .venv/bin/activate

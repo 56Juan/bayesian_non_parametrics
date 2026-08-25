@@ -1,0 +1,51 @@
+{
+  "scheme": "holdout_temporal",
+  "T": 400,
+  "T0": 280,
+  "prop_train": 0.7,
+  "horizons": [
+    1
+  ],
+  "n_lags": 1,
+  "scores_scale": "standardized_zscore_ddof0",
+  "objetivo_evaluacion": "curva_verdadera",
+  "modo_residuo": "ninguno",
+  "nivel_credibilidad": 0.95,
+  "ventana_movil": {
+    "w": [
+      10,
+      20,
+      40
+    ],
+    "paso": 1,
+    "solapadas": true
+  },
+  "metrics_scores": [
+    "RMSE",
+    "R2",
+    "razon_dispersion"
+  ],
+  "metrics_curvas": [
+    "MISE",
+    "RMSE_funcional"
+  ],
+  "metrics_dist": [
+    "CRPS",
+    "energy_score",
+    "cobertura_95",
+    "PIT"
+  ],
+  "estratificacion": {
+    "variable": "sigma2_media",
+    "descripcion": "varianza condicional latente, promedio sobre el dominio",
+    "fuente": "reports/.../10_estado_volatilidad.csv",
+    "respaldo": "raw/escenario_2.npz::interno_sigma2",
+    "n_estratos": 3,
+    "etiquetas": [
+      "baja",
+      "media",
+      "alta"
+    ],
+    "metodo": "cuantiles sobre los orígenes evaluados"
+  }
+}
