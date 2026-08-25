@@ -26,6 +26,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+# Progreso por consola. Estas figuras no son lentas, pero cada panel calcula
+# cifras --cobertura por bloque, fraccion del dominio cubierta, desviacion del
+# PIT respecto de la uniforme-- que hoy solo aparecen dentro del titulo de un
+# grafico. Con `verbose=True` salen tambien como texto, que es lo que se puede
+# leer, copiar a una tabla y comparar entre escenarios.
+from ..utils.progreso import Progreso
+
 __all__ = [
     "plot_ventana_movil",
     "plot_bandas_serie",
@@ -58,7 +65,8 @@ def plot_ventana_movil(tabla: pd.DataFrame, T0: int, metricas: Sequence[str],
                        columna_grupo: Optional[str] = None,
                        tablas_por_w: Optional[Dict[int, pd.DataFrame]] = None,
                        title: str = "Evolución del error sobre ventana móvil",
-                       save_path: Optional[str] = None):
+                       save_path: Optional[str] = None,
+                       verbose: bool = False):
     """
     Una fila por métrica; el eje x es el tiempo del experimento.
 
@@ -70,6 +78,10 @@ def plot_ventana_movil(tabla: pd.DataFrame, T0: int, metricas: Sequence[str],
         para mostrar que la conclusión no depende del w elegido a dedo; el w
         mayor va más opaco.
 
+    verbose : imprime, por métrica y ancho de ventana, la mediana en train y en
+        test excluyendo las ventanas que cruzan T0. Es la lectura numérica de la
+        figura: permite ver el salto train→test sin medirlo a ojo sobre el eje.
+
     Las ventanas que CRUZAN T0 se dibujan punteadas: su cifra mezcla dentro y
     fuera de muestra y no debe leerse como ninguno de los dos.
     """
@@ -80,6 +92,7 @@ def plot_ventana_movil(tabla: pd.DataFrame, T0: int, metricas: Sequence[str],
 
     fuentes = tablas_por_w if tablas_por_w else {tabla.attrs.get("w", 0): tabla}
     ws = sorted(fuentes)
+    prog = Progreso("plot_ventana_movil", total=len(metricas), verbose=verbose)
 
     for ax, met in zip(axes, metricas):
         t_min = min(float(t["t_centro"].min()) for t in fuentes.values())
@@ -122,10 +135,27 @@ def plot_ventana_movil(tabla: pd.DataFrame, T0: int, metricas: Sequence[str],
             if l:
                 ax.legend(fontsize=8, ncol=min(len(l), 5), loc="upper left")
 
+        # Resumen numerico del panel. Se usa la mediana y no la media porque la
+        # serie de ventanas tiene picos aislados en los origenes dificiles que
+        # desplazan la media y no representan el nivel tipico del bloque.
+        if verbose:
+            partes = []
+            for w in ws:
+                tw = fuentes[w]
+                if met not in tw.columns:
+                    continue
+                limpio = tw[~tw["cruza_T0"]]
+                for bloque in ("train", "test"):
+                    v = limpio.loc[limpio["bloque"] == bloque, met]
+                    if not v.empty:
+                        partes.append(f"w={w} {bloque}={v.median():.4g}")
+            prog.paso(f"{met}: " + "  ".join(partes))
+
     axes[-1].set_xlabel("tiempo $t$ (centro de la ventana)")
     fig.suptitle(title, fontsize=12)
     fig.tight_layout()
     _guardar(fig, save_path)
+    prog.fin((f"-> {save_path}" if save_path else ""))
     return fig
 
 
@@ -139,7 +169,8 @@ def plot_bandas_serie(y_obs: np.ndarray, y_hat: np.ndarray,
                       etiquetas: Optional[Sequence[str]] = None,
                       nivel: float = 0.95,
                       title: str = "Bandas de credibilidad por score",
-                      save_path: Optional[str] = None):
+                      save_path: Optional[str] = None,
+                      verbose: bool = False):
     """
     Serie de cada score con su banda, cubriendo entrenamiento y prueba.
 
@@ -147,6 +178,11 @@ def plot_bandas_serie(y_obs: np.ndarray, y_hat: np.ndarray,
     si se omite se asume 1..n. Los puntos fuera de banda se marcan y se cuentan
     por separado en cada bloque, que es la comparación que interesa: una banda
     puede estar perfectamente calibrada dentro de muestra y fallar fuera.
+
+    verbose : imprime por componente la cobertura empírica en cada bloque, su
+        brecha contra el nominal y el ancho medio de la banda. Son las mismas
+        cifras del título de cada panel, en un formato que se puede llevar a
+        una tabla del capítulo sin transcribirlas de la figura.
     """
     Y = np.atleast_2d(y_obs); P = np.atleast_2d(y_hat)
     L = np.atleast_2d(li);    U = np.atleast_2d(ls)
@@ -156,6 +192,7 @@ def plot_bandas_serie(y_obs: np.ndarray, y_hat: np.ndarray,
 
     fig, axes = plt.subplots(M, 1, figsize=(13, 2.7 * M), sharex=True, squeeze=False)
     axes = axes[:, 0]
+    prog = Progreso("plot_bandas_serie", total=M, verbose=verbose)
 
     for m, ax in enumerate(axes):
         _sombrear_bloques(ax, T0, float(t[0]), float(t[-1]))
@@ -178,10 +215,19 @@ def plot_bandas_serie(y_obs: np.ndarray, y_hat: np.ndarray,
         if m == 0:
             ax.legend(fontsize=8, ncol=3, loc="upper right")
 
+        ancho = U[:, m] - L[:, m]
+        a_tr = float(ancho[es_train].mean()) if es_train.any() else np.nan
+        a_te = float(ancho[~es_train].mean()) if (~es_train).any() else np.nan
+        prog.paso(f"{etiquetas[m]}: cob train={c_tr:.3f} ({c_tr - nivel:+.3f}) "
+                  f"test={c_te:.3f} ({c_te - nivel:+.3f}) | "
+                  f"ancho train={a_tr:.4g} test={a_te:.4g} | "
+                  f"{int(fuera.sum())}/{n} fuera")
+
     axes[-1].set_xlabel("tiempo $t$")
     fig.suptitle(title, fontsize=12)
     fig.tight_layout()
     _guardar(fig, save_path)
+    prog.fin((f"-> {save_path}" if save_path else ""))
     return fig
 
 
@@ -197,7 +243,8 @@ def plot_extractos_curvas(X_true: np.ndarray, X_pred: np.ndarray,
                           nivel: float = 0.95,
                           X_obs: Optional[np.ndarray] = None,
                           title: str = "Intervalos de credibilidad sobre la curva",
-                          save_path: Optional[str] = None):
+                          save_path: Optional[str] = None,
+                          verbose: bool = False):
     """
     Rejilla de curvas tomadas cada `cada` períodos, cada una con su banda.
 
@@ -211,6 +258,10 @@ def plot_extractos_curvas(X_true: np.ndarray, X_pred: np.ndarray,
     El título de cada panel indica el bloque y la fracción del dominio cubierta
     por la banda en ese período, que es lo que permite ver de un vistazo si el
     modelo falla en curvas concretas y no de forma difusa.
+
+    verbose : imprime esa misma cobertura por extracto, más el promedio de cada
+        bloque al cerrar. Sirve para identificar el período problemático por su
+        índice `t` en vez de contando paneles en la rejilla.
     """
     Xt = np.atleast_2d(X_true); Xp = np.atleast_2d(X_pred)
     L = np.atleast_2d(li);      U = np.atleast_2d(ls)
@@ -223,6 +274,8 @@ def plot_extractos_curvas(X_true: np.ndarray, X_pred: np.ndarray,
     fig, axes = plt.subplots(n_fil, n_col, figsize=(3.0 * n_col, 2.7 * n_fil),
                              sharex=True, sharey=True, squeeze=False)
     planos = axes.ravel()
+    prog = Progreso("plot_extractos_curvas", total=len(idx), verbose=verbose)
+    cob_tr, cob_te = [], []
 
     for ax, i in zip(planos, idx):
         es_test = t[i] > T0
@@ -238,6 +291,11 @@ def plot_extractos_curvas(X_true: np.ndarray, X_pred: np.ndarray,
         ax.set_title(rf"$X_{{{int(t[i])}}}$ · {'test' if es_test else 'train'}"
                      f" · cob={cob:.2f}", fontsize=9, color=color)
         ax.tick_params(labelsize=7)
+
+        (cob_te if es_test else cob_tr).append(cob)
+        rmse_i = float(np.sqrt(np.mean((Xt[i] - Xp[i]) ** 2)))
+        prog.paso(f"t={int(t[i])} [{'test' if es_test else 'train'}] "
+                  f"cob={cob:.3f} rmse={rmse_i:.4g}")
 
     for ax in planos[len(idx):]:
         ax.axis("off")
@@ -264,6 +322,9 @@ def plot_extractos_curvas(X_true: np.ndarray, X_pred: np.ndarray,
     margen = min(0.06, 1.2 / max(n_fil, 1))
     fig.tight_layout(rect=[0, 0.01, 1, 1 - margen])
     _guardar(fig, save_path)
+    prog.fin(f"cob media train={np.mean(cob_tr) if cob_tr else float('nan'):.3f} "
+             f"test={np.mean(cob_te) if cob_te else float('nan'):.3f} "
+             f"(nominal {nivel:.2f})")
     return fig
 
 
@@ -275,7 +336,8 @@ def plot_calibracion_pit(pit_train: Dict[str, np.ndarray],
                          pit_test: Dict[str, np.ndarray],
                          n_bins: int = 10,
                          title: str = "Calibración: histograma PIT por bloque",
-                         save_path: Optional[str] = None):
+                         save_path: Optional[str] = None,
+                         verbose: bool = False):
     """
     Histograma PIT por componente, entrenamiento contra prueba.
 
@@ -284,26 +346,38 @@ def plot_calibracion_pit(pit_train: Dict[str, np.ndarray],
     demasiado anchas, y una pendiente un sesgo sistemático del centro.
     Contrastar train y test separa el desajuste del modelo de la pérdida de
     calibración fuera de muestra, que tienen causas distintas.
+
+    verbose : imprime por componente la media del PIT (0.5 bajo calibración) y
+        la desviación máxima de su histograma respecto de la densidad uniforme,
+        que es la lectura numérica de "cuán lejos de plano está". La forma sigue
+        siendo la figura: el número dice cuánto, no qué falla.
     """
     claves = list(pit_train)
     fig, axes = plt.subplots(1, len(claves), figsize=(3.4 * len(claves), 3.1),
                              squeeze=False, sharey=True)
     bordes = np.linspace(0, 1, n_bins + 1)
+    prog = Progreso("plot_calibracion_pit", total=len(claves), verbose=verbose)
 
     for ax, k in zip(axes[0], claves):
+        resumen = []
         for u, color, etq in ((pit_train[k], C_TRAIN, "train"),
                               (pit_test.get(k), C_TEST, "test")):
             if u is None:
                 continue
-            ax.hist(u, bins=bordes, density=True, histtype="step", lw=1.8,
-                    color=color, label=etq)
+            dens, _ = ax.hist(u, bins=bordes, density=True, histtype="step",
+                              lw=1.8, color=color, label=etq)[:2]
+            resumen.append(f"{etq}: media={np.mean(u):.3f} "
+                           f"desv_max={np.abs(dens - 1.0).max():.3f} "
+                           f"n={np.size(u)}")
         ax.axhline(1.0, color="k", lw=1.0, ls="--", alpha=0.7)
         ax.set_title(k, fontsize=10)
         ax.set_xlabel("PIT")
         ax.set_xlim(0, 1)
+        prog.paso(f"{k}  " + "  |  ".join(resumen))
     axes[0, 0].set_ylabel("densidad")
     axes[0, 0].legend(fontsize=8)
     fig.suptitle(title, fontsize=12)
     fig.tight_layout()
     _guardar(fig, save_path)
+    prog.fin((f"-> {save_path}" if save_path else ""))
     return fig

@@ -48,6 +48,12 @@ from ..fit.diagnostics_mcmc import (
     diagnostico_variable as _compute_diag,
 )
 
+# Progreso por consola. Estas cuatro funciones recorren p variables x n_chains
+# calculando ACF (y, en los paneles de convergencia, ESS de Geyer y R-hat) antes
+# de dibujar nada: con p grande la figura tarda en aparecer y no hay forma de
+# saber si avanza. `verbose=True` lo hace visible sin alterar la figura.
+from ..utils.progreso import Progreso
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Paleta de colores para cadenas
@@ -90,6 +96,7 @@ def plot_traces_bj(
     figsize_per_var: Tuple[float, float] = (14, 2.2),
     title_prefix: str = "",
     save_path: Optional[str] = None,
+    verbose: bool = False,
 ) -> plt.Figure:
     """
     Trazas post-burn-in y ACF de β̄_j (betajhout promediado sobre átomos)
@@ -106,6 +113,7 @@ def plot_traces_bj(
     figsize_per_var : (ancho, alto) por fila de variable
     title_prefix  : prefijo opcional para el título
     save_path     : si se especifica, guarda la figura
+    verbose       : imprime el avance por covariable. No altera la figura.
 
     Retorna
     -------
@@ -125,6 +133,8 @@ def plot_traces_bj(
         f"{prefix}Trazas β̄_j — Componente {k + 1}",
         fontsize=11, y=1.002,
     )
+    prog = Progreso(f"plot_traces_bj[FPC {k + 1}]", total=len(names),
+                    verbose=verbose)
 
     for j, fname in enumerate(names):
         mat = _build_chains_matrix(models_chains, k, trace_key, j, burn, n_chains)
@@ -157,9 +167,12 @@ def plot_traces_bj(
         ax_acf.legend(fontsize=6, loc="upper right")
         ax_acf.grid(True, alpha=0.3)
 
+        prog.paso(f"{fname}  media={mat.mean():.4g}  n_post={n_post}")
+
     plt.tight_layout()
     if save_path:
         fig.savefig(save_path, dpi=150, bbox_inches="tight")
+    prog.fin(f"figura {p}x2" + (f" -> {save_path}" if save_path else ""))
     return fig
 
 
@@ -173,11 +186,13 @@ def plot_traces_pj(
     figsize_per_var: Tuple[float, float] = (14, 2.2),
     title_prefix: str = "",
     save_path: Optional[str] = None,
+    verbose: bool = False,
 ) -> plt.Figure:
     """
     Trazas post-burn-in y ACF de p_j (pijout) por covariable del componente k.
 
-    Mismos parámetros que `plot_traces_bj` (con trace_key='pijout').
+    Mismos parámetros que `plot_traces_bj` (con trace_key='pijout'), incluido
+    `verbose`.
     """
     trace_key = "pijout"
     p = models_chains[k][0].n_features_
@@ -193,6 +208,8 @@ def plot_traces_pj(
         f"{prefix}Trazas p_j — Componente {k + 1}",
         fontsize=11, y=1.002,
     )
+    prog = Progreso(f"plot_traces_pj[FPC {k + 1}]", total=len(names),
+                    verbose=verbose)
 
     for j, fname in enumerate(names):
         mat = _build_chains_matrix(models_chains, k, trace_key, j, burn, n_chains)
@@ -225,9 +242,12 @@ def plot_traces_pj(
         ax_acf.legend(fontsize=6, loc="upper right")
         ax_acf.grid(True, alpha=0.3)
 
+        prog.paso(f"{fname}  PIP media={mat.mean():.4f}  n_post={n_post}")
+
     plt.tight_layout()
     if save_path:
         fig.savefig(save_path, dpi=150, bbox_inches="tight")
+    prog.fin(f"figura {p}x2" + (f" -> {save_path}" if save_path else ""))
     return fig
 
 
@@ -241,10 +261,15 @@ def plot_convergence_bj(
     figsize_per_var: Tuple[float, float] = (15, 2.4),
     title_prefix: str = "",
     save_path: Optional[str] = None,
+    verbose: bool = False,
 ) -> Tuple[plt.Figure, list]:
     """
     Panel completo de convergencia para β̄_j: traza | ACF | posterior.
     Incluye R̂, ESS_min y |Geweke|_max en el título de cada posterior.
+
+    `verbose` imprime R̂, ESS y el veredicto de cada variable a medida que se
+    calculan, en lugar de dejarlos escondidos en los títulos de una figura que
+    aparece al final. No altera la figura ni `diag_records`.
 
     Retorna
     -------
@@ -264,6 +289,8 @@ def plot_convergence_bj(
         f"{prefix}Convergencia β̄_j — Componente {k + 1}",
         fontsize=12, y=1.002,
     )
+    prog = Progreso(f"plot_convergence_bj[FPC {k + 1}]", total=len(names),
+                    verbose=verbose)
 
     diag_records = []
     for j, fname in enumerate(names):
@@ -314,9 +341,14 @@ def plot_convergence_bj(
         ax_post.legend(fontsize=6)
         ax_post.grid(True, alpha=0.3)
 
+        prog.paso(f"{fname}  rhat={diag['rhat']:.3f}  "
+                  f"ess_min={diag['ess_min']:.0f}  "
+                  f"|G|={diag['geweke_max']:.2f}  {conv_flag}")
+
     plt.tight_layout()
     if save_path:
         fig.savefig(save_path, dpi=150, bbox_inches="tight")
+    prog.fin(f"{sum(not d['converge'] for d in diag_records)}/{p} sin converger")
     return fig, diag_records
 
 
@@ -330,10 +362,13 @@ def plot_convergence_pj(
     figsize_per_var: Tuple[float, float] = (15, 2.4),
     title_prefix: str = "",
     save_path: Optional[str] = None,
+    verbose: bool = False,
 ) -> Tuple[plt.Figure, list]:
     """
     Panel completo de convergencia para p_j: traza | ACF | posterior.
     Incluye R̂, ESS_min y |Geweke|_max.
+
+    `verbose` se comporta como en `plot_convergence_bj`.
 
     Retorna
     -------
@@ -353,6 +388,8 @@ def plot_convergence_pj(
         f"{prefix}Convergencia p_j — Componente {k + 1}",
         fontsize=12, y=1.002,
     )
+    prog = Progreso(f"plot_convergence_pj[FPC {k + 1}]", total=len(names),
+                    verbose=verbose)
 
     diag_records = []
     for j, fname in enumerate(names):
@@ -403,7 +440,12 @@ def plot_convergence_pj(
         ax_post.legend(fontsize=6)
         ax_post.grid(True, alpha=0.3)
 
+        prog.paso(f"{fname}  rhat={diag['rhat']:.3f}  "
+                  f"ess_min={diag['ess_min']:.0f}  "
+                  f"|G|={diag['geweke_max']:.2f}  {conv_flag}")
+
     plt.tight_layout()
     if save_path:
         fig.savefig(save_path, dpi=150, bbox_inches="tight")
+    prog.fin(f"{sum(not d['converge'] for d in diag_records)}/{p} sin converger")
     return fig, diag_records

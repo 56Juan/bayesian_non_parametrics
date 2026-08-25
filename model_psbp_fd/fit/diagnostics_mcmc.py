@@ -37,6 +37,8 @@ from typing import Dict, List, Optional, Sequence
 import numpy as np
 import pandas as pd
 
+from ..utils.progreso import Progreso
+
 __all__ = [
     "autocorr",
     "ess_geyer",
@@ -179,7 +181,8 @@ def diagnostico_variable(cadenas: np.ndarray) -> dict:
 def tabla_diagnosticos(models_chains: Dict, burn: int,
                        component_idx: Optional[Sequence[int]] = None,
                        claves: Sequence[str] = ("betajhout", "pijout"),
-                       feature_names: Optional[Sequence[str]] = None
+                       feature_names: Optional[Sequence[str]] = None,
+                       verbose: bool = False
                        ) -> pd.DataFrame:
     """
     Tabla de diagnosticos para todas las componentes, variables y cadenas.
@@ -191,12 +194,28 @@ def tabla_diagnosticos(models_chains: Dict, burn: int,
     claves : trazas a diagnosticar. Por defecto los coeficientes de regresion
         (promediados sobre componentes) y las probabilidades de inclusion, que
         son las dos cantidades que se reportan en la tesis.
+    verbose : imprime el avance por (componente, parametro, variable). El bucle
+        recorre componentes x claves x p variables y dentro de cada celda corre
+        `ess_geyer` sobre cada cadena, que es un bucle Python sobre lags: con p
+        grande la funcion tarda minutos sin devolver nada. No afecta al
+        resultado.
 
     Retorna una fila por (componente FPCA, parametro, variable). No dibuja nada:
     ese es el punto de este modulo.
     """
     _ALIAS = {"betajhout": "beta_j", "pijout": "p_j", "wjout": "w_j",
               "psijhout": "psi_j", "gammajhout": "gamma_j", "osumout": "osum_j"}
+
+    # Conteo previo del trabajo para poder informar porcentaje y tiempo
+    # restante. Solo mira formas, no toca las trazas.
+    total = 0
+    for k in sorted(models_chains):
+        cadenas_k = sorted(models_chains[k])
+        if not cadenas_k:
+            continue
+        t0 = models_chains[k][cadenas_k[0]].traces
+        total += sum(t0[c].shape[-1] for c in claves if c in t0)
+    prog = Progreso("tabla_diagnosticos", total=total, verbose=verbose)
 
     filas = []
     for k in sorted(models_chains):
@@ -217,14 +236,23 @@ def tabla_diagnosticos(models_chains: Dict, burn: int,
                 mat = np.vstack([
                     extraer_traza_variable(models_chains[k][c].traces[clave], j, burn)
                     for c in cadenas_k])
+                diag = diagnostico_variable(mat)
                 filas.append({
                     "componente": fpc,
                     "param":      _ALIAS.get(clave, clave),
                     "variable":   etiquetas[j],
-                    **diagnostico_variable(mat),
+                    **diag,
                 })
+                prog.paso(f"fpc_{fpc} {_ALIAS.get(clave, clave)}[{etiquetas[j]}] "
+                          f"rhat={diag['rhat']:.3f} ess_min={diag['ess_min']:.0f}")
 
-    return pd.DataFrame(filas)
+    tabla = pd.DataFrame(filas)
+    if not tabla.empty:
+        prog.fin(f"{int((~tabla['converge']).sum())} variables sin converger "
+                 f"de {len(tabla)}")
+    else:
+        prog.fin("tabla vacia")
+    return tabla
 
 
 def resumen_convergencia(tabla: pd.DataFrame) -> dict:

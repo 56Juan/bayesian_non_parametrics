@@ -32,6 +32,8 @@ __all__ = [
     "crps_gaussiano",
     "energy_score",
     "cobertura",
+    "estratos_por_cuantil",
+    "cobertura_condicional",
     "intervalo_muestral",
     "pit_muestral",
     "pit_gaussiano",
@@ -191,6 +193,125 @@ def cobertura(y_obs, li, ls, tau: Optional[np.ndarray] = None) -> dict:
         anc = float(ancho.mean())
 
     return {"cobertura": cob, "ancho_medio": anc}
+
+
+# ==========================================================================
+# COBERTURA CONDICIONAL AL ESTADO DEL GENERADOR
+# ==========================================================================
+#
+# La cobertura marginal de `cobertura` promedia sobre todos los origenes y por
+# ello no distingue un modelo calibrado de uno que compensa: bandas demasiado
+# anchas en los periodos de calma contra bandas demasiado angostas en los de
+# estres promedian al nivel nominal y superan el control. El diseno del estudio
+# (docs/03 Modelo.tex, seccion 03_06, eje 2) pide en consecuencia estratificar
+# los origenes segun el ESTADO VERDADERO del generador --nivel de volatilidad
+# en el Algoritmo 2, regimen activo en el Algoritmo 3-- y examinar la cobertura
+# dentro de cada estrato.
+#
+# El estado verdadero es una cantidad latente que solo el generador conoce:
+# `SalidaSimulacion.internos` la expone (`sigma2` en el Algoritmo 2,
+# `regimenes` en el Algoritmo 3). No debe reemplazarse por un proxy estimado a
+# partir de los datos --por ejemplo la varianza empirica en una ventana-- sin
+# declararlo, porque entonces la estratificacion depende del ruido de medicion
+# y del ancho de la ventana, y deja de ser una particion exogena.
+
+def estratos_por_cuantil(valores: np.ndarray, n_estratos: int = 3,
+                         etiquetas: Optional[list] = None):
+    """
+    Particiona los origenes en `n_estratos` grupos por cuantiles de `valores`.
+
+    Devuelve `(indice, etiquetas)`, con `indice` de forma (n,) y valores en
+    {0, ..., n_estratos-1}, ordenados de menor a mayor.
+
+    Se emplean cuantiles y no cortes fijos para que los estratos queden
+    equilibrados con independencia de la escala del estado, que cambia entre
+    escenarios y entre replicas. Cuando la variable de estado es discreta --el
+    regimen del Algoritmo 3-- esta funcion no corresponde: alli el estrato es
+    el propio valor del estado y se pasa directamente a `cobertura_condicional`.
+    """
+    v = np.asarray(valores, dtype=float).ravel()
+    if n_estratos < 2:
+        raise ValueError("n_estratos debe ser al menos 2.")
+    if v.size < n_estratos:
+        raise ValueError(
+            f"Hay {v.size} origenes y se piden {n_estratos} estratos.")
+
+    cortes = np.quantile(v, np.linspace(0.0, 1.0, n_estratos + 1)[1:-1])
+    idx = np.searchsorted(cortes, v, side="right").astype(int)
+
+    if etiquetas is None:
+        if n_estratos == 3:
+            etiquetas = ["baja", "media", "alta"]
+        else:
+            etiquetas = [f"q{i + 1}" for i in range(n_estratos)]
+    if len(etiquetas) != n_estratos:
+        raise ValueError(
+            f"Se entregaron {len(etiquetas)} etiquetas para {n_estratos} estratos.")
+    return idx, list(etiquetas)
+
+
+def cobertura_condicional(y_obs, li, ls, estratos,
+                          etiquetas: Optional[list] = None,
+                          tau: Optional[np.ndarray] = None,
+                          muestras: Optional[np.ndarray] = None) -> list:
+    """
+    Cobertura y ancho medio dentro de cada estrato del estado verdadero.
+
+    Parametros
+    ----------
+    y_obs, li, ls : (n,) para un score, o (n, G) para la curva.
+    estratos : (n,) indice entero de estrato por origen, tal como lo devuelve
+        `estratos_por_cuantil` o directamente el estado discreto del generador.
+    etiquetas : nombre de cada estrato, en el orden de sus indices.
+    tau : grilla; con entradas (n, G) promedia la cobertura sobre el dominio
+        con la cuadratura trapezoidal, igual que `cobertura`.
+    muestras : (S, n) o (S, n, G), opcional. Si se entrega se agrega el puntaje
+        propio del estrato --CRPS para un score, puntaje de energia para la
+        curva--, de modo que la lectura no dependa solo de la cobertura: un
+        estrato puede alcanzar el nivel nominal con bandas desmedidas y el
+        puntaje propio lo penaliza.
+
+    Devuelve una lista de diccionarios, uno por estrato, apta para
+    `pd.DataFrame(...)`. Se reporta ademas `desvio`, la diferencia entre la
+    cobertura del estrato y la marginal: es la cifra que hace visible la
+    compensacion que la marginal esconde.
+    """
+    y = np.asarray(y_obs, float)
+    li = np.asarray(li, float)
+    ls = np.asarray(ls, float)
+    s = np.asarray(estratos).ravel()
+
+    if s.size != y.shape[0]:
+        raise ValueError(
+            f"estratos tiene {s.size} entradas y hay {y.shape[0]} origenes.")
+
+    marginal = cobertura(y, li, ls, tau=tau)["cobertura"]
+    unicos = np.unique(s)
+    if etiquetas is None:
+        etiquetas = [f"estrato_{int(u)}" for u in unicos]
+    if len(etiquetas) != unicos.size:
+        raise ValueError(
+            f"Se entregaron {len(etiquetas)} etiquetas para {unicos.size} estratos.")
+
+    filas = []
+    for etq, u in zip(etiquetas, unicos):
+        m = (s == u)
+        cob = cobertura(y[m], li[m], ls[m], tau=tau)
+        fila = {
+            "estrato": etq,
+            "n": int(m.sum()),
+            "cobertura": cob["cobertura"],
+            "ancho_medio": cob["ancho_medio"],
+            "desvio": cob["cobertura"] - marginal,
+        }
+        if muestras is not None:
+            Z = np.asarray(muestras, float)[:, m, ...]
+            if y.ndim == 1:
+                fila["crps"] = float(crps_muestral(y[m], Z).mean())
+            else:
+                fila["energy"] = float(energy_score(y[m], Z))
+        filas.append(fila)
+    return filas
 
 
 # ==========================================================================

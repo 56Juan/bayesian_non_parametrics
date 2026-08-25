@@ -64,6 +64,7 @@ import pandas as pd
 from .metrics_distribucional import crps_muestral
 from .metrics_puntual import _2d
 from ..utils.quadrature import pesos_trapezoidales
+from ..utils.progreso import Progreso
 
 __all__ = [
     "indices_ventanas",
@@ -115,7 +116,9 @@ def _bloque(t_centro: int, T0: int) -> str:
 def ventana_movil(metricas: Dict[str, Callable[[np.ndarray], float]],
                   n: int, T0: int, w: int, paso: int = 1,
                   solapadas: bool = True,
-                  t_offset: int = 0) -> pd.DataFrame:
+                  t_offset: int = 0,
+                  verbose: bool = False,
+                  etiqueta: str = "ventana_movil") -> pd.DataFrame:
     """
     Aplica un diccionario de metricas a cada ventana y devuelve una tabla larga.
 
@@ -129,12 +132,23 @@ def ventana_movil(metricas: Dict[str, Callable[[np.ndarray], float]],
     t_offset : desplazamiento para reportar `t` en el tiempo del experimento
         cuando la serie evaluada no empieza en t=0 (p. ej. tras descartar los
         primeros N_LAGS origenes).
+    verbose : informa el avance sobre las ventanas. Con `crps` o `energy` entre
+        las metricas cada ventana recorre las S extracciones de la predictiva,
+        y con ventanas solapadas hay del orden de `n` de ellas: es el bucle mas
+        caro del pipeline de error. No afecta al resultado.
+    etiqueta : nombre que encabeza las lineas de progreso. Lo fijan las
+        funciones que envuelven a esta para que se distinga la pasada por
+        scores de la pasada funcional, y para que en el barrido por componente
+        se vea cual se esta procesando.
 
     Columnas: t_ini, t_fin, t_centro (tiempo del experimento, base-1), bloque,
     n_ventana, y una columna por metrica.
     """
+    ventanas = indices_ventanas(n, w, paso, solapadas)
+    prog = Progreso(etiqueta, total=len(ventanas), verbose=verbose)
+
     filas = []
-    for idx in indices_ventanas(n, w, paso, solapadas):
+    for idx in ventanas:
         t_ini, t_fin = int(idx[0]), int(idx[-1])
         t_centro = (t_ini + t_fin) // 2
         fila = {
@@ -151,10 +165,18 @@ def ventana_movil(metricas: Dict[str, Callable[[np.ndarray], float]],
         for nombre, f in metricas.items():
             fila[nombre] = float(f(idx))
         filas.append(fila)
+        # Se muestra la primera metrica del diccionario como testigo: basta
+        # para ver que las cifras son del orden esperado y no NaN.
+        primera = next(iter(metricas), None)
+        prog.paso(f"t={fila['t_centro']} [{fila['bloque']}]"
+                  + (f" {primera}={fila[primera]:.4g}" if primera else ""))
 
     if not filas:
+        prog.fin("ninguna ventana")
         raise ValueError(f"Ninguna ventana cabe: n={n}, w={w}.")
-    return pd.DataFrame(filas)
+    tabla = pd.DataFrame(filas)
+    prog.fin(f"{int(tabla['cruza_T0'].sum())} ventanas cruzan T0")
+    return tabla
 
 
 # ==========================================================================
@@ -167,7 +189,8 @@ def ventana_movil_scores(y_obs: np.ndarray, y_pred: np.ndarray, T0: int,
                          muestras: Optional[np.ndarray] = None,
                          li: Optional[np.ndarray] = None,
                          ls: Optional[np.ndarray] = None,
-                         etiquetas: Optional[Sequence[str]] = None
+                         etiquetas: Optional[Sequence[str]] = None,
+                         verbose: bool = False
                          ) -> pd.DataFrame:
     """
     Evolucion del error por componente FPCA.
@@ -176,6 +199,9 @@ def ventana_movil_scores(y_obs: np.ndarray, y_pred: np.ndarray, T0: int,
     T0    : corte train/test en el indexado de `y_obs`.
     muestras : (S, n, M) opcional. Si se entrega se agrega `crps` a la tabla.
     li, ls   : (n, M) opcional. Si se entregan se agrega `cobertura` y `ancho`.
+    verbose : informa el avance ventana a ventana, con la componente en curso
+        en la etiqueta. El costo es M veces el de `ventana_movil`, y con
+        `muestras` cada ventana calcula el CRPS sobre las S extracciones.
 
     Retorna una tabla larga con una fila por (ventana, componente).
     """
@@ -217,7 +243,10 @@ def ventana_movil_scores(y_obs: np.ndarray, y_pred: np.ndarray, T0: int,
             metricas["ancho"] = lambda idx, a=L[:, m], b=U[:, m]: float(
                 np.mean(b[idx] - a[idx]))
 
-        tabla = ventana_movil(metricas, n, T0, w, paso, solapadas, t_offset)
+        tabla = ventana_movil(
+            metricas, n, T0, w, paso, solapadas, t_offset,
+            verbose=verbose,
+            etiqueta=f"ventana_movil_scores[{nombres[m]}, w={w}]")
         tabla.insert(0, "componente", nombres[m])
         partes.append(tabla)
 
@@ -235,7 +264,8 @@ def ventana_movil_funcional(X_obs: np.ndarray, X_pred: np.ndarray,
                             tau: np.ndarray, T0: int, w: int, paso: int = 1,
                             solapadas: bool = True, t_offset: int = 0,
                             li: Optional[np.ndarray] = None,
-                            ls: Optional[np.ndarray] = None) -> pd.DataFrame:
+                            ls: Optional[np.ndarray] = None,
+                            verbose: bool = False) -> pd.DataFrame:
     """
     Evolucion del error funcional: una sola serie que agrega las M componentes.
 
@@ -251,6 +281,7 @@ def ventana_movil_funcional(X_obs: np.ndarray, X_pred: np.ndarray,
     li, ls : (n, G) opcional, banda puntual. Agrega `cobertura_puntual`, que es
         la fraccion de pares (t, tau_g) cubiertos: NO es cobertura simultanea
         de la curva y debe declararse asi al reportar.
+    verbose : informa el avance ventana a ventana. No afecta al resultado.
 
     Metricas por ventana:
         mise   : (1/w) sum_t integral (X_t - Xhat_t)^2 dtau
@@ -290,7 +321,9 @@ def ventana_movil_funcional(X_obs: np.ndarray, X_pred: np.ndarray,
         metricas["cobertura_puntual"] = lambda idx: float(dentro[idx].mean())
         metricas["ancho_medio"] = lambda idx: float((U[idx] - L[idx]).mean())
 
-    salida = ventana_movil(metricas, n, T0, w, paso, solapadas, t_offset)
+    salida = ventana_movil(metricas, n, T0, w, paso, solapadas, t_offset,
+                           verbose=verbose,
+                           etiqueta=f"ventana_movil_funcional[w={w}]")
     salida.attrs["w"] = int(w)
     salida.attrs["solapadas"] = bool(solapadas)
     return salida

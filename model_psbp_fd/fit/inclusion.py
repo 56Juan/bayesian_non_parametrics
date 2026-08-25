@@ -39,6 +39,8 @@ from typing import Dict, List, Optional, Sequence
 import numpy as np
 import pandas as pd
 
+from ..utils.progreso import Progreso
+
 __all__ = [
     "pip_global",
     "pip_por_componente",
@@ -91,7 +93,8 @@ def pip_por_componente(traces: Dict[str, np.ndarray], burn: int) -> np.ndarray:
 def matriz_pip(models_chains: Dict, burn: int,
                component_idx: Optional[Sequence[int]] = None,
                feature_names: Optional[Sequence[str]] = None,
-               incluir_dispersion: bool = True) -> pd.DataFrame:
+               incluir_dispersion: bool = True,
+               verbose: bool = False) -> pd.DataFrame:
     """
     Matriz PIP lista para reportar: filas = variables, columnas = componentes FPCA.
 
@@ -101,12 +104,16 @@ def matriz_pip(models_chains: Dict, burn: int,
         la media sin su dispersion oculta justamente el caso en que las cadenas
         discrepan sobre que variables importan --que es un fallo de mezcla
         disfrazado de resultado de seleccion.
+    verbose : informa por componente FPCA, con el rango de PIP obtenido. El
+        recorrido lee `osumout` completo de cada cadena, que es la traza mas
+        pesada del `.mat`. No afecta al resultado.
 
     Las cadenas se promedian con peso igual, que es la mezcla que corresponde
     cuando todas tienen la misma longitud post-calentamiento.
     """
     columnas: Dict[str, pd.Series] = {}
     etiquetas: Optional[List[str]] = None
+    prog = Progreso("matriz_pip", total=len(models_chains), verbose=verbose)
 
     for k in sorted(models_chains):
         cadenas_k = sorted(models_chains[k])
@@ -129,10 +136,16 @@ def matriz_pip(models_chains: Dict, burn: int,
                 else np.zeros(pips.shape[0])
             columnas[f"{col}_sd"] = pd.Series(sd, index=nombres)
 
+        media = pips.mean(axis=1)
+        prog.paso(f"{col}: {len(cadenas_k)} cadenas, {pips.shape[0]} variables, "
+                  f"PIP en [{media.min():.3f}, {media.max():.3f}]")
+
     if not columnas:
+        prog.fin("sin componentes")
         return pd.DataFrame()
     tabla = pd.DataFrame(columnas)
     tabla.index.name = "variable"
+    prog.fin(f"tabla {tabla.shape[0]}x{tabla.shape[1]}")
     return tabla
 
 
