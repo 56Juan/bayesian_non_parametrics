@@ -1,0 +1,54 @@
+{
+  "scheme": "holdout_temporal",
+  "T": 400,
+  "T0": 280,
+  "prop_train": 0.7,
+  "horizons": [
+    1
+  ],
+  "n_lags": 1,
+  "scores_scale": "standardized_zscore_ddof0",
+  "objetivo_evaluacion": "curva_verdadera",
+  "modo_residuo": "ninguno",
+  "nivel_credibilidad": 0.95,
+  "ventana_movil": {
+    "w": [
+      10,
+      20,
+      40
+    ],
+    "paso": 1,
+    "solapadas": true
+  },
+  "metrics_scores": [
+    "RMSE",
+    "R2",
+    "razon_dispersion"
+  ],
+  "metrics_curvas": [
+    "MISE",
+    "RMSE_funcional"
+  ],
+  "metrics_dist": [
+    "CRPS",
+    "energy_score",
+    "cobertura_95",
+    "PIT"
+  ],
+  "estratificacion": {
+    "variable": "regimen_idx",
+    "descripcion": "régimen vigente del generador (estado latente, base-0)",
+    "fuente": "reports/.../10_estado_regimen.csv",
+    "respaldo": "raw/escenario_3.npz::interno_regimenes",
+    "n_estratos": 2,
+    "etiquetas": [
+      "régimen 1",
+      "régimen 2"
+    ],
+    "metodo": "estado discreto del generador, sin cuantilizar"
+  },
+  "origenes_ambiguos": {
+    "variable": "ambiguedad",
+    "regla": "ambiguedad > 0.4  (equivale a |p - 0.5| < 0.1)"
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "sim_params": {
+    "L": 75,
+    "T": 400,
+    "burn_in": 200,
+    "sigma_obs": 0.25,
+    "R": 1,
+    "seed": 41232,
+    "media_fn": "media_senoidal",
+    "jitter": 1e-10,
+    "gammas": [
+      0.3,
+      0.3
+    ],
+    "hs_norms": [
+      0.3,
+      0.8
+    ],
+    "sigmas_eps": [
+      1.0,
+      1.0
+    ],
+    "desplazamientos": [
+      -1.5,
+      1.5
+    ],
+    "forma_desplazamiento_fn": null,
+    "ell": 0.2,
+    "mecanismo": "probit",
+    "umbrales": [
+      0.0
+    ],
+    "nitidez": 2.0,
+    "direccion_fn": null,
+    "matriz_transicion": null,
+    "fracciones_quiebre": [
+      0.5
+    ]
+  },
+  "diagnostico": {
+    "n_replicas": 1,
+    "n_curvas": 400,
+    "n_puntos_grilla": 75,
+    "todo_finito": true,
+    "media_empirica_global": 0.7246353457149871,
+    "media_ee_montecarlo": NaN,
+    "var_puntual_media": 4.137256529685428,
+    "var_puntual_min": 3.447338131928056,
+    "var_puntual_max": 4.678324456901485,
+    "acf1_media": 0.47985385796534796,
+    "acf1_ee_montecarlo": NaN,
+    "razon_senal_ruido": 66.19610447496684,
+    "mecanismo": "probit",
+    "n_regimenes": 2,
+    "hs_norm_objetivo": [
+      0.3,
+      0.8
+    ],
+    "hs_norm_efectiva": [
+      0.29999999999999993,
+      0.7999999999999999
+    ],
+    "hs_norm_error_absoluto_max": 1.1102230246251565e-16,
+    "hs_norm_maxima": 0.7999999999999999,
+    "radio_espectral_operadores": [
+      0.2663678384759019,
+      0.7103142359357381
+    ],
+    "contractividad_todos_los_regimenes": true,
+    "estacionariedad_garantizada": true,
+    "proporcion_regimen": [
+      0.3525,
+      0.6475
+    ],
+    "proporcion_regimen_minima": 0.3525,
+    "n_transiciones_media": 139.0,
+    "duracion_media_racha": 2.857142857142857,
+    "duracion_media_por_regimen": [
+      2.0142857142857142,
+      3.7
+    ],
+    "separacion_niveles_L2_max": 3.0,
+    "separacion_en_sd_puntual": 1.4749083342312737
+  },
+  "replica_idx": 0,
+  "experiment_id": "escenario_3_r01",
+  "escenario_id": 3,
+  "replica_id": 1,
+  "seed": 41232,
+  "T": 400,
+  "G": 75,
+  "n_regimenes": 2
+}
