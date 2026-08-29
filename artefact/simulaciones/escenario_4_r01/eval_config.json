@@ -1,0 +1,65 @@
+{
+  "scheme": "holdout_temporal",
+  "T": 400,
+  "T0": 280,
+  "prop_train": 0.7,
+  "horizons": [
+    1
+  ],
+  "n_lags": 1,
+  "scores_scale": "standardized_zscore_ddof0",
+  "objetivo_evaluacion": "curva_verdadera",
+  "modo_residuo": "ninguno",
+  "nivel_credibilidad": 0.95,
+  "ventana_movil": {
+    "w": [
+      10,
+      20,
+      40
+    ],
+    "paso": 1,
+    "solapadas": true
+  },
+  "metrics_scores": [
+    "RMSE",
+    "R2",
+    "razon_dispersion"
+  ],
+  "metrics_curvas": [
+    "MISE",
+    "RMSE_funcional"
+  ],
+  "metrics_dist": [
+    "CRPS",
+    "energy_score",
+    "cobertura_95",
+    "PIT"
+  ],
+  "estratificacion": null,
+  "estratificacion_motivo": "El Algoritmo 4 no tiene estado latente: la asimetría es una propiedad constante de la ley de la innovación, no un régimen ni un nivel de volatilidad que cambie de origen a origen. Estratificar por cuantiles de una cantidad observada inventaría un eje que el generador no tiene. 14_04 omite la sección de calibración condicional, como la corrida 11.",
+  "forma_predictiva": {
+    "familia": "st",
+    "delta_skew": 0.85,
+    "nu": 5.0,
+    "asimetria_innovacion": 1.72559654996661,
+    "curtosis_innovacion": 15.876138054595582,
+    "asimetria_curvas": 0.5724468602603612,
+    "curtosis_curvas": 3.730190958354001,
+    "asimetria_scores_train": [
+      -0.7399887983013819,
+      -0.6129604026719382,
+      0.10074934267202847
+    ],
+    "curtosis_scores_train": [
+      3.381744446200637,
+      4.654944326424872,
+      3.5045102825432823
+    ],
+    "fuente": "reports/.../10_momentos_curva.csv",
+    "respaldo": "raw/escenario_4.npz::interno_operador"
+  },
+  "comparacion_de_referencia": {
+    "experiment_id": "escenario_1_r01",
+    "motivo": "Misma dinámica (gamma=0.30, ||Psi||_HS=0.70, ell=0.2) y misma representación; sólo cambia la ley de la innovación. RMSE y R2 deberían coincidir; CRPS, energía y PIT son donde debe verse la diferencia."
+  }
+}

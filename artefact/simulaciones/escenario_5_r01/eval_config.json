@@ -1,0 +1,82 @@
+{
+  "scheme": "holdout_temporal",
+  "T": 400,
+  "T0": 280,
+  "prop_train": 0.7,
+  "horizons": [
+    1
+  ],
+  "n_lags": 1,
+  "scores_scale": "standardized_zscore_ddof0",
+  "objetivo_evaluacion": "curva_verdadera",
+  "modo_residuo": "ninguno",
+  "nivel_credibilidad": 0.95,
+  "ventana_movil": {
+    "w": [
+      10,
+      20,
+      40
+    ],
+    "paso": 1,
+    "solapadas": true
+  },
+  "metrics_scores": [
+    "RMSE",
+    "R2",
+    "razon_dispersion"
+  ],
+  "metrics_curvas": [
+    "MISE",
+    "RMSE_funcional"
+  ],
+  "metrics_dist": [
+    "CRPS",
+    "energy_score",
+    "cobertura_95",
+    "PIT"
+  ],
+  "estratificacion": null,
+  "estratificacion_motivo": "El Algoritmo 5 no tiene estado latente: el proceso es gaussiano, lineal, estacionario y homogéneo en el tiempo. Lo que el escenario interviene es la reducción de dimensión, que es una propiedad del diseño y no una variable que cambie de origen a origen. 15_04 omite la sección de calibración condicional, como las corridas 11 y 14.",
+  "representacion": {
+    "bloque_del_anexo": 2,
+    "J_generador": 10,
+    "base_generador": "fourier ortonormal en L2",
+    "indice_predecible_fourier": 3,
+    "phi_predecible": 0.9,
+    "phis_generador": [
+      0.0,
+      0.0,
+      0.9,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "espectro_generador": [
+      1.0,
+      0.5,
+      0.25,
+      0.125,
+      0.0625,
+      0.03125,
+      0.015625,
+      0.0078125,
+      0.00390625,
+      0.001953125
+    ],
+    "M_retenidas": 4,
+    "fpc_con_dinamica": 3,
+    "M_umbral_para_retener": 3,
+    "retiene_direccion_informativa": true,
+    "es_caso_nulo": true,
+    "var_ratio_fpc_con_dinamica": 0.10213301926697195,
+    "ar1_fpc_con_dinamica": 0.8591397791317591,
+    "mise_bspline_vs_verdadera": 0.026762594134520895,
+    "fuente": "reports/.../10_alineacion_fpca_generador.csv",
+    "respaldo": "raw/escenario_5.npz::interno_coeficientes",
+    "advertencia": "El resultado de este escenario NO discrimina entre especificaciones dinámicas: la degradación por truncamiento alcanza por igual a todo método sobre la misma representación. Acota el alcance de la reducción de dimensión."
+  }
+}
