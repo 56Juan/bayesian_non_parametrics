@@ -1,16 +1,5 @@
 % psbp_fd_iteracion.m — Escenario 4 (Algoritmo 4 del anexo), corrida 14
 %
-% Replica exacta del paso 2 de las corridas 11, 12 y 13. El muestreador NO cambia entre
-% escenarios: lo unico que distingue esta corrida es el generador que produjo
-% los datos y, en consecuencia, el ESCENARIO_ID con que se arma el
-% EXPERIMENT_ID. Mantenerlo identico es lo que permite atribuir las
-% diferencias de resultado al generador y no al ajuste.
-%
-% Aqui la dinamica es la MISMA del Algoritmo 1 (corrida 11) y solo cambia la
-% ley de la innovacion, que pasa a ser una mezcla de escala skew-normal. La
-% comparacion 11 vs 14 es por tanto el contraste que da sentido al escenario, y
-% exige que este archivo sea identico al de la corrida 11 salvo ESCENARIO_ID.
-%
 % Paso 2 del ciclo Python -> MATLAB -> Python. Lee el contrato que escribio
 % 14_01_simulaciones.ipynb, arma una lista plana de jobs (cadena x componente
 % FPCA) y la reparte con parfor. Entrena SOLO con el bloque de entrenamiento.

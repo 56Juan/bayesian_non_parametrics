@@ -1,16 +1,5 @@
 % psbp_fd_iteracion.m — Escenario 5 (Algoritmo 5 del anexo), corrida 15
 %
-% Replica exacta del paso 2 de las corridas 11 a 14. El muestreador NO cambia entre
-% escenarios: lo unico que distingue esta corrida es el generador que produjo
-% los datos y, en consecuencia, el ESCENARIO_ID con que se arma el
-% EXPERIMENT_ID. Mantenerlo identico es lo que permite atribuir las
-% diferencias de resultado al generador y no al ajuste.
-%
-% El Algoritmo 5 pertenece al Bloque 2 del anexo: no interviene la ley
-% condicional sino la REDUCCION DE DIMENSION. La degradacion que produzca
-% alcanza por igual a cualquier metodo sobre la misma representacion, de modo
-% que el resultado no discrimina entre especificaciones dinamicas.
-%
 % Paso 2 del ciclo Python -> MATLAB -> Python. Lee el contrato que escribio
 % 15_01_simulaciones.ipynb, arma una lista plana de jobs (cadena x componente
 % FPCA) y la reparte con parfor. Entrena SOLO con el bloque de entrenamiento.

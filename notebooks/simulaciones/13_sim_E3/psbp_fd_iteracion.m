@@ -1,11 +1,5 @@
 % psbp_fd_iteracion.m — Escenario 3 (Algoritmo 3 del anexo), corrida 13
 %
-% Replica exacta del paso 2 de las corridas 11 y 12. El muestreador NO cambia entre
-% escenarios: lo unico que distingue esta corrida es el generador que produjo
-% los datos y, en consecuencia, el ESCENARIO_ID con que se arma el
-% EXPERIMENT_ID. Mantenerlo identico es lo que permite atribuir las
-% diferencias de resultado al generador y no al ajuste.
-%
 % Paso 2 del ciclo Python -> MATLAB -> Python. Lee el contrato que escribio
 % 13_01_simulaciones.ipynb, arma una lista plana de jobs (cadena x componente
 % FPCA) y la reparte con parfor. Entrena SOLO con el bloque de entrenamiento.

@@ -1,17 +1,5 @@
 % psbp_fd_iteracion.m — Escenario 6 (Algoritmo 6 del anexo), corrida 16
 %
-% Replica exacta del paso 2 de las corridas 11 a 15. El muestreador NO cambia entre
-% escenarios: lo unico que distingue esta corrida es el generador que produjo
-% los datos y, en consecuencia, el ESCENARIO_ID con que se arma el
-% EXPERIMENT_ID. Mantenerlo identico es lo que permite atribuir las
-% diferencias de resultado al generador y no al ajuste.
-%
-% El Algoritmo 6 pertenece al Bloque 2 del anexo: la covarianza del proceso se
-% reordena en t* = T0, de modo que la base estimada sobre el bloque de
-% entrenamiento pierde vigencia sobre el periodo evaluado. El muestreador ve
-% SOLO el bloque de entrenamiento, que es homogeneo; toda la no estacionariedad
-% queda del lado de la evaluacion.
-%
 % Paso 2 del ciclo Python -> MATLAB -> Python. Lee el contrato que escribio
 % 16_01_simulaciones.ipynb, arma una lista plana de jobs (cadena x componente
 % FPCA) y la reparte con parfor. Entrena SOLO con el bloque de entrenamiento.
