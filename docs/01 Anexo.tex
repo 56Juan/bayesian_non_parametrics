@@ -20,7 +20,7 @@ Cada proceso se genera con un tamaño muestral $T$, precedido de un período de 
 
 El Cuadro~\ref{tab:ane_esquema} recoge los valores del esquema de observación, comunes a los seis algoritmos.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption{Parámetros del esquema de observación, comunes a los seis algoritmos.}
 \label{tab:ane_esquema}
@@ -32,8 +32,7 @@ $L$                 & puntos de la grilla regular                & $75$ \\
 $T$                 & períodos retenidos                        & $400$ \\
 $T_0$               & corte del bloque de entrenamiento         & $280$ \\
 ---                 & períodos de calentamiento descartados     & $200$ \\
-$\sigma_\epsilon$   & desviación del ruido de medición          & $0.5$ \\
-$R$                 & réplicas independientes                   & $50$ \\
+$\sigma_\epsilon$   & desviación del ruido de medición          & $0.25$ \\
 $\mu(\tau)$         & función media                             & $\sin(2\pi\tau)$ \\
 \hline
 \end{tabular}
@@ -51,7 +50,6 @@ El segundo bloque deja la ley condicional dentro de lo que el modelo puede repre
     \item El Algoritmo~5 desalinea el orden de las varianzas respecto del orden de la predictibilidad, de manera que la dirección informativa sobre el futuro del proceso es una de las que el truncamiento descarta.
     \item El Algoritmo~6 hace variar el operador de covarianza a lo largo de la serie, con lo que la base ajustada sobre el entrenamiento pierde vigencia sobre el período evaluado.
 \end{itemize}
-Cada subsección especifica el proceso generador, el rol de sus parámetros y los pasos de generación.\\
 
 Los generadores del primer bloque operan necesariamente sobre la grilla, ya que sus operadores actúan sobre la curva completa. Los del segundo se especifican en cambio sobre los coeficientes de un sistema ortonormal fijo y la curva se obtiene al final mediante un único producto matricial.
 
@@ -64,7 +62,7 @@ Este algoritmo genera curvas desde un proceso autorregresivo funcional de orden 
 \end{equation}
 con función media $\mu(\tau)$ y núcleo autorregresivo gaussiano
 \begin{equation}\label{eq:ane_alg1_kernel}
-    \psi(\tau, s) = c \exp\!\left\{
+    \psi(\tau, s) = c \cdot \exp\!\left\{
     -\frac{(\tau - s)^2}{2\gamma^2}\right\},
 \end{equation}
 donde $\gamma > 0$ controla el alcance de la dependencia entre puntos del dominio, de modo que valores pequeños concentran la influencia de $X_{t-1}$ en un entorno estrecho de cada $\tau$ y valores grandes la distribuyen sobre todo el dominio, y la constante $c$ se calibra de modo que la norma de Hilbert--Schmidt del operador, $\|\Psi\|_{\mathcal{HS}} = \bigl(\int_0^1\!\int_0^1 \psi^2(\tau,s)\, d\tau\, ds\bigr)^{1/2}$, alcance un valor prefijado menor que uno, condición que garantiza la existencia de una solución estacionaria y determina la persistencia temporal del proceso, \cite{02_02_bosq2000linear}. Las innovaciones $\{\varepsilon_t\}$ son trayectorias independientes de un proceso gaussiano de media cero con núcleo de covarianza exponencial cuadrático,
@@ -77,14 +75,16 @@ donde $\sigma_\varepsilon^2$ escala la magnitud de la innovación y $\ell > 0$ e
 
 La generación procede de la siguiente forma:
 \begin{enumerate}
-    \item Se discretizan el núcleo $\psi(\tau,s)$ y el núcleo de covarianza de la innovación sobre la grilla $\{\tau_l\}_{l=1}^{L}$, obteniendo las matrices $\boldsymbol{\Psi} \in \mathbb{R}^{L \times L}$, con entradas $\psi(\tau_l, \tau_{l'})\,w_{l'}$, y $\mathbf{K}_\varepsilon \in \mathbb{R}^{L \times L}$, con entradas $\mathrm{Cov}(\varepsilon_t(\tau_l), \varepsilon_t(\tau_{l'}))$. Los pesos $\{w_l\}_{l=1}^{L}$ son los de la cuadratura trapezoidal asociada a la grilla, esto es, $w_1 = w_L = h/2$ y $w_l = h$ en los puntos interiores, con $h = 1/(L-1)$. La norma de Hilbert--Schmidt se aproxima de forma consistente con esa misma cuadratura, $\|\Psi\|_{\mathcal{HS}}^2 \approx \sum_{l,l'} \psi^2(\tau_l,\tau_{l'})\, w_l\, w_{l'}$, y la constante $c$ se despeja de ahí. Emplear la regla trapezoidal y no una suma de Riemann uniforme no es un refinamiento cosmético: es la misma cuadratura con que se calcula la métrica $L^2$ en la etapa de representación funcional a la que se someten después estos datos, y adoptar reglas distintas en la generación y en la representación desalinea el producto interno bajo el cual se define la ortonormalidad de las autofunciones, sin que ninguna verificación intermedia lo detecte.
-    \item Se inicializa $X_0$ como una trayectoria del proceso de innovación y se itera la versión discretizada de \eqref{eq:ane_alg1_far} durante el período de calentamiento y los $T$ períodos retenidos, generando en cada paso la innovación como $\boldsymbol{\varepsilon}_t \sim \mathcal{N}_L(\mathbf{0}, \mathbf{K}_\varepsilon)$ mediante la factorización de Cholesky de $\mathbf{K}_\varepsilon$.
+    \item Se discretizan el núcleo $\psi(\tau,s)$ y el núcleo de covarianza de la innovación sobre la grilla $\{\tau_l\}_{l=1}^{L}$, obteniendo las matrices $\mathbf{\Psi} \in \mathbb{R}^{L \times L}$ y $\mathbf{K}_\varepsilon \in \mathbb{R}^{L \times L}$. La constante $c$ se despeja de modo que la norma de Hilbert--Schmidt aproximada del operador alcance el valor objetivo.
+    
+    \item Se inicializa $X_0 \sim \mathcal{N}_L(\mathbf{0}, \mathbf{K}_\varepsilon)$ y se itera la versión discretizada de \eqref{eq:ane_alg1_far} durante el período de calentamiento y los $T$ períodos retenidos, generando en cada paso la innovación como $\boldsymbol{\varepsilon}_t \sim \mathcal{N}_L(\mathbf{0}, \mathbf{K}_\varepsilon)$ mediante la factorización de Cholesky de $\mathbf{K}_\varepsilon$.
+    
     \item Se aplica el esquema de observación \eqref{eq:ane_observacion} a las $T$ curvas retenidas, obteniendo la matriz de datos que se entrega a los métodos.
 \end{enumerate}
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
-\caption{Parámetros del Algoritmo~1.}
+\caption{Parámetros del Algoritmo~1 utilizados.}
 \label{tab:ane_alg1}
 \begin{tabular}{llc}
 \hline
@@ -93,7 +93,7 @@ Símbolo & Descripción & Valor \\
 $\gamma$                    & alcance del núcleo autorregresivo         & $0.3$ \\
 $\|\Psi\|_{\mathcal{HS}}$   & norma objetivo del operador               & $0.7$ \\
 $\sigma_\varepsilon$        & escala de la innovación funcional         & $1.0$ \\
-$\ell$                      & longitud de correlación de la innovación  & $0.2$ \\
+$\ell$                      & longitud de correlación de la innovación  & $0.5$ \\
 \hline
 \end{tabular}
 \end{table}
@@ -110,70 +110,76 @@ donde $\{\eta_t\}$ es un proceso de innovación funcional independiente e idént
     + \int_{0}^{1} \beta(\tau, s)\, \bigl(X_{t-1}(s) - \mu(s)\bigr)^2\, ds
     + \int_{0}^{1} \gamma(\tau, s)\, \sigma_{t-1}^2(s)\, ds,
 \end{equation}
-con $\delta(\tau) > 0$ una función de nivel base y $\beta(\tau,s) \geq 0$, $\gamma(\tau,s) \geq 0$ núcleos no negativos que garantizan $\sigma_t^2(\tau) > 0$ para toda trayectoria. El núcleo $\beta$ gobierna la sensibilidad de la varianza futura a la magnitud de la curva más reciente, en analogía directa con el parámetro ARCH escalar, mientras que $\gamma$ gobierna la persistencia de la varianza condicional pasada, en analogía con el parámetro GARCH escalar. La existencia de una solución estrictamente estacionaria requiere que el operador conjunto con núcleo $\beta(\tau,s)+\gamma(\tau,s)$ tenga radio espectral menor que uno, condición análoga a $\alpha+\beta<1$ en el caso escalar y que, en la implementación discretizada, se verifica sobre la matriz resultante de evaluar dicho núcleo en la grilla $\{\tau_l\}_{l=1}^L$.\\
+con $\delta(\tau) > 0$ una función de nivel base y $\beta(\tau,s) \geq 0$, $\gamma(\tau,s) \geq 0$ núcleos no negativos que garantizan $\sigma_t^2(\tau) > 0$ para toda trayectoria. El núcleo $\beta$ gobierna la sensibilidad de la varianza futura a la magnitud de la curva más reciente (análogo al parámetro ARCH escalar), mientras que $\gamma$ gobierna la persistencia de la varianza condicional pasada (análogo al parámetro GARCH escalar). La existencia de una solución estrictamente estacionaria requiere que el operador conjunto con núcleo $\beta(\tau,s)+\gamma(\tau,s)$ tenga radio espectral menor que uno, condición que en la implementación discretizada se verifica sobre la matriz $\mathbf{B}+\mathbf{\Gamma}$.\\
 
 La generación procede de la siguiente forma:
 \begin{enumerate}
     \item Se discretizan los núcleos $\delta(\tau)$, $\beta(\tau,s)$ y $\gamma(\tau,s)$ sobre la grilla $\{\tau_l\}_{l=1}^{L}$, obteniendo el vector $\boldsymbol{\delta}\in\mathbb{R}^L$ y las matrices $\mathbf{B},\mathbf{\Gamma}\in\mathbb{R}^{L\times L}$, y se verifica que el radio espectral de $\mathbf{B}+\mathbf{\Gamma}$ sea menor que uno.
-    \item Se inicializan $X_0$ y $\boldsymbol{\sigma}_0^2$ en un valor consistente con el nivel estacionario del proceso, y se itera la recursión \eqref{eq:ane_alg2_recursion} en su versión discretizada durante el período de calentamiento y los $T$ períodos retenidos.
-    \item En cada período $t$ se genera la innovación $\boldsymbol{\eta}_t\in\mathbb{R}^L$ como una trayectoria de un proceso gaussiano de media cero cuya matriz de covarianza discretizada es la matriz de \emph{correlación} exponencial cuadrática $\mathbf{R}_\eta$, de diagonal unitaria y entradas $\exp\{-(\tau_l-\tau_{l'})^2/(2\ell^2)\}$, y se construye la curva mediante $\mathbf{X}_t = \boldsymbol{\mu} + \boldsymbol{\sigma}_t \odot \boldsymbol{\eta}_t$, con $\odot$ el producto elemento a elemento. Especificar la correlación, y no una covarianza general reescalada a posteriori, es lo que hace que $\mathbb{E}[\eta_t^2(\tau)] = 1$ se cumpla de forma exacta para todo $\tau$, que es la condición de identificación del modelo: es $\sigma_t^2(\tau)$ y no la innovación quien debe portar la escala. Normalizar en cambio cada trayectoria por su propia desviación muestral sobre la grilla haría que $\boldsymbol{\eta}_t$ dependiera de su realización, con lo que las innovaciones dejarían de ser independientes entre períodos y $\sigma_t^2(\tau)$ dejaría de ser la varianza condicional del proceso.
+    
+    \item Se inicializa $\boldsymbol{\sigma}_0^2$ en el nivel estacionario de la varianza puntual fijado en el Cuadro~\ref{tab:ane_alg2} y $X_0$ desde la distribución estacionaria inducida por dicho nivel. Luego se itera la recursión \eqref{eq:ane_alg2_recursion} en su versión discretizada durante el período de calentamiento y los $T$ períodos retenidos.
+    
+    \item En cada período $t$ se genera la innovación $\boldsymbol{\eta}_t\in\mathbb{R}^L$ desde $\mathcal{N}_L(\mathbf{0}, \mathbf{R}_\eta)$, donde $\mathbf{R}_\eta$ es la matriz de correlación exponencial cuadrática con entradas $\exp\{-(\tau_l-\tau_{l'})^2/(2\ell^2)\}$, y se construye la curva mediante $\mathbf{X}_t = \boldsymbol{\mu} + \boldsymbol{\sigma}_t \odot \boldsymbol{\eta}_t$, con $\odot$ el producto elemento a elemento.
+    
     \item Se aplica el esquema de observación \eqref{eq:ane_observacion} a las $T$ curvas retenidas, obteniendo la matriz de datos que se entrega a los métodos.
 \end{enumerate}
 
-En la implementación los núcleos no se especifican en bruto, sino mediante cantidades interpretables de las que $\delta$, $\beta$ y $\gamma$ se despejan: el radio espectral objetivo de $\mathbf{B}+\mathbf{\Gamma}$, que fija la persistencia total; la fracción de esa persistencia atribuible a $\beta$, análoga al reparto entre los parámetros ARCH y GARCH del caso escalar; el nivel estacionario de la varianza puntual, del cual se despeja $\delta$ por la identidad $\delta/(1-\text{persistencia})$; y los alcances de $\beta$ y $\gamma$ sobre el dominio. El Cuadro~\ref{tab:ane_alg2} recoge esas cantidades.
+En la implementación, los núcleos no se fijan directamente, sino que se despejan a partir de cantidades interpretables: el radio espectral $\rho$ de $\mathbf{B}+\mathbf{\Gamma}$ (persistencia total), la fracción $\alpha$ de esa persistencia atribuible a $\beta$, el nivel estacionario $\sigma^2_0$ de la varianza puntual, del cual se despeja $\delta$ mediante $\delta = \sigma^2_0(1-\rho)$, y los alcances de $\beta$ y $\gamma$ sobre el dominio. El Cuadro~\ref{tab:ane_alg2} recoge dichas cantidades.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
-\caption{Parámetros del Algoritmo~2.}
+\caption{Parámetros del Algoritmo~2 utilizados.}
 \label{tab:ane_alg2}
 \begin{tabular}{llc}
 \hline
 Símbolo & Descripción & Valor \\
 \hline
----                     & radio espectral de $\mathbf{B}+\mathbf{\Gamma}$ (persistencia) & $0.85$ \\
----                     & fracción de la persistencia atribuible a $\beta$              & $0.25$ \\
----                     & nivel estacionario de la varianza puntual                     & $1.0$ \\
----                     & alcance del núcleo $\beta$ sobre el dominio                   & $0.15$ \\
----                     & alcance del núcleo $\gamma$ sobre el dominio                  & $0.30$ \\
-$\ell$                  & longitud de correlación de $\eta$                             & $0.2$ \\
+$\rho$          & radio espectral de $\mathbf{B}+\mathbf{\Gamma}$ (persistencia)  & $0.85$ \\
+$\alpha$        & fracción de la persistencia atribuible a $\beta$               & $0.25$ \\
+$\sigma^2_0$    & nivel estacionario de la varianza puntual                       & $1.0$ \\
+---             & alcance del núcleo $\beta$ sobre el dominio                     & $0.15$ \\
+---             & alcance del núcleo $\gamma$ sobre el dominio                    & $0.30$ \\
+$\ell$          & longitud de correlación de $\eta$                               & $0.50$ \\
 \hline
 \end{tabular}
 \end{table}
-
 \subsection{Algoritmo 3: Proceso autorregresivo funcional con cambio de régimen}
 \label{ane_01_03_00_alg3}
-Este algoritmo genera curvas cuya dinámica alterna entre dos operadores autorregresivos según el estado del proceso, con el fin de inducir una ley condicional multimodal. Sea $\Psi^{(1)}$ y $\Psi^{(2)}$ dos operadores integrales de la forma \eqref{eq:ane_alg1_kernel}, con núcleos $\psi^{(1)}(\tau,s)$ y $\psi^{(2)}(\tau,s)$ que difieren en su constante de escala o en su alcance $\gamma$, sean $d_1, d_2 \in \mathbb{R}$ dos desplazamientos de nivel y $f:\mathcal{T}\to\mathbb{R}$ una forma normalizada a máximo unitario, y sea $\phi:\mathbb{R}\to[0,1]$ una función de enlace monótona. La curva se define como:
+
+Este algoritmo genera curvas cuya dinámica alterna entre dos operadores autorregresivos según el estado del proceso, con el fin de inducir una ley condicional multimodal.\\
+
+Sean $\Psi^{(1)}$ y $\Psi^{(2)}$ dos operadores integrales de la forma \eqref{eq:ane_alg1_kernel}, con núcleos $\psi^{(1)}(\tau,s)$ y $\psi^{(2)}(\tau,s)$ que difieren en su constante de escala o en su alcance $\gamma$, $d_1, d_2 \in \mathbb{R}$ dos desplazamientos de nivel, $f:\mathcal{T}\to\mathbb{R}$ una forma normalizada a máximo unitario, y $\phi:\mathbb{R}\to[0,1]$ una función de enlace. La curva se define como:
 \begin{align}
     X_t(\tau) = {}& \mu(\tau) + d_{R_t} f(\tau)
     + \int_0^1 \psi^{(1)}(\tau,s)\,\bigl(X_{t-1}(s)-\mu(s)\bigr)\,ds\; \mathbf{1}(R_t=1) \notag \\
     &+ \int_0^1 \psi^{(2)}(\tau,s)\,\bigl(X_{t-1}(s)-\mu(s)\bigr)\,ds\;\mathbf{1}(R_t=2)
-    + \varepsilon_t(\tau). \label{eq:ane_alg3_regimen}
+    + \varepsilon_t(\tau), \label{eq:ane_alg3_regimen}
 \end{align}
 donde $R_t\in\{1,2\}$ es el régimen activo en el período $t$ y $\{\varepsilon_t\}$ es el proceso de innovación funcional especificado en \eqref{eq:ane_alg1_innovacion}.\\
 
-El término $d_{R_t} f(\tau)$ desplaza el nivel de la curva según el régimen activo y es lo que produce una ley condicional genuinamente \emph{multimodal}. Conviene explicitar por qué se incluye. Si los regímenes difirieran únicamente por su operador, esto es con $d_1 = d_2$, la distribución de $X_t$ dado $X_{t-1}$ sería una mezcla de dos componentes gaussianas de \emph{igual media condicional} y distinta persistencia; tal mezcla es unimodal y se aproxima bien por una única gaussiana de varianza intermedia, de modo que el escenario no distinguiría un modelo capaz de representar mezclas de uno que no lo es. Con $d_1 \neq d_2$ las dos componentes tienen centros separados y la condicional es bimodal cuando la separación domina a la dispersión de la innovación, que es la estructura que el modelo propuesto existe para capturar. La forma $f$ se fija constante, de modo que el desplazamiento es vertical y uniforme sobre el dominio y no introduce un segundo mecanismo de variación de forma que se confunda con el operador.\\
-
-El régimen se determina mediante una variable latente dependiente del estado rezagado de la propia curva, y no de un mecanismo exógeno o de un reloj calendario, de modo que la multimodalidad resultante es genuinamente condicional a la historia del proceso:
+El término $d_{R_t} f(\tau)$ desplaza el nivel de la curva según el régimen activo y es lo que produce una ley condicional multimodal. El régimen se determina mediante una variable latente dependiente del estado rezagado de la propia curva:
 \begin{equation}\label{eq:ane_alg3_proyeccion}
     p_t = \phi\bigl(\langle X_{t-1}-\mu,\, e\rangle\bigr),
     \qquad
     R_t \mid p_t \sim \mathrm{Bernoulli}(p_t) + 1,
 \end{equation}
-donde $e\in L^2(\mathcal{T})$ es una dirección de referencia fija sobre la cual se proyecta la curva rezagada centrada, y $\langle\cdot,\cdot\rangle$ es el producto interno de $L^2(\mathcal{T})$. La elección de $e$ determina qué aspecto de la forma de la curva pasada gobierna el cambio de régimen; en particular, $e$ puede coincidir con una función propia de la covarianza estacionaria del proceso, de modo que el régimen responda al modo de variación dominante. Esta construcción evita el uso de generadores de multimodalidad en la forma de una única curva sobre su propio dominio, los cuales no inducen dependencia entre la distribución condicional de $X_t$ y la historia del proceso.\\
+donde $e\in L^2(\mathcal{T})$ es una dirección de referencia fija sobre la cual se proyecta la curva rezagada centrada, y $\langle\cdot,\cdot\rangle$ es el producto interno de $L^2(\mathcal{T})$. La elección de $e$ determina qué aspecto de la forma de la curva pasada gobierna el cambio de régimen; en particular, $e$ puede coincidir con una función propia de la covarianza estacionaria del proceso, de modo que el régimen responda al modo de variación dominante.\\
 
 La generación procede de la siguiente forma:
 \begin{enumerate}
-    \item Se discretizan los núcleos $\psi^{(1)}$, $\psi^{(2)}$, la dirección $e$ y la forma $f$ sobre la grilla $\{\tau_l\}_{l=1}^{L}$, obteniendo las matrices $\boldsymbol{\Psi}^{(1)}, \boldsymbol{\Psi}^{(2)}\in\mathbb{R}^{L\times L}$ y los vectores $\mathbf{e}, \mathbf{f}\in\mathbb{R}^L$. Ambos operadores se discretizan con la misma cuadratura trapezoidal del Algoritmo~1, y sus constantes de escala se calibran por separado a sus respectivas normas objetivo.
-    \item En cada período $t$, se calcula la proyección discretizada $\langle \mathbf{X}_{t-1}-\boldsymbol{\mu}, \mathbf{e}\rangle$ con la misma cuadratura, se obtiene $p_t$ evaluando la función de enlace y se extrae $R_t$ de la distribución \eqref{eq:ane_alg3_proyeccion}.
+    \item Se discretizan los núcleos $\psi^{(1)}$, $\psi^{(2)}$, la dirección $e$ y la forma $f$ sobre la grilla $\{\tau_l\}_{l=1}^{L}$, obteniendo las matrices $\mathbf{\Psi}^{(1)}, \mathbf{\Psi}^{(2)}\in\mathbb{R}^{L\times L}$ y los vectores $\mathbf{e}, \mathbf{f}\in\mathbb{R}^L$. Las constantes de escala de ambos operadores se calibran por separado a sus respectivas normas objetivo.
+    
+    \item En cada período $t$, se calcula la proyección discretizada $\langle \mathbf{X}_{t-1}-\boldsymbol{\mu}, \mathbf{e}\rangle$, se obtiene $p_t$ evaluando la función de enlace y se extrae $R_t$ de la distribución \eqref{eq:ane_alg3_proyeccion}.
+    
     \item Se aplica el operador correspondiente al régimen extraído sobre $\mathbf{X}_{t-1}-\boldsymbol{\mu}$, se agrega el desplazamiento $d_{R_t}\mathbf{f}$ y la innovación generada como en el Algoritmo~1, y se obtiene $\mathbf{X}_t$.
+    
     \item Se repiten los pasos 2 y 3 durante el período de calentamiento y los $T$ períodos retenidos, y se aplica el esquema de observación \eqref{eq:ane_observacion} a las curvas retenidas, obteniendo la matriz de datos que se entrega a los métodos.
 \end{enumerate}
 
-La función de enlace se toma como $\phi(z) = \Phi(\kappa z - c)$, con $\Phi$ la función de distribución normal estándar, $\kappa>0$ un parámetro de nitidez y $c$ un umbral. El parámetro $\kappa$ interpola entre dos regímenes límite: valores grandes aproximan un umbral duro, en el que $R_t$ queda determinado por el signo de la proyección, mientras que valores moderados producen una mezcla genuina con pesos dependientes del estado, que es el caso de interés. Los desplazamientos se fijan simétricos, $d_1 = -d_2$, de modo que la media incondicional del proceso coincide con $\mu(\tau)$ cuando ambos regímenes son igualmente frecuentes y la bimodalidad no se confunde con un corrimiento global del nivel.
+La función de enlace se toma como $\phi(z) = \Phi(\kappa z - c)$, con $\Phi$ la función de distribución normal estándar, $\kappa>0$ un parámetro de pendiente y $c$ un umbral. Los desplazamientos se fijan simétricos, $d_1 = -d_2$, de modo que la media incondicional del proceso coincide con $\mu(\tau)$ cuando ambos regímenes son igualmente frecuentes.
 
 \begin{table}[htbp]
 \centering
-\caption{Parámetros del Algoritmo~3.}
+\caption{Parámetros del Algoritmo~3 utilizados.}
 \label{tab:ane_alg3}
 \begin{tabular}{llc}
 \hline
@@ -188,7 +194,7 @@ $e(\tau)$                            & dirección de proyección del estado     
 $\kappa$                             & nitidez de la función de enlace           & $2.0$ \\
 $c$                                  & umbral de la función de enlace            & $0$ \\
 $\sigma_\varepsilon$                 & escala de la innovación funcional         & $1.0$ \\
-$\ell$                               & longitud de correlación de la innovación  & $0.2$ \\
+$\ell$                               & longitud de correlación de la innovación  & $0.5$ \\
 \hline
 \end{tabular}
 \end{table}

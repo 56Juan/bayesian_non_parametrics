@@ -1,0 +1,20 @@
+experiment_id,escenario_2_r01
+objetivo_evaluacion,curva_verdadera
+modo_residuo,ninguno
+n_lags,1
+M_fpca,2
+n_train_origenes,279
+n_test_origenes,120
+w_ventana,20
+p_bic_libre,1
+far_hs_norm,0.089078
+far_hs_referencia,0 (no hay dependencia en la media)
+far_radio_espectral,0.082539
+mise_truncamiento_test,0.03484901
+mise_test_VAR,1.03485781
+mise_test_FAR1,1.03474573
+mise_test_RF,1.09645143
+mise_test_GBT,1.44383686
+mise_test_media,1.00927498
+mise_test_persistencia,1.74690916
+mise_test_PSBPM-FD,1.01429345
