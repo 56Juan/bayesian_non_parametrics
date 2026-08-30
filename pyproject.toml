@@ -9,14 +9,28 @@ description = "PSBP extendido a series de tiempo funcionales"
 requires-python = ">=3.11"
 
 dependencies = [
+    # Nucleo numerico y de datos
     "numpy>=1.26",
     "scipy>=1.12",
-    "seaborn>=0.12",
-    "matplotlib>=3.8",
-    "pyyaml>=6.0",
-    "scikit-fda>=0.9",
-    "jinja2>=3.1.3",
     "pandas>=2.0",
+
+    # Representacion funcional: bases y FPCA
+    "scikit-fda>=0.9",
+
+    # Modelos de referencia de los notebooks NN_05 (RandomForest,
+    # HistGradientBoosting). El VAR y el FAR se resuelven con numpy.
+    "scikit-learn>=1.3",
+
+    # Figuras
+    "matplotlib>=3.8",
+    "seaborn>=0.12",
+
+    # Dependencias INDIRECTAS que hay que declarar porque el codigo las usa a
+    # traves de pandas y fallarian en tiempo de ejecucion si faltaran:
+    #   jinja2   -> lo exige `DataFrame.style` para renderizar (los NN_04 y
+    #               NN_05 muestran todas sus tablas con Styler).
+    #   openpyxl -> lo exige `pd.read_excel` sobre .xlsx, en notebooks/reales.
+    "jinja2>=3.1.3",
     "openpyxl>=3.1",
 ]
 
