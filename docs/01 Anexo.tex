@@ -177,7 +177,7 @@ La generación procede de la siguiente forma:
 
 La función de enlace se toma como $\phi(z) = \Phi(\kappa z - c)$, con $\Phi$ la función de distribución normal estándar, $\kappa>0$ un parámetro de pendiente y $c$ un umbral. Los desplazamientos se fijan simétricos, $d_1 = -d_2$, de modo que la media incondicional del proceso coincide con $\mu(\tau)$ cuando ambos regímenes son igualmente frecuentes.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption{Parámetros del Algoritmo~3 utilizados.}
 \label{tab:ane_alg3}
@@ -201,11 +201,12 @@ $\ell$                               & longitud de correlación de la innovació
 
 \subsection{Algoritmo 4: Proceso con innovaciones asimétricas}
 \label{ane_01_04_00_alg4}
-Este algoritmo genera curvas con una dinámica autorregresiva lineal idéntica a la del Algoritmo~1, reemplazando la innovación gaussiana simétrica por un proceso funcional cuya distribución puntual es asimétrica, mediante una mezcla de escala skew-normal (SMSN), \citet{03_04_lachos2011heteroscedastic}. La curva se define como en \eqref{eq:ane_alg1_far}, con innovación
+
+Este algoritmo genera curvas con una dinámica autorregresiva lineal idéntica a la del Algoritmo~1, reemplazando la innovación gaussiana simétrica por un proceso funcional cuya distribución puntual es asimétrica, mediante una mezcla de escala skew-normal (SMSN) \citet{03_04_lachos2011heteroscedastic}. La curva se define como en \eqref{eq:ane_alg1_far}, con innovación
 \begin{equation}\label{eq:ane_alg4_innovacion}
     \varepsilon_t(\tau) = \varsigma(\tau)\, Z_t(\tau),
 \end{equation}
-donde $\varsigma(\tau)>0$ escala la magnitud de la innovación en cada punto del dominio, y $\{Z_t\}$ es un proceso funcional cuyas evaluaciones puntuales se construyen, coordenada a coordenada sobre la grilla de discretización, mediante la representación de mezcla de escala,
+donde $\varsigma(\tau)>0$ escala la magnitud de la innovación en cada punto del dominio, y $\{Z_t\}$ es un proceso funcional cuyas evaluaciones puntuales se construyen mediante la representación de mezcla de escala,
 \begin{equation}\label{eq:ane_alg4_smsn}
     Z_t(\tau_l) = U_t^{-1/2}\, W_t(\tau_l),
     \qquad
@@ -213,7 +214,7 @@ donde $\varsigma(\tau)>0$ escala la magnitud de la innovación en cada punto del
     \qquad
     U_t \sim \pi(u),
 \end{equation}
-con $U_t$ una variable de mezcla positiva \emph{escalar}, independiente de $W_t$ y común a todos los puntos del dominio, cuya distribución $\pi(u)$ determina el comportamiento de colas de la innovación resultante; en particular, $U_t\equiv 1$ produce una innovación skew-normal pura y $U_t\sim\mathrm{Gamma}(\nu/2,\nu/2)$ produce una innovación skew-$t$ con $\nu$ grados de libertad. Que $U_t$ sea escalar y no un campo aleatorio es lo que preserva la coherencia de las colas a lo largo de la curva: un período de cola pesada lo es en todo el dominio simultáneamente, y no en puntos aislados.\\
+con $U_t$ una variable de mezcla positiva escalar, independiente de $W_t$ y común a todos los puntos del dominio, cuya distribución $\pi(u)$ determina el comportamiento de colas de la innovación resultante; en particular, $U_t\equiv 1$ produce una innovación skew-normal pura y $U_t\sim\mathrm{Gamma}(\nu/2,\nu/2)$ produce una innovación skew-$t$ con $\nu$ grados de libertad.
 
 El proceso $W_t$ es un proceso skew-normal multivariado sobre la grilla, construido mediante su representación estocástica,
 \begin{equation}\label{eq:ane_alg4_representacion}
@@ -223,24 +224,28 @@ El proceso $W_t$ es un proceso skew-normal multivariado sobre la grilla, constru
     \qquad
     \mathbf{u}_{1t} \sim \mathcal{N}_L(\mathbf{0}, \mathbf{I}),
 \end{equation}
-donde $u_{0t}$ es \emph{escalar} y su valor absoluto es lo que introduce la asimetría de forma común a todo el dominio, $\boldsymbol{\Delta}\in\mathbb{R}^L$ recoge la magnitud de la componente asimétrica en cada punto y $\boldsymbol{\Gamma}$ es una matriz de covarianza cuya correlación es la exponencial cuadrática de \eqref{eq:ane_alg1_innovacion}, de modo que la innovación conserva la suavidad de las trayectorias del Algoritmo~1. Conviene subrayar que esta construcción no equivale a generar un proceso gaussiano y transformar sus marginales a skew-normal: esa última operación fija las marginales pero deja la dependencia determinada por la cópula gaussiana subyacente, y produce en general un proceso distinto del skew-normal multivariado, que es el que corresponde a la familia SMSN de \citet{03_04_lachos2011heteroscedastic} sobre la que se define el escenario.\\
+donde $u_{0t}$ es escalar y su valor absoluto introduce la asimetría de forma común a todo el dominio, $\boldsymbol{\Delta}\in\mathbb{R}^L$ recoge la magnitud de la componente asimétrica en cada punto y $\boldsymbol{\Gamma}$ es una matriz de covarianza cuya correlación es la exponencial cuadrática de \eqref{eq:ane_alg1_innovacion}, de modo que la innovación conserva la suavidad de las trayectorias del Algoritmo~1.
 
-La asimetría se parametriza mediante el coeficiente $\delta_l \in (-1,1)$ en cada punto de la grilla, relacionado con el parámetro de forma por $\delta = \lambda/\sqrt{1+\lambda^2}$; se emplea $\delta$ y no $\lambda$ porque está acotado, lo que hace directamente interpretable la magnitud de la asimetría y evita el comportamiento no lineal de $\lambda$ cerca del caso simétrico. El valor $\delta=0$ recupera el caso simétrico del Algoritmo~1.\\
+La asimetría se parametriza mediante el coeficiente $\delta_l \in (-1,1)$ en cada punto de la grilla, relacionado con el parámetro de forma por $\delta = \lambda/\sqrt{1+\lambda^2}$; se emplea $\delta$ porque está acotado, lo que hace directamente interpretable la magnitud de la asimetría. El valor $\delta=0$ recupera el caso simétrico del Algoritmo~1.\\
 
-Dos normalizaciones completan la especificación. La primera es de escala: dado que $\mathbb{E}[Z_t(\tau)^2]$ depende de $\delta$ y de $\pi(u)$, y difiere de uno salvo en el caso simétrico, $\boldsymbol{\Delta}$ y $\boldsymbol{\Gamma}$ se despejan de modo que $\mathrm{Var}(\varepsilon_t(\tau_l)) = \sigma_\varepsilon^2$ de forma exacta para todo $l$, con lo que la magnitud de la innovación es comparable entre valores de $\delta$ y no queda confundida con el grado de asimetría introducido. La segunda es de posición: la innovación se centra restando su esperanza, $\mathbb{E}[\varepsilon_t] = \kappa_1\sqrt{2/\pi}\,\boldsymbol{\Delta}$, con $\kappa_1 = \mathbb{E}[U_t^{-1/2}]$. Omitir este centrado dejaría $\mathbb{E}[\varepsilon_t]\neq 0$, y entonces la media estacionaria del proceso sería $\mu + (I-\Psi)^{-1}\mathbb{E}[\varepsilon_t]$ y no $\mu$, de modo que $\mu(\tau)$ dejaría de ser la función media y la asimetría quedaría confundida con un corrimiento de nivel.\\
+Dos normalizaciones completan la especificación. Primero, $\boldsymbol{\Delta}$ y $\boldsymbol{\Gamma}$ se despejan de modo que $\mathrm{Var}(\varepsilon_t(\tau_l)) = \sigma_\varepsilon^2$ de forma exacta para todo $l$, con lo que la magnitud de la innovación es comparable entre valores de $\delta$. Segundo, la innovación se centra restando su esperanza, $\mathbb{E}[\varepsilon_t] = \kappa_1\sqrt{2/\pi}\,\boldsymbol{\Delta}$, con $\kappa_1 = \mathbb{E}[U_t^{-1/2}]$; omitir este centrado desplazaría la media estacionaria del proceso y confundiría la asimetría con un corrimiento de nivel.\\
 
 La generación procede de la siguiente forma:
 \begin{enumerate}
     \item Se fijan $\delta$ y la distribución de $U_t$, y se calculan los momentos $\kappa_1 = \mathbb{E}[U_t^{-1/2}]$ y $\kappa_2 = \mathbb{E}[U_t^{-1}]$, de los que se despejan $\boldsymbol{\Delta}$ y $\boldsymbol{\Gamma}$ imponiendo $\mathrm{Var}(\varepsilon_t(\tau_l)) = \sigma_\varepsilon^2$, junto con la constante de centrado $\kappa_1\sqrt{2/\pi}\,\boldsymbol{\Delta}$.
+    
     \item En cada período $t$ se extrae el factor de escala $U_t$ desde $\pi(u)$, el escalar $u_{0t}\sim\mathcal{N}(0,1)$ y el vector $\mathbf{u}_{1t}\sim\mathcal{N}_L(\mathbf{0},\mathbf{I})$, y se construye $\mathbf{W}_t$ según \eqref{eq:ane_alg4_representacion} mediante la factorización de Cholesky de $\boldsymbol{\Gamma}$.
+    
     \item Se construye $\boldsymbol{\varepsilon}_t = U_t^{-1/2}\,\mathbf{W}_t - \kappa_1\sqrt{2/\pi}\,\boldsymbol{\Delta}$, que tiene media cero y varianza puntual $\sigma_\varepsilon^2$ por construcción.
+    
     \item Se itera la recursión \eqref{eq:ane_alg1_far} en su versión discretizada, reemplazando la innovación gaussiana por la innovación construida en el paso anterior, durante el período de calentamiento y los $T$ períodos retenidos.
+    
     \item Se aplica el esquema de observación \eqref{eq:ane_observacion} a las curvas retenidas, obteniendo la matriz de datos que se entrega a los métodos.
 \end{enumerate}
 
-Los parámetros de la dinámica se fijan idénticos a los del Algoritmo~1. Esa identidad no es una coincidencia de valores sino el diseño del escenario: al mantener fijos el alcance del núcleo, la norma del operador y la suavidad de la innovación, cualquier diferencia de desempeño entre ambos algoritmos es atribuible a la asimetría y no a un cambio de persistencia. Un valor distinto de $\|\Psi\|_{\mathcal{HS}}$ entre los dos escenarios confundiría ambos efectos y anularía la comparación.
+Los parámetros de la dinámica se fijan idénticos a los del Algoritmo~1, de modo que cualquier diferencia de desempeño entre ambos escenarios es atribuible a la asimetría y no a un cambio de persistencia.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption{Parámetros del Algoritmo~4. La dinámica coincide con la del Cuadro~\ref{tab:ane_alg1}.}
 \label{tab:ane_alg4}
@@ -258,9 +263,9 @@ $\nu$                       & grados de libertad (innovación skew-$t$)  & $5$ \
 \hline
 \end{tabular}
 \end{table}
-
 \subsection{Algoritmo 5: Proceso con predictibilidad en componente subordinada}
 \label{ane_01_05_00_alg5}
+
 Este algoritmo genera curvas cuyo modo de variación predecible no coincide con el de mayor varianza, con el fin de someter a prueba el criterio con que se fija el número $M$ de componentes retenidas. Sea $\{\varphi_j\}_{j=1}^{J}$ un sistema ortonormal fijo sobre $\mathcal{T}$, por ejemplo la base de Fourier, y sean $\lambda_1 > \dots > \lambda_J > 0$ varianzas prefijadas en orden decreciente. El proceso se define directamente sobre los coeficientes,
 \begin{equation}\label{eq:ane_alg5_scores}
     a_{tj} = \phi_j\, a_{t-1,j} + e_{tj},
@@ -272,21 +277,24 @@ y la curva se obtiene por reconstrucción,
 \begin{equation}\label{eq:ane_alg5_curva}
     X_t(\tau) = \mu(\tau) + \sum_{j=1}^{J} a_{tj}\,\varphi_j(\tau).
 \end{equation}
-La parametrización de la varianza de la innovación en \eqref{eq:ane_alg5_scores} garantiza que la varianza marginal estacionaria de la $j$-ésima componente sea exactamente $\lambda_j$ con independencia de su coeficiente autorregresivo, de modo que el espectro del proceso queda fijado por construcción y es separable de la dinámica. Los coeficientes $\{\phi_j\}$, con $|\phi_j|<1$, determinan la predictibilidad de cada componente, y su elección es el mecanismo del escenario: fijando $\phi_j = 0$ para las primeras componentes y $\phi_j \neq 0$ para alguna posterior, la varianza y la predictibilidad quedan ordenadas de forma inversa.\\
+La parametrización de la varianza de la innovación en \eqref{eq:ane_alg5_scores} garantiza que la varianza marginal estacionaria de la $j$-ésima componente sea exactamente $\lambda_j$ con independencia de su coeficiente autorregresivo, de modo que el espectro del proceso queda fijado por construcción y es separable de la dinámica. Los coeficientes $\{\phi_j\}$, con $|\phi_j|<1$, determinan la predictibilidad de cada componente: fijando $\phi_j = 0$ para las primeras componentes y $\phi_j \neq 0$ para alguna posterior, la varianza y la predictibilidad quedan ordenadas de forma inversa.\\
 
-Conviene precisar qué supuesto se viola y cuál no. La covarianza marginal del proceso es exactamente diagonal en $\{\varphi_j\}$, de modo que la descomposición espectral recupera la base correcta y los autovalores poblacionales son los $\lambda_j$ prefijados. Lo que falla es el criterio de selección de $M$, ya que este ordena por varianza marginal, cantidad que no incorpora información sobre la dinámica, y descarta por tanto la única dirección que el modelo podría predecir. La pérdida ocurre antes de que el modelo dinámico se ajuste y ninguna especificación de este la remedia.\\
+La covarianza marginal del proceso es exactamente diagonal en $\{\varphi_j\}$, de modo que la descomposición espectral recupera la base correcta y los autovalores poblacionales son los $\lambda_j$ prefijados.\\
 
 La generación procede de la siguiente forma:
 \begin{enumerate}
-    \item Se fijan el sistema $\{\varphi_j\}_{j=1}^{J}$, el espectro $\{\lambda_j\}_{j=1}^{J}$ y los coeficientes $\{\phi_j\}_{j=1}^{J}$, y se evalúan las funciones base sobre la grilla $\{\tau_l\}_{l=1}^{L}$, obteniendo la matriz $\boldsymbol{\Phi}\in\mathbb{R}^{L\times J}$.
+    \item Se fijan el sistema $\{\varphi_j\}_{j=1}^{J}$, el espectro $\{\lambda_j\}_{j=1}^{J}$ y los coeficientes $\{\phi_j\}_{j=1}^{J}$, y se evalúan las funciones base sobre la grilla $\{\tau_l\}_{l=1}^{L}$, obteniendo la matriz $\mathbf{\Phi}\in\mathbb{R}^{L\times J}$.
+    
     \item Se inicializa $\mathbf{a}_0$ desde la distribución estacionaria, esto es, $a_{0j}\sim\mathcal{N}(0,\lambda_j)$, y se itera \eqref{eq:ane_alg5_scores} durante el período de calentamiento y los $T$ períodos retenidos, obteniendo la matriz de coeficientes $\mathbf{A}\in\mathbb{R}^{T\times J}$.
-    \item Se construyen las curvas discretizadas mediante el producto $\mathbf{X} = \mathbf{1}\boldsymbol{\mu}^\top + \mathbf{A}\boldsymbol{\Phi}^\top$, con $\mathbf{X}\in\mathbb{R}^{T\times L}$.
+    
+    \item Se construyen las curvas discretizadas mediante el producto $\mathbf{X} = \mathbf{1}\boldsymbol{\mu}^\top + \mathbf{A}\mathbf{\Phi}^\top$, con $\mathbf{X}\in\mathbb{R}^{T\times L}$.
+    
     \item Se aplica el esquema de observación \eqref{eq:ane_observacion} a las curvas retenidas, obteniendo la matriz de datos que se entrega a los métodos.
 \end{enumerate}
 
-El sistema $\{\varphi_j\}$ es la base de Fourier, ortonormal en $L^2(\mathcal{T})$. La cuadratura trapezoidal sobre la grilla regular reproduce esa ortonormalidad con error de máquina siempre que el armónico más alto de la base satisfaga $2k_{\max} < L-1$, condición que con $J=10$ y $L=75$ se cumple holgadamente. El espectro se toma geométrico, $\lambda_j = \rho^{\,j-1}$, que es estrictamente decreciente por construcción.
+El sistema $\{\varphi_j\}$ es la base de Fourier, ortonormal en $L^2(\mathcal{T})$, y la discretización sobre la grilla preserva esa ortonormalidad para los valores de $J$ y $L$ empleados. El espectro se toma geométrico, $\lambda_j = \rho^{\,j-1}$, que es estrictamente decreciente por construcción.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption{Parámetros del Algoritmo~5.}
 \label{tab:ane_alg5}
@@ -302,9 +310,9 @@ $\phi_j,\ j\neq j^\ast$ & coeficiente de las demás componentes              & $
 \hline
 \end{tabular}
 \end{table}
-
 \subsection{Algoritmo 6: Proceso con covarianza no estacionaria}
 \label{ane_01_06_00_alg6}
+
 Este algoritmo genera curvas cuya estructura de covarianza cambia a lo largo de la serie, con el fin de someter a prueba el tratamiento de la función media y las autofunciones como cantidades conocidas, estimadas una única vez sobre el bloque de entrenamiento. Sobre la misma construcción del Algoritmo~5, se permite que el espectro varíe con el período,
 \begin{equation}\label{eq:ane_alg6_espectro}
     a_{tj} = \phi_j\, a_{t-1,j} + e_{tj},
@@ -312,20 +320,22 @@ Este algoritmo genera curvas cuya estructura de covarianza cambia a lo largo de 
     e_{tj} \overset{\mathrm{ind}}{\sim}
     \mathcal{N}\bigl(0,\, \lambda_j(t)\,(1-\phi_j^2)\bigr),
 \end{equation}
-con $\lambda_j(t)$ una trayectoria determinista de varianzas que interpola entre un espectro inicial $\{\lambda_j^{(0)}\}$ y uno final $\{\lambda_j^{(1)}\}$. La forma de la interpolación distingue dos mecanismos: un cambio abrupto en un instante $t^*$ del bloque de prueba representa un quiebre estructural, mientras que una interpolación lineal a lo largo de la serie representa una deriva gradual. Cuando el reordenamiento entre $\{\lambda_j^{(0)}\}$ y $\{\lambda_j^{(1)}\}$ altera el orden de las varianzas, la base estimada sobre el entrenamiento deja de estar ordenada según la variabilidad del bloque de prueba.\\
+con $\lambda_j(t)$ una trayectoria determinista de varianzas que interpola entre un espectro inicial $\{\lambda_j^{(0)}\}$ y uno final $\{\lambda_j^{(1)}\}$. La forma de la interpolación distingue dos mecanismos: un cambio abrupto en un instante $t^*$ del bloque de prueba representa un quiebre estructural, mientras que una interpolación lineal a lo largo de la serie representa una deriva gradual. En el estudio de simulación se emplea el cambio abrupto, con $t^*$ fijado en el primer período del bloque de prueba. Cuando el reordenamiento entre $\{\lambda_j^{(0)}\}$ y $\{\lambda_j^{(1)}\}$ altera el orden de las varianzas, la base estimada sobre el entrenamiento deja de estar ordenada según la variabilidad del bloque de prueba.\\
 
-Este escenario incumple el supuesto de estacionariedad de segundo orden sobre el que descansa el tratamiento de la base como fija. Cabe precisar que dicho supuesto no es relajado por el modelo dinámico, que flexibiliza la forma de la ley condicional y no la estructura de covarianza que sostiene la representación, de modo que la degradación esperada afecta por igual a todos los métodos que operan sobre la misma reducción.\\
+Este escenario incumple el supuesto de estacionariedad de segundo orden sobre el que descansa el tratamiento de la base como fija; la degradación esperada afecta por igual a todos los métodos que operan sobre la misma reducción.\\
 
 La generación procede de la siguiente forma:
 \begin{enumerate}
-    \item Se fijan el sistema $\{\varphi_j\}_{j=1}^{J}$, los espectros inicial y final, los coeficientes $\{\phi_j\}_{j=1}^{J}$ y la forma de la trayectoria $\lambda_j(t)$, y se evalúan las funciones base sobre la grilla, obteniendo $\boldsymbol{\Phi}\in\mathbb{R}^{L\times J}$.
+    \item Se fijan el sistema $\{\varphi_j\}_{j=1}^{J}$, los espectros inicial y final, los coeficientes $\{\phi_j\}_{j=1}^{J}$ y la forma de la trayectoria $\lambda_j(t)$, y se evalúan las funciones base sobre la grilla, obteniendo $\mathbf{\Phi}\in\mathbb{R}^{L\times J}$.
+    
     \item Se inicializa $\mathbf{a}_0$ desde la distribución estacionaria asociada al espectro inicial y se itera \eqref{eq:ane_alg6_espectro} durante el período de calentamiento y los $T$ períodos retenidos, evaluando $\lambda_j(t)$ en cada paso.
+    
     \item Se construyen las curvas discretizadas como en el paso 3 del Algoritmo~5 y se aplica el esquema de observación \eqref{eq:ane_observacion}, obteniendo la matriz de datos que se entrega a los métodos.
 \end{enumerate}
 
-El espectro final se obtiene del inicial intercambiando dos de sus componentes, con lo que el reordenamiento afecta al orden de las varianzas y no a su magnitud conjunta; así la degradación proviene de que la base deja de estar ordenada según la variabilidad del bloque de prueba, y no de un cambio en la escala global del proceso. A diferencia del Algoritmo~5, aquí los coeficientes autorregresivos son comunes a todas las componentes: con $\phi_j$ igual para todo $j$ la predictibilidad no varía entre componentes, de modo que el escenario aísla el efecto del reordenamiento del espectro sin mezclarlo con el desalineamiento entre varianza y predictibilidad que ya introduce el Algoritmo~5.
+El espectro final se obtiene del inicial intercambiando dos de sus componentes, de modo que el reordenamiento afecta al orden de las varianzas y no a su escala global. Los coeficientes autorregresivos son comunes a todas las componentes, con $\phi_j$ igual para todo $j$; así el escenario aísla el efecto del reordenamiento del espectro sin mezclarlo con el desalineamiento entre varianza y predictibilidad que introduce el Algoritmo~5.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption{Parámetros del Algoritmo~6.}
 \label{tab:ane_alg6}

@@ -1,0 +1,105 @@
+{
+  "scheme": "holdout_temporal",
+  "T": 400,
+  "T0": 280,
+  "prop_train": 0.7,
+  "horizons": [
+    1
+  ],
+  "n_lags": 1,
+  "scores_scale": "standardized_zscore_ddof0",
+  "objetivo_evaluacion": "curva_verdadera",
+  "modo_residuo": "ninguno",
+  "nivel_credibilidad": 0.95,
+  "ventana_movil": {
+    "w": [
+      10,
+      20,
+      40
+    ],
+    "paso": 1,
+    "solapadas": true
+  },
+  "metrics_scores": [
+    "RMSE",
+    "R2",
+    "razon_dispersion"
+  ],
+  "metrics_curvas": [
+    "MISE",
+    "RMSE_funcional"
+  ],
+  "metrics_dist": [
+    "CRPS",
+    "energy_score",
+    "cobertura_95",
+    "PIT"
+  ],
+  "estratificacion": {
+    "variable": "quiebre_idx",
+    "descripcion": "régimen de covarianza del generador (0 = pre, 1 = post)",
+    "fuente": "reports/.../10_estado_quiebre.csv",
+    "respaldo": "raw/escenario_6.npz::interno_trayectoria_espectro",
+    "n_estratos": 2,
+    "etiquetas": [
+      "pre-quiebre",
+      "post-quiebre"
+    ],
+    "metodo": "estado discreto del generador, sin cuantilizar",
+    "advertencia": "t* = T0, de modo que este estrato COINCIDE con la partición train/test. La cobertura condicional y la comparación train/test miden lo mismo. No es un defecto —es la tesis del escenario— pero hay que declararlo: el desplome de cobertura en el bloque de prueba es pérdida de VIGENCIA DE LA BASE, no pérdida de generalización."
+  },
+  "representacion": {
+    "bloque_del_anexo": 2,
+    "J_generador": 10,
+    "base_generador": "fourier ortonormal en L2",
+    "phi_comun": 0.7,
+    "espectro_inicial": [
+      1.0,
+      0.5,
+      0.25,
+      0.125,
+      0.0625,
+      0.03125,
+      0.015625,
+      0.0078125,
+      0.00390625,
+      0.001953125
+    ],
+    "espectro_final": [
+      0.5,
+      1.0,
+      0.25,
+      0.125,
+      0.0625,
+      0.03125,
+      0.015625,
+      0.0078125,
+      0.00390625,
+      0.001953125
+    ],
+    "indices_intercambio": [
+      1,
+      2
+    ],
+    "t_quiebre": 280,
+    "t_quiebre_default_del_codigo": 270,
+    "periodos_adaptacion": 5,
+    "M_retenidas": 5,
+    "fpc_intercambiadas": [
+      1,
+      2
+    ],
+    "razon_var_test_train": [
+      0.44897965160121,
+      1.0844892509360768,
+      1.106724205419718,
+      1.1629273507008722,
+      1.0162389936279153
+    ],
+    "mise_bspline_vs_verdadera": 0.010794535005257502,
+    "mise_bspline_train": 0.010529841474701221,
+    "mise_bspline_test": 0.011412153243222164,
+    "fuente": "reports/.../10_alineacion_fpca_generador.csv",
+    "advertencia": "El resultado de este escenario NO discrimina entre especificaciones dinámicas: la obsolescencia de la base alcanza por igual a todo método sobre la misma representación. Acota el alcance de la reducción de dimensión."
+  }
+}
