@@ -1,0 +1,62 @@
+{
+  "scheme": "holdout_temporal",
+  "T": 400,
+  "T0": 280,
+  "prop_train": 0.7,
+  "horizons": [
+    1
+  ],
+  "n_lags": 1,
+  "scores_scale": "standardized_zscore_ddof0",
+  "objetivo_evaluacion": "curva_verdadera",
+  "modo_residuo": "ninguno",
+  "nivel_credibilidad": 0.95,
+  "ventana_movil": {
+    "w": [
+      10,
+      20,
+      40
+    ],
+    "paso": 1,
+    "solapadas": true
+  },
+  "metrics_scores": [
+    "RMSE",
+    "R2",
+    "razon_dispersion"
+  ],
+  "metrics_curvas": [
+    "MISE",
+    "RMSE_funcional"
+  ],
+  "metrics_dist": [
+    "CRPS",
+    "energy_score",
+    "cobertura_95",
+    "PIT"
+  ],
+  "estratificacion": {
+    "variable": "b_t",
+    "descripcion": "deriva determinista acumulada b(t) = TEND_DERIVA * u(t)",
+    "fuente": "reports/simulaciones/<EXPERIMENT_ID>/10_estado_tendencia.csv",
+    "metodo": "cuantiles del estado verdadero (estratos_por_cuantil)",
+    "n_estratos": 4,
+    "etiquetas": [
+      "deriva Q1",
+      "deriva Q2",
+      "deriva Q3",
+      "deriva Q4"
+    ],
+    "advertencia": "b(t) es MONOTONA en t, de modo que los estratos por nivel de deriva son intervalos temporales contiguos y el estrato mas alto coincide casi exactamente con el bloque de prueba. La cobertura condicional de 17_04 §9 y la comparacion train/test de 17_04 §4 miden por tanto LO MISMO. Es la tesis del escenario, no un defecto, pero sin declararlo el desplome de cobertura se leeria como perdida de GENERALIZACION cuando es perdida de VIGENCIA DEL CENTRADO. Para separar ambos efectos habria que usar TEND_FORMA='cuadratica', que concentra la deriva dentro del test."
+  },
+  "tendencia": {
+    "deriva_total": 3.0,
+    "forma": "lineal",
+    "inclinacion": 0.0,
+    "g_medio": 1.0,
+    "componente_deriva_fpc": 1,
+    "ar1_componente_deriva": 0.7416061957378001,
+    "media_xi_test_max": 1.528338825799527,
+    "media_xi_test_c11_ref": 0.063
+  }
+}
