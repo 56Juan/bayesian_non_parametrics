@@ -40,6 +40,7 @@ import numpy as np
 import pandas as pd
 
 from ..utils.progreso import Progreso
+from ..utils.trazas import asegurar_3d
 
 __all__ = [
     "pip_global",
@@ -68,7 +69,7 @@ def pip_global(traces: Dict[str, np.ndarray], burn: int) -> np.ndarray:
         return 1.0 - osum.mean(axis=0)
     if "gammajhout" not in traces:
         raise KeyError("Se requiere 'osumout' o 'gammajhout' en las trazas.")
-    g = np.asarray(traces["gammajhout"], dtype=float)[burn:]     # (T, N, p)
+    g = asegurar_3d(np.asarray(traces["gammajhout"], dtype=float))[burn:]  # (T, N, p)
     return (g.max(axis=1) > 0).mean(axis=0)
 
 
@@ -82,7 +83,9 @@ def pip_por_componente(traces: Dict[str, np.ndarray], burn: int) -> np.ndarray:
     """
     if "gammajhout" not in traces:
         raise KeyError("Se requiere 'gammajhout' en las trazas.")
-    g = np.asarray(traces["gammajhout"], dtype=float)[burn:]     # (T, N, p)
+    # `asegurar_3d`: con p = 1 MATLAB guarda gammajhout como (nsim, N) y la
+    # media sobre el eje 0 devolveria (N,) en vez de (N, 1).
+    g = asegurar_3d(np.asarray(traces["gammajhout"], dtype=float))[burn:]  # (T, N, p)
     return g.mean(axis=0)
 
 

@@ -24,7 +24,7 @@ ESCENARIO_ID = 1;            % Algoritmo del anexo
 REPLICA_ID   = 1;            % replica Monte Carlo
 BASENAME     = "escenario";
 
-M_FPCA       = 1;            % [BARRIDO] componentes FPCA; DEBE coincidir con 20_01
+M_FPCA       = 2;            % [BARRIDO] componentes FPCA; DEBE coincidir con 20_01
 
 % EXPERIMENT_ID incluye la replica y M:
 %   <basename>_<escenario>_r<replica a 2 digitos>_m<M a 2 digitos>

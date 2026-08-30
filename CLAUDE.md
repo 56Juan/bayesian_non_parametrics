@@ -55,7 +55,7 @@ Los dos directorios no son intercambiables y el `.m` depende de la distinción:
 - **No usar `crps_gaussiano` / `lps_gaussiano` / `pit_gaussiano` con la predictiva del modelo propuesto**: son la aproximación de dos momentos y descartan la multimodalidad/asimetría que el estudio existe para medir. Usar las versiones muestrales.
 - **El error de representación no es opcional** en las bandas funcionales: `PropagadorFuncional(modo_residuo=...)` con `"empirico"` es lo recomendado; `"ninguno"` solo si se evalúa la curva *proyectada*, y debe declararse al reportar.
 - **`base_en_grilla` obtiene cada base por diferencia** (`reconstruct(e_k) - reconstruct(0)`) porque con `center=True` la reconstrucción es afín y contaminaría la base con la media funcional.
-- **`pipelines/real_pipeline.py` es un stub `TODO`.** El flujo de datos reales vive solo en `notebooks/reales/`.
+- **`pipelines/real_pipeline.py` es un stub `TODO`.** El flujo de datos reales vive solo en `notebooks/reales/`; desde la corrida 21 usa la misma arquitectura y los mismos artefactos que las simulaciones.
 - **`versioning/changelog.md` está obsoleto**: describe un Gibbs de 8 pasos con prior MNIW y un directorio `configs/` que no existen en el diseño actual (stick-breaking probit, muestreador en MATLAB). `versioning/experiment_registry.md` está vacío.
 - Los comentarios `% [FIX]` / `% [FIX N]` en los `.m` documentan correcciones deliberadas contra la implementación original (grid G\* sobre `Xnoint` sin el intercepto, `randi` que ignoraba parte del rango, factores `exp(1.2*·)` eliminados). No revertirlos sin entender el motivo.
 
@@ -160,7 +160,7 @@ El anexo los ordena por **qué someten a prueba**, y la lectura de los resultado
 | 2 | FGARCH(1,1) | `pipelines/sim_escenario_2.py` | Implementado; revisar parámetros |
 | 3 | FAR con cambio de régimen | `pipelines/sim_escenario_3.py` | Implementado (más general que el anexo); revisar parámetros |
 | 4 | Innovación SMSN (asimetría) | `pipelines/sim_escenario_4.py` | Implementado; revisar parámetros |
-| 5 | Predictibilidad en componente subordinada | `pipelines/sim_escenario_5.py` | Implementado con los parámetros del anexo como default |
+| 5 | Predictibilidad en componente subordinada | `pipelines/sim_escenario_5.py` | Implementado, **descartado del estudio**: pasa a cota analítica en limitaciones (ver Etapa B) |
 | 6 | Covarianza no estacionaria | `pipelines/sim_escenario_6.py` | Implementado con los parámetros del anexo como default |
 
 **Los Algoritmos 5 y 6 cambiaron de definición.** La nota antigua de este archivo ("Algoritmo 5 no implementado por su estacionariedad bajo skew-normal") describía un diseño anterior y ya no aplica: en el anexo vigente el 5 es *predictibilidad en componente subordinada* y el 6 es *covarianza no estacionaria*. Ambos son del Bloque 2 y **no reutilizan la maquinaria de `sim_comun`** para la dinámica — no hay operador integral, ni Cholesky de innovación funcional, ni norma HS. Comparten en cambio el esquema de observación, las réplicas y las semillas, de modo que lo que sí se reutiliza de `sim_comun` es `grilla_regular`, `evaluar_media`, `semillas_replicas`, `aplicar_ruido_observacion`, `diagnostico_comun`, `ConfigObservacion` y `SalidaSimulacion`.
@@ -208,7 +208,7 @@ Falta para poder cerrar el capítulo:
 5. ~~**Error sobre ventana móvil**~~ — hecho: `fit/rolling.py`.
 6. ~~**Probabilidades posteriores de inclusión como cantidad reportable**~~ — hecho: `fit/inclusion.py`.
 7. **Agregación entre réplicas** (media, error estándar Monte Carlo por escenario/métrica/`M`) y las tablas del capítulo.
-8. ~~**Escenarios 5 y 6** completos, incluidos sus diagnósticos~~ — hecho (ver Etapa B). Queda pendiente el notebook `_01` que los ejecute y escriba artefactos.
+8. ~~**Escenarios 5 y 6** completos, incluidos sus diagnósticos y sus notebooks `_01`~~ — hecho (corridas 15 y 16). El Escenario 5 quedó después descartado del estudio.
 
 ## Zonas grises que `docs/` todavía no resuelve
 
@@ -225,9 +225,39 @@ Orden pensado para que cada etapa sea utilizable antes de empezar la siguiente.
 
 **Etapa A — alinear lo que ya existe con `docs/`.** El esquema de observación ya está decidido (§Parámetros fijos del estudio) y difiere del Cuadro `tab:escenarios` a propósito. Queda decidir el caso del `desplazamientos` del Alg. 3 y del `familia`/`delta` del Alg. 4, y dejar los valores del anexo como default de la dataclass en vez de como argumento del notebook — el notebook debería poder no pasar nada y obtener el escenario del anexo.
 
-**Etapa B — Escenarios 5 y 6. HECHA.** `sim_escenario_5.py` y `sim_escenario_6.py` implementan la generación sobre coeficientes + base de Fourier `J = 10` (`base_fourier`, ortonormal en L² continuo; la cuadratura trapezoidal sobre grilla regular la reproduce con error de máquina si `2*k_max < L-1`, condición que `validar()` verifica). Los defaults de ambas dataclasses son los del Cuadro `tab:escenarios` — `ConfigEscenario5()` / `ConfigEscenario6()` sin argumentos son el escenario del anexo, incluida `media_fn=media_senoidal` y `sigma_obs=0.1`. Ambos exportan por `pipelines/__init__.py`. Falta el notebook `_01` que los consuma. Nota de diagnóstico: `resumen_escenario_6` compara varianzas en la ventana posterior a `t*=270`, que tiene 30 períodos; con `R=1` el reordenamiento no se separa del ruido Monte Carlo y `reordenamiento_detectado` puede dar False sin que el generador falle (con `R≥20` se detecta).
+**Etapa B — Escenarios 5 y 6. HECHA.** `sim_escenario_5.py` y `sim_escenario_6.py` implementan la generación sobre coeficientes + base de Fourier `J = 10` (`base_fourier`, ortonormal en L² continuo; la cuadratura trapezoidal sobre grilla regular la reproduce con error de máquina si `2*k_max < L-1`, condición que `validar()` verifica). Los defaults de ambas dataclasses son los del Cuadro `tab:escenarios` — `ConfigEscenario5()` / `ConfigEscenario6()` sin argumentos son el escenario del anexo, incluida `media_fn=media_senoidal` y `sigma_obs=0.1`. Ambos exportan por `pipelines/__init__.py`. **Cuidado con esos defaults**: son los del Cuadro del Capítulo 3 (`L=48`, `T=300`, `sigma_obs=0.1`, `R=50`, `t_quiebre=270`) y **no** los parámetros fijos del estudio, así que los `_01` de las corridas 15 y 16 pasan los seis campos del esquema de observación explícitos y lo verifican con un assert; omitir uno rompería la comparabilidad sin dar error. Nota de diagnóstico: `resumen_escenario_6` compara varianzas en la ventana posterior a `t*`, y con el default de 270 esa ventana tiene 30 períodos, con lo que `reordenamiento_detectado` puede dar False con `R=1` sin que el generador falle. Con el `t*=280` de la corrida 16 (y con el 340 decidido) el problema desaparece.
+
+**Los notebooks `_01` de ambos ya existen** (corridas 15 y 16); el punto 8 de la lista de pendientes está cerrado. El Escenario 5 quedó luego **descartado del estudio** por la cota `lambda_j * phi_j^2` (ver la corrida 15).
 
 **Etapa C — evaluación. PARCIALMENTE HECHA.** Listos y verificados sobre trazas reales: `fit/rolling.py` (ventana móvil), `fit/inclusion.py` (PIP y contraste con la verdad), `fit/diagnostics_mcmc.py` (ESS/Geweke/R-hat separados del dibujo) y `graphics/viz_evaluacion.py`. También hechos: los modelos de referencia (en `NN_05_comparacion.ipynb`, no en `fit/baselines.py`) y la cobertura condicional estratificada. **Queda pendiente lo único que bloquea el capítulo**: dotar a esas referencias de una predictiva para poder darles CRPS, energy, PIT y cobertura.
+
+### Qué corridas hay y cuáles son informativas
+
+| Carpeta | Escenario | `EXPERIMENT_ID` | Estado |
+|---|---|---|---|
+| `11_sim_E1` | Alg. 1 | `escenario_1_r01` | corrida; usó `mu = 5 + 2 sin`, **superada por la 20** |
+| `12_sim_E2` | Alg. 2 | `escenario_2_r01` | corrida |
+| `13_sim_E3` | Alg. 3 | `escenario_3_r01` | corrida |
+| `14_sim_E4` | Alg. 4 | `escenario_4_r01` | corrida |
+| `15_sim_E5` | Alg. 5 | `escenario_5_r01` | corrida; escenario **descartado** |
+| `16_sim_E6` | Alg. 6 | `escenario_6_r01` | corrida |
+| `17_sim_EA` | **Escenario A: FAR(1) con tendencia** | `escenario_A_r01` | escenario de **diagnóstico**, no es un Algoritmo del anexo; sin `_05` |
+| `20_sim_E1` | Alg. 1 | `escenario_1_r01_m01`, `..._m02` | **plantilla vigente**: `mu = sin(2 pi tau)`, `M` en el id. Barrido en curso |
+| `21_real_nivel` | **datos reales** | `real_nivel_v01_m03` | la arquitectura de la 20 sobre la serie observada; ver §Datos reales |
+
+**Veredicto de informatividad (2026-08-30), y difiere del orden intuitivo.** El criterio no es "¿el generador rompe un supuesto?" sino "¿rompe uno que el modelo propuesto puede aprovechar y las referencias no?". Bajo ese criterio:
+
+- **E2 es el mejor de los seis hoy** — el único con evidencia positiva y limpia (el modelo ensancha con la volatilidad). Amplitud corta, arreglable con `prop_arch`.
+- **E3 debería ser el mejor** (multimodalidad es literalmente para lo que existe una mezcla) y hoy es el que falló más claramente. Pendiente el diagnóstico oracle que decide si es hallazgo o defecto.
+- **E1 es informativo por su valor negativo**: cuantifica el precio de la flexibilidad bajo especificación correcta. Imprescindible como control.
+- **E4** tiene contraste en el generador que el modelo no recupera; mismo patrón que E3.
+- **E5 y E6 son Bloque 2 y no discriminan métodos**: su degradación alcanza por igual a PSBPM-FD, FAR(1), VAR y RF, porque la base congelada les falla a todos y no hay covariable rezagada que anticipe el cambio. Son **limitación, no resultado**. E6 conserva un aporte propio que ningún otro da: `e_t = ||X_t - Pi_M X_t||^2`, métrica independiente del modelo predictivo que separa "falla la representación" de "falla la predicción".
+
+El peso del capítulo tiene que caer en **2, 3 y 4**.
+
+**La corrida 20 (`notebooks/simulaciones/20_sim_E1/`) es la plantilla vigente**, copia de la 11 con dos cambios: `mu(tau) = sin(2 pi tau)` (la 11 corrió con `5 + 2 sin`) y `M_FPCA` como eje de barrido en el `EXPERIMENT_ID`. El resto de `SIM_CFG` es el del anexo y no se tocó. Para las corridas de E2, E3 y E4 con las constantes nuevas, partir de la 20 y no de la 11.
+
+**Dato del barrido en curso, y no es menor:** con `mu = sin(2 pi tau)` el GCV eligió una base distinta de la de la 11 — `K = 4` contra los 6 de aquella— y la varianza acumulada cambió (`M=1` → 83.24 %, `M=2` → 97.69 %, contra 97.54 % de la 11). O sea que **la regla del 95 % sigue dando `M = 2`, pero sobre un espectro distinto**: cambiar la media cambió la base, y con ella el techo `K` del barrido. Con `K = 4` el punto `M = 3` de este escenario cae en el mismo terreno que E2/E3 —componentes que son en buena medida artefacto de una base corta— y hay que leerlo con esa advertencia, no como "una FPC más del proceso".
 
 **La corrida 11 (`notebooks/simulaciones/11_sim_E1/`) es la plantilla de referencia** para regenerar los escenarios 2–6: parámetros fijos del estudio, evaluación contra la curva verdadera, `seed_base` leída del JSON, `EXPERIMENT_ID` con réplica y la evaluación partida en convergencia + predicción. Lo que cambia por escenario es el generador del `_01`, el `ESCENARIO_ID` y el diccionario `VERDAD` de `_03` §6.1, que declara qué covariables usó realmente el generador.
 
@@ -296,3 +326,80 @@ Orden pensado para que cada etapa sea utilizable antes de empezar la siguiente.
 - **Réplicas (`R = 50`)**, que sigue siendo el cambio estructural grande y no está empezado. Con `R = 1` una diferencia del 2–3 % en MISE entre PSBPM-FD y FAR(1) es indistinguible del ruido Monte Carlo, de modo que **ninguna afirmación comparativa del capítulo es concluyente hoy**.
 
 **Etapa E — agregación y tablas** siguiendo los seis puntos del `% [PENDIENTE]` de `§03_07`.
+
+---
+
+# Datos reales: la corrida 21
+
+`notebooks/reales/21_real_nivel/` es la **corrida 20 aplicada a una serie observada**, y sustituye a los
+`notebooks/reales/Ejemplo_{1,2,3}/`, que siguen la arquitectura antigua (sin partición train/test, sin
+`artifacts.py`, evaluación en un solo `03_03`). Los notebooks son `21_01_datos`, `21_03_convergencia`,
+`21_04_evaluacion` y `21_05_comparacion`; `config_paths.m` apunta a `data/reales/` y `artefact/reales/`.
+
+**Datos.** `data/reales/raw/Tabla_de_Mediciones_Wed_Jun_17_2026.xlsx` — estación RIO MAPOCHO EN LOS ALMENDROS,
+48 mediciones diarias (cada media hora), 2020-01-01 a 2026-05-31. Cada **día** es una curva. La variable
+modelada es `Nivel de Agua (m)`; el archivo también trae turbiedad, precipitación y caudal.
+
+**`EXPERIMENT_ID`**: `real_<serie>_v<ventana a 2 dígitos>_m<M a 2 dígitos>` (p. ej. `real_nivel_v01_m03`).
+Sustituye a `ESCENARIO_ID`/`REPLICA_ID`, que no aplican: no hay generador ni réplicas Monte Carlo. Como en la
+corrida 20, `M` viaja en el id y está escrito a mano en los cuatro notebooks y en el `.m`.
+
+**Lo que cambia respecto de una simulación, y por qué:**
+
+- **No hay curva verdadera.** No se escribe `X_curves_true.npy`; `cargar_curvas_true(PATHS, estricto=False)`
+  devuelve `None` y `_04`/`_05` toman la curva **observada** como objetivo. `eval_config.json` lo declara con
+  `objetivo_evaluacion = "curva_observada"`.
+- **`modo_residuo = "empirico"`**, no `"ninguno"`: la banda tiene que cubrir la curva observada, de modo que el
+  error de representación forma parte de lo que hay que cubrir. `_04` estima los residuos con
+  `residuos_representacion` **sólo sobre el bloque de entrenamiento**. Con `"ninguno"` aparecería subcobertura
+  atribuible a la representación y no al modelo.
+- **Las cifras NO son comparables con las de los escenarios simulados**: allí el denominador es la curva sin
+  ruido y aquí incluye el ruido de medición, que ningún modelo puede predecir.
+- **`_03 §6.1` deja de ser validación y pasa a ser hallazgo**: no hay estructura verdadera contra la cual
+  contrastar las PIP, de modo que `contraste_con_verdad` no se usa y se reportan las PIP contra el **prior**
+  (0.90 sobre el propio rezago, 0.50 sobre los cruzados).
+- **`_05 §3.2` cambia de sentido**: sin operador verdadero, `||Psi_hat||_HS` pasa de verificación a estimación,
+  y depende del `M` con que se calculó.
+
+**Higiene de datos que la simulación da gratis** (todo en `21_01 §2.2`, con asserts): grilla intra-diaria
+canónica (horas presentes en ≥90 % de los días), interpolación de huecos **a lo largo de tau** dentro de cada
+día, descarte de días con >20 % ausente, detección de marcas `(día, hora)` duplicadas, y reporte de **saltos en
+la secuencia de días** — un día ausente rompe el supuesto AR porque el rezago de `t` deja de ser `t-1` en tiempo
+real. `MARGEN_DIAS` hace que la ventana lea de más para llegar a `T_CURVAS` tras los descartes; la fecha final
+efectiva queda en `dataset_config.json`, el análogo real de `simulation_config.json`.
+
+**Ancla de continuidad**: la curva del día `d` gana un punto en `tau = 0` igual a la última medición del día
+`d-1`, de modo que `G = 49` y no 48. Viene de `Ejemplo_3` y se conserva.
+
+## Dos secciones nuevas en `21_05`, y responden a una pregunta abierta del capítulo
+
+**§3.2.1 — `VAR` y `FAR1` son el mismo modelo con `p = 1`.** En las figuras de ventana móvil la curva del VAR
+queda oculta bajo la del FAR1, y no es un problema de dibujo: la estandarización es afín, luego el FAR1 en
+escala estandarizada es `D^-1 Psi D` más un intercepto, exactamente la familia sobre la que el VAR minimiza por
+MCO. Sólo difieren en el estimador (MCO contra Yule-Walker) y en el intercepto. La sección lo **cuantifica**;
+en `real_nivel_v01_m03` da `corr = 0.999986` y `max|VAR - FAR1| = 0.85 %` de la sd del objetivo.
+**Consecuencia para el capítulo: son UNA referencia lineal, no dos, y así hay que citarlas.** Para separarlas
+haría falta `p > 1` en el VAR o `RIDGE_FAR > 0`.
+
+**§3.2.2 — RESET de Ramsey sobre el bloque de entrenamiento.** Contrasta si la media condicional de `xi_t` dado
+`xi_{t-1}` es lineal. Es la condición **necesaria** para que el PSBPM-FD pueda ganar en MISE: si no se rechaza,
+la referencia lineal está correctamente especificada y el MISE no discrimina, exactamente como en el Escenario 1
+simulado. En `real_nivel_v01_m03` **no rechaza** en ninguna de las tres componentes (`p` = 0.94, 0.58, 0.80).
+
+## Diagnóstico de la primera corrida ejecutada (`real_nivel_v01_m03`)
+
+Ventana 2024-01-01 … 2025-02-06, `T = 400`, `T0 = 280`, base B-spline `(10, 2)` por GCV, `K = 10`, `M = 3`
+(99.51 % de varianza), `N_LAGS = 1`, `cond(W) = 3.86`, contrato verificado.
+
+- **`acf1_nivel_diario = 0.989`.** El nivel medio diario está cerca de una raíz unitaria. La línea base de
+  **persistencia** da `MISE = 0.00051` contra `0.0254` de la media incondicional: **el piso a batir es
+  `y_hat(t) = y(t-1)`**, no la media. Cualquier modelo lineal razonable queda muy cerca de ese piso, y la
+  brecha disponible para un modelo flexible es diminuta.
+- **La regla del 95 % da `M = 1`**: `lambda_1` se lleva casi toda la varianza porque el nivel diario domina el
+  espectro. `M = 3` es una elección por encima de la regla, y hay que declararla.
+- Combinado con el RESET que no rechaza, el veredicto es el mismo que en el Escenario 1: **en la media
+  condicional no hay nada que ganar en esta serie**, y el argumento del capítulo tiene que salir de `21_04`
+  —CRPS, energía, cobertura, PIT—, no de la tabla de MISE.
+- **Camino natural si se busca contraste en la media**: modelar el **incremento** `X_t - X_{t-1}` en vez del
+  nivel (quita la raíz unitaria y deja al descubierto la dinámica), o pasar a `Caudal (m3/seg)`, que es mucho
+  menos persistente que el nivel. Ninguna de las dos está implementada.

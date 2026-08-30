@@ -1,0 +1,20 @@
+experiment_id,escenario_6_r01
+objetivo_evaluacion,curva_verdadera
+modo_residuo,ninguno
+n_lags,1
+M_fpca,5
+n_train_origenes,279
+n_test_origenes,120
+w_ventana,20
+p_bic_libre,1
+far_hs_norm,1.604613
+far_hs_referencia,phi = 0.7 en todas las direcciones
+far_radio_espectral,0.741129
+mise_truncamiento_test,0.0755032
+mise_test_VAR,0.97573247
+mise_test_FAR1,0.97703592
+mise_test_RF,1.27532305
+mise_test_GBT,1.40893865
+mise_test_media,2.02835174
+mise_test_persistencia,1.11836709
+mise_test_PSBPM-FD,0.9853846

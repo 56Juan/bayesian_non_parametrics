@@ -68,6 +68,8 @@ from typing import Dict, Optional, Tuple, Union
 import numpy as np
 from scipy.stats import norm
 
+from ....utils.trazas import normalizar_trazas_mat
+
 __all__ = ["PSBPPredictor", "pesos_probit", "medias_componente"]
 
 
@@ -147,6 +149,10 @@ class PSBPPredictor:
     """
 
     def __init__(self, traces: Dict[str, np.ndarray], burn: int):
+        # MATLAB descarta las dimensiones singleton finales: con una sola
+        # covariable (p = 1, el punto M = 1 del barrido) betajhout/psijhout/
+        # Gammajhout llegan 2D. Se restaura el eje antes de validar.
+        traces = normalizar_trazas_mat(traces)
         self._validar(traces, burn)
         self.burn = int(burn)
         post = slice(self.burn, None)

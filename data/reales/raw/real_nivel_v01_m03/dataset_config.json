@@ -1,0 +1,30 @@
+{
+  "fuente": "C:\\Users\\56jua\\Desktop\\git_tesis\\bayesian_non_parametrics-1\\data\\reales\\raw\\Tabla_de_Mediciones_Wed_Jun_17_2026.xlsx",
+  "estacion": "RIO MAPOCHO EN LOS ALMENDROS",
+  "variable": "Nivel de Agua (m)",
+  "serie_id": "nivel",
+  "ventana_id": 1,
+  "fecha_inicio": "2024-01-01",
+  "fecha_fin": "2025-02-06",
+  "T": 400,
+  "G": 49,
+  "prop_train": 0.7,
+  "ancla_continuidad": true,
+  "max_hueco_dia": 0.2,
+  "margen_dias": 60,
+  "diagnostico": {
+    "T": 400,
+    "G": 49,
+    "acf1_nivel_diario": 0.989189,
+    "sd_entre_dias": 0.109095,
+    "sd_intra_dia_media": 0.015302,
+    "razon_intra_entre": 0.140261,
+    "asimetria_nivel": 0.317807,
+    "exceso_curtosis_nivel": -0.433436,
+    "dias_descartados": 8,
+    "saltos_secuencia_dias": 2,
+    "duplicados_dia_hora": 0
+  },
+  "experiment_id": "real_nivel_v01_m03",
+  "procesado": "2026-08-30 14:34:00"
+}
