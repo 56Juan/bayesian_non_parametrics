@@ -1,14 +1,14 @@
 {
   "method": "bspline",
-  "n_basis": 8,
+  "n_basis": 12,
   "order": 3,
   "T": 400,
-  "K": 8,
+  "K": 12,
   "T0": 280,
   "prop_train": 0.7,
   "ajustado_en": "train",
   "center": false,
   "n_basis_gcv": 12,
   "order_gcv": 3,
-  "mise_bspline_vs_verdadera": 0.026762594134520895
+  "mise_bspline_vs_verdadera": 0.010796380548679072
 }

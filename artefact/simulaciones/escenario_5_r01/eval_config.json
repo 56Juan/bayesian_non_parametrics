@@ -67,14 +67,14 @@
       0.00390625,
       0.001953125
     ],
-    "M_retenidas": 4,
+    "M_retenidas": 5,
     "fpc_con_dinamica": 3,
     "M_umbral_para_retener": 3,
     "retiene_direccion_informativa": true,
     "es_caso_nulo": true,
-    "var_ratio_fpc_con_dinamica": 0.10213301926697195,
-    "ar1_fpc_con_dinamica": 0.8591397791317591,
-    "mise_bspline_vs_verdadera": 0.026762594134520895,
+    "var_ratio_fpc_con_dinamica": 0.10097548117989326,
+    "ar1_fpc_con_dinamica": 0.8587848322744077,
+    "mise_bspline_vs_verdadera": 0.010796380548679072,
     "fuente": "reports/.../10_alineacion_fpca_generador.csv",
     "respaldo": "raw/escenario_5.npz::interno_coeficientes",
     "advertencia": "El resultado de este escenario NO discrimina entre especificaciones dinámicas: la degradación por truncamiento alcanza por igual a todo método sobre la misma representación. Acota el alcance de la reducción de dimensión."
