@@ -1,0 +1,20 @@
+experiment_id,escenario_A_r01
+objetivo_evaluacion,curva_verdadera
+modo_residuo,ninguno
+n_lags,1
+M_fpca,4
+n_train_origenes,279
+n_test_origenes,120
+w_ventana,20
+p_bic_libre,1
+far_hs_norm,0.8752
+far_hs_referencia,||Psi||_HS = 0.70 sobre Y_t (Algoritmo 1) + deriva aditiva b(t) g(tau)
+far_radio_espectral,0.732882
+mise_truncamiento_test,0.04104279
+mise_test_VAR,1.23689899
+mise_test_FAR1,1.23973562
+mise_test_RF,2.08505435
+mise_test_GBT,2.18816105
+mise_test_media,4.08173046
+mise_test_persistencia,1.38858014
+mise_test_PSBPM-FD,1.28273934

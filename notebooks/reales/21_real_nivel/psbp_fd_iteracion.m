@@ -28,7 +28,7 @@ clear; clc; close all;
 N_WORKERS    = 8;            % workers del pool
 BASENAME     = "real";
 SERIE_ID     = "nivel";      % variable modelada; DEBE coincidir con 21_01
-VENTANA_ID   = 1;            % ventana temporal;  DEBE coincidir con 21_01
+VENTANA_ID   = 2;            % ventana temporal;  DEBE coincidir con 21_01
 
 M_FPCA       = 3;            % [BARRIDO] componentes FPCA; DEBE coincidir con 21_01
 
