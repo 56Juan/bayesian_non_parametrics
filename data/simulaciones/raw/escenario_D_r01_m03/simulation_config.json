@@ -1,0 +1,127 @@
+{
+  "sim_params": {
+    "L": 75,
+    "T": 400,
+    "burn_in": 200,
+    "sigma_obs": 0.25,
+    "R": 1,
+    "seed": 41232,
+    "media_fn": "media_senoidal",
+    "jitter": 1e-10,
+    "gamma": 0.3,
+    "hs_norm": 0.7,
+    "sigma_eps": 1.0,
+    "ell": 0.5,
+    "deriva": 3.0,
+    "forma_tendencia": "cuadratica",
+    "inclinacion": 0.0,
+    "mecanismo": "interaccion",
+    "interacciones": [
+      [
+        0.25,
+        0.75
+      ],
+      [
+        0.5,
+        0.5
+      ]
+    ],
+    "pesos_interaccion": [
+      1.0,
+      1.0
+    ],
+    "ancho_lectura": 0.1,
+    "ancho_respuesta": 0.15,
+    "razon_interaccion": 0.6,
+    "saturacion": 3.0,
+    "factores_operador": [
+      1.0,
+      -1.0
+    ],
+    "derivas_regimen": [
+      1.0,
+      -1.0
+    ],
+    "nitidez": 4.0,
+    "umbral": 0.0,
+    "direccion_fn": null,
+    "n_dim_diagnostico": 5,
+    "prop_train_referencia": 0.7,
+    "n_pilot": 2000
+  },
+  "diagnostico": {
+    "n_replicas": 1,
+    "n_curvas": 400,
+    "n_puntos_grilla": 75,
+    "todo_finito": true,
+    "media_empirica_global": 1.254075434042777,
+    "media_ee_montecarlo": NaN,
+    "var_puntual_media": 3.585189625284507,
+    "var_puntual_min": 2.2462167611545625,
+    "var_puntual_max": 5.690128279762813,
+    "acf1_media": 0.771889047354492,
+    "acf1_ee_montecarlo": NaN,
+    "razon_senal_ruido": 57.36303400455211,
+    "hs_norm_objetivo": 0.7,
+    "hs_norm_efectiva": 0.7,
+    "radio_espectral": 0.6215249564437708,
+    "estacionariedad_garantizada": false,
+    "motivo_no_estacionario": "tendencia determinista en t (por construccion)",
+    "mecanismo": "interaccion",
+    "forma_tendencia": "cuadratica",
+    "deriva_total": 3.0,
+    "inclinacion": 0.0,
+    "g_medio": 1.0,
+    "pendiente_recuperada": 1.2945403718304804,
+    "pendiente_esperada": 1.0,
+    "pendiente_ee": 0.07368372404921882,
+    "pendiente_ee_autocorr": 0.17583273872827287,
+    "acf1_residuo_tendencia": 0.7012477308924971,
+    "desvio_pendiente_en_ee": 1.6751167840572345,
+    "b_en_T0": 1.4668438012324043,
+    "b_en_T": 3.0,
+    "desfase_train_test": 1.7047631610354206,
+    "sd_proceso_sin_tendencia": 1.680892625982867,
+    "razon_deriva_sd": 1.7847659949402257,
+    "desfase_en_sd": 1.0142011064142755,
+    "var_Y_primera_mitad": 2.064252890497643,
+    "var_Y_segunda_mitad": 2.436736182395112,
+    "razon_varianza_Y_mitades": 1.1804446023121093,
+    "n_dim_diagnostico": 5,
+    "r2_lineal_fuera_de_muestra": 0.7232479304849688,
+    "r2_lineal_dentro_de_muestra": 0.6514741921068212,
+    "r2_oraculo_fuera_de_muestra": 0.8557380319770906,
+    "brecha_oraculo_lineal": 0.13249010149212181,
+    "r2_lineal_destendenciado": 0.5506990656008959,
+    "r2_oraculo_destendenciado": 0.6179143766981261,
+    "brecha_oraculo_lineal_destendenciada": 0.06721531109723022,
+    "interacciones": [
+      [
+        0.25,
+        0.75
+      ],
+      [
+        0.5,
+        0.5
+      ]
+    ],
+    "razon_interaccion_objetivo": 0.6,
+    "razon_interaccion_efectiva": 0.6444203220905429,
+    "escala_interaccion_calibrada": 0.2626452728528384,
+    "contribucion_interaccion_media_L2": 0.4291664987767614,
+    "contribucion_lineal_media_L2": 0.7259882175332826,
+    "saturacion": 3.0,
+    "cota_saturacion": [
+      5.207309685453191,
+      6.576192213236088
+    ],
+    "fraccion_saturada": 0.095
+  },
+  "replica_idx": 0,
+  "experiment_id": "escenario_D_r01_m03",
+  "escenario_id": "D",
+  "replica_id": 1,
+  "seed": 41232,
+  "T": 400,
+  "G": 75
+}

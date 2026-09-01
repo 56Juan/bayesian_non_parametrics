@@ -169,7 +169,7 @@ El anexo los ordena por **qué someten a prueba**, y la lectura de los resultado
 | 5 | Predictibilidad en componente subordinada | `pipelines/sim_escenario_5.py` | Implementado, **descartado del estudio**: pasa a cota analítica en limitaciones (ver Etapa B) |
 | 6 | Covarianza no estacionaria | `pipelines/sim_escenario_6.py` | Implementado con los parámetros del anexo como default |
 | **B** | **FAR con signo conmutado por umbral** | `pipelines/sim_escenario_B.py` | Implementado; **no es del anexo**, es de diagnóstico (ver §El Escenario B) |
-| **C–F** | **Tendencia (lineal/cuadrática) × no linealidad (interacción intra-curva / multimodalidad)** | `pipelines/sim_escenario_T.py` | Implementado; **no son del anexo**, son de diagnóstico. Un módulo, cuatro corridas (ver §La familia con tendencia) |
+| **C–I** | **Tendencia (lineal, cuadrática, logarítmica, sinusoidal, por tramos, volátil) × no linealidad (interacción intra-curva / mezcla de J regímenes)** | `pipelines/sim_escenario_T.py` | Implementado; **no son del anexo**, son de diagnóstico. Un módulo, siete corridas (ver §La familia con tendencia) |
 
 **Los Algoritmos 5 y 6 cambiaron de definición.** La nota antigua de este archivo ("Algoritmo 5 no implementado por su estacionariedad bajo skew-normal") describía un diseño anterior y ya no aplica: en el anexo vigente el 5 es *predictibilidad en componente subordinada* y el 6 es *covarianza no estacionaria*. Ambos son del Bloque 2 y **no reutilizan la maquinaria de `sim_comun`** para la dinámica — no hay operador integral, ni Cholesky de innovación funcional, ni norma HS. Comparten en cambio el esquema de observación, las réplicas y las semillas, de modo que lo que sí se reutiliza de `sim_comun` es `grilla_regular`, `evaluar_media`, `semillas_replicas`, `aplicar_ruido_observacion`, `diagnostico_comun`, `ConfigObservacion` y `SalidaSimulacion`.
 
@@ -255,6 +255,9 @@ Orden pensado para que cada etapa sea utilizable antes de empezar la siguiente.
 | `22_sim_ED` | **Escenario D: interacciones + tendencia cuadrática** | `escenario_D_r01_m02`…`_m04` | ídem, eje tendencia. **Sin correr** |
 | `23_sim_EE` | **Escenario E: multimodalidad + tendencia por régimen (lineal)** | `escenario_E_r01_m01`…`_m03` | ídem, eje no linealidad. **Sin correr** |
 | `24_sim_EF` | **Escenario F: multimodalidad + tendencia por régimen (cuadrática)** | `escenario_F_r01_m01`…`_m03` | ídem, las dos. **Sin correr** |
+| `25_sim_EG` | **Escenario G: 3 regímenes, una forma de tendencia por régimen** | `escenario_G_r01_m01`…`_m03` | familia con tendencia, segunda tanda. **Sin correr** |
+| `26_sim_EH` | **Escenario H: tendencia sinusoidal volátil** | `escenario_H_r01_m01`…`_m03` | la pendiente misma es estocástica. **Sin correr** |
+| `27_sim_EI` | **Escenario I: tendencia por tramos (cuad → log → sen)** | `escenario_I_r01_m01`…`_m03` | cambios de régimen de tendencia. **Sin correr** |
 | `20_sim_E1` | Alg. 1 | `escenario_1_r01_m01`, `..._m02` | **plantilla vigente**: `mu = sin(2 pi tau)`, `M` en el id. Barrido en curso |
 | `21_real_nivel` | **datos reales** | `real_nivel_v01_m03` | la arquitectura de la 20 sobre la serie observada; ver §Datos reales |
 
@@ -471,30 +474,86 @@ de la tabla de arriba salen de ejecutar `18_01` hasta §2.7).
 
 ---
 
-# La familia con tendencia: corridas 19, 22, 23 y 24
+# La familia con tendencia: corridas 19, 22, 23, 24, 25, 26 y 27
 
-`pipelines/sim_escenario_T.py` genera **cuatro** escenarios de diagnóstico —C, D,
-E y F— con un **diseño factorial 2×2**. Un solo módulo, porque comparten la
-tendencia, el esquema de observación, el oráculo y el control de calidad:
+`pipelines/sim_escenario_T.py` genera **siete** escenarios de diagnóstico —C a
+I— en dos tandas. Un solo módulo, porque comparten la tendencia, el esquema de
+observación, el oráculo y el control de calidad.
+
+**Primera tanda: un factorial 2×2 limpio.**
 
 | | tendencia **lineal** | tendencia **cuadrática** |
 |---|---|---|
 | **interacciones** intra-curva (unimodal) | **C · corrida 19** | **D · corrida 22** |
-| **multimodalidad** con tendencia por régimen | **E · corrida 23** | **F · corrida 24** |
+| **multimodalidad**, 2 regímenes | **E · corrida 23** | **F · corrida 24** |
 
 Cualquier diferencia entre 19 y 22 (o 23 y 24) es atribuible a la **forma de la
-tendencia**; entre las dos filas, al **tipo de no linealidad**. Todo lo demás
-—esquema de observación, `gamma=0.30`, `hs_norm=0.70`, `ell=0.5`, priors,
-`mcmc_config`— es idéntico a las corridas 18 y 20.
+tendencia**; entre las dos filas, al **tipo de no linealidad**.
+
+**Segunda tanda: tendencias con estructura propia.** Ya no es un factorial —cada
+una interviene una cosa distinta— y todas son variantes del mecanismo `mezcla`:
+
+| corrida | regímenes | tendencia | qué rompe |
+|---|---|---|---|
+| **G · 25** | **3** | una **forma distinta por régimen** (cuadrática / sinusoidal / logarítmica) | las modas se separan **a ritmos distintos y con formas distintas** |
+| **H · 26** | 2 | **sinusoidal y volátil**: la pendiente es un AR(1) que llega a invertirse | la tendencia deja de ser determinista y de ser monótona |
+| **I · 27** | **3** | **por tramos**: cuadrática → logarítmica → sinusoidal, con quiebres en `0.45T` y `0.75T` | la **derivada** de la tendencia es discontinua: cambia el régimen de tendencia |
+
+Todo lo demás —esquema de observación, `gamma=0.30`, `hs_norm=0.70`, `ell=0.5`,
+priors, `mcmc_config`— es idéntico a las corridas 18 y 20 en las siete.
 
     Y_t = m(Y_{t-1}, S_t) + eps_t,   X_t = mu + b_{S_t}(t) g(tau) + Y_t
 
 `deriva = 3.0` (desplazamiento total entre t=1 y t=T), `inclinacion = 0` (nivel
 puro). `perfil_tendencia` está normalizado como en el Escenario A: `b(1)=0`,
-`b(T)=deriva`, de modo que las tres corridas con tendencia son comparables. Con
+`b(T)=deriva`, de modo que las corridas con tendencia son comparables. Con
 `T0 = 0.7T`: la lineal deja `b(T0)=0.70·deriva`, la cuadrática `0.49·deriva`, y
 el desfase entre bloques pasa de 0.35 a 0.44 de la deriva — **la cuadrática es
 el caso adverso, no una variante cosmética**.
+
+## Las cuatro formas de tendencia, y qué rompe cada una
+
+| forma | expresión | qué hace | `deriva` significa |
+|---|---|---|---|
+| `lineal` | `u` | reparte la deriva de forma uniforme | desplazamiento total |
+| `cuadratica` | `u²` | la concentra al final: el test ve la mitad | desplazamiento total |
+| `logaritmica` | `log(1+cu)/log(1+c)` | **espejo de la cuadrática**: casi toda la deriva ocurre al principio y se aplana | desplazamiento total |
+| `sinusoidal` | `sin(2π·κ·u)` | **no monótona**: vuelve sobre sus pasos | **amplitud** |
+
+La logarítmica produce el modo de fallo **opuesto** al de la cuadrática: el
+entrenamiento ve una pendiente grande y el test una casi nula, de modo que un
+modelo que extrapole sobrecorrige. La sinusoidal rompe la **monotonía**, y con
+ella la coincidencia entre un estrato por nivel de tendencia y la partición
+train/test —el defecto de la corrida 16—: el mismo nivel de `b(t)` ocurre en los
+dos bloques. Con `ciclos_sinusoidal` **no entero** (1.25) los dos bloques caen
+además en fases distintas, que es lo que impide que el modelo aprenda el ciclo
+del entrenamiento y lo continúe.
+
+`perfil_tramos` encadena varias formas **con continuidad**: cada tramo arranca
+donde terminó el anterior, de modo que el perfil es continuo pero **su derivada
+no lo es** — y esa discontinuidad *es* el cambio de régimen de tendencia. El
+perfil global se normaliza por su máxima excursión para que `deriva` conserve su
+lectura y encadenar tres tramos no la multiplique por tres.
+
+## Tendencia volátil
+
+`volatilidad_tendencia > 0` multiplica la tendencia por `1 + v·eta_t`, con
+`eta_t` un AR(1) estandarizado de persistencia `persistencia_volatilidad`. Tres
+decisiones que hay que conocer:
+
+- **`eta_t` se sortea de un generador propio**, derivado de la semilla pero
+  independiente del de la dinámica. Así activar la volatilidad **no desplaza el
+  consumo del generador de `Y`**, y una corrida volátil y su gemela determinista
+  comparten exactamente la misma trayectoria de la componente estable: la
+  diferencia entre ambas es atribuible sólo a la tendencia.
+- **Se permite que el factor sea negativo** (`v·eta_t < -1`): hay tramos con la
+  tendencia invertida. Una tendencia volátil que nunca cambia de signo es una
+  tendencia con ruido, no una tendencia volátil. `fraccion_tendencia_invertida`
+  lo reporta (1.5 % en la corrida 26).
+- **El oráculo condiciona sobre `eta_{t-1}`**, que es un estado **latente que
+  ningún método observa**. En la corrida 26 el oráculo es por tanto una cota más
+  generosa que en el resto y parte de la brecha es **irreducible**. Hay que
+  declararlo al reportar la fracción recuperada.
 
 ## Los dos mecanismos
 
@@ -525,40 +584,72 @@ no sobrevive a la base ni al truncamiento FPCA.
   Escenario B: `Psi` sigue estando y sigue siendo estimable, de modo que **la
   referencia lineal no muere, se queda corta**. Es el caso realista.
 
-**`"mezcla"` (E y F), multimodal.** Dos ramas antisimétricas en el operador
-(`factores_operador = (+1, -1)`) **y en la tendencia**
-(`derivas_regimen = (+1, -1)`), con el mismo probit sobre `z = <Y_{t-1}, e>` del
-Escenario B. El rasgo propio:
+**`"mezcla"` (E, F, G, H, I), multimodal.** `J` ramas ---la longitud de
+`factores_operador`--- sorteadas por un **probit ordenado** sobre
+`z = <Y_{t-1}, e>`, con `J-1` cortes: es el mismo mecanismo del Algoritmo 3 y por
+eso un escenario de esta familia con tres ramas es comparable con aquél. Cada
+rama tiene su factor sobre el operador, su deriva **y opcionalmente su propia
+forma de tendencia** (`formas_regimen`), que es lo que hace multimodal a la
+tendencia misma en la corrida 25. El rasgo propio:
 
     separacion(t) = |f_0-f_1| ||Psi Y_{t-1}||  +  |d_0-d_1| b(t) ||g||
                      (dinámica, constante)         (tendencia, creciente)
 
-**la distancia entre las dos modas crece con t**: 5.28 sd de la innovación en
-`T0` contra 7.08 en `T` (corrida 23). Un modelo unimodal responde con una moda
-en el medio y su error **crece con el tiempo** — modo de fallo que ningún
+**la distancia entre las modas extremas crece con t**: 5.32 sd de la innovación
+en `T0` contra 7.12 en `T` (corrida 23). Un modelo unimodal responde con una
+moda en el medio y su error **crece con el tiempo** — modo de fallo que ningún
 escenario anterior produce, y que la ventana móvil de `_04 §7` debería mostrar.
 
-## Diagnóstico medido de las cuatro corridas (seed 41232, T=400, R=1)
+**Con `J = 3` el coeficiente de Sarle deja de ser la cifra principal, y no es un
+fracaso.** Con tres modas aproximadamente equiespaciadas la central **rellena el
+hueco** entre las extremas y la densidad se aplana: Sarle detecta *bi*modalidad
+y baja aunque la multimodalidad sea mayor (0.44 en la corrida 25 contra 0.66 en
+la 23, con más modas). Por eso el diagnóstico agrega **`modas_efectivas`**
+`= 1/sum_j p_j^2`, el número efectivo de componentes activas por origen, y con
+`J = 3` la lectura correcta es el par (modas efectivas, separación máxima). El
+valor absoluto del Sarle **no es comparable entre escenarios con distinto número
+de ramas**; la comparación interna —ambiguos contra deterministas, train contra
+test— sí lo sigue siendo.
 
-| | C (19) | D (22) | E (23) | F (24) |
-|---|---|---|---|---|
-| `r2_lineal_fuera_de_muestra` | 0.730 | 0.723 | 0.214 | 0.066 |
-| `r2_oraculo_fuera_de_muestra` | 0.847 | 0.856 | 0.533 | 0.506 |
-| brecha | 0.118 | 0.133 | 0.319 | **0.441** |
-| `r2_lineal_destendenciado` | 0.551 | 0.551 | 0.208 | 0.060 |
-| `r2_oraculo_destendenciado` | 0.618 | 0.618 | 0.525 | 0.499 |
-| **brecha destendenciada** | 0.067 | 0.067 | 0.317 | 0.439 |
-| `acf1_media` | 0.760 | 0.772 | 0.109 | 0.120 |
-| `desfase_en_sd` (train↔test) | 0.89 | 1.01 | 1.08 | 1.23 |
-| `razon_varianza_Y_mitades` | 1.18 | 1.18 | 1.17 | 1.17 |
-| espectro acumulado (M=1,2,3) | .873/.937/.981 | .882/.942/.982 | .923/.974/.985 | .895/.965/.979 |
-| **M por la regla del 95 %** | **3** | **3** | **2** | **2** |
-| Sarle oráculo ambiguos train→test | — | — | 0.458→**0.660** | 0.388→**0.600** |
+## Diagnóstico medido de las siete corridas (seed 41232, T=400, R=1)
 
-Las brechas destendenciadas de C y D son idénticas **por construcción**: la
-tendencia no realimenta la dinámica, de modo que la componente `Y` es la misma
-serie en las dos corridas y sólo cambia la parte determinista. Es la prueba de
-que el eje "forma de la tendencia" está aislado.
+| | C (19) | D (22) | E (23) | F (24) | G (25) | H (26) | I (27) |
+|---|---|---|---|---|---|---|---|
+| regímenes | — | — | 2 | 2 | **3** | 2 | **3** |
+| `r2_lineal_fuera_de_muestra` | 0.730 | 0.723 | 0.263 | 0.129 | 0.313 | **−0.101** | 0.262 |
+| `r2_oraculo_fuera_de_muestra` | 0.847 | 0.856 | 0.461 | 0.422 | 0.527 | 0.479 | 0.530 |
+| brecha | 0.118 | 0.133 | 0.198 | 0.294 | 0.215 | **0.580** | 0.267 |
+| **brecha destendenciada** | 0.067 | 0.067 | 0.210 | 0.308 | 0.218 | **0.592** | 0.272 |
+| `acf1_media` | 0.760 | 0.772 | 0.018 | 0.023 | 0.053 | −0.033 | 0.053 |
+| `desfase_en_sd` (train↔test) | 0.89 | 1.01 | 1.13 | 1.28 | 1.36 | 1.47 | 1.11 |
+| `monotona` | sí | sí | sí | sí | **no** | **no** | **no** |
+| `razon_varianza_Y_mitades` | 1.18 | 1.18 | 0.93 | 0.93 | 0.95 | 0.93 | 0.98 |
+| ambiguos | — | — | 0.33 | 0.33 | **0.60** | 0.33 | **0.60** |
+| `modas_efectivas_media` | — | — | 1.41 | 1.41 | **1.88** | 1.41 | **1.88** |
+| separación T0 → T (sd innov.) | — | — | 5.3→7.1 | 4.1→7.1 | 5.0→6.9 | **10.7→14.7** | 5.4→5.5 |
+| Sarle oráculo ambiguos train→test | — | — | 0.47→**0.69** | 0.40→**0.63** | 0.38→0.44 | 0.59→**0.65** | 0.37→0.47 |
+| `fraccion_tendencia_invertida` | 0 | 0 | 0 | 0 | 0 | **0.015** | 0 |
+| espectro acumulado (M=1,2,3) | .873/.937/.981 | .882/.942/.982 | .929/.976/.986 | .903/.967/.981 | .909/.970/.982 | **.971**/.990/.994 | .907/.970/.981 |
+| **M por la regla del 95 %** | **3** | **3** | **2** | **2** | **2** | **1** | **2** |
+
+Cuatro lecturas de esta tabla:
+
+- **Las brechas destendenciadas de C y D son idénticas por construcción**: la
+  tendencia no realimenta la dinámica, de modo que la componente `Y` es la misma
+  serie en las dos corridas y sólo cambia la parte determinista. Es la prueba de
+  que el eje "forma de la tendencia" está aislado.
+- **H es el escenario con más margen del estudio entero**: el mejor predictor
+  lineal queda **por debajo de la media incondicional** (`R² = −0.10`) y el
+  oráculo llega a 0.48. Pero su oráculo condiciona sobre un estado latente
+  (`eta_{t-1}`) y es por tanto una cota más generosa: parte de esa brecha es
+  irreducible y hay que declararlo.
+- **G e I tienen el Sarle más bajo y son los MÁS multimodales**: con tres modas
+  la central rellena el hueco y el coeficiente baja. `modas_efectivas` (1.88 de
+  3 posibles, contra 1.41 de 2 en E/F) es la cifra que hay que citar ahí.
+- **En H el espectro cambia de forma**: la primera componente se lleva el 97 %
+  porque la tendencia sinusoidal de nivel puro domina, y la regla del 95 % da
+  `M = 1`. El barrido sigue siendo `(1, 2, 3)`, pero el punto `M = 1` deja de
+  ser el punto "pobre" que es en las demás corridas de mezcla.
 
 ## Lo que hay que arrastrar al reporte
 
@@ -593,22 +684,35 @@ que el eje "forma de la tendencia" está aislado.
   más componentes que una dirección suave para sobrevivir al truncamiento.
   `19_01 §3.5` persiste `10_alineacion_interaccion.csv` con
   `fraccion_explicada` de cada lectura.
-- **E y F corren `M = 1, 2, 3`**, como la 18: la dirección de conmutación carga
-  sobre la **segunda** componente (`|<e, phi_2>| = 0.85`), de modo que el punto
-  de corte del barrido está predicho de antemano.
-  `10_alineacion_conmutacion.csv`.
+- **E, F, G, H e I corren `M = 1, 2, 3`**, como la 18: la dirección de
+  conmutación carga sobre la **segunda** componente (`|<e, phi_2>| = 0.85` en las
+  cinco), de modo que el punto de corte del barrido está predicho de antemano.
+  `10_alineacion_conmutacion.csv`. La excepción a vigilar es la 26, donde la
+  regla del 95 % ya da `M = 1` y el punto bajo del barrido no es tan pobre como
+  en las demás.
 - Estado verdadero: `10_estado_tendencia.csv` (C, D: `b_t`, `q_interaccion`,
-  `estrato_q`) y `10_estado_signo_tendencia.csv` (E, F: régimen, `p_regimen_0`,
-  `sep_dinamica`, `sep_tendencia`, `bimodal`).
+  `estrato_q`) y `10_estado_signo_tendencia.csv` (E–I: régimen, una columna
+  `p_regimen_j` por rama, `p_max`, `modas_efectivas`, `sep_dinamica`,
+  `sep_tendencia`, `factor_volatil`, `bimodal`). En las corridas 25 a 27 el
+  archivo tiene **J columnas de probabilidad** y `ambiguo` pasa a definirse como
+  `p_max < 0.75` —ninguna rama domina—, que con `J = 2` coincide exactamente con
+  la definición de las corridas 18, 23 y 24.
 - `_04 §9.1` cambia de contenido según el mecanismo: **error y cobertura por
   cuartil de interacción** en C y D (`61_error_por_interaccion.csv`), y
   **bimodalidad contra el oráculo, comparando train con test**, en E y F
   (`61_bimodalidad_predictiva.csv`). `62_cobertura_condicional.csv` en los
   cuatro. `_05 §7.1` (techo del oráculo, `76_techo_oraculo.csv`) es común.
 
-**Estado: los dieciséis notebooks y los `.m` están escritos; ninguna de las
-cuatro corridas se ha ejecutado.** Los generadores sí están verificados: las
+**Estado: los veintiocho notebooks y los siete `.m` están escritos; ninguna de
+las siete corridas se ha ejecutado.** Los generadores sí están verificados: las
 cifras de la tabla salen de ejecutar los `_01` hasta §2.7.
+
+**Nota de reproducibilidad:** al generalizar el mecanismo `mezcla` a `J` ramas,
+el sorteo del régimen pasó de `rng.random() < p` a `rng.choice(J, p=...)`, que
+consume el generador de otra forma. Las corridas **23 y 24 cambiaron de
+realización** —no de distribución— y las cifras de la tabla son las nuevas; las
+19 y 22 son bit-idénticas a las de antes del cambio, y eso se verificó
+explícitamente.
 
 
 # Datos reales: la corrida 21

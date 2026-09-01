@@ -151,8 +151,10 @@ from .sim_escenario_T import (
     generar_escenario_T,
     resumen_escenario_T,
     perfil_tendencia,
+    perfil_tramos,
     forma_tendencia_lineal_en_tau,
     nucleo_local,
+    coeficiente_sarle_mezcla,
 )
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -261,8 +263,10 @@ __all__ = [
     "generar_escenario_T",
     "resumen_escenario_T",
     "perfil_tendencia",
+    "perfil_tramos",
     "forma_tendencia_lineal_en_tau",
     "nucleo_local",
+    "coeficiente_sarle_mezcla",
     # ── Contrato de artefactos ──
     "ARCHIVOS",
     "ArtefactosFPCA",

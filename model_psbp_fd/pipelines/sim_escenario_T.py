@@ -162,14 +162,16 @@ __all__ = [
 ]
 
 _MECANISMOS = ("interaccion", "mezcla")
-_FORMAS = ("lineal", "cuadratica")
+_FORMAS = ("lineal", "cuadratica", "logaritmica", "sinusoidal")
 
 
 # ==========================================================================
 # TENDENCIA
 # ==========================================================================
 
-def perfil_tendencia(t_idx: np.ndarray, T: int, forma: str) -> np.ndarray:
+def perfil_tendencia(t_idx: np.ndarray, T: int, forma: str,
+                     ciclos: float = 1.5,
+                     curvatura_log: float = 9.0) -> np.ndarray:
     """
     Perfil b(t) / deriva en [0, 1]: fraccion de la deriva total acumulada en t.
 
@@ -186,11 +188,89 @@ def perfil_tendencia(t_idx: np.ndarray, T: int, forma: str) -> np.ndarray:
     y el desfase medio entre bloques ---que es lo que invalida el centrado--- es
     0.35 deriva en la lineal contra 0.44 en la cuadratica. La cuadratica es por
     tanto el caso adverso, no una variante cosmetica.
+
+    Las otras dos formas rompen supuestos distintos y `deriva` cambia de lectura
+    en la ultima:
+
+        logaritmica : log(1 + c u)/log(1 + c), concava, b(1)=0 y b(T)=deriva. Es
+                      el ESPEJO de la cuadratica: acumula casi toda la deriva al
+                      principio y se aplana, de modo que el entrenamiento ve una
+                      pendiente grande y el test una casi nula. Un modelo que
+                      extrapole la pendiente del entrenamiento sobrecorregira,
+                      que es el modo de fallo opuesto al de la cuadratica.
+        sinusoidal  : sin(2 pi ciclos u), y aqui `deriva` es la AMPLITUD, no el
+                      desplazamiento total: el perfil vuelve a pasar por cero.
+                      Rompe la monotonia, y con ella la coincidencia entre un
+                      estrato por nivel de tendencia y la particion train/test
+                      ---el defecto de la corrida 16---, porque el mismo nivel de
+                      b(t) ocurre en los dos bloques. Con `ciclos` no entero los
+                      dos bloques quedan ademas en fases distintas, que es lo que
+                      impide que el modelo aprenda el ciclo y lo continue.
     """
     if forma not in _FORMAS:
         raise ValueError(f"forma_tendencia no reconocida: {forma!r}. Opciones: {_FORMAS}.")
     u = (np.asarray(t_idx, dtype=float) - 1.0) / (T - 1.0)
-    return u if forma == "lineal" else u ** 2
+    if forma == "lineal":
+        return u
+    if forma == "cuadratica":
+        return u ** 2
+    if forma == "logaritmica":
+        return np.log1p(curvatura_log * u) / np.log1p(curvatura_log)
+    return np.sin(2.0 * np.pi * ciclos * u)
+
+
+def perfil_tramos(t_idx: np.ndarray, T: int, tramos: Sequence[tuple],
+                  ciclos: float = 1.5, curvatura_log: float = 9.0) -> np.ndarray:
+    """
+    Perfil por TRAMOS: cada segmento de la serie tiene su propia forma
+    funcional, y los segmentos se empalman CON CONTINUIDAD.
+
+    `tramos` es una secuencia de `(fraccion_fin, forma, peso)` con las
+    fracciones estrictamente crecientes y la ultima igual a 1. Cada tramo se
+    construye evaluando su propia forma sobre su propio [0, 1] interno, se
+    escala por `peso` y se le suma el valor con que termino el tramo anterior,
+    de modo que el perfil global es continuo aunque su DERIVADA no lo sea ---y
+    esa discontinuidad de la derivada es justamente el cambio de regimen de
+    tendencia que el escenario quiere producir.
+
+    El perfil global se normaliza al final por su maxima excursion absoluta, de
+    modo que `deriva` conserve su lectura: el desplazamiento maximo en unidades
+    de X. Sin esa normalizacion, encadenar tres tramos multiplicaria la deriva
+    por tres sin que nadie lo pidiera.
+
+    Ejemplo: `((0.5, "cuadratica", 1.0), (0.8, "logaritmica", 0.6),
+    (1.0, "sinusoidal", 0.4))` acelera durante la primera mitad, se aplana con
+    una concava y termina oscilando. Los dos quiebres caen en t = 0.5 T y
+    t = 0.8 T, uno dentro del entrenamiento y otro dentro de la prueba, que es
+    la unica forma de que el escenario informe sobre AMBOS bloques.
+    """
+    fr = [float(f) for f, _, _ in tramos]
+    if len(tramos) == 0:
+        raise ValueError("`tramos` esta vacio.")
+    if not np.all(np.diff(fr) > 0):
+        raise ValueError("Las fracciones de `tramos` deben ser estrictamente crecientes.")
+    if not np.isclose(fr[-1], 1.0):
+        raise ValueError("La ultima fraccion de `tramos` debe ser 1.0.")
+    if fr[0] <= 0:
+        raise ValueError("La primera fraccion de `tramos` debe ser positiva.")
+
+    u = (np.asarray(t_idx, dtype=float) - 1.0) / (T - 1.0)
+    perfil = np.zeros_like(u)
+    ini, base = 0.0, 0.0
+    for (fin, forma, peso) in tramos:
+        fin = float(fin)
+        m = (u >= ini) & (u <= fin + 1e-12)
+        if not m.any():
+            ini = fin
+            continue
+        v = (u[m] - ini) / max(fin - ini, 1e-12)          # [0, 1] interno del tramo
+        local = float(peso) * perfil_tendencia(
+            1.0 + v * (T - 1.0), T, forma, ciclos=ciclos, curvatura_log=curvatura_log)
+        perfil[m] = base + local
+        base = float(perfil[m][-1])
+        ini = fin
+    pico = float(np.max(np.abs(perfil)))
+    return perfil / pico if pico > 0 else perfil
 
 
 def forma_tendencia_lineal_en_tau(inclinacion: float) -> Callable[[np.ndarray], np.ndarray]:
@@ -300,7 +380,21 @@ class ConfigEscenarioT(ConfigObservacion):
     Mecanismo "mezcla"
         factores_operador  : multiplicador del operador en cada rama. Por
                              defecto (1.0, -1.0), antisimetrico como en el
-                             Escenario B.
+                             Escenario B. Su longitud J define el NUMERO DE
+                             REGIMENES: con tres entradas el escenario tiene tres
+                             modas y el sorteo pasa a ser un probit ORDENADO,
+                             como el del Algoritmo 3.
+        formas_regimen     : forma de tendencia propia de cada rama, o None para
+                             que todas compartan `forma_tendencia`. Es lo que
+                             hace MULTIMODAL a la tendencia misma: una rama puede
+                             acelerar (cuadratica), otra aplanarse (logaritmica)
+                             y otra oscilar (sinusoidal), de modo que las modas
+                             de la ley condicional no solo se separan sino que lo
+                             hacen a ritmos distintos y en direcciones distintas.
+        umbrales           : cortes del probit ordenado, longitud J-1 y
+                             estrictamente crecientes. Con J = 2 y `umbrales`
+                             None se usa `umbral`, que es la forma antigua y se
+                             conserva para no romper las corridas 23 y 24.
         derivas_regimen    : multiplicador de la deriva en cada rama. Por
                              defecto (1.0, -1.0): las dos ramas se separan a lo
                              largo del tiempo y la distancia entre las modas
@@ -312,6 +406,41 @@ class ConfigEscenarioT(ConfigObservacion):
                              Escenario B, que carga sobre la segunda componente
                              principal y produce el punto de corte del barrido
                              en M.
+
+    Tendencia compuesta y volatil (comun a los dos mecanismos)
+        tramos_tendencia : `((fraccion_fin, forma, peso), ...)`. Si se entrega,
+                           IGNORA `forma_tendencia` y arma el perfil por tramos
+                           con `perfil_tramos`: es el CAMBIO DE REGIMEN DE
+                           TENDENCIA ---p. ej. cuadratica hasta la mitad de la
+                           serie y logaritmica despues---. Los quiebres son
+                           deterministas y conocidos, de modo que el oraculo los
+                           incorpora y la brecha que quede es de estimacion, no
+                           de informacion.
+        ciclos_sinusoidal: numero de ciclos completos de la forma sinusoidal
+                           sobre la serie. Conviene NO entero (1.5 por defecto)
+                           para que el bloque de prueba caiga en una fase
+                           distinta de la del entrenamiento.
+        curvatura_log    : c de log(1+cu)/log(1+c). Cuanto mayor, mas concava.
+        volatilidad_tendencia   : desviacion RELATIVA del factor estocastico que
+                           multiplica a la tendencia. Con 0 la tendencia es
+                           determinista (el caso de las corridas 19-24). Con
+                           v > 0 el multiplicador es 1 + v u_t con u_t un AR(1)
+                           estandarizado, de modo que la PENDIENTE misma cambia
+                           de un periodo a otro y puede llegar a invertirse si
+                           v u_t < -1 ---eso es deliberado: una tendencia volatil
+                           que nunca cambia de signo es una tendencia con ruido,
+                           no una tendencia volatil.
+                           u_t se sortea de un GENERADOR PROPIO derivado de la
+                           semilla, no del de la dinamica, para que activar la
+                           volatilidad no altere la trayectoria de Y: asi la
+                           comparacion entre una corrida volatil y su gemela
+                           determinista es exacta y no queda contaminada por el
+                           orden de consumo del generador aleatorio.
+        persistencia_volatilidad : phi del AR(1) de u_t. Cerca de 1 produce
+                           excursiones largas ---tramos enteros de la serie con
+                           la pendiente cambiada---, que es lo interpretable;
+                           cerca de 0 produce un temblor sin estructura que el
+                           modelo no puede sino promediar.
 
     Diagnostico
         n_dim_diagnostico     : componentes sobre las que se ajusta el mejor
@@ -333,6 +462,13 @@ class ConfigEscenarioT(ConfigObservacion):
     deriva: float = 3.0
     forma_tendencia: str = "lineal"
     inclinacion: float = 0.0
+    ciclos_sinusoidal: float = 1.5
+    curvatura_log: float = 9.0
+    tramos_tendencia: Optional[Sequence[tuple]] = None
+
+    # Tendencia volatil
+    volatilidad_tendencia: float = 0.0
+    persistencia_volatilidad: float = 0.95
 
     # Mecanismo
     mecanismo: str = "interaccion"
@@ -348,14 +484,32 @@ class ConfigEscenarioT(ConfigObservacion):
     # -- "mezcla"
     factores_operador: Sequence[float] = (1.0, -1.0)
     derivas_regimen: Sequence[float] = (1.0, -1.0)
+    formas_regimen: Optional[Sequence[Optional[str]]] = None
     nitidez: float = 4.0
     umbral: float = 0.0
+    umbrales: Optional[Sequence[float]] = None
     direccion_fn: Optional[Callable[[np.ndarray], np.ndarray]] = None
 
     # Diagnostico
     n_dim_diagnostico: int = 5
     prop_train_referencia: float = 0.70
     n_pilot: int = 2000
+
+    @property
+    def n_regimenes(self) -> int:
+        """Numero de ramas del mecanismo 'mezcla'; 1 para 'interaccion'."""
+        return len(self.factores_operador) if self.mecanismo == "mezcla" else 1
+
+    @property
+    def cortes_probit(self) -> tuple:
+        """Umbrales efectivos del probit ordenado, longitud J-1.
+
+        Con J = 2 y `umbrales` sin declarar se usa `umbral`, que es la forma que
+        emplean las corridas 23 y 24; declararlo explicitamente tiene prioridad.
+        """
+        if self.umbrales is not None:
+            return tuple(float(x) for x in self.umbrales)
+        return (float(self.umbral),) * (len(self.factores_operador) - 1)
 
     def validar(self) -> None:
         super().validar()
@@ -371,6 +525,25 @@ class ConfigEscenarioT(ConfigObservacion):
         if self.forma_tendencia not in _FORMAS:
             raise ValueError(
                 f"forma_tendencia='{self.forma_tendencia}' invalida. Opciones: {list(_FORMAS)}.")
+        if self.tramos_tendencia is not None:
+            fr = [float(f) for f, _, _ in self.tramos_tendencia]
+            if not np.all(np.diff(fr) > 0) or not np.isclose(fr[-1], 1.0):
+                raise ValueError(
+                    "tramos_tendencia debe tener fracciones crecientes y terminar en 1.0.")
+            for (_, forma, _) in self.tramos_tendencia:
+                if forma not in _FORMAS:
+                    raise ValueError(f"forma '{forma}' de tramos_tendencia invalida.")
+        if self.ciclos_sinusoidal <= 0:
+            raise ValueError("ciclos_sinusoidal debe ser positivo.")
+        if self.curvatura_log <= 0:
+            raise ValueError("curvatura_log debe ser positivo.")
+        if self.volatilidad_tendencia < 0:
+            raise ValueError("volatilidad_tendencia no puede ser negativa.")
+        if not (0.0 <= self.persistencia_volatilidad < 1.0):
+            raise ValueError(
+                "persistencia_volatilidad debe estar en [0, 1): con 1 el factor "
+                "estocastico es un paseo aleatorio sin varianza estacionaria y la "
+                "tendencia deja de tener escala definida.")
         if self.mecanismo not in _MECANISMOS:
             raise ValueError(
                 f"mecanismo='{self.mecanismo}' invalido. Opciones: {list(_MECANISMOS)}.")
@@ -412,21 +585,47 @@ class ConfigEscenarioT(ConfigObservacion):
                 raise ValueError("n_pilot debe ser al menos 200 para calibrar la escala.")
 
         else:  # "mezcla"
-            for nombre, sec in (("factores_operador", self.factores_operador),
-                                ("derivas_regimen", self.derivas_regimen)):
-                if len(sec) != 2:
+            J = len(self.factores_operador)
+            if J < 2:
+                raise ValueError(
+                    "factores_operador debe tener al menos dos entradas; con una el "
+                    "escenario no tiene mezcla.")
+            if len(self.derivas_regimen) != J:
+                raise ValueError(
+                    f"derivas_regimen tiene {len(self.derivas_regimen)} entradas y "
+                    f"factores_operador {J}: todas las tuplas por regimen deben "
+                    "tener igual longitud.")
+            if self.formas_regimen is not None:
+                if len(self.formas_regimen) != J:
                     raise ValueError(
-                        f"{nombre} tiene {len(sec)} entradas; el probit define dos ramas.")
+                        f"formas_regimen tiene {len(self.formas_regimen)} entradas y "
+                        f"hay {J} regimenes.")
+                for f in self.formas_regimen:
+                    if f is not None and f not in _FORMAS:
+                        raise ValueError(f"forma_regimen '{f}' invalida.")
+            cortes = self.cortes_probit
+            if len(cortes) != J - 1:
+                raise ValueError(
+                    f"Se requieren {J-1} umbrales para {J} regimenes; hay {len(cortes)}.")
+            if J > 2 and not np.all(np.diff(np.asarray(cortes, dtype=float)) > 0):
+                raise ValueError(
+                    "umbrales debe ser estrictamente creciente para que el probit "
+                    "ordenado asigne probabilidades no negativas.")
             if np.max(np.abs(np.asarray(self.factores_operador, dtype=float))) > 1.0 + 1e-12:
                 raise ValueError(
                     "Ningun factor del operador puede exceder 1 en valor absoluto: la "
                     "cota ||factor Psi||_HS <= ||Psi||_HS es lo que da la estabilidad "
                     "de la componente Y.")
-            if np.allclose(self.factores_operador[0], self.factores_operador[1]) and \
-               np.allclose(self.derivas_regimen[0], self.derivas_regimen[1]):
+            fo = np.asarray(self.factores_operador, dtype=float)
+            dr = np.asarray(self.derivas_regimen, dtype=float)
+            fr_ = list(self.formas_regimen or [None] * J)
+            distinguibles = (len(set(np.round(fo, 12))) > 1
+                             or len(set(np.round(dr, 12))) > 1
+                             or len(set(map(str, fr_))) > 1)
+            if not distinguibles:
                 raise ValueError(
-                    "Las dos ramas son identicas en operador Y en tendencia: no hay "
-                    "mezcla que estimar.")
+                    "Todas las ramas son identicas en operador, tendencia y forma: no "
+                    "hay mezcla que estimar.")
             if self.nitidez <= 0:
                 raise ValueError("nitidez debe ser positivo.")
 
@@ -434,6 +633,83 @@ class ConfigEscenarioT(ConfigObservacion):
             raise ValueError("n_dim_diagnostico debe ser al menos 1.")
         if not (0.0 < self.prop_train_referencia < 1.0):
             raise ValueError("prop_train_referencia debe estar en (0, 1).")
+
+
+# ==========================================================================
+# PROBIT ORDENADO Y PERFILES POR REGIMEN
+# ==========================================================================
+
+def _probabilidades_probit(z: float, cortes: np.ndarray, nitidez: float) -> np.ndarray:
+    """
+    P(S <= j | z) = Phi(nitidez (corte_j - z)), y P(S = j) por diferencias.
+
+    Replica el mecanismo "probit" del Algoritmo 3 ---misma parametrizacion, mismo
+    sentido de los cortes--- para que un escenario de esta familia con tres ramas
+    y el Algoritmo 3 con tres regimenes sean comparables. Con J = 2 se reduce
+    exactamente a Phi(nitidez (z - umbral)) para la rama 0, que es lo que usaban
+    las corridas 23 y 24.
+    """
+    J = len(cortes) + 1
+    acum = np.empty(J + 1)
+    acum[0], acum[J] = 0.0, 1.0
+    acum[1:J] = norm.cdf(nitidez * (np.asarray(cortes, dtype=float) - z))
+    p = np.clip(np.diff(acum), 0.0, None)
+    total = float(np.sum(p))
+    return p / total if total > 0 else np.full(J, 1.0 / J)
+
+
+def _perfiles_por_regimen(cfg: "ConfigEscenarioT", t_idx: np.ndarray) -> np.ndarray:
+    """
+    Matriz (J, T) con el perfil de tendencia de cada rama.
+
+    Si `formas_regimen` es None todas las ramas comparten el perfil global ---el
+    caso de las corridas 19 a 24, donde la tendencia por regimen difiere solo en
+    un escalar---. Si se declara, cada rama trae su propia forma funcional y la
+    tendencia pasa a ser MULTIMODAL en sentido fuerte: las modas no solo se
+    separan, lo hacen siguiendo trayectorias de distinta forma.
+
+    `tramos_tendencia`, cuando esta presente, tiene prioridad sobre la forma
+    simple y se aplica por igual a todas las ramas: el cambio de regimen de
+    TENDENCIA es un evento del calendario, no del estado, y mezclarlo con el
+    regimen del proceso haria inseparables los dos mecanismos.
+    """
+    def uno(forma):
+        if cfg.tramos_tendencia is not None:
+            return perfil_tramos(t_idx, cfg.T, cfg.tramos_tendencia,
+                                 ciclos=cfg.ciclos_sinusoidal,
+                                 curvatura_log=cfg.curvatura_log)
+        return perfil_tendencia(t_idx, cfg.T, forma,
+                                ciclos=cfg.ciclos_sinusoidal,
+                                curvatura_log=cfg.curvatura_log)
+
+    J = cfg.n_regimenes
+    formas = list(cfg.formas_regimen or [cfg.forma_tendencia] * J)
+    formas = [f if f is not None else cfg.forma_tendencia for f in formas]
+    return np.array([uno(f) for f in formas])
+
+
+def _factor_volatil(cfg: "ConfigEscenarioT", semilla: int) -> np.ndarray:
+    """
+    Factor multiplicativo (T,) de la tendencia: 1 + v u_t con u_t un AR(1)
+    estandarizado a varianza unitaria.
+
+    Se sortea de un generador PROPIO, derivado de la semilla maestra pero
+    independiente del de la dinamica. Es deliberado: asi activar la volatilidad
+    no desplaza el consumo del generador de Y, y una corrida volatil y su gemela
+    determinista comparten exactamente la misma trayectoria de la componente
+    estable. Sin esa separacion, la diferencia entre las dos corridas mezclaria
+    el efecto de la volatilidad con el de haber simulado otra realizacion.
+    """
+    if cfg.volatilidad_tendencia <= 0:
+        return np.ones(cfg.T)
+    rng = np.random.default_rng(semilla)
+    phi = float(cfg.persistencia_volatilidad)
+    u = np.empty(cfg.T)
+    u[0] = rng.standard_normal()
+    escala = np.sqrt(1.0 - phi ** 2)
+    for t in range(1, cfg.T):
+        u[t] = phi * u[t - 1] + escala * rng.standard_normal()
+    return 1.0 + float(cfg.volatilidad_tendencia) * u
 
 
 # ==========================================================================
@@ -522,6 +798,9 @@ def _simular_replica(
     """
     L = Psi.shape[0]
     innovacion = generador_innovacion(chol_K, rng)
+    cortes = np.asarray(cfg.cortes_probit, dtype=float)
+    factores = np.asarray(cfg.factores_operador, dtype=float)
+    J = len(factores)
 
     Y = innovacion()
     # Calentamiento
@@ -531,15 +810,15 @@ def _simular_replica(
                 inter, Y, escala_inter, centrado_inter, cota_inter) + innovacion()
         else:
             z = float(np.sum(w_quad * direccion * Y))
-            p = float(norm.cdf(cfg.nitidez * (z - cfg.umbral)))
-            s = 0 if rng.random() < p else 1
+            p = _probabilidades_probit(z, cortes, cfg.nitidez)
+            s = int(rng.choice(len(p), p=p))
             Y = float(cfg.factores_operador[s]) * (Psi @ Y) + innovacion()
 
     T = cfg.T
     Y_serie = np.empty((T, L))
     m_cond = np.empty((T, L))          # media condicional de Y (sin tendencia)
     regimen = np.zeros(T, dtype=int)
-    prob_r0 = np.full(T, np.nan)
+    probs = np.full((T, J), np.nan)      # P(S_t = j | X_{t-1}) para cada rama
     z_lag = np.full(T, np.nan)
     contrib_inter = np.full(T, np.nan)  # norma L2 del termino cuadratico
     contrib_lineal = np.full(T, np.nan)
@@ -558,18 +837,19 @@ def _simular_replica(
             Y = m_cond[t] + innovacion()
         else:
             z = float(np.sum(w_quad * direccion * Y))
-            p = float(norm.cdf(cfg.nitidez * (z - cfg.umbral)))
-            s = 0 if rng.random() < p else 1
-            f0, f1 = float(cfg.factores_operador[0]), float(cfg.factores_operador[1])
-            m_cond[t] = (p * f0 + (1.0 - p) * f1) * arrastre
-            z_lag[t], prob_r0[t], regimen[t] = z, p, s
-            Y = (f0 if s == 0 else f1) * arrastre + innovacion()
+            p = _probabilidades_probit(z, cortes, cfg.nitidez)
+            s = int(rng.choice(J, p=p))
+            # Media condicional: la MEZCLA de las J ramas, no la rama realizada.
+            m_cond[t] = float(p @ factores) * arrastre
+            z_lag[t], regimen[t] = z, s
+            probs[t] = p
+            Y = factores[s] * arrastre + innovacion()
 
         Y_serie[t] = Y
 
     return {
         "Y": Y_serie, "m_cond_Y": m_cond, "regimen": regimen,
-        "prob_r0": prob_r0, "z_lag": z_lag,
+        "probs": probs, "z_lag": z_lag,
         "contrib_inter": contrib_inter, "contrib_lineal": contrib_lineal,
         "saturado": saturado,
     }
@@ -657,10 +937,19 @@ def generar_escenario_T(cfg: ConfigEscenarioT) -> SalidaSimulacion:
                      else _normalizar(cfg.direccion_fn(tau), tau))
         escala_inter, centrado_inter, cota_inter = 0.0, np.zeros(1), np.ones(1)
 
-    # Tendencia: perfil temporal y forma sobre el dominio
+    # Tendencia: un perfil temporal por rama, la forma sobre el dominio y el
+    # factor estocastico que multiplica a todo.
     t_idx = np.arange(1, cfg.T + 1)
-    perfil = perfil_tendencia(t_idx, cfg.T, cfg.forma_tendencia)          # (T,)
+    perfiles = _perfiles_por_regimen(cfg, t_idx)                          # (J, T)
+    perfil = perfiles[0]                                                  # compatibilidad
     g_tau = forma_tendencia_lineal_en_tau(cfg.inclinacion)(tau)           # (L,)
+    v_t = _factor_volatil(cfg, cfg.seed + 104729)                         # (T,)
+    phi_v = float(cfg.persistencia_volatilidad)
+    # Valor esperado del factor dado su propio pasado: es lo que el oraculo
+    # puede saber. Con volatilidad nula se reduce a 1 en todo t.
+    v_esp = np.empty_like(v_t)
+    v_esp[0] = 1.0
+    v_esp[1:] = 1.0 + phi_v * (v_t[:-1] - 1.0)
 
     hijas, registro = semillas_replicas(cfg.seed, cfg.R)
 
@@ -670,7 +959,11 @@ def generar_escenario_T(cfg: ConfigEscenarioT) -> SalidaSimulacion:
     tendencias = np.empty((cfg.R, cfg.T, cfg.L))
     tendencias_det = np.empty((cfg.R, cfg.T, cfg.L))
     regimenes = np.zeros((cfg.R, cfg.T), dtype=int)
-    probs_r0 = np.full((cfg.R, cfg.T), np.nan)
+    # El contenedor se dimensiona con la longitud de `factores_operador` y no
+    # con `n_regimenes`, que vale 1 en el mecanismo "interaccion": la
+    # trayectoria devuelve una fila por rama en los dos casos, y en
+    # "interaccion" queda entera en NaN por no haber sorteo.
+    probs_reg = np.full((cfg.R, cfg.T, len(cfg.factores_operador)), np.nan)
     z_lags = np.full((cfg.R, cfg.T), np.nan)
     contrib_inter = np.full((cfg.R, cfg.T), np.nan)
     contrib_lineal = np.full((cfg.R, cfg.T), np.nan)
@@ -687,30 +980,36 @@ def generar_escenario_T(cfg: ConfigEscenarioT) -> SalidaSimulacion:
                 "mecanismo='interaccion' significa que el termino cuadratico domina; "
                 "bajar `razon_interaccion` o `saturacion`.")
 
-        b_t = cfg.deriva * perfil                                    # (T,)
         if cfg.mecanismo == "mezcla":
-            # La tendencia depende del regimen VIGENTE, y por eso la separacion
-            # entre las dos modas crece con t: es el rasgo del escenario.
-            f = np.asarray(cfg.derivas_regimen, dtype=float)[out["regimen"]]
-            tend = np.outer(b_t * f, g_tau)
-            # Componente determinista de la tendencia: la esperada bajo la
-            # ocupacion de las ramas. Es funcion de t solamente, de modo que
-            # restarla NO altera la relacion entre la media condicional y el
-            # pasado --- que es la condicion para que el diagnostico
-            # destendenciado siga midiendo lo que dice medir. Restar la
-            # tendencia REALIZADA rompe esa propiedad, porque depende del
-            # regimen y por tanto de la propia variable a predecir.
-            f_med = float(np.mean(np.asarray(cfg.derivas_regimen, dtype=float)[out["regimen"]]))
-            tend_det = np.outer(b_t * f_med, g_tau)
-            # La media condicional incorpora la tendencia ESPERADA bajo el
-            # probit, que es la mezcla de las dos ramas, no la realizada.
-            p0 = out["prob_r0"]
-            f_esp = p0 * float(cfg.derivas_regimen[0]) + (1 - p0) * float(cfg.derivas_regimen[1])
-            tend_esp = np.outer(b_t * f_esp, g_tau)
-        else:
+            # La tendencia depende del regimen VIGENTE ---y cada rama puede
+            # tener su propia FORMA---, y por eso la separacion entre las modas
+            # crece con t: es el rasgo de estos escenarios.
+            d = np.asarray(cfg.derivas_regimen, dtype=float)
+            B = cfg.deriva * (d[:, None] * perfiles) * v_t[None, :]       # (J, T)
+            b_t = B[out["regimen"], np.arange(cfg.T)]                     # realizada
             tend = np.outer(b_t, g_tau)
-            tend_esp = tend
-            tend_det = tend
+            # Tendencia ESPERADA: la mezcla de las ramas con los pesos del
+            # probit y el factor volatil esperado dado su propio pasado. Es lo
+            # que el oraculo puede saber, y por eso es la que entra en la media
+            # condicional.
+            B_esp = cfg.deriva * (d[:, None] * perfiles) * v_esp[None, :]  # (J, T)
+            tend_esp = np.outer(np.sum(out["probs"] * B_esp.T, axis=1), g_tau)
+
+            # Componente DETERMINISTA: la esperada bajo la ocupacion empirica de
+            # las ramas y con el factor volatil en su media. Es funcion de t
+            # solamente, de modo que restarla NO altera la relacion entre la
+            # media condicional y el pasado --- que es la condicion para que el
+            # diagnostico destendenciado siga midiendo lo que dice medir.
+            # Restar la tendencia REALIZADA rompe esa propiedad, porque depende
+            # del regimen y por tanto de la propia variable a predecir.
+            ocup = np.array([float(np.mean(out["regimen"] == j))
+                             for j in range(len(d))])
+            tend_det = np.outer(cfg.deriva * (ocup @ (d[:, None] * perfiles)), g_tau)
+        else:
+            b_t = cfg.deriva * perfil * v_t
+            tend = np.outer(b_t, g_tau)
+            tend_esp = np.outer(cfg.deriva * perfil * v_esp, g_tau)
+            tend_det = np.outer(cfg.deriva * perfil, g_tau)
 
         X_true = mu + tend + out["Y"]
         curvas[r] = X_true
@@ -718,7 +1017,7 @@ def generar_escenario_T(cfg: ConfigEscenarioT) -> SalidaSimulacion:
         tendencias[r] = tend
         tendencias_det[r] = tend_det
         regimenes[r] = out["regimen"]
-        probs_r0[r] = out["prob_r0"]
+        probs_reg[r] = out["probs"]
         z_lags[r] = out["z_lag"]
         contrib_inter[r] = out["contrib_inter"]
         contrib_lineal[r] = out["contrib_lineal"]
@@ -732,6 +1031,9 @@ def generar_escenario_T(cfg: ConfigEscenarioT) -> SalidaSimulacion:
         "tendencia": tendencias,
         "tendencia_determinista": tendencias_det,
         "perfil_tendencia": perfil,
+        "perfiles_regimen": perfiles,
+        "factor_volatil": v_t,
+        "factor_volatil_esperado": v_esp,
         "forma_tendencia_tau": g_tau,
         "contribucion_interaccion": contrib_inter,
         "fraccion_saturada": saturado,
@@ -742,7 +1044,8 @@ def generar_escenario_T(cfg: ConfigEscenarioT) -> SalidaSimulacion:
         internos.update({
             "direccion_estado": direccion,
             "regimenes": regimenes,
-            "prob_regimen_0": probs_r0,
+            "prob_regimenes": probs_reg,
+            "prob_regimen_0": probs_reg[:, :, 0],
             "proyeccion_estado": z_lags,
         })
     else:
@@ -773,6 +1076,49 @@ def _normalizar(e: np.ndarray, tau: np.ndarray) -> np.ndarray:
     if norma <= 0:
         raise ValueError("direccion_fn produjo una funcion de norma nula.")
     return e / norma
+
+
+# ==========================================================================
+# BIMODALIDAD DE UNA MEZCLA DE J COMPONENTES
+# ==========================================================================
+
+def coeficiente_sarle_mezcla(pesos: np.ndarray, medias: np.ndarray,
+                             sd: float) -> np.ndarray:
+    """
+    Coeficiente de bimodalidad de Sarle b = (g1^2 + 1)/g2 de una mezcla de J
+    normales con varianza comun, calculado de forma EXACTA a partir de sus
+    momentos y no por simulacion.
+
+    `pesos` y `medias` son (n, J): una fila por origen. Referencias: 1/3 para la
+    gaussiana y 5/9 para la uniforme; por encima de 5/9 se lee como evidencia de
+    multimodalidad.
+
+    Generaliza `coeficiente_sarle_mezcla_simetrica` del Escenario B, que sigue
+    valiendo para el caso de dos componentes simetricas y se conserva porque es
+    mas barata y mas legible en ese caso. Aqui hace falta la version general
+    porque con TRES ramas ---y con tres tendencias distintas--- la mezcla no es
+    simetrica ni tiene una separacion unica: cada origen tiene sus propios pesos
+    y sus propias tres medias.
+
+    Ojo con la lectura: el coeficiente de Sarle es una heuristica descriptiva y
+    no un test, y con J = 3 su cota superior sigue siendo 1 pero se alcanza en
+    configuraciones distintas. Lo que informa es la COMPARACION entre grupos de
+    origenes del mismo escenario, no el valor absoluto.
+    """
+    pesos = np.atleast_2d(np.asarray(pesos, dtype=float))
+    medias = np.atleast_2d(np.asarray(medias, dtype=float))
+    if pesos.shape != medias.shape:
+        raise ValueError(f"pesos {pesos.shape} y medias {medias.shape} no coinciden.")
+    s2 = float(sd) ** 2
+    mu = np.sum(pesos * medias, axis=1, keepdims=True)
+    d = medias - mu
+    m2 = np.sum(pesos * (d ** 2 + s2), axis=1)
+    m3 = np.sum(pesos * (d ** 3 + 3.0 * d * s2), axis=1)
+    m4 = np.sum(pesos * (d ** 4 + 6.0 * (d ** 2) * s2 + 3.0 * s2 ** 2), axis=1)
+    m2 = np.where(m2 > 0, m2, np.nan)
+    g1 = m3 / m2 ** 1.5
+    g2 = m4 / m2 ** 2
+    return (g1 ** 2 + 1.0) / g2
 
 
 # ==========================================================================
@@ -868,7 +1214,8 @@ def resumen_escenario_T(salida: SalidaSimulacion) -> dict:
 
     R, T, L = salida.curvas.shape
     T0 = int(np.floor(cfg.prop_train_referencia * T))
-    b_t = cfg.deriva * perfil
+    v_t = salida.internos["factor_volatil"]
+    b_t = cfg.deriva * perfil * v_t
     g_medio = float(np.mean(g_tau))
 
     # ── Tendencia ───────────────────────────────────────────────────────────
@@ -887,6 +1234,19 @@ def resumen_escenario_T(salida: SalidaSimulacion) -> dict:
     r1 = float(np.corrcoef(resid[:-1], resid[1:])[0, 1]) if T > 3 else 0.0
     r1 = min(max(r1, 0.0), 0.99)
     ee_pend_ac = float(ee_pend * np.sqrt((1.0 + r1) / (1.0 - r1)))
+    # Y hay una segunda razon por la que el error estandar de MCO no sirve aqui,
+    # que solo aparece con tendencia por regimen o volatil: el residuo es
+    # HETEROCEDASTICO por construccion. Su parte dominante es
+    # b(t)(d_{S_t} - E[d]) g_medio, cuya varianza crece con b(t), de modo que
+    # los ultimos periodos pesan mucho mas que los primeros. Con el EE de MCO
+    # una desviacion inocua parece significativa ---medido, 4.2 EE en el
+    # escenario con tendencia volatil---. Se reporta tambien el EE robusto de
+    # White y el `assert` de los notebooks usa el MAXIMO de los dos, que es la
+    # unica lectura conservadora cuando ambos problemas coexisten.
+    XtX_inv = np.linalg.inv(Z.T @ Z)
+    meat = (Z * (resid ** 2)[:, None]).T @ Z
+    ee_pend_hc = float(np.sqrt((XtX_inv @ meat @ XtX_inv)[1, 1]))
+    ee_pend_robusto = float(max(ee_pend_ac, ee_pend_hc))
 
     # Con "mezcla" la tendencia realizada alterna de signo con el regimen, de
     # modo que la pendiente esperada NO es g_medio sino su promedio ponderado
@@ -894,8 +1254,20 @@ def resumen_escenario_T(salida: SalidaSimulacion) -> dict:
     # cada mecanismo en vez de una sola que solo valdria en un caso.
     if cfg.mecanismo == "mezcla":
         f = np.asarray(cfg.derivas_regimen, dtype=float)
-        ocup = np.array([float(np.mean(salida.internos["regimenes"] == j)) for j in (0, 1)])
-        pend_esperada = g_medio * float(ocup @ f)
+        ocup = np.array([float(np.mean(salida.internos["regimenes"] == j))
+                         for j in range(f.size)])
+        # Con `formas_regimen` distintas la pendiente esperada ya no es un
+        # escalar por g_medio: cada rama arrastra su propio perfil. Se regresa
+        # sobre el perfil de la PRIMERA rama, de modo que la referencia correcta
+        # es el promedio ponderado de los coeficientes de proyeccion de cada
+        # perfil sobre aquel. Con formas iguales se reduce al caso anterior.
+        perfiles = salida.internos["perfiles_regimen"]
+        p0 = perfiles[0]
+        den = float(np.sum((p0 - p0.mean()) ** 2))
+        proy = np.array([float(np.sum((p0 - p0.mean()) * (perfiles[j] - perfiles[j].mean()))
+                               / den) if den > 0 else 0.0
+                         for j in range(f.size)])
+        pend_esperada = g_medio * float(ocup @ (f * proy))
     else:
         pend_esperada = g_medio
 
@@ -924,6 +1296,25 @@ def resumen_escenario_T(salida: SalidaSimulacion) -> dict:
         # Tendencia
         "mecanismo": cfg.mecanismo,
         "forma_tendencia": cfg.forma_tendencia,
+        "tramos_tendencia": ([[float(f), str(fo_), float(p)]
+                              for (f, fo_, p) in cfg.tramos_tendencia]
+                             if cfg.tramos_tendencia is not None else None),
+        "ciclos_sinusoidal": float(cfg.ciclos_sinusoidal),
+        "curvatura_log": float(cfg.curvatura_log),
+        # La monotonia se mide sobre la tendencia DETERMINISTA promediada en tau
+        # ---no sobre el perfil de la primera rama---, porque es la que decide si
+        # un estrato por nivel de tendencia seria un intervalo temporal contiguo
+        # y coincidiria con la particion train/test, que es el defecto declarado
+        # de la corrida 16. Con formas por rama o con tramos, el perfil de una
+        # rama puede ser monotono y la tendencia agregada no serlo.
+        "monotona": bool(
+            np.all(np.diff(tend_det[0].mean(axis=1)) >= -1e-12)
+            or np.all(np.diff(tend_det[0].mean(axis=1)) <= 1e-12)),
+        "volatilidad_tendencia": float(cfg.volatilidad_tendencia),
+        "persistencia_volatilidad": float(cfg.persistencia_volatilidad),
+        "factor_volatil_min": float(np.min(v_t)),
+        "factor_volatil_max": float(np.max(v_t)),
+        "fraccion_tendencia_invertida": float(np.mean(v_t < 0.0)),
         "deriva_total": float(cfg.deriva),
         "inclinacion": float(cfg.inclinacion),
         "g_medio": g_medio,
@@ -931,8 +1322,11 @@ def resumen_escenario_T(salida: SalidaSimulacion) -> dict:
         "pendiente_esperada": float(pend_esperada),
         "pendiente_ee": ee_pend,
         "pendiente_ee_autocorr": ee_pend_ac,
+        "pendiente_ee_robusto_white": ee_pend_hc,
+        "pendiente_ee_usado": ee_pend_robusto,
         "acf1_residuo_tendencia": r1,
-        "desvio_pendiente_en_ee": float(abs(coef[1] - pend_esperada) / max(ee_pend_ac, 1e-300)),
+        "desvio_pendiente_en_ee": float(
+            abs(coef[1] - pend_esperada) / max(ee_pend_robusto, 1e-300)),
         "b_en_T0": float(b_t[T0 - 1]),
         "b_en_T": float(b_t[-1]),
         "desfase_train_test": desfase,
@@ -972,37 +1366,57 @@ def resumen_escenario_T(salida: SalidaSimulacion) -> dict:
         })
     else:
         reg = salida.internos["regimenes"]
-        p0 = salida.internos["prob_regimen_0"]
+        PR = salida.internos["prob_regimenes"]          # (R, T, J)
         z = salida.internos["proyeccion_estado"]
-        ambiguo = (p0 > 0.25) & (p0 < 0.75)
+        J = PR.shape[2]
+        d = np.asarray(cfg.derivas_regimen, dtype=float)
+        fo = np.asarray(cfg.factores_operador, dtype=float)
+        perfiles = salida.internos["perfiles_regimen"]  # (J, T)
+        v_t = salida.internos["factor_volatil"]
+
+        # Un origen es AMBIGUO cuando ninguna rama domina. Con J = 2 coincide
+        # exactamente con la definicion de las corridas 18, 23 y 24 ---p en
+        # [0.25, 0.75]---, y con J > 2 la generaliza sin privilegiar a ninguna.
+        ambiguo = PR.max(axis=2) < 0.75
         transiciones = float(np.mean([int(np.sum(np.diff(reg[r]) != 0)) for r in range(R)]))
 
-        # Separacion entre las dos modas: la parte dinamica no depende de t, la
-        # de tendencia si, y esa es la novedad de estos escenarios.
+        # Separacion entre modas. La parte dinamica no depende de t; la de
+        # tendencia si, y con `formas_regimen` distintas cada par de ramas se
+        # separa a su propio ritmo. Se reporta el MAXIMO sobre pares, que es la
+        # distancia entre las dos modas extremas.
         Y0 = salida.curvas[0] - tend[0] - salida.media
         arr = Y0[:-1] @ Psi.T
-        df = abs(float(cfg.factores_operador[0]) - float(cfg.factores_operador[1]))
+        df = float(np.max(fo) - np.min(fo))
         sep_din = float(np.mean(np.sqrt(np.sum(w * (df * arr) ** 2, axis=1))))
-        dd = abs(float(cfg.derivas_regimen[0]) - float(cfg.derivas_regimen[1]))
         norma_g = float(np.sqrt(np.sum(w * g_tau ** 2)))
-        sep_tend_T0 = dd * float(b_t[T0 - 1]) * norma_g
-        sep_tend_T = dd * float(b_t[-1]) * norma_g
+        B = cfg.deriva * (d[:, None] * perfiles) * v_t[None, :]          # (J, T)
+        sep_tend_t = (B.max(axis=0) - B.min(axis=0)) * norma_g           # (T,)
         sd_innov_L2 = float(np.sqrt(max(float(np.sum(w * np.diag(K))), 0.0)))
 
-        # Sarle exacto de la ley condicional verdadera sobre la primera
-        # componente, al principio y al final de la serie: la referencia oracle.
+        # Sarle EXACTO de la ley condicional verdadera sobre la primera
+        # componente: la referencia oracle contra la que el _04 contrasta la
+        # predictiva del modelo. Cada origen aporta sus J pesos y sus J medias.
         _, U0 = _fpca_empirica(Y0 - Y0.mean(axis=0, keepdims=True), w, 1)
         u1 = U0[:, 0]
-        a_din = (arr @ (w * u1)) * (df / 2.0)
-        a_tend = (dd / 2.0) * b_t[1:] * float(np.sum(w * g_tau * u1))
+        a_din = np.outer(arr @ (w * u1), fo)                              # (T-1, J)
+        a_tend = (B.T[1:] * float(np.sum(w * g_tau * u1)))                # (T-1, J)
         sd_u1 = float(np.sqrt(max(float(u1 @ ((w[:, None] * K) * w[None, :]) @ u1), 0.0)))
-        b_sarle = coeficiente_sarle_mezcla_simetrica(p0[0][1:], a_din + a_tend, sd_u1)
+        b_sarle = coeficiente_sarle_mezcla(PR[0][1:], a_din + a_tend, sd_u1)
         amb1 = ambiguo[0][1:]
         primera = np.arange(len(b_sarle)) < (T0 - 1)
 
+        def _media(mascara):
+            return float(np.nanmean(b_sarle[mascara])) if mascara.any() else float("nan")
+
         especifico.update({
-            "factores_operador": [float(x) for x in cfg.factores_operador],
-            "derivas_regimen": [float(x) for x in cfg.derivas_regimen],
+            "n_regimenes": int(J),
+            "factores_operador": [float(x) for x in fo],
+            "derivas_regimen": [float(x) for x in d],
+            "formas_regimen": list(cfg.formas_regimen) if cfg.formas_regimen
+                              else [cfg.forma_tendencia] * J,
+            "cortes_probit": [float(x) for x in cfg.cortes_probit],
+            "proporcion_por_regimen": [float(np.mean(reg == j)) for j in range(J)],
+            "proporcion_regimen_minima": float(min(np.mean(reg == j) for j in range(J))),
             "proporcion_regimen_0": float(np.mean(reg == 0)),
             "n_transiciones_media": transiciones,
             "duracion_media_racha": float(T / (transiciones + 1.0)),
@@ -1010,21 +1424,28 @@ def resumen_escenario_T(salida: SalidaSimulacion) -> dict:
             "nitidez": float(cfg.nitidez),
             "nitidez_en_sd_z": float(cfg.nitidez * float(np.std(z))),
             "fraccion_origenes_ambiguos": float(np.mean(ambiguo)),
+            # Numero EFECTIVO de componentes de la mezcla, 1/sum_j p_j^2,
+            # promediado sobre origenes. Complementa al coeficiente de Sarle y no
+            # lo duplica: Sarle detecta BImodalidad, y con tres modas
+            # equiespaciadas BAJA aunque la multimodalidad sea mayor ---la moda
+            # central rellena el hueco entre las extremas y la densidad se
+            # aplana---. Con J = 3 el par (modas efectivas, separacion maxima) es
+            # la lectura correcta, y el Sarle pasa a ser secundario.
+            "modas_efectivas_media": float(np.mean(1.0 / np.sum(PR[0] ** 2, axis=1))),
+            "modas_efectivas_maxima": float(np.max(1.0 / np.sum(PR[0] ** 2, axis=1))),
             "n_origenes_ambiguos": int(np.sum(ambiguo) / R),
             "separacion_modas_dinamica_L2": sep_din,
-            "separacion_modas_tendencia_en_T0": sep_tend_T0,
-            "separacion_modas_tendencia_en_T": sep_tend_T,
+            "separacion_modas_tendencia_en_T0": float(sep_tend_t[T0 - 1]),
+            "separacion_modas_tendencia_en_T": float(sep_tend_t[-1]),
+            "separacion_modas_tendencia_maxima": float(np.max(sep_tend_t)),
             "sd_innovacion_L2": sd_innov_L2,
             "separacion_total_en_sd_T0": float(
-                (sep_din + sep_tend_T0) / max(sd_innov_L2, 1e-300)),
+                (sep_din + sep_tend_t[T0 - 1]) / max(sd_innov_L2, 1e-300)),
             "separacion_total_en_sd_T": float(
-                (sep_din + sep_tend_T) / max(sd_innov_L2, 1e-300)),
-            "sarle_oraculo_ambiguos_train": float(np.nanmean(b_sarle[amb1 & primera]))
-                if (amb1 & primera).any() else float("nan"),
-            "sarle_oraculo_ambiguos_test": float(np.nanmean(b_sarle[amb1 & ~primera]))
-                if (amb1 & ~primera).any() else float("nan"),
-            "sarle_oraculo_deterministas_test": float(np.nanmean(b_sarle[~amb1 & ~primera]))
-                if (~amb1 & ~primera).any() else float("nan"),
+                (sep_din + sep_tend_t[-1]) / max(sd_innov_L2, 1e-300)),
+            "sarle_oraculo_ambiguos_train": _media(amb1 & primera),
+            "sarle_oraculo_ambiguos_test": _media(amb1 & ~primera),
+            "sarle_oraculo_deterministas_test": _media(~amb1 & ~primera),
             "sarle_referencia_uniforme": 5.0 / 9.0,
             "sarle_referencia_gaussiana": 1.0 / 3.0,
         })
