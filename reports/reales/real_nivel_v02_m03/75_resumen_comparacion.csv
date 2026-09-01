@@ -1,0 +1,20 @@
+experiment_id,real_nivel_v02_m03
+objetivo_evaluacion,curva_observada
+modo_residuo,empirico
+n_lags,1
+M_fpca,3
+n_train_origenes,594
+n_test_origenes,255
+w_ventana,20
+p_bic_libre,2
+far_hs_norm,1.390993
+far_hs_referencia,no observable (serie real)
+far_radio_espectral,0.979215
+mise_truncamiento_test,8.412e-05
+mise_test_VAR,0.00024617
+mise_test_FAR1,0.00024588
+mise_test_RF,0.00035592
+mise_test_GBT,0.0002755
+mise_test_media,0.0022439
+mise_test_persistencia,0.00029526
+mise_test_PSBPM-FD,0.00023204

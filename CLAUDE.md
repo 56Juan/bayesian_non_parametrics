@@ -168,6 +168,8 @@ El anexo los ordena por **qué someten a prueba**, y la lectura de los resultado
 | 4 | Innovación SMSN (asimetría) | `pipelines/sim_escenario_4.py` | Implementado; revisar parámetros |
 | 5 | Predictibilidad en componente subordinada | `pipelines/sim_escenario_5.py` | Implementado, **descartado del estudio**: pasa a cota analítica en limitaciones (ver Etapa B) |
 | 6 | Covarianza no estacionaria | `pipelines/sim_escenario_6.py` | Implementado con los parámetros del anexo como default |
+| **B** | **FAR con signo conmutado por umbral** | `pipelines/sim_escenario_B.py` | Implementado; **no es del anexo**, es de diagnóstico (ver §El Escenario B) |
+| **C–F** | **Tendencia (lineal/cuadrática) × no linealidad (interacción intra-curva / multimodalidad)** | `pipelines/sim_escenario_T.py` | Implementado; **no son del anexo**, son de diagnóstico. Un módulo, cuatro corridas (ver §La familia con tendencia) |
 
 **Los Algoritmos 5 y 6 cambiaron de definición.** La nota antigua de este archivo ("Algoritmo 5 no implementado por su estacionariedad bajo skew-normal") describía un diseño anterior y ya no aplica: en el anexo vigente el 5 es *predictibilidad en componente subordinada* y el 6 es *covarianza no estacionaria*. Ambos son del Bloque 2 y **no reutilizan la maquinaria de `sim_comun`** para la dinámica — no hay operador integral, ni Cholesky de innovación funcional, ni norma HS. Comparten en cambio el esquema de observación, las réplicas y las semillas, de modo que lo que sí se reutiliza de `sim_comun` es `grilla_regular`, `evaluar_media`, `semillas_replicas`, `aplicar_ruido_observacion`, `diagnostico_comun`, `ConfigObservacion` y `SalidaSimulacion`.
 
@@ -248,6 +250,11 @@ Orden pensado para que cada etapa sea utilizable antes de empezar la siguiente.
 | `15_sim_E5` | Alg. 5 | `escenario_5_r01` | corrida; escenario **descartado** |
 | `16_sim_E6` | Alg. 6 | `escenario_6_r01` | corrida |
 | `17_sim_EA` | **Escenario A: FAR(1) con tendencia** | `escenario_A_r01` | escenario de **diagnóstico**, no es un Algoritmo del anexo; sin `_05` |
+| `18_sim_EB` | **Escenario B: FAR con signo conmutado** | `escenario_B_r01_m01`…`_m03` | escenario de **diagnóstico**, no es un Algoritmo del anexo; **construido para que el FAR muera**. Arquitectura de la 20 (barrido en `M`). **Sin correr** |
+| `19_sim_EC` | **Escenario C: interacciones intra-curva + tendencia lineal** | `escenario_C_r01_m02`…`_m04` | familia con tendencia (`sim_escenario_T.py`). **Sin correr** |
+| `22_sim_ED` | **Escenario D: interacciones + tendencia cuadrática** | `escenario_D_r01_m02`…`_m04` | ídem, eje tendencia. **Sin correr** |
+| `23_sim_EE` | **Escenario E: multimodalidad + tendencia por régimen (lineal)** | `escenario_E_r01_m01`…`_m03` | ídem, eje no linealidad. **Sin correr** |
+| `24_sim_EF` | **Escenario F: multimodalidad + tendencia por régimen (cuadrática)** | `escenario_F_r01_m01`…`_m03` | ídem, las dos. **Sin correr** |
 | `20_sim_E1` | Alg. 1 | `escenario_1_r01_m01`, `..._m02` | **plantilla vigente**: `mu = sin(2 pi tau)`, `M` en el id. Barrido en curso |
 | `21_real_nivel` | **datos reales** | `real_nivel_v01_m03` | la arquitectura de la 20 sobre la serie observada; ver §Datos reales |
 
@@ -259,7 +266,9 @@ Orden pensado para que cada etapa sea utilizable antes de empezar la siguiente.
 - **E4** tiene contraste en el generador que el modelo no recupera; mismo patrón que E3.
 - **E5 y E6 son Bloque 2 y no discriminan métodos**: su degradación alcanza por igual a PSBPM-FD, FAR(1), VAR y RF, porque la base congelada les falla a todos y no hay covariable rezagada que anticipe el cambio. Son **limitación, no resultado**. E6 conserva un aporte propio que ningún otro da: `e_t = ||X_t - Pi_M X_t||^2`, métrica independiente del modelo predictivo que separa "falla la representación" de "falla la predicción".
 
-El peso del capítulo tiene que caer en **2, 3 y 4**.
+El peso del capítulo tiene que caer en **2, 3 y 4**, y —desde que existe— en el
+**Escenario B de la corrida 18**, que es el único con brecha medible entre la
+clase lineal y el óptimo (ver §El Escenario B).
 
 **La corrida 20 (`notebooks/simulaciones/20_sim_E1/`) es la plantilla vigente**, copia de la 11 con dos cambios: `mu(tau) = sin(2 pi tau)` (la 11 corrió con `5 + 2 sin`) y `M_FPCA` como eje de barrido en el `EXPERIMENT_ID`. El resto de `SIM_CFG` es el del anexo y no se tocó. Para las corridas de E2, E3 y E4 con las constantes nuevas, partir de la 20 y no de la 11.
 
@@ -336,6 +345,271 @@ El peso del capítulo tiene que caer en **2, 3 y 4**.
 **Etapa E — agregación y tablas** siguiendo los seis puntos del `% [PENDIENTE]` de `§03_07`.
 
 ---
+
+---
+
+# El Escenario B: la corrida 18
+
+`notebooks/simulaciones/18_sim_EB/` es un escenario de **diagnóstico** —como el A
+de la 17, se nombra con letra y no es un Algoritmo del anexo— construido para
+responder al único hueco que ninguno de los seis cubre: **un generador donde la
+clase lineal homogénea no pueda competir en media condicional.**
+
+## Por qué existe
+
+El cuello de botella del capítulo no es que falten escenarios que rompan un
+supuesto, sino que **los que existen rompen supuestos que la clase lineal
+tampoco necesita**: en el E1 la media condicional es lineal (el FAR(1) está
+correctamente especificado), en el E2 es constante (la media incondicional es
+óptima), en el E4 es la del E1, y en la corrida 21 el RESET no rechaza
+linealidad. En los cuatro casos el MISE no discrimina, y **no por defecto del
+modelo**. El E3 debía ser la excepción y no lo fue.
+
+## El generador
+
+    X_t = mu + s_t · Psi(X_{t-1} - mu) + eps_t,   P(s_t = +1 | X_{t-1}) = Phi(kappa (z_{t-1} - c)),
+    z_{t-1} = <X_{t-1} - mu, e>,  e(tau) ∝ sin(2 pi tau)
+
+es decir el **FAR(1) del Algoritmo 1 con el signo del operador conmutado** por
+un umbral sobre el estado rezagado. Los dos regímenes son `Psi` y `-Psi`:
+**antisimétricos**.
+
+**El mecanismo es de simetría, y es exacto.** El mejor predictor lineal depende
+del proceso sólo a través de `C1 = E[Y_t ⊗ Y_{t-1}] = Psi E[s(Y_{t-1}) Y_{t-1} ⊗ Y_{t-1}]`,
+cuyo integrando es par en el signo e impar en `Y`: si la ley de `Y` fuera
+exactamente simétrica, `C1` sería el operador **nulo**. No lo es —la deriva
+conmutada es par y eso desplaza la media— pero la cancelación es casi completa
+cuando `e` es casi ortogonal a la dirección dominante del proceso, que es lo que
+fija la elección de `e ∝ sin(2 pi tau)` y de `gamma = 0.60`.
+
+**Diagnóstico del generador con los parámetros elegidos** (`seed=41232`, `T=400`,
+`R=1`), todo calculado por `resumen_escenario_B`:
+
+| Cantidad | Valor | Lectura |
+|---|---|---|
+| `r2_lineal_fuera_de_muestra` | **−0.038** | el mejor lineal **no supera a la media incondicional** |
+| `r2_oraculo_fuera_de_muestra` | **0.376** | y sin embargo un tercio largo de la varianza es predecible |
+| `acf1_media` | 0.049 | la serie **parece ruido blanco** a cualquier diagnóstico lineal |
+| `fraccion_origenes_ambiguos` | 0.353 (141 de 400) | contra el 14 % de la corrida 13 |
+| `fraccion_origenes_bimodales` | 0.188 (75) | ambiguos **y** con estado grande |
+| `separacion_modas_en_sd_innovacion` | 2.29 | contra 1.47 de la corrida 13 |
+| `sarle_oraculo_bimodales` | **0.581** | por encima del 5/9 uniforme: bimodalidad genuina |
+| `sarle_oraculo_ambiguos` / `_deterministas` | 0.473 / 0.386 | el contraste que el modelo debería reproducir |
+| espectro FPCA | 89.8 % / 96.9 % | la regla del 95 % da **M = 2** |
+| `\|<e, phi_2>\|` | 0.85 | **la dirección de conmutación es la 2ª componente** |
+
+`r2_lineal_dentro_de_muestra` (0.007) se reporta aparte a propósito: con L=75
+regresores y T=400 el `R²` dentro de muestra está inflado por sobreajuste, y es
+el sesgo que haría parecer favorable al escenario sin serlo. La cifra citable es
+la de fuera de muestra.
+
+## Lo que este escenario permite y ningún otro
+
+1. **El MISE discrimina.** `18_05 §7.1` es la sección nueva: pone en la misma
+   escala la media incondicional, el mejor lineal, el PSBPM-FD y el **oráculo**
+   —la media condicional verdadera, leída de `interno_media_condicional` del
+   `.npz` y proyectada sobre las mismas `M` autofunciones—. La cifra reportable
+   es `fraccion_brecha_recuperada`: 0 significa que el modelo se comporta como
+   un lineal, 1 que alcanza el óptimo teórico. **Ningún otro escenario del
+   estudio puede producir esa cifra**, porque en los demás la brecha es nula.
+2. **Referencia *oracle* para la bimodalidad.** `coeficiente_sarle_mezcla_simetrica`
+   calcula de forma **exacta** el Sarle de la ley condicional verdadera
+   proyectada, y viaja en `eval_config["forma_predictiva"]`. `18_04 §9.1` lo
+   contrasta con el mismo coeficiente sobre la predictiva del modelo, separando
+   deterministas / ambiguos / **bimodales** (ambiguos y con estado grande). Es
+   exactamente el diagnóstico que a la corrida 13 le faltó y sin el cual un
+   Sarle bajo no distingue un fallo del modelo de un generador sin contenido.
+3. **El barrido en `M` tiene un punto de corte predicho de antemano.** Con
+   `M = 1` el modelo **no observa** la dirección que gobierna la conmutación
+   —carga sobre la 2ª componente— y no puede sino fallar como el FAR; con
+   `M >= 2` sí la observa. La predicción es un **salto** entre 1 y 2, no la
+   degradación suave de la corrida 20 (después de `M=2` vuelve a regir aquélla).
+   `18_01 §3.5` persiste `10_alineacion_conmutacion.csv` con
+   `fraccion_e_explicada = sum_{k<=M} <e, phi_k>^2`, que es la cifra que decide
+   de qué lado cae cada punto del barrido.
+
+## Divergencias deliberadas respecto del Algoritmo 1
+
+Sólo dos, y ambas están argumentadas en `18_01 §2.1`. **Hay que declararlas al
+comparar la 18 con la 20**, porque la comparación no es limpia:
+
+| | Alg. 1 | Escenario B | Por qué |
+|---|---|---|---|
+| `gamma` | 0.30 | **0.60** | núcleo más ancho ⇒ el rango de `Psi` se concentra en la dirección casi constante y queda más ortogonal a `e` ⇒ más cancelación. `r2_lineal` pasa de 0.031 a 0.002 en corrida larga |
+| `hs_norm` | 0.70 | **0.90** | la media condicional es `s_t Psi Y_{t-1}`: su varianza —y con ella el `R²` del oráculo— crece con `hs_norm` |
+
+`nitidez = 4.0` (≈ 1.5 en unidades de `sd(z)`) es el punto elegido del
+intercambio central del escenario: **subirla agranda la brecha oráculo/lineal y
+elimina los orígenes bimodales**, que son los únicos con contenido para el eje
+distribucional. `ell = 0.5`, `sigma_eps = 1.0`, `umbral = 0` y los parámetros
+fijos del estudio (`L=75`, `T=400`, `PROP_TRAIN=0.70`, `sigma_obs=0.25`,
+`mu = sin(2 pi tau)`) son los de siempre.
+
+## Archivos propios
+
+- `pipelines/sim_escenario_B.py` — `ConfigEscenarioB`, `generar_escenario_B`,
+  `resumen_escenario_B`, `simular_trayectoria_far_signo`,
+  `direccion_oscilatoria`, `coeficiente_sarle_mezcla_simetrica`.
+  `internos` lleva `signos`, `proyeccion_estado`, `prob_signo_positivo`,
+  **`media_condicional`** (el oráculo, `(R, T, L)`) y el operador.
+- `18_01 §2.3` — la celda que decide si el escenario sirve: tres `assert`
+  (`r2_lineal < 0.05`, `r2_oraculo > 0.15`, `fraccion_ambiguos > 0.15`). Si
+  alguno falla no tiene sentido gastar MCMC.
+- `reports/.../10_estado_signo.csv` — estado verdadero por período (`signo`,
+  `p_signo_pos`, `z_lag`, `ambiguo`, `norma_arrastre`, `bimodal`). A diferencia
+  de la corrida 16, **el estrato no coincide con la partición train/test**, de
+  modo que la cobertura condicional mide algo distinto de la comparación
+  train/test.
+- `reports/.../10_alineacion_conmutacion.csv` — carga de `e` sobre cada FPC.
+- Salidas nuevas: `61_bimodalidad_predictiva.csv` y `62_cobertura_condicional.csv`
+  del `_04`; `76_techo_oraculo.csv` del `_05`.
+
+**Estado: los cuatro notebooks y los tres `.m` están escritos, pero la corrida
+no se ha ejecutado.** El generador sí está verificado numéricamente (las cifras
+de la tabla de arriba salen de ejecutar `18_01` hasta §2.7).
+
+
+---
+
+# La familia con tendencia: corridas 19, 22, 23 y 24
+
+`pipelines/sim_escenario_T.py` genera **cuatro** escenarios de diagnóstico —C, D,
+E y F— con un **diseño factorial 2×2**. Un solo módulo, porque comparten la
+tendencia, el esquema de observación, el oráculo y el control de calidad:
+
+| | tendencia **lineal** | tendencia **cuadrática** |
+|---|---|---|
+| **interacciones** intra-curva (unimodal) | **C · corrida 19** | **D · corrida 22** |
+| **multimodalidad** con tendencia por régimen | **E · corrida 23** | **F · corrida 24** |
+
+Cualquier diferencia entre 19 y 22 (o 23 y 24) es atribuible a la **forma de la
+tendencia**; entre las dos filas, al **tipo de no linealidad**. Todo lo demás
+—esquema de observación, `gamma=0.30`, `hs_norm=0.70`, `ell=0.5`, priors,
+`mcmc_config`— es idéntico a las corridas 18 y 20.
+
+    Y_t = m(Y_{t-1}, S_t) + eps_t,   X_t = mu + b_{S_t}(t) g(tau) + Y_t
+
+`deriva = 3.0` (desplazamiento total entre t=1 y t=T), `inclinacion = 0` (nivel
+puro). `perfil_tendencia` está normalizado como en el Escenario A: `b(1)=0`,
+`b(T)=deriva`, de modo que las tres corridas con tendencia son comparables. Con
+`T0 = 0.7T`: la lineal deja `b(T0)=0.70·deriva`, la cuadrática `0.49·deriva`, y
+el desfase entre bloques pasa de 0.35 a 0.44 de la deriva — **la cuadrática es
+el caso adverso, no una variante cosmética**.
+
+## Los dos mecanismos
+
+**`"interaccion"` (C y D), unimodal.** La media condicional suma al operador
+lineal un término cuadrático que hace interactuar puntos del dominio **dentro de
+la misma curva rezagada**:
+
+    m(Y) = Psi Y + lambda sum_j peso_j s_j tanh((Y(a_j) Y(b_j) - c_j)/s_j) h_j
+
+con pares por defecto `(0.25, 0.75)` —un extremo interactúa con el otro— y
+`(0.50, 0.50)` —el cuadrado del nivel local—. `Y(a)` es un **promedio local**
+(`nucleo_local`, integral unitaria) y no el valor de una celda: un valor puntual
+no sobrevive a la base ni al truncamiento FPCA.
+
+- **La saturación `tanh` no es cosmética y hay que declararla.** Una recursión
+  bilineal sin acotar es **explosiva con probabilidad positiva**; medido, con
+  `razon_interaccion = 0.6` la serie desborda antes de los 600 períodos (fue el
+  primer intento y falló con `overflow`). La zona lineal se fija en `saturacion`
+  desviaciones del producto: en el rango central el término **es** el producto.
+  `fraccion_saturada` = **9.5 %** de pares-instante con los valores por defecto.
+- **`razon_interaccion` se CALIBRA**, no se fija a ciegas: un piloto sin el
+  término mide la sd L² de la parte lineal y de la cuadrática y ajusta `lambda`
+  para que su cociente sea el pedido. Es de primer orden —al activar el término
+  la varianza cambia— y por eso el diagnóstico reporta
+  `razon_interaccion_efectiva` (0.644 contra 0.60 nominal) en vez de dar por
+  buena la nominal.
+- **Aquí la no linealidad NO cancela la parte lineal**, al revés que en el
+  Escenario B: `Psi` sigue estando y sigue siendo estimable, de modo que **la
+  referencia lineal no muere, se queda corta**. Es el caso realista.
+
+**`"mezcla"` (E y F), multimodal.** Dos ramas antisimétricas en el operador
+(`factores_operador = (+1, -1)`) **y en la tendencia**
+(`derivas_regimen = (+1, -1)`), con el mismo probit sobre `z = <Y_{t-1}, e>` del
+Escenario B. El rasgo propio:
+
+    separacion(t) = |f_0-f_1| ||Psi Y_{t-1}||  +  |d_0-d_1| b(t) ||g||
+                     (dinámica, constante)         (tendencia, creciente)
+
+**la distancia entre las dos modas crece con t**: 5.28 sd de la innovación en
+`T0` contra 7.08 en `T` (corrida 23). Un modelo unimodal responde con una moda
+en el medio y su error **crece con el tiempo** — modo de fallo que ningún
+escenario anterior produce, y que la ventana móvil de `_04 §7` debería mostrar.
+
+## Diagnóstico medido de las cuatro corridas (seed 41232, T=400, R=1)
+
+| | C (19) | D (22) | E (23) | F (24) |
+|---|---|---|---|---|
+| `r2_lineal_fuera_de_muestra` | 0.730 | 0.723 | 0.214 | 0.066 |
+| `r2_oraculo_fuera_de_muestra` | 0.847 | 0.856 | 0.533 | 0.506 |
+| brecha | 0.118 | 0.133 | 0.319 | **0.441** |
+| `r2_lineal_destendenciado` | 0.551 | 0.551 | 0.208 | 0.060 |
+| `r2_oraculo_destendenciado` | 0.618 | 0.618 | 0.525 | 0.499 |
+| **brecha destendenciada** | 0.067 | 0.067 | 0.317 | 0.439 |
+| `acf1_media` | 0.760 | 0.772 | 0.109 | 0.120 |
+| `desfase_en_sd` (train↔test) | 0.89 | 1.01 | 1.08 | 1.23 |
+| `razon_varianza_Y_mitades` | 1.18 | 1.18 | 1.17 | 1.17 |
+| espectro acumulado (M=1,2,3) | .873/.937/.981 | .882/.942/.982 | .923/.974/.985 | .895/.965/.979 |
+| **M por la regla del 95 %** | **3** | **3** | **2** | **2** |
+| Sarle oráculo ambiguos train→test | — | — | 0.458→**0.660** | 0.388→**0.600** |
+
+Las brechas destendenciadas de C y D son idénticas **por construcción**: la
+tendencia no realimenta la dinámica, de modo que la componente `Y` es la misma
+serie en las dos corridas y sólo cambia la parte determinista. Es la prueba de
+que el eje "forma de la tendencia" está aislado.
+
+## Lo que hay que arrastrar al reporte
+
+- **Ninguno de los cuatro es estacionario**, y eso trae de vuelta la lección de
+  la corrida 17: el centrado del FPCA y del estandarizador se ajustan con el
+  bloque de entrenamiento y **dejan de ser válidos en el de prueba**. Parte del
+  error de test es de *vigencia del centrado*, no de predicción.
+- **Por eso todo se reporta por duplicado**, en bruto y destendenciado. Con
+  `acf1 = 0.76` un VAR sobre scores parecerá excelente sin haber aprendido nada
+  de la dinámica — el mismo fenómeno que la corrida 21 encontró en el Mapocho
+  (`acf1 = 0.989`, la persistencia como piso). El destendenciado usa la
+  tendencia **determinista** (la esperada bajo la ocupación de las ramas), no la
+  realizada: restar la realizada rompería la relación entre la media condicional
+  y el pasado, y el diagnóstico dejaría de medir lo que dice.
+- **El error estándar de la pendiente va corregido por autocorrelación.** El
+  residuo de la regresión del nivel sobre `b(t)` es `Y` promediada sobre `tau`,
+  fuertemente autocorrelacionada (`acf1 = 0.71` en C), y el EE de MCO la
+  subestima por un factor 2.4: con el de MCO la pendiente parecería
+  significativamente distinta de la esperada sin serlo. El `assert` usa
+  `desvio_pendiente_en_ee` sobre el EE corregido.
+- **El estrato de `_04 §9` nunca es `b(t)`.** `b(t)` es monótona en `t`, de modo
+  que su estrato sería un intervalo contiguo y coincidiría con la partición
+  train/test — el defecto declarado de la corrida 16. En C y D el estrato es
+  **el cuartil de la magnitud de la interacción** (`q_t`), y en E y F el
+  **estado discreto del régimen**. Las dos celdas verifican con `assert` que
+  ningún estrato caiga casi entero en un bloque.
+
+## Barrido en `M` y archivos propios
+
+- **C y D corren `M = 2, 3, 4`** y no `1, 2, 3`: la regla del 95 % da `M = 3` y,
+  sobre todo, los núcleos de lectura son funciones **localizadas** y necesitan
+  más componentes que una dirección suave para sobrevivir al truncamiento.
+  `19_01 §3.5` persiste `10_alineacion_interaccion.csv` con
+  `fraccion_explicada` de cada lectura.
+- **E y F corren `M = 1, 2, 3`**, como la 18: la dirección de conmutación carga
+  sobre la **segunda** componente (`|<e, phi_2>| = 0.85`), de modo que el punto
+  de corte del barrido está predicho de antemano.
+  `10_alineacion_conmutacion.csv`.
+- Estado verdadero: `10_estado_tendencia.csv` (C, D: `b_t`, `q_interaccion`,
+  `estrato_q`) y `10_estado_signo_tendencia.csv` (E, F: régimen, `p_regimen_0`,
+  `sep_dinamica`, `sep_tendencia`, `bimodal`).
+- `_04 §9.1` cambia de contenido según el mecanismo: **error y cobertura por
+  cuartil de interacción** en C y D (`61_error_por_interaccion.csv`), y
+  **bimodalidad contra el oráculo, comparando train con test**, en E y F
+  (`61_bimodalidad_predictiva.csv`). `62_cobertura_condicional.csv` en los
+  cuatro. `_05 §7.1` (techo del oráculo, `76_techo_oraculo.csv`) es común.
+
+**Estado: los dieciséis notebooks y los `.m` están escritos; ninguna de las
+cuatro corridas se ha ejecutado.** Los generadores sí están verificados: las
+cifras de la tabla salen de ejecutar los `_01` hasta §2.7.
+
 
 # Datos reales: la corrida 21
 

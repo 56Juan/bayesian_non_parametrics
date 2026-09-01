@@ -1,0 +1,63 @@
+{
+  "scheme": "holdout_temporal",
+  "T": 400,
+  "T0": 280,
+  "prop_train": 0.7,
+  "horizons": [
+    1
+  ],
+  "n_lags": 1,
+  "scores_scale": "standardized_zscore_ddof0",
+  "objetivo_evaluacion": "curva_verdadera",
+  "modo_residuo": "ninguno",
+  "nivel_credibilidad": 0.95,
+  "ventana_movil": {
+    "w": [
+      10,
+      20,
+      40
+    ],
+    "paso": 1,
+    "solapadas": true
+  },
+  "metrics_scores": [
+    "RMSE",
+    "R2",
+    "razon_dispersion"
+  ],
+  "metrics_curvas": [
+    "MISE",
+    "RMSE_funcional"
+  ],
+  "metrics_dist": [
+    "CRPS",
+    "energy_score",
+    "cobertura_95",
+    "PIT"
+  ],
+  "estratificacion": {
+    "variable": "ambiguo",
+    "fuente": "reports/<EXPERIMENT_ID>/10_estado_signo.csv",
+    "metodo": "estado discreto del generador (no se cuantiliza)",
+    "n_estratos": 2,
+    "etiquetas": [
+      "determinista",
+      "ambiguo"
+    ],
+    "nota": "`bimodal` = ambiguo Y con estado grande es el subconjunto que sostiene el argumento distribucional: la separación entre modas es 2||Psi Y_{t-1}||, proporcional al estado."
+  },
+  "forma_predictiva": {
+    "r2_lineal_fuera_de_muestra": -0.03770186474466164,
+    "r2_oraculo_fuera_de_muestra": 0.37608549878644715,
+    "brecha_oraculo_lineal": 0.4137873635311088,
+    "sarle_oraculo_bimodales": 0.5806563623512816,
+    "sarle_oraculo_ambiguos": 0.4725528132348507,
+    "sarle_oraculo_deterministas": 0.3858247685206641,
+    "sarle_referencia_uniforme": 0.5555555555555556,
+    "sarle_referencia_gaussiana": 0.3333333333333333,
+    "separacion_modas_en_sd_innovacion": 2.2917570909541722,
+    "fraccion_origenes_ambiguos": 0.3525,
+    "fraccion_origenes_bimodales": 0.18796992481203006
+  },
+  "fraccion_e_explicada": 0.7166821042712364
+}

@@ -1,0 +1,37 @@
+{
+  "scores_scale": "standardized_zscore_ddof0",
+  "n_components": 1,
+  "n_lags": 1,
+  "component_idx": [
+    0
+  ],
+  "cov_names": [
+    "fpc_1_lag1"
+  ],
+  "T": 400,
+  "T0": 280,
+  "prop_train": 0.7,
+  "n_train_eff": 279,
+  "n_test_eff": 120,
+  "ajuste_en": "train",
+  "datasets": {
+    "train": {
+      "dataset_fpc_1_train.csv": {
+        "response": "fpc_1",
+        "shape": [
+          279,
+          2
+        ]
+      }
+    },
+    "test": {
+      "dataset_fpc_1_test.csv": {
+        "response": "fpc_1",
+        "shape": [
+          120,
+          2
+        ]
+      }
+    }
+  }
+}

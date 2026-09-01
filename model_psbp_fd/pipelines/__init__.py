@@ -36,6 +36,16 @@ dimension; se definen sobre los coeficientes de un sistema ortonormal fijo, de
 modo que comparten con los anteriores el esquema de observacion, las replicas y
 las semillas, pero NO la maquinaria de operadores integrales, cuadratura de la
 dinamica ni factorizacion de la innovacion funcional.
+
+Ademas de los seis, `sim_escenario_B.py` implementa un escenario de DIAGNOSTICO
+---no es un Algoritmo del anexo, igual que el Escenario A de la corrida 17---
+construido para que la clase lineal homogenea falle: un FAR(1) cuyo operador
+cambia de SIGNO segun un umbral sobre el estado rezagado. La antisimetria de
+los dos regimenes cancela la covarianza cruzada, de modo que el mejor predictor
+lineal no supera a la media incondicional mientras un tercio de la varianza
+sigue siendo predecible. Es el unico escenario del estudio en que el MISE
+discrimina entre la clase lineal y un metodo capaz de representar una media
+condicional no lineal.
 """
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -123,6 +133,26 @@ from .sim_escenario_6 import (
     simular_coeficientes_ar1_no_estacionario,
     trayectoria_espectro,
     espectro_intercambiado,
+)
+
+# --- Escenario B: FAR con signo conmutado por umbral (diagnostico) ---
+from .sim_escenario_B import (
+    ConfigEscenarioB,
+    generar_escenario_B,
+    resumen_escenario_B,
+    simular_trayectoria_far_signo,
+    direccion_oscilatoria,
+    coeficiente_sarle_mezcla_simetrica,
+)
+
+# --- Escenarios C-F: tendencia + no linealidad intra-curva (diagnostico) ---
+from .sim_escenario_T import (
+    ConfigEscenarioT,
+    generar_escenario_T,
+    resumen_escenario_T,
+    perfil_tendencia,
+    forma_tendencia_lineal_en_tau,
+    nucleo_local,
 )
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -219,6 +249,20 @@ __all__ = [
     "simular_coeficientes_ar1_no_estacionario",
     "trayectoria_espectro",
     "espectro_intercambiado",
+    # ── Escenario B: FAR con signo conmutado por umbral (diagnostico) ──
+    "ConfigEscenarioB",
+    "generar_escenario_B",
+    "resumen_escenario_B",
+    "simular_trayectoria_far_signo",
+    "direccion_oscilatoria",
+    "coeficiente_sarle_mezcla_simetrica",
+    # ── Escenarios C-F: tendencia + no linealidad intra-curva (diagnostico) ──
+    "ConfigEscenarioT",
+    "generar_escenario_T",
+    "resumen_escenario_T",
+    "perfil_tendencia",
+    "forma_tendencia_lineal_en_tau",
+    "nucleo_local",
     # ── Contrato de artefactos ──
     "ARCHIVOS",
     "ArtefactosFPCA",
