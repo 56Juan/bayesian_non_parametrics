@@ -1,0 +1,73 @@
+{
+  "scheme": "holdout_temporal",
+  "T": 400,
+  "T0": 280,
+  "prop_train": 0.7,
+  "horizons": [
+    1
+  ],
+  "n_lags": 1,
+  "scores_scale": "standardized_zscore_ddof0",
+  "objetivo_evaluacion": "curva_verdadera",
+  "modo_residuo": "ninguno",
+  "nivel_credibilidad": 0.95,
+  "ventana_movil": {
+    "w": [
+      10,
+      20,
+      40
+    ],
+    "paso": 1,
+    "solapadas": true
+  },
+  "metrics_scores": [
+    "RMSE",
+    "R2",
+    "razon_dispersion"
+  ],
+  "metrics_curvas": [
+    "MISE",
+    "RMSE_funcional"
+  ],
+  "metrics_dist": [
+    "CRPS",
+    "energy_score",
+    "cobertura_95",
+    "PIT"
+  ],
+  "estratificacion": {
+    "variable": "q_interaccion",
+    "fuente": "reports/<EXPERIMENT_ID>/10_estado_tendencia.csv",
+    "metodo": "cuartiles (estratos_por_cuantil), como sigma2 en la corrida 12",
+    "n_estratos": 4,
+    "etiquetas": [
+      "q1 (baja)",
+      "q2",
+      "q3",
+      "q4 (alta)"
+    ],
+    "pregunta": "¿se ensancha la banda donde la interacción es fuerte? Si el modelo recupera el mecanismo, en el cuartil alto debe apartarse del FAR(1) más que en el bajo."
+  },
+  "forma_predictiva": {
+    "r2_lineal_fuera_de_muestra": 0.7494940857674629,
+    "r2_oraculo_fuera_de_muestra": 0.9011267804336422,
+    "brecha_oraculo_lineal": 0.15163269466617935,
+    "r2_lineal_destendenciado": 0.5506990656008958,
+    "r2_oraculo_destendenciado": 0.6179143766981259,
+    "brecha_oraculo_lineal_destendenciada": 0.06721531109723011,
+    "razon_interaccion_efectiva": 0.6444203220905429,
+    "fraccion_saturada": 0.095
+  },
+  "tendencia": {
+    "forma": "potencia",
+    "deriva_total": 4.5,
+    "inclinacion": 0.0,
+    "b_en_T0": 1.5385316561798528,
+    "b_en_T": 4.5,
+    "desfase_train_test": 2.4726934074402465,
+    "desfase_en_sd": 1.4710597031707426,
+    "estacionario": false,
+    "advertencia": "El proceso NO es estacionario. Parte del error de test es de vigencia del centrado, no de capacidad predictiva; contrastar r2_oraculo con r2_oraculo_destendenciado."
+  },
+  "fraccion_e_explicada": 0.5429406908660572
+}

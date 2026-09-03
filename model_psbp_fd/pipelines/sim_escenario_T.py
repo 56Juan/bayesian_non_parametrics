@@ -162,7 +162,8 @@ __all__ = [
 ]
 
 _MECANISMOS = ("interaccion", "mezcla")
-_FORMAS = ("lineal", "cuadratica", "logaritmica", "sinusoidal")
+_FORMAS = ("lineal", "cuadratica", "potencia", "exponencial", "logistica",
+           "logaritmica", "escalon", "sinusoidal", "sinusoidal_creciente")
 
 
 # ==========================================================================
@@ -171,7 +172,13 @@ _FORMAS = ("lineal", "cuadratica", "logaritmica", "sinusoidal")
 
 def perfil_tendencia(t_idx: np.ndarray, T: int, forma: str,
                      ciclos: float = 1.5,
-                     curvatura_log: float = 9.0) -> np.ndarray:
+                     curvatura_log: float = 9.0,
+                     amplitud: float = 0.15,
+                     exponente: float = 2.0,
+                     curvatura_exp: float = 3.0,
+                     centro_logistica: float = 0.5,
+                     pendiente_logistica: float = 10.0,
+                     fraccion_escalon: float = 0.6) -> np.ndarray:
     """
     Perfil b(t) / deriva en [0, 1]: fraccion de la deriva total acumulada en t.
 
@@ -214,13 +221,48 @@ def perfil_tendencia(t_idx: np.ndarray, T: int, forma: str,
         return u
     if forma == "cuadratica":
         return u ** 2
+    if forma == "potencia":
+        # Generaliza a la cuadratica (exponente 2) y permite tanto formas mas
+        # convexas ---exponente 3, que casi duplica la curvatura--- como
+        # concavas ---exponente 0.5, la raiz, que es el espejo.
+        return u ** float(exponente)
+    if forma == "exponencial":
+        c = float(curvatura_exp)
+        return (np.expm1(c * u)) / np.expm1(c)
+    if forma == "logistica":
+        # S alargada: plana, sube, vuelve a aplanarse. Es la unica forma del
+        # catalogo con DOS cambios de concavidad, y por eso la que mas castiga a
+        # un des-tendenciado que ajuste una sola curva global.
+        k, c0 = float(pendiente_logistica), float(centro_logistica)
+        cruda = 1.0 / (1.0 + np.exp(-k * (u - c0)))
+        lo = 1.0 / (1.0 + np.exp(k * c0))
+        hi = 1.0 / (1.0 + np.exp(-k * (1.0 - c0)))
+        return (cruda - lo) / max(hi - lo, 1e-12)
+    if forma == "escalon":
+        # Cambio de NIVEL en un instante: no es una tendencia sino un quiebre, y
+        # se incluye porque es el caso extremo contra el que se leen las demas.
+        return (u >= float(fraccion_escalon)).astype(float)
     if forma == "logaritmica":
         return np.log1p(curvatura_log * u) / np.log1p(curvatura_log)
-    return np.sin(2.0 * np.pi * ciclos * u)
+    if forma == "sinusoidal":
+        return np.sin(2.0 * np.pi * ciclos * u)
+    # "sinusoidal_creciente": tendencia que SUBE con ondulaciones encima. Es la
+    # forma util cuando lo que se quiere es una tendencia visible en el
+    # historico y no una onda que vuelve a su punto de partida; la sinusoidal
+    # pura tiene b(1) = b(T) = 0 y a ojo la serie parece no tener tendencia.
+    crudo = u + amplitud * np.sin(2.0 * np.pi * ciclos * u)
+    fin = 1.0 + amplitud * float(np.sin(2.0 * np.pi * ciclos))
+    if fin <= 0:
+        raise ValueError(
+            "La combinacion de `ciclos` y `amplitud_sinusoidal` deja b(T) <= 0: "
+            "la forma dejaria de ser creciente. Bajar la amplitud o usar un "
+            "numero entero de ciclos.")
+    return crudo / fin
 
 
 def perfil_tramos(t_idx: np.ndarray, T: int, tramos: Sequence[tuple],
-                  ciclos: float = 1.5, curvatura_log: float = 9.0) -> np.ndarray:
+                  ciclos: float = 1.5, curvatura_log: float = 9.0,
+                  amplitud: float = 0.15, **kw_forma) -> np.ndarray:
     """
     Perfil por TRAMOS: cada segmento de la serie tiene su propia forma
     funcional, y los segmentos se empalman CON CONTINUIDAD.
@@ -265,7 +307,8 @@ def perfil_tramos(t_idx: np.ndarray, T: int, tramos: Sequence[tuple],
             continue
         v = (u[m] - ini) / max(fin - ini, 1e-12)          # [0, 1] interno del tramo
         local = float(peso) * perfil_tendencia(
-            1.0 + v * (T - 1.0), T, forma, ciclos=ciclos, curvatura_log=curvatura_log)
+            1.0 + v * (T - 1.0), T, forma, ciclos=ciclos,
+            curvatura_log=curvatura_log, amplitud=amplitud, **kw_forma)
         perfil[m] = base + local
         base = float(perfil[m][-1])
         ini = fin
@@ -463,7 +506,13 @@ class ConfigEscenarioT(ConfigObservacion):
     forma_tendencia: str = "lineal"
     inclinacion: float = 0.0
     ciclos_sinusoidal: float = 1.5
+    amplitud_sinusoidal: float = 0.15
     curvatura_log: float = 9.0
+    exponente_potencia: float = 2.0
+    curvatura_exponencial: float = 3.0
+    centro_logistica: float = 0.5
+    pendiente_logistica: float = 10.0
+    fraccion_escalon: float = 0.6
     tramos_tendencia: Optional[Sequence[tuple]] = None
 
     # Tendencia volatil
@@ -535,6 +584,14 @@ class ConfigEscenarioT(ConfigObservacion):
                     raise ValueError(f"forma '{forma}' de tramos_tendencia invalida.")
         if self.ciclos_sinusoidal <= 0:
             raise ValueError("ciclos_sinusoidal debe ser positivo.")
+        if self.exponente_potencia <= 0:
+            raise ValueError("exponente_potencia debe ser positivo.")
+        if self.curvatura_exponencial == 0:
+            raise ValueError("curvatura_exponencial no puede ser cero.")
+        if self.pendiente_logistica <= 0:
+            raise ValueError("pendiente_logistica debe ser positiva.")
+        if not (0.0 < self.fraccion_escalon < 1.0):
+            raise ValueError("fraccion_escalon debe estar en (0, 1).")
         if self.curvatura_log <= 0:
             raise ValueError("curvatura_log debe ser positivo.")
         if self.volatilidad_tendencia < 0:
@@ -673,14 +730,19 @@ def _perfiles_por_regimen(cfg: "ConfigEscenarioT", t_idx: np.ndarray) -> np.ndar
     TENDENCIA es un evento del calendario, no del estado, y mezclarlo con el
     regimen del proceso haria inseparables los dos mecanismos.
     """
+    kw = dict(ciclos=cfg.ciclos_sinusoidal,
+              curvatura_log=cfg.curvatura_log,
+              amplitud=cfg.amplitud_sinusoidal,
+              exponente=cfg.exponente_potencia,
+              curvatura_exp=cfg.curvatura_exponencial,
+              centro_logistica=cfg.centro_logistica,
+              pendiente_logistica=cfg.pendiente_logistica,
+              fraccion_escalon=cfg.fraccion_escalon)
+
     def uno(forma):
         if cfg.tramos_tendencia is not None:
-            return perfil_tramos(t_idx, cfg.T, cfg.tramos_tendencia,
-                                 ciclos=cfg.ciclos_sinusoidal,
-                                 curvatura_log=cfg.curvatura_log)
-        return perfil_tendencia(t_idx, cfg.T, forma,
-                                ciclos=cfg.ciclos_sinusoidal,
-                                curvatura_log=cfg.curvatura_log)
+            return perfil_tramos(t_idx, cfg.T, cfg.tramos_tendencia, **kw)
+        return perfil_tendencia(t_idx, cfg.T, forma, **kw)
 
     J = cfg.n_regimenes
     formas = list(cfg.formas_regimen or [cfg.forma_tendencia] * J)
@@ -1307,6 +1369,22 @@ def resumen_escenario_T(salida: SalidaSimulacion) -> dict:
         # y coincidiria con la particion train/test, que es el defecto declarado
         # de la corrida 16. Con formas por rama o con tramos, el perfil de una
         # rama puede ser monotono y la tendencia agregada no serlo.
+        # Cuanto de NO LINEAL tiene la forma: maxima distancia entre la
+        # tendencia determinista y su propia recta de minimos cuadrados, en
+        # unidades de la desviacion de la componente estable. Es la cifra que
+        # decide si mirar la serie basta para distinguir una cuadratica de una
+        # lineal: por debajo de ~0.5 sd, a ojo son la misma cosa. La cuadratica
+        # es intrinsecamente poco curva ---su maxima separacion respecto de su
+        # recta es deriva/4---, de modo que un valor bajo aqui no es un error
+        # sino una propiedad de la forma, y lo que la distingue de la lineal es
+        # el DESFASE entre bloques y no su aspecto.
+        "curvatura_en_sd": float(
+            np.max(np.abs(tend_det[0].mean(axis=1)
+                          - np.column_stack([np.ones(T), np.arange(T)])
+                          @ np.linalg.lstsq(
+                              np.column_stack([np.ones(T), np.arange(T)]),
+                              tend_det[0].mean(axis=1), rcond=None)[0]))
+            / max(float(np.std(salida.curvas[0] - tend[0])), 1e-300)),
         "monotona": bool(
             np.all(np.diff(tend_det[0].mean(axis=1)) >= -1e-12)
             or np.all(np.diff(tend_det[0].mean(axis=1)) <= 1e-12)),

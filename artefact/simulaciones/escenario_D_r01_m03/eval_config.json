@@ -49,25 +49,25 @@
     "pregunta": "¿se ensancha la banda donde la interacción es fuerte? Si el modelo recupera el mecanismo, en el cuartil alto debe apartarse del FAR(1) más que en el bajo."
   },
   "forma_predictiva": {
-    "r2_lineal_fuera_de_muestra": 0.7232479304849688,
-    "r2_oraculo_fuera_de_muestra": 0.8557380319770906,
-    "brecha_oraculo_lineal": 0.13249010149212181,
-    "r2_lineal_destendenciado": 0.5506990656008959,
-    "r2_oraculo_destendenciado": 0.6179143766981261,
-    "brecha_oraculo_lineal_destendenciada": 0.06721531109723022,
+    "r2_lineal_fuera_de_muestra": 0.7494940857674629,
+    "r2_oraculo_fuera_de_muestra": 0.9011267804336422,
+    "brecha_oraculo_lineal": 0.15163269466617935,
+    "r2_lineal_destendenciado": 0.5506990656008958,
+    "r2_oraculo_destendenciado": 0.6179143766981259,
+    "brecha_oraculo_lineal_destendenciada": 0.06721531109723011,
     "razon_interaccion_efectiva": 0.6444203220905429,
     "fraccion_saturada": 0.095
   },
   "tendencia": {
-    "forma": "cuadratica",
-    "deriva_total": 3.0,
+    "forma": "potencia",
+    "deriva_total": 4.5,
     "inclinacion": 0.0,
-    "b_en_T0": 1.4668438012324043,
-    "b_en_T": 3.0,
-    "desfase_train_test": 1.7047631610354206,
-    "desfase_en_sd": 1.0142011064142755,
+    "b_en_T0": 1.5385316561798528,
+    "b_en_T": 4.5,
+    "desfase_train_test": 2.4726934074402465,
+    "desfase_en_sd": 1.4710597031707426,
     "estacionario": false,
     "advertencia": "El proceso NO es estacionario. Parte del error de test es de vigencia del centrado, no de capacidad predictiva; contrastar r2_oraculo con r2_oraculo_destendenciado."
   },
-  "fraccion_e_explicada": 0.6680778613716872
+  "fraccion_e_explicada": 0.6679529111856035
 }

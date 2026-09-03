@@ -1,0 +1,80 @@
+{
+  "scheme": "holdout_temporal",
+  "T": 400,
+  "T0": 280,
+  "prop_train": 0.7,
+  "horizons": [
+    1
+  ],
+  "n_lags": 1,
+  "scores_scale": "standardized_zscore_ddof0",
+  "objetivo_evaluacion": "curva_verdadera",
+  "modo_residuo": "ninguno",
+  "nivel_credibilidad": 0.95,
+  "ventana_movil": {
+    "w": [
+      10,
+      20,
+      40
+    ],
+    "paso": 1,
+    "solapadas": true
+  },
+  "metrics_scores": [
+    "RMSE",
+    "R2",
+    "razon_dispersion"
+  ],
+  "metrics_curvas": [
+    "MISE",
+    "RMSE_funcional"
+  ],
+  "metrics_dist": [
+    "CRPS",
+    "energy_score",
+    "cobertura_95",
+    "PIT"
+  ],
+  "estratificacion": {
+    "variable": "ambiguo",
+    "fuente": "reports/<EXPERIMENT_ID>/10_estado_signo_tendencia.csv",
+    "metodo": "estado discreto del generador (no se cuantiliza)",
+    "n_estratos": 2,
+    "etiquetas": [
+      "determinista",
+      "ambiguo"
+    ],
+    "nota": "`bimodal` = ambiguo Y con separación mayor que la sd de la innovación. La separación CRECE con t, de modo que la fracción bimodal es mayor en el bloque de prueba que en el de entrenamiento: ése es el rasgo del escenario."
+  },
+  "forma_predictiva": {
+    "r2_lineal_fuera_de_muestra": 0.21296276917784462,
+    "r2_oraculo_fuera_de_muestra": 0.7672533663747768,
+    "brecha_oraculo_lineal": 0.5542905971969322,
+    "r2_lineal_destendenciado": 0.05289396515517897,
+    "r2_oraculo_destendenciado": 0.4029068395252604,
+    "brecha_oraculo_lineal_destendenciada": 0.35001287437008144,
+    "sarle_oraculo_ambiguos_train": 0.3447798441015217,
+    "sarle_oraculo_ambiguos_test": 0.411061775926432,
+    "sarle_oraculo_deterministas_test": 0.33902428572666043,
+    "sarle_referencia_uniforme": 0.5555555555555556,
+    "sarle_referencia_gaussiana": 0.3333333333333333,
+    "n_regimenes": 3,
+    "modas_efectivas_media": 1.884795446335679,
+    "modas_efectivas_maxima": 2.6541107196855567,
+    "separacion_modas_tendencia_maxima": 4.8,
+    "separacion_total_en_sd_T0": 2.8132237045416257,
+    "separacion_total_en_sd_T": 5.715040214035808
+  },
+  "tendencia": {
+    "forma": "lineal",
+    "deriva_total": 6.0,
+    "inclinacion": 0.0,
+    "b_en_T0": 2.9336876024648086,
+    "b_en_T": 6.0,
+    "desfase_train_test": 3.409526322070841,
+    "desfase_en_sd": 2.709482819308378,
+    "estacionario": false,
+    "advertencia": "El proceso NO es estacionario. Parte del error de test es de vigencia del centrado, no de capacidad predictiva; contrastar r2_oraculo con r2_oraculo_destendenciado."
+  },
+  "fraccion_e_explicada": 0.0009355635572569964
+}

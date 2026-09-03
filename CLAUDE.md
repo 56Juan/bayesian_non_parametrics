@@ -464,6 +464,9 @@ fijos del estudio (`L=75`, `T=400`, `PROP_TRAIN=0.70`, `sigma_obs=0.25`,
   modo que la cobertura condicional mide algo distinto de la comparación
   train/test.
 - `reports/.../10_alineacion_conmutacion.csv` — carga de `e` sobre cada FPC.
+- `reports/.../11_tendencia_nivel.png` — el nivel con la tendencia determinista,
+  la de cada rama y la recta de MCO superpuestas. Es la figura que hace
+  verificable que la tendencia existe y que su forma no es lineal.
 - Salidas nuevas: `61_bimodalidad_predictiva.csv` y `62_cobertura_condicional.csv`
   del `_04`; `76_techo_oraculo.csv` del `_05`.
 
@@ -482,13 +485,13 @@ observación, el oráculo y el control de calidad.
 
 **Primera tanda: un factorial 2×2 limpio.**
 
-| | tendencia **lineal** | tendencia **cuadrática** |
+| | tendencia **lineal** | tendencia **acelerada** (`potencia p=3`) |
 |---|---|---|
 | **interacciones** intra-curva (unimodal) | **C · corrida 19** | **D · corrida 22** |
 | **multimodalidad**, 2 regímenes | **E · corrida 23** | **F · corrida 24** |
 
 Cualquier diferencia entre 19 y 22 (o 23 y 24) es atribuible a la **forma de la
-tendencia**; entre las dos filas, al **tipo de no linealidad**.
+tendencia** —lineal contra `potencia p=3`, que es la que sí se ve—; entre las dos filas, al **tipo de no linealidad**.
 
 **Segunda tanda: tendencias con estructura propia.** Ya no es un factorial —cada
 una interviene una cosa distinta— y todas son variantes del mecanismo `mezcla`:
@@ -496,29 +499,90 @@ una interviene una cosa distinta— y todas son variantes del mecanismo `mezcla`
 | corrida | regímenes | tendencia | qué rompe |
 |---|---|---|---|
 | **G · 25** | **3** | una **forma distinta por régimen** (cuadrática / sinusoidal / logarítmica) | las modas se separan **a ritmos distintos y con formas distintas** |
-| **H · 26** | 2 | **sinusoidal y volátil**: la pendiente es un AR(1) que llega a invertirse | la tendencia deja de ser determinista y de ser monótona |
-| **I · 27** | **3** | **por tramos**: cuadrática → logarítmica → sinusoidal, con quiebres en `0.45T` y `0.75T` | la **derivada** de la tendencia es discontinua: cambia el régimen de tendencia |
+| **H · 26** | 2 | **sinusoidal creciente y volátil**: sube ondulando y el factor de escala es un AR(1) | la tendencia deja de ser determinista y de ser monótona |
+| **I · 27** | **3** | **por tramos**: cuadrática → logarítmica → sinusoidal creciente, con quiebres en `0.45T` y `0.75T` | la **derivada** de la tendencia es discontinua: cambia el régimen de tendencia |
 
 Todo lo demás —esquema de observación, `gamma=0.30`, `hs_norm=0.70`, `ell=0.5`,
 priors, `mcmc_config`— es idéntico a las corridas 18 y 20 en las siete.
 
     Y_t = m(Y_{t-1}, S_t) + eps_t,   X_t = mu + b_{S_t}(t) g(tau) + Y_t
 
-`deriva = 3.0` (desplazamiento total entre t=1 y t=T), `inclinacion = 0` (nivel
-puro). `perfil_tendencia` está normalizado como en el Escenario A: `b(1)=0`,
+`deriva` es el desplazamiento total entre t=1 y t=T: **3.0** en las corridas de
+interacción (19, 22) y **6.0** en las de mezcla (23–27), donde hace falta más
+porque las ramas reparten la deriva. `inclinacion = 0` (nivel puro). `perfil_tendencia` está normalizado como en el Escenario A: `b(1)=0`,
 `b(T)=deriva`, de modo que las corridas con tendencia son comparables. Con
 `T0 = 0.7T`: la lineal deja `b(T0)=0.70·deriva`, la cuadrática `0.49·deriva`, y
 el desfase entre bloques pasa de 0.35 a 0.44 de la deriva — **la cuadrática es
 el caso adverso, no una variante cosmética**.
 
-## Las cuatro formas de tendencia, y qué rompe cada una
+## La tendencia tiene que VERSE, y eso costó dos correcciones
 
-| forma | expresión | qué hace | `deriva` significa |
+Las dos primeras versiones de esta familia producían series en las que **la
+tendencia no era visible en el histórico**, por motivos distintos y ambos
+instructivos:
+
+1. **Derivas antisimétricas por régimen.** Con `derivas_regimen = (+1, -1)` y
+   ocupaciones parecidas, la tendencia se **cancela en el nivel medio**: medido,
+   la deriva neta de la serie era `-0.06` desviaciones. Cada rama tenía su
+   tendencia y la separación entre modas crecía, pero un gráfico de la serie
+   parecía estacionario. La corrección es que **todas las derivas sean del mismo
+   signo y difieran en magnitud** —`(1.0, 0.25)` con dos ramas, `(1.0, 0.6, 0.2)`
+   con tres—: la separación entre modas depende de la *diferencia* de derivas y
+   no de sus signos, de modo que no se pierde nada y se gana una tendencia neta
+   de ~2.7–3.4 sd.
+2. **Formas por régimen que se promedian a una recta.** En el Escenario G cada
+   rama tiene su propia forma (cuadrática, sinusoidal creciente, logarítmica) y
+   el promedio ponderado de las tres es **casi lineal**: la curvatura de la
+   tendencia media es sólo 0.30 sd. No es un defecto —lo que distingue al
+   escenario vive en la *dispersión* entre ramas y no en su promedio— pero hay
+   que saberlo antes de mirar el gráfico y concluir que la tendencia es lineal.
+   Por eso la figura `11_tendencia_nivel.png` dibuja **las J tendencias por
+   rama** además de la media.
+
+`_01 §2.5` produce esa figura —nivel realizado, tendencia determinista,
+tendencia de cada rama y **la recta ajustada por MCO**— y falla con `assert` si
+la deriva neta no supera una desviación estándar. La distancia entre la
+tendencia y su propia recta es la cifra que dice si la forma es genuinamente no
+lineal o si una recta la resume.
+
+## El catálogo de formas, y cuánto se ve cada una
+
+La columna que decide si una forma se distingue de una recta **a ojo** es la
+curvatura: la máxima distancia entre `b(t)` y su propia recta de mínimos
+cuadrados, en unidades de `deriva`. Multiplicada por `deriva` y dividida por la
+desviación de la componente estable (~1.34) da `curvatura_en_sd`, que el
+diagnóstico reporta. **Por debajo de ~0.5 sd la forma se lee como lineal.**
+
+| forma | expresión | curvatura | qué hace |
 |---|---|---|---|
-| `lineal` | `u` | reparte la deriva de forma uniforme | desplazamiento total |
-| `cuadratica` | `u²` | la concentra al final: el test ve la mitad | desplazamiento total |
-| `logaritmica` | `log(1+cu)/log(1+c)` | **espejo de la cuadrática**: casi toda la deriva ocurre al principio y se aplana | desplazamiento total |
-| `sinusoidal` | `sin(2π·κ·u)` | **no monótona**: vuelve sobre sus pasos | **amplitud** |
+| `lineal` | `u` | 0 | reparte la deriva de forma uniforme |
+| `cuadratica` | `u²` | **0.166** | la concentra al final; es de las formas **menos curvas** que hay |
+| `potencia` | `u^p` | 0.30 con `p=3` | generaliza a la cuadrática; `p<1` da formas cóncavas |
+| `exponencial` | `(e^{cu}−1)/(e^c−1)` | 0.28 con `c=3` | acelera al final, como la potencia |
+| `logistica` | sigmoide normalizada | 0.16 | **dos cambios de concavidad**: plana, sube, se aplana |
+| `logaritmica` | `log(1+cu)/log(1+c)` | 0.25 | **espejo de la cuadrática**: casi toda la deriva al principio |
+| `sinusoidal` | `sin(2π·κ·u)` | 0.30 | **vuelve a cero**: `b(1)=b(T)=0`, la serie no tiene tendencia neta |
+| `sinusoidal_creciente` | `[u + a·sin(2π·κ·u)]/(1 + a·sin(2π·κ))` | 0.20 | **sube ondulando**, con retrocesos locales |
+| `escalon` | `1{u ≥ f}` | 0.54 | quiebre de nivel; no es tendencia, es el caso extremo |
+
+En todas salvo `sinusoidal` —donde es la amplitud— `deriva` es el desplazamiento
+total entre `t=1` y `t=T`.
+
+**La lección de la cuadrática.** Su máxima separación respecto de su propia recta
+es `deriva/4`, la segunda más baja del catálogo: con `deriva = 6` son 0.51 sd y
+sobre 400 puntos con ruido **se lee como una recta**. Por eso las corridas 22 y
+24 usan `potencia` con `p = 3` en vez de `u²`: con `deriva = 8` la curvatura
+llega a **1.22 sd**, la forma es inequívoca, y —esto es lo que importa— el `R²`
+del mejor predictor lineal **cae a 0.018**, porque una recta ya no la resume. Lo
+que distingue a una cuadrática de una lineal en el pipeline nunca fue su aspecto
+sino el desfase entre bloques; con `p = 3` además se ve.
+
+`sinusoidal` pura es la que hay que evitar cuando lo que se quiere es una
+tendencia visible: al volver a su punto de partida, el histórico parece no
+tener tendencia. `sinusoidal_creciente` es la que usan las corridas 26 y 27:
+sube como la lineal pero con `κ` ondas encima, y con `amplitud_sinusoidal`
+grande la **pendiente instantánea llega a ser negativa** por tramos sin que la
+tendencia deje de ser creciente en el largo plazo.
 
 La logarítmica produce el modo de fallo **opuesto** al de la cuadrática: el
 entrenamiento ve una pendiente grande y el test una casi nula, de modo que un
@@ -546,10 +610,12 @@ decisiones que hay que conocer:
   consumo del generador de `Y`**, y una corrida volátil y su gemela determinista
   comparten exactamente la misma trayectoria de la componente estable: la
   diferencia entre ambas es atribuible sólo a la tendencia.
-- **Se permite que el factor sea negativo** (`v·eta_t < -1`): hay tramos con la
-  tendencia invertida. Una tendencia volátil que nunca cambia de signo es una
-  tendencia con ruido, no una tendencia volátil. `fraccion_tendencia_invertida`
-  lo reporta (1.5 % en la corrida 26).
+- **Se permite que el factor sea negativo** (`v·eta_t < -1`): habría tramos con
+  la tendencia invertida. `fraccion_tendencia_invertida` lo reporta; con la
+  `volatilidad_tendencia = 0.5` de la corrida 26 vale 0, es decir el factor se
+  mantiene positivo y lo que cambia es **cuán rápido sube**, entre 0.2x y 2.4x.
+  Los retrocesos que sí se ven vienen de la ondulación de
+  `sinusoidal_creciente`, no del factor.
 - **El oráculo condiciona sobre `eta_{t-1}`**, que es un estado **latente que
   ningún método observa**. En la corrida 26 el oráculo es por tanto una cota más
   generosa que en el resto y parte de la brecha es **irreducible**. Hay que
@@ -615,41 +681,56 @@ test— sí lo sigue siendo.
 
 | | C (19) | D (22) | E (23) | F (24) | G (25) | H (26) | I (27) |
 |---|---|---|---|---|---|---|---|
-| regímenes | — | — | 2 | 2 | **3** | 2 | **3** |
-| `r2_lineal_fuera_de_muestra` | 0.730 | 0.723 | 0.263 | 0.129 | 0.313 | **−0.101** | 0.262 |
-| `r2_oraculo_fuera_de_muestra` | 0.847 | 0.856 | 0.461 | 0.422 | 0.527 | 0.479 | 0.530 |
-| brecha | 0.118 | 0.133 | 0.198 | 0.294 | 0.215 | **0.580** | 0.267 |
-| **brecha destendenciada** | 0.067 | 0.067 | 0.210 | 0.308 | 0.218 | **0.592** | 0.272 |
-| `acf1_media` | 0.760 | 0.772 | 0.018 | 0.023 | 0.053 | −0.033 | 0.053 |
-| `desfase_en_sd` (train↔test) | 0.89 | 1.01 | 1.13 | 1.28 | 1.36 | 1.47 | 1.11 |
-| `monotona` | sí | sí | sí | sí | **no** | **no** | **no** |
-| `razon_varianza_Y_mitades` | 1.18 | 1.18 | 0.93 | 0.93 | 0.95 | 0.93 | 0.98 |
+| mecanismo | interacción | interacción | 2 reg. | 2 reg. | **3 reg.** | 2 reg. | **3 reg.** |
+| forma de la tendencia | lineal | **potencia p=3** | lineal | **potencia p=3** | una por rama | sinus. creciente + volátil | tramos |
+| `deriva` | 3.0 | 4.5 | 6.0 | 8.0 | 6.0 | 6.0 | 6.0 |
+| **deriva neta del nivel** | +2.16 sd | +2.79 sd | +2.73 sd | **+3.34 sd** | +2.86 sd | **+3.41 sd** | +3.23 sd |
+| **`curvatura_en_sd`** | 0.00 | 0.80 | 0.00 | **1.22** | 0.30 | 0.62 | 0.30 |
+| `r2_lineal_fuera_de_muestra` | 0.729 | 0.749 | 0.294 | **0.018** | 0.213 | 0.212 | 0.427 |
+| `r2_oraculo_fuera_de_muestra` | 0.847 | 0.901 | 0.690 | 0.772 | 0.767 | 0.775 | 0.778 |
+| **brecha destendenciada** | 0.067 | 0.067 | 0.207 | 0.337 | 0.350 | **0.435** | 0.262 |
+| `acf1_media` | 0.760 | 0.827 | 0.279 | 0.442 | 0.420 | 0.381 | 0.407 |
+| `desfase_en_sd` (train↔test) | 0.89 | 1.47 | 2.25 | **3.29** | 2.71 | 1.96 | 2.52 |
+| `monotona` | sí | sí | sí | sí | sí | **no** | **no** |
 | ambiguos | — | — | 0.33 | 0.33 | **0.60** | 0.33 | **0.60** |
 | `modas_efectivas_media` | — | — | 1.41 | 1.41 | **1.88** | 1.41 | **1.88** |
-| separación T0 → T (sd innov.) | — | — | 5.3→7.1 | 4.1→7.1 | 5.0→6.9 | **10.7→14.7** | 5.4→5.5 |
-| Sarle oráculo ambiguos train→test | — | — | 0.47→**0.69** | 0.40→**0.63** | 0.38→0.44 | 0.59→**0.65** | 0.37→0.47 |
-| `fraccion_tendencia_invertida` | 0 | 0 | 0 | 0 | 0 | **0.015** | 0 |
-| espectro acumulado (M=1,2,3) | .873/.937/.981 | .882/.942/.982 | .929/.976/.986 | .903/.967/.981 | .909/.970/.982 | **.971**/.990/.994 | .907/.970/.981 |
-| **M por la regla del 95 %** | **3** | **3** | **2** | **2** | **2** | **1** | **2** |
+| separación T0 → T (sd innov.) | — | — | 4.3→5.6 | 3.2→7.1 | 2.8→5.7 | **8.0→9.7** | 4.5→5.7 |
+| Sarle oráculo ambiguos train→test | — | — | 0.43→0.59 | 0.38→0.58 | 0.34→0.41 | 0.47→**0.64** | 0.35→0.41 |
+| espectro acumulado (M=1,2,3) | .873/.937/.981 | .907/.954/.986 | .926/.975/.985 | .931/.977/.986 | .901/.967/.980 | **.959**/.986/.992 | .924/.975/.985 |
+| **M por la regla del 95 %** | **3** | **2** | **2** | **2** | **2** | **1** | **2** |
+
+Las cifras son las de los `_01` **ya ejecutados** (los 21 puntos del barrido, seed
+41232), no estimaciones.
 
 Cuatro lecturas de esta tabla:
 
-- **Las brechas destendenciadas de C y D son idénticas por construcción**: la
-  tendencia no realimenta la dinámica, de modo que la componente `Y` es la misma
-  serie en las dos corridas y sólo cambia la parte determinista. Es la prueba de
-  que el eje "forma de la tendencia" está aislado.
-- **H es el escenario con más margen del estudio entero**: el mejor predictor
-  lineal queda **por debajo de la media incondicional** (`R² = −0.10`) y el
-  oráculo llega a 0.48. Pero su oráculo condiciona sobre un estado latente
-  (`eta_{t-1}`) y es por tanto una cota más generosa: parte de esa brecha es
-  irreducible y hay que declararlo.
+- **Las brechas destendenciadas de C y D son idénticas por construcción** (0.067):
+  la tendencia no realimenta la dinámica, de modo que la componente `Y` es la
+  misma serie en las dos corridas y sólo cambia la parte determinista. Es la
+  prueba de que el eje "forma de la tendencia" está aislado.
+- **F es el caso que muestra para qué sirve el eje de la tendencia.** Con la
+  forma `potencia p=3` el `R²` del mejor predictor lineal cae a **0.018** —una
+  recta no resume una tendencia con esa curvatura— mientras el oráculo se
+  mantiene en 0.77. La forma de la tendencia, y no sólo la no linealidad de la
+  dinámica, puede por sí sola matar a la referencia lineal.
+- **Los `R²` en bruto ya NO son la cifra a citar.** Con una tendencia neta de
+  ~3 sd, el predictor lineal recoge la persistencia que la propia tendencia
+  induce (`acf1` sube de ~0.02 a ~0.4) y su `R²` pasa de ~0 a 0.14–0.43 sin
+  haber aprendido nada de la dinámica. **La columna que discrimina es la brecha
+  destendenciada**, y ahí H y G son los que más margen dejan (0.44 y 0.35).
+  Es el mismo fenómeno que la corrida 21 encontró en el Mapocho.
+- **H mantiene el mayor margen** (0.435 destendenciada) y además su oráculo
+  condiciona sobre un estado latente (`eta_{t-1}`), de modo que es una cota más
+  generosa que la de los demás: parte de esa brecha es irreducible y hay que
+  declararlo.
 - **G e I tienen el Sarle más bajo y son los MÁS multimodales**: con tres modas
   la central rellena el hueco y el coeficiente baja. `modas_efectivas` (1.88 de
   3 posibles, contra 1.41 de 2 en E/F) es la cifra que hay que citar ahí.
-- **En H el espectro cambia de forma**: la primera componente se lleva el 97 %
-  porque la tendencia sinusoidal de nivel puro domina, y la regla del 95 % da
-  `M = 1`. El barrido sigue siendo `(1, 2, 3)`, pero el punto `M = 1` deja de
-  ser el punto "pobre" que es en las demás corridas de mezcla.
+- **En H el espectro cambia de forma**: la primera componente se lleva el 96 %
+  porque la tendencia de nivel puro domina, y la regla del 95 % da `M = 1`. El
+  barrido sigue siendo `(1, 2, 3)` y el punto informativo sigue siendo `M = 2`
+  —donde entra la dirección de conmutación—, pero el punto `M = 1` deja de ser
+  el punto "pobre" que es en las demás corridas de mezcla.
 
 ## Lo que hay que arrastrar al reporte
 

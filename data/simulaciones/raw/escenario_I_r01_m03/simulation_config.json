@@ -1,0 +1,216 @@
+{
+  "sim_params": {
+    "L": 75,
+    "T": 400,
+    "burn_in": 200,
+    "sigma_obs": 0.25,
+    "R": 1,
+    "seed": 41232,
+    "media_fn": "media_senoidal",
+    "jitter": 1e-10,
+    "gamma": 0.3,
+    "hs_norm": 0.7,
+    "sigma_eps": 1.0,
+    "ell": 0.5,
+    "deriva": 6.0,
+    "forma_tendencia": "lineal",
+    "inclinacion": 0.0,
+    "ciclos_sinusoidal": 1.5,
+    "amplitud_sinusoidal": 0.15,
+    "curvatura_log": 9.0,
+    "exponente_potencia": 2.0,
+    "curvatura_exponencial": 3.0,
+    "centro_logistica": 0.5,
+    "pendiente_logistica": 10.0,
+    "fraccion_escalon": 0.6,
+    "tramos_tendencia": [
+      [
+        0.45,
+        "cuadratica",
+        1.0
+      ],
+      [
+        0.75,
+        "logaritmica",
+        0.6
+      ],
+      [
+        1.0,
+        "sinusoidal_creciente",
+        0.5
+      ]
+    ],
+    "volatilidad_tendencia": 0.0,
+    "persistencia_volatilidad": 0.95,
+    "mecanismo": "mezcla",
+    "interacciones": [
+      [
+        0.25,
+        0.75
+      ],
+      [
+        0.5,
+        0.5
+      ]
+    ],
+    "pesos_interaccion": [
+      1.0,
+      1.0
+    ],
+    "ancho_lectura": 0.1,
+    "ancho_respuesta": 0.15,
+    "razon_interaccion": 0.6,
+    "saturacion": 3.0,
+    "factores_operador": [
+      0.9,
+      0.3,
+      -0.9
+    ],
+    "derivas_regimen": [
+      1.0,
+      0.6,
+      0.2
+    ],
+    "formas_regimen": null,
+    "nitidez": 4.0,
+    "umbral": 0.0,
+    "umbrales": [
+      -0.17,
+      0.17
+    ],
+    "direccion_fn": null,
+    "n_dim_diagnostico": 5,
+    "prop_train_referencia": 0.7,
+    "n_pilot": 2000
+  },
+  "diagnostico": {
+    "n_replicas": 1,
+    "n_curvas": 400,
+    "n_puntos_grilla": 75,
+    "todo_finito": true,
+    "media_empirica_global": 1.8622191322597241,
+    "media_ee_montecarlo": NaN,
+    "var_puntual_media": 3.9703236067038348,
+    "var_puntual_min": 3.919926975351735,
+    "var_puntual_max": 4.042970722267871,
+    "acf1_media": 0.4074776611286332,
+    "acf1_ee_montecarlo": NaN,
+    "razon_senal_ruido": 63.525177707261356,
+    "hs_norm_objetivo": 0.7,
+    "hs_norm_efectiva": 0.7,
+    "radio_espectral": 0.6215249564437708,
+    "estacionariedad_garantizada": false,
+    "motivo_no_estacionario": "tendencia determinista en t (por construccion)",
+    "mecanismo": "mezcla",
+    "forma_tendencia": "lineal",
+    "tramos_tendencia": [
+      [
+        0.45,
+        "cuadratica",
+        1.0
+      ],
+      [
+        0.75,
+        "logaritmica",
+        0.6
+      ],
+      [
+        1.0,
+        "sinusoidal_creciente",
+        0.5
+      ]
+    ],
+    "ciclos_sinusoidal": 1.5,
+    "curvatura_log": 9.0,
+    "curvatura_en_sd": 0.2978285775545432,
+    "monotona": false,
+    "volatilidad_tendencia": 0.0,
+    "persistencia_volatilidad": 0.95,
+    "factor_volatil_min": 1.0,
+    "factor_volatil_max": 1.0,
+    "fraccion_tendencia_invertida": 0.0,
+    "deriva_total": 6.0,
+    "inclinacion": 0.0,
+    "g_medio": 1.0,
+    "pendiente_recuperada": 0.6001342945135654,
+    "pendiente_esperada": 0.637,
+    "pendiente_ee": 0.038222021436801965,
+    "pendiente_ee_autocorr": 0.04115251515968439,
+    "pendiente_ee_robusto_white": 0.03771957814370954,
+    "pendiente_ee_usado": 0.04115251515968439,
+    "acf1_residuo_tendencia": 0.07373913116745522,
+    "desvio_pendiente_en_ee": 0.8958311622845988,
+    "b_en_T0": 4.4210049830418585,
+    "b_en_T": 5.967661500595327,
+    "desfase_train_test": 3.169979069442027,
+    "sd_proceso_sin_tendencia": 1.2604220324114683,
+    "razon_deriva_sd": 4.760310313300905,
+    "desfase_en_sd": 2.515014009535481,
+    "var_Y_primera_mitad": 1.189626175548866,
+    "var_Y_segunda_mitad": 1.1677112253850035,
+    "razon_varianza_Y_mitades": 0.9815782885293766,
+    "n_dim_diagnostico": 5,
+    "r2_lineal_fuera_de_muestra": 0.42716313871718725,
+    "r2_lineal_dentro_de_muestra": 0.34730110031230643,
+    "r2_oraculo_fuera_de_muestra": 0.7775143911220368,
+    "brecha_oraculo_lineal": 0.35035125240484954,
+    "r2_lineal_destendenciado": 0.24397470475463245,
+    "r2_oraculo_destendenciado": 0.5063523861858701,
+    "brecha_oraculo_lineal_destendenciada": 0.26237768143123763,
+    "n_regimenes": 3,
+    "factores_operador": [
+      0.9,
+      0.3,
+      -0.9
+    ],
+    "derivas_regimen": [
+      1.0,
+      0.6,
+      0.2
+    ],
+    "formas_regimen": [
+      "lineal",
+      "lineal",
+      "lineal"
+    ],
+    "cortes_probit": [
+      -0.17,
+      0.17
+    ],
+    "proporcion_por_regimen": [
+      0.3925,
+      0.3075,
+      0.3
+    ],
+    "proporcion_regimen_minima": 0.3,
+    "proporcion_regimen_0": 0.3925,
+    "n_transiciones_media": 254.0,
+    "duracion_media_racha": 1.5686274509803921,
+    "sd_proyeccion_estado": 0.38633334448787354,
+    "nitidez": 4.0,
+    "nitidez_en_sd_z": 1.5453333779514942,
+    "fraccion_origenes_ambiguos": 0.6,
+    "modas_efectivas_media": 1.8826190219259311,
+    "modas_efectivas_maxima": 2.654161327550217,
+    "n_origenes_ambiguos": 240,
+    "separacion_modas_dinamica_L2": 0.914336948355517,
+    "separacion_modas_tendencia_en_T0": 3.536803986433487,
+    "separacion_modas_tendencia_en_T": 4.774129200476262,
+    "separacion_modas_tendencia_maxima": 4.8,
+    "sd_innovacion_L2": 1.0,
+    "separacion_total_en_sd_T0": 4.451140934789004,
+    "separacion_total_en_sd_T": 5.688466148831779,
+    "sarle_oraculo_ambiguos_train": 0.35424886525363947,
+    "sarle_oraculo_ambiguos_test": 0.410638945499362,
+    "sarle_oraculo_deterministas_test": 0.35289522155354036,
+    "sarle_referencia_uniforme": 0.5555555555555556,
+    "sarle_referencia_gaussiana": 0.3333333333333333
+  },
+  "replica_idx": 0,
+  "experiment_id": "escenario_I_r01_m03",
+  "escenario_id": "I",
+  "replica_id": 1,
+  "seed": 41232,
+  "T": 400,
+  "G": 75
+}
