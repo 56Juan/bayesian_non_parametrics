@@ -1,12 +1,13 @@
 {
   "scheme": "holdout_temporal",
-  "T": 400,
-  "T0": 280,
+  "T": 800,
+  "T0": 560,
   "prop_train": 0.7,
   "horizons": [
     1
   ],
   "n_lags": 1,
+  "m_fpca": 1,
   "scores_scale": "standardized_zscore_ddof0",
   "objetivo_evaluacion": "curva_verdadera",
   "modo_residuo": "ninguno",

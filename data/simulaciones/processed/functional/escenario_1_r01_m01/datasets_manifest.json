@@ -8,18 +8,18 @@
   "cov_names": [
     "fpc_1_lag1"
   ],
-  "T": 400,
-  "T0": 280,
+  "T": 800,
+  "T0": 560,
   "prop_train": 0.7,
-  "n_train_eff": 279,
-  "n_test_eff": 120,
+  "n_train_eff": 559,
+  "n_test_eff": 240,
   "ajuste_en": "train",
   "datasets": {
     "train": {
       "dataset_fpc_1_train.csv": {
         "response": "fpc_1",
         "shape": [
-          279,
+          559,
           2
         ]
       }
@@ -28,7 +28,7 @@
       "dataset_fpc_1_test.csv": {
         "response": "fpc_1",
         "shape": [
-          120,
+          240,
           2
         ]
       }

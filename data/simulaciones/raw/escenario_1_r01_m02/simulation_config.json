@@ -1,7 +1,7 @@
 {
   "sim_params": {
-    "L": 75,
-    "T": 400,
+    "L": 100,
+    "T": 800,
     "burn_in": 200,
     "sigma_obs": 0.25,
     "R": 1,
@@ -15,28 +15,34 @@
   },
   "diagnostico": {
     "n_replicas": 1,
-    "n_curvas": 400,
-    "n_puntos_grilla": 75,
+    "n_curvas": 800,
+    "n_puntos_grilla": 100,
     "todo_finito": true,
-    "media_empirica_global": -0.00976185331370684,
+    "media_empirica_global": -0.04563192419948652,
     "media_ee_montecarlo": NaN,
-    "var_puntual_media": 1.548643747043619,
-    "var_puntual_min": 1.2100393207817661,
-    "var_puntual_max": 1.7506118082675508,
-    "acf1_media": 0.5432309181905448,
+    "var_puntual_media": 1.4357499660080761,
+    "var_puntual_min": 1.1904278083783477,
+    "var_puntual_max": 1.5880640219546143,
+    "acf1_media": 0.5596797953637771,
     "acf1_ee_montecarlo": NaN,
-    "razon_senal_ruido": 24.778299952697903,
+    "razon_senal_ruido": 22.97199945612922,
     "hs_norm_objetivo": 0.7,
     "hs_norm_efectiva": 0.7,
     "hs_norm_error_absoluto": 0.0,
-    "radio_espectral_operador": 0.6215249564437708,
+    "radio_espectral_operador": 0.621523864570761,
     "estacionariedad_garantizada": true
   },
   "replica_idx": 0,
   "experiment_id": "escenario_1_r01_m02",
   "escenario_id": 1,
   "replica_id": 1,
+  "m_fpca": 2,
+  "m_fpca_list": [
+    1,
+    2,
+    3
+  ],
   "seed": 41232,
-  "T": 400,
-  "G": 75
+  "T": 800,
+  "G": 100
 }

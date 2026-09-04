@@ -259,6 +259,7 @@ Orden pensado para que cada etapa sea utilizable antes de empezar la siguiente.
 | `26_sim_EH` | **Escenario H: tendencia sinusoidal volátil** | `escenario_H_r01_m01`…`_m03` | la pendiente misma es estocástica. **Sin correr** |
 | `27_sim_EI` | **Escenario I: tendencia por tramos (cuad → log → sen)** | `escenario_I_r01_m01`…`_m03` | cambios de régimen de tendencia. **Sin correr** |
 | `20_sim_E1` | Alg. 1 | `escenario_1_r01_m01`, `..._m02` | **plantilla vigente**: `mu = sin(2 pi tau)`, `M` en el id. Barrido en curso |
+| `30_sim_E1` | Alg. 1 | `escenario_1_r01_m*` | **corrida de trabajo: se puede modificar libremente**. Es el banco de pruebas actual; tocar aquí antes que en la 20 |
 | `21_real_nivel` | **datos reales** | `real_nivel_v01_m03` | la arquitectura de la 20 sobre la serie observada; ver §Datos reales |
 
 **Veredicto de informatividad (2026-08-30), y difiere del orden intuitivo.** El criterio no es "¿el generador rompe un supuesto?" sino "¿rompe uno que el modelo propuesto puede aprovechar y las referencias no?". Bajo ese criterio:
@@ -272,6 +273,8 @@ Orden pensado para que cada etapa sea utilizable antes de empezar la siguiente.
 El peso del capítulo tiene que caer en **2, 3 y 4**, y —desde que existe— en el
 **Escenario B de la corrida 18**, que es el único con brecha medible entre la
 clase lineal y el óptimo (ver §El Escenario B).
+
+**La corrida 30 (`notebooks/simulaciones/30_sim_E1/`) es la corrida modificable.** Es copia de la 20 y está explícitamente habilitada para experimentar: cambiar parámetros, probar variantes del `_01` o de la evaluación y romper cosas ahí no requiere preguntar. Las corridas 11–27 y la 20 (plantilla) **no** se editan sin acordarlo antes; si hace falta probar algo sobre ellas, se prueba en la 30.
 
 **La corrida 20 (`notebooks/simulaciones/20_sim_E1/`) es la plantilla vigente**, copia de la 11 con dos cambios: `mu(tau) = sin(2 pi tau)` (la 11 corrió con `5 + 2 sin`) y `M_FPCA` como eje de barrido en el `EXPERIMENT_ID`. El resto de `SIM_CFG` es el del anexo y no se tocó. Para las corridas de E2, E3 y E4 con las constantes nuevas, partir de la 20 y no de la 11.
 

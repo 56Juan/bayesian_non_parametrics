@@ -12,6 +12,13 @@ Utilidades transversales del proyecto.
                    Es la unica factorizacion del proyecto: `pipelines.sim_comun`
                    la re-exporta bajo el nombre de dominio `factor_cholesky`.
     raiz.py        Localizacion de la raiz del proyecto.
+    rutas.py       Las cinco rutas del contrato (`raw`, `functional`, `predict`,
+                   `out_report`, `out_artefact`) y la convencion del
+                   `EXPERIMENT_ID`. Es el gemelo Python de `config_paths.m`:
+                   antes cada notebook armaba el dict `PATHS` a mano y cualquier
+                   cambio de convencion habia que propagarlo a todas las copias.
+                   Incluye el barrido en `M` (`rutas_por_M`) y la replicacion de
+                   los artefactos que no dependen de `M`.
     trazas.py      Normalizacion de forma de las trazas `.mat`: MATLAB descarta
                    las dimensiones singleton finales, de modo que con una sola
                    covariable (p = 1, el punto M = 1 del barrido) las trazas de
@@ -31,6 +38,16 @@ from .quadrature import (
 )
 from .linalg import sym, safe_chol, es_triangular_inferior
 from .raiz import get_project_root
+from .rutas import (
+    CLAVES_PATHS,
+    experiment_id,
+    construir_paths,
+    normalizar_lista_M,
+    rutas_por_M,
+    ruta_barrido_M,
+    guardar_en_todos,
+    replicar_figura,
+)
 from .trazas import normalizar_trazas_mat, asegurar_3d
 from .progreso import Progreso, aviso
 
@@ -47,6 +64,15 @@ __all__ = [
     "es_triangular_inferior",
     # Infraestructura
     "get_project_root",
+    # Rutas del contrato y convencion del EXPERIMENT_ID
+    "CLAVES_PATHS",
+    "experiment_id",
+    "construir_paths",
+    "normalizar_lista_M",
+    "rutas_por_M",
+    "ruta_barrido_M",
+    "guardar_en_todos",
+    "replicar_figura",
     "normalizar_trazas_mat",
     "asegurar_3d",
     "Progreso",
