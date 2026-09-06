@@ -512,6 +512,31 @@ def indicador_cobertura(y_obs, li, ls) -> np.ndarray:
     return ((y >= L) & (y <= U))
 
 
+def indicador_cobertura_simultanea(y_obs, li, ls) -> np.ndarray:
+    """
+    Indicador SIMULTANEO por curva: 1 si TODOS los puntos de la curva caen
+    dentro de [li, ls]; 0 si al menos uno escapa.
+
+    Distinto de `indicador_cobertura` en que SI agrega -pero sobre el ultimo
+    eje (tau u otras componentes de una misma curva), no sobre el tiempo-. Con
+    entrada (n, G) el resultado es (n,): una cifra por origen que responde
+    "?la curva ENTERA quedo cubierta?", no "?que fraccion de la curva cubre?"
+    -que es lo que promedia `indicador_cobertura(...).mean(axis=-1)`, la
+    cobertura PUNTUAL de siempre-. Es la version que corresponde a un
+    intervalo de credibilidad simultaneo sobre la curva completa: con w
+    origenes en una ventana, el promedio de este indicador es la fraccion de
+    curvas totalmente contenidas (18/20 curvas -> 0.90), no el promedio de
+    fracciones puntuales cubiertas.
+    """
+    y = np.asarray(y_obs, float)
+    L = np.asarray(li, float)
+    U = np.asarray(ls, float)
+    if not (y.shape == L.shape == U.shape):
+        raise ValueError(f"Formas incompatibles: y {y.shape}, li {L.shape}, "
+                         f"ls {U.shape}.")
+    return ((y >= L) & (y <= U)).all(axis=-1)
+
+
 def picp(y_obs, li, ls, nivel: float = 0.95) -> dict:
     """
     Cobertura empirica (PICP) con su error estandar y el desvio ACE.

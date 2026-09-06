@@ -1,0 +1,73 @@
+M,metrica,columna,bloque,modelo,pct_ventanas_ganadas,n_ventanas
+1,1. MAE   (L^1),mae_f,train,FAR,0.025925925925925925,540
+1,1. MAE   (L^1),mae_f,train,RF,0.46296296296296297,540
+1,1. MAE   (L^1),mae_f,train,GBT,0.4888888888888889,540
+1,1. MAE   (L^1),mae_f,train,PSBPM-FD,0.022222222222222223,540
+1,1. MAE   (L^1),mae_f,test,FAR,0.23076923076923078,221
+1,1. MAE   (L^1),mae_f,test,RF,0.24434389140271492,221
+1,1. MAE   (L^1),mae_f,test,GBT,0.04072398190045249,221
+1,1. MAE   (L^1),mae_f,test,PSBPM-FD,0.4841628959276018,221
+1,2. RMSE  (L^2),rmse_f,train,FAR,0.018518518518518517,540
+1,2. RMSE  (L^2),rmse_f,train,RF,0.43703703703703706,540
+1,2. RMSE  (L^2),rmse_f,train,GBT,0.5148148148148148,540
+1,2. RMSE  (L^2),rmse_f,train,PSBPM-FD,0.02962962962962963,540
+1,2. RMSE  (L^2),rmse_f,test,FAR,0.18552036199095023,221
+1,2. RMSE  (L^2),rmse_f,test,RF,0.22624434389140272,221
+1,2. RMSE  (L^2),rmse_f,test,GBT,0.013574660633484163,221
+1,2. RMSE  (L^2),rmse_f,test,PSBPM-FD,0.5746606334841629,221
+1,"3. Error maximo (L^inf, prom. por curva)",linf_medio,train,FAR,0.025925925925925925,540
+1,"3. Error maximo (L^inf, prom. por curva)",linf_medio,train,RF,0.4111111111111111,540
+1,"3. Error maximo (L^inf, prom. por curva)",linf_medio,train,GBT,0.5314814814814814,540
+1,"3. Error maximo (L^inf, prom. por curva)",linf_medio,train,PSBPM-FD,0.03148148148148148,540
+1,"3. Error maximo (L^inf, prom. por curva)",linf_medio,test,FAR,0.29411764705882354,221
+1,"3. Error maximo (L^inf, prom. por curva)",linf_medio,test,RF,0.19457013574660634,221
+1,"3. Error maximo (L^inf, prom. por curva)",linf_medio,test,GBT,0.07692307692307693,221
+1,"3. Error maximo (L^inf, prom. por curva)",linf_medio,test,PSBPM-FD,0.4343891402714932,221
+2,1. MAE   (L^1),mae_f,train,FAR,0.0,540
+2,1. MAE   (L^1),mae_f,train,RF,0.001851851851851852,540
+2,1. MAE   (L^1),mae_f,train,GBT,0.9981481481481481,540
+2,1. MAE   (L^1),mae_f,train,PSBPM-FD,0.0,540
+2,1. MAE   (L^1),mae_f,test,FAR,0.2986425339366516,221
+2,1. MAE   (L^1),mae_f,test,RF,0.09954751131221719,221
+2,1. MAE   (L^1),mae_f,test,GBT,0.01809954751131222,221
+2,1. MAE   (L^1),mae_f,test,PSBPM-FD,0.583710407239819,221
+2,2. RMSE  (L^2),rmse_f,train,FAR,0.0,540
+2,2. RMSE  (L^2),rmse_f,train,RF,0.001851851851851852,540
+2,2. RMSE  (L^2),rmse_f,train,GBT,0.9981481481481481,540
+2,2. RMSE  (L^2),rmse_f,train,PSBPM-FD,0.0,540
+2,2. RMSE  (L^2),rmse_f,test,FAR,0.2986425339366516,221
+2,2. RMSE  (L^2),rmse_f,test,RF,0.08597285067873303,221
+2,2. RMSE  (L^2),rmse_f,test,GBT,0.02262443438914027,221
+2,2. RMSE  (L^2),rmse_f,test,PSBPM-FD,0.5927601809954751,221
+2,"3. Error maximo (L^inf, prom. por curva)",linf_medio,train,FAR,0.0,540
+2,"3. Error maximo (L^inf, prom. por curva)",linf_medio,train,RF,0.0,540
+2,"3. Error maximo (L^inf, prom. por curva)",linf_medio,train,GBT,1.0,540
+2,"3. Error maximo (L^inf, prom. por curva)",linf_medio,train,PSBPM-FD,0.0,540
+2,"3. Error maximo (L^inf, prom. por curva)",linf_medio,test,FAR,0.3438914027149321,221
+2,"3. Error maximo (L^inf, prom. por curva)",linf_medio,test,RF,0.004524886877828055,221
+2,"3. Error maximo (L^inf, prom. por curva)",linf_medio,test,GBT,0.013574660633484163,221
+2,"3. Error maximo (L^inf, prom. por curva)",linf_medio,test,PSBPM-FD,0.6380090497737556,221
+3,1. MAE   (L^1),mae_f,train,FAR,0.0,540
+3,1. MAE   (L^1),mae_f,train,RF,0.0,540
+3,1. MAE   (L^1),mae_f,train,GBT,1.0,540
+3,1. MAE   (L^1),mae_f,train,PSBPM-FD,0.0,540
+3,1. MAE   (L^1),mae_f,test,FAR,0.2895927601809955,221
+3,1. MAE   (L^1),mae_f,test,RF,0.10407239819004525,221
+3,1. MAE   (L^1),mae_f,test,GBT,0.01809954751131222,221
+3,1. MAE   (L^1),mae_f,test,PSBPM-FD,0.5882352941176471,221
+3,2. RMSE  (L^2),rmse_f,train,FAR,0.0,540
+3,2. RMSE  (L^2),rmse_f,train,RF,0.0,540
+3,2. RMSE  (L^2),rmse_f,train,GBT,1.0,540
+3,2. RMSE  (L^2),rmse_f,train,PSBPM-FD,0.0,540
+3,2. RMSE  (L^2),rmse_f,test,FAR,0.23076923076923078,221
+3,2. RMSE  (L^2),rmse_f,test,RF,0.19909502262443438,221
+3,2. RMSE  (L^2),rmse_f,test,GBT,0.0,221
+3,2. RMSE  (L^2),rmse_f,test,PSBPM-FD,0.5701357466063348,221
+3,"3. Error maximo (L^inf, prom. por curva)",linf_medio,train,FAR,0.0,540
+3,"3. Error maximo (L^inf, prom. por curva)",linf_medio,train,RF,0.0,540
+3,"3. Error maximo (L^inf, prom. por curva)",linf_medio,train,GBT,1.0,540
+3,"3. Error maximo (L^inf, prom. por curva)",linf_medio,train,PSBPM-FD,0.0,540
+3,"3. Error maximo (L^inf, prom. por curva)",linf_medio,test,FAR,0.2579185520361991,221
+3,"3. Error maximo (L^inf, prom. por curva)",linf_medio,test,RF,0.08144796380090498,221
+3,"3. Error maximo (L^inf, prom. por curva)",linf_medio,test,GBT,0.01809954751131222,221
+3,"3. Error maximo (L^inf, prom. por curva)",linf_medio,test,PSBPM-FD,0.6425339366515838,221

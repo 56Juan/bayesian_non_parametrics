@@ -40,7 +40,8 @@ from .functions.propagation import (
     residuos_representacion,
 )
 
-__all__ = ["PSBP_FD_v3", "cargar_trazas_mat"]
+__all__ = ["PSBP_FD_v3", "cargar_trazas_mat", "ruta_traza",
+           "leer_traza", "ModeloTraza"]
 
 
 # ==========================================================================
@@ -48,7 +49,8 @@ __all__ = ["PSBP_FD_v3", "cargar_trazas_mat"]
 # ==========================================================================
 
 _CLAVES = ("betajhout", "beta0hout", "tauhout", "alphahout",
-           "psijhout", "Gammajhout", "gammajhout", "osumout", "inEout")
+           "psijhout", "Gammajhout", "gammajhout", "osumout", "inEout",
+           "pijout", "wjout")
 
 
 def cargar_trazas_mat(ruta) -> Dict[str, np.ndarray]:
@@ -90,6 +92,113 @@ def cargar_trazas_mat(ruta) -> Dict[str, np.ndarray]:
             f"La traza {ruta.name} no contiene {sorted(faltan)}. Verifique que "
             "fue generada por psbp_train.m y no truncada al guardarse.")
     return trazas
+
+
+# ==========================================================================
+# CONVENCION DE NOMBRES Y LECTURA COMPLETA DE UNA TRAZA
+# ==========================================================================
+
+def ruta_traza(paths, fpc_idx: int, chain: int) -> Path:
+    """
+    Ruta del `.mat` de una (componente FPCA, cadena), por la convencion unica
+    del proyecto: `chain_fpc_<fpc_idx>_iter<chain a 2 digitos>.mat`.
+
+    paths : dict de rutas del experimento; se usa la clave `out_artefact`.
+    fpc_idx : indice de la componente en BASE-1 (`component_idx[k] + 1`), que
+        es como los nombra `psbp_fd_iteracion.m`. Pasar el base-0 apunta al
+        archivo equivocado sin dar error.
+    chain : numero de cadena en BASE-1.
+
+    Existe aqui y no en cada notebook porque la convencion la fija el `.m` y
+    duplicarla en cada carpeta de experimento fue historicamente la fuente de
+    error mas persistente del proyecto: un cambio de nombre en el muestreador
+    obligaba a corregir a mano una copia por notebook.
+    """
+    return Path(paths["out_artefact"]) / f"chain_fpc_{fpc_idx}_iter{chain:02d}.mat"
+
+
+def leer_traza(ruta):
+    """
+    Lee una traza completa: `(trazas, burn, feature_names)`.
+
+    Complementa a `cargar_trazas_mat` --que devuelve solo los arreglos-- con
+    los dos metadatos que el `.mat` tambien guarda y que hacen falta para
+    construir un predictor y para verificar el contrato con el dataset:
+
+        burn          iteraciones de calentamiento que declaro el muestreador.
+        feature_names nombres de las covariables, en el orden del diseno. El
+                      notebook los contrasta contra las columnas del dataset;
+                      si no coinciden, la matriz de diseno esta permutada y el
+                      resultado seria silenciosamente incorrecto.
+
+    La lectura de los arreglos pasa por `cargar_trazas_mat`, de modo que hereda
+    la normalizacion de formas de `beta0hout`/`tauhout` (MATLAB las guarda
+    (nsim, N, 1) o (nsim, N) segun la version).
+    """
+    from scipy.io import loadmat
+
+    trazas = cargar_trazas_mat(ruta)
+    crudo = loadmat(str(Path(ruta)))
+    burn = int(np.asarray(crudo["burn"]).ravel()[0])
+    feat = str(np.atleast_1d(crudo["feature_names"]).ravel()[0]).split(",")
+    return trazas, burn, feat
+
+
+class ModeloTraza:
+    """
+    Predictiva de UNA (componente FPCA, cadena), con la matriz de diseno
+    construida desde el dataset AR.
+
+    Es la capa delgada que separa dos cosas que conviene no mezclar: el
+    `PSBPPredictor` opera sobre una matriz de diseno con intercepto, y los
+    datasets del proyecto son tablas cuya primera columna es el objetivo y el
+    resto las covariables. `ModeloTraza` hace esa traduccion en un solo lugar.
+
+    Conserva `traces` sin tocar a proposito: las probabilidades de inclusion
+    (`fit.inclusion`) se calculan sobre las trazas crudas --`osumout`,
+    `gammajhout`-- y no sobre el predictor, de modo que descartarlas aqui
+    obligaria a releer el `.mat`.
+
+    Uso
+    ---
+        traces, burn, feat = leer_traza(ruta_traza(P, fpc_idx, chain))
+        modelo = ModeloTraza(traces, burn, feat)
+        mom = modelo.momentos(df)            # media y sd predictivas
+        Z   = modelo.muestrear(df, d, seed)  # (n_post * d, n)
+    """
+
+    def __init__(self, traces: Dict[str, np.ndarray], burn: int,
+                 feature_names: Sequence[str]):
+        self.traces = traces
+        self.feature_names_ = list(feature_names)
+        self.burn = int(burn)
+        self.predictor_ = PSBPPredictor(traces=traces, burn=burn)
+        self.n_features_ = int(self.predictor_.n_features_)
+
+    @classmethod
+    def desde_ruta(cls, ruta) -> "ModeloTraza":
+        """Atajo: lee el `.mat` y construye el modelo en un paso."""
+        return cls(*leer_traza(ruta))
+
+    def _diseno(self, df) -> np.ndarray:
+        """
+        (n, p+1) con la columna de intercepto delante.
+
+        Acepta un DataFrame --primera columna el objetivo, el resto
+        covariables-- o directamente un arreglo con esa misma disposicion, para
+        no imponer pandas como dependencia de este modulo.
+        """
+        bloque = df.iloc[:, 1:] if hasattr(df, "iloc") else np.asarray(df)[:, 1:]
+        Xp = np.asarray(bloque, dtype=float)
+        return np.hstack([np.ones((Xp.shape[0], 1)), Xp])
+
+    def momentos(self, df) -> Dict[str, np.ndarray]:
+        """Momentos predictivos (media, sd PREDICTIVA, descomposicion)."""
+        return self.predictor_.momentos_predictivos(self._diseno(df))
+
+    def muestrear(self, df, d: int = 1, seed: Optional[int] = None) -> np.ndarray:
+        """Extracciones de la predictiva, (n_post * d, n)."""
+        return self.predictor_.muestrear(self._diseno(df), d, seed=seed)
 
 
 # ==========================================================================

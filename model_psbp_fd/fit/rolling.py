@@ -81,6 +81,15 @@ Bloque A y Bloque B sobre la ventana
         winkler    PRIMARIA del bloque, regla de puntuacion propia
         picp, mpiw DIAGNOSTICAS: la descomposicion del Winkler en cobertura y
                    ancho. Nunca rankean modelos por si solas.
+        picp_simultaneo  cobertura SIMULTANEA: fraccion de CURVAS de la
+                   ventana totalmente contenidas en su banda (18 de 20 -> 0.90),
+                   contra `picp`, que es la fraccion de PUNTOS (t, tau)
+                   cubiertos. Basta un tau fuera para que una curva cuente
+                   como no cubierta, de modo que `picp_simultaneo <= picp`
+                   siempre, y la brecha entre las dos es informativa: una
+                   banda con `picp` nominal y `picp_simultaneo` bajo cubre en
+                   promedio por punto pero casi nunca contiene la curva
+                   entera.
 
 ORDEN DE AGREGACION, que la especificacion de metricas exige cerrar: `rmse_f`
 es y sigue siendo `sqrt(mise)`, es decir la raiz del MSE agregado sobre
@@ -98,7 +107,9 @@ from typing import Callable, Dict, List, Optional, Sequence
 import numpy as np
 import pandas as pd
 
-from .metrics_distribucional import crps_muestral, winkler
+from .metrics_distribucional import (
+    crps_muestral, winkler, indicador_cobertura_simultanea,
+)
 from .metrics_puntual import _2d, normas_error_por_origen, pesos_normalizados
 from ..utils.quadrature import pesos_trapezoidales
 from ..utils.progreso import Progreso
@@ -461,6 +472,16 @@ def ventana_movil_funcional(X_obs: np.ndarray, X_pred: np.ndarray,
         dentro = (O >= L) & (O <= U)                       # (n, G)
         metricas["cobertura_puntual"] = lambda idx: float(dentro[idx].mean())
         metricas["ancho_medio"] = lambda idx: float((U[idx] - L[idx]).mean())
+        # Cobertura SIMULTANEA: 1 por origen si la curva ENTERA quedo dentro
+        # de la banda, 0 si al menos un tau escapo (`indicador_cobertura_
+        # simultanea`, un AND sobre tau en vez del promedio de siempre). El
+        # promedio de esta serie sobre la ventana es la FRACCION DE CURVAS
+        # totalmente contenidas -18 de 20 curvas -> 0.90-, una cantidad
+        # distinta de `cobertura_puntual` (fraccion de PUNTOS cubiertos) y
+        # normalmente menor: basta un tau fuera para que la curva entera
+        # cuente como no cubierta.
+        dentro_curva = indicador_cobertura_simultanea(O, L, U)   # (n,)
+        metricas["cobertura_simultanea"] = lambda idx: float(dentro_curva[idx].mean())
         if bloque_A:
             # Winkler integrado sobre el dominio con los pesos NORMALIZADOS,
             # de modo que queda en las unidades de la curva y es comparable con
@@ -472,6 +493,7 @@ def ventana_movil_funcional(X_obs: np.ndarray, X_pred: np.ndarray,
             metricas["winkler"] = lambda idx, v=w_t: float(v[idx].mean())
             metricas["picp"] = metricas["cobertura_puntual"]
             metricas["mpiw"] = metricas["ancho_medio"]
+            metricas["picp_simultaneo"] = metricas["cobertura_simultanea"]
 
     salida = ventana_movil(metricas, n, T0, w, paso, solapadas, t_offset,
                            verbose=verbose,

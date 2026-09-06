@@ -35,7 +35,13 @@ Contenido
     functions/propagation.py Transporte de scores a curvas.
 """
 
-from .psbp_fd_v3 import PSBP_FD_v3, cargar_trazas_mat
+from .psbp_fd_v3 import (
+    PSBP_FD_v3,
+    cargar_trazas_mat,
+    ruta_traza,
+    leer_traza,
+    ModeloTraza,
+)
 from .functions import (
     PSBPPredictor,
     PropagadorFuncional,
@@ -51,6 +57,9 @@ __all__ = [
     # Orquestador y lectura de trazas
     "PSBP_FD_v3",
     "cargar_trazas_mat",
+    "ruta_traza",
+    "leer_traza",
+    "ModeloTraza",
     # Predictiva por score
     "PSBPPredictor",
     "pesos_probit",

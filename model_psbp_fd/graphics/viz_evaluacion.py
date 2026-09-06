@@ -270,6 +270,7 @@ def plot_extractos_curvas(X_true: np.ndarray, X_pred: np.ndarray,
                           cada: int = 10, n_col: int = 5,
                           nivel: float = 0.95,
                           X_obs: Optional[np.ndarray] = None,
+                          X_prev: Optional[np.ndarray] = None,
                           title: str = "Intervalos de credibilidad sobre la curva",
                           save_path: Optional[str] = None,
                           verbose: bool = False):
@@ -282,6 +283,11 @@ def plot_extractos_curvas(X_true: np.ndarray, X_pred: np.ndarray,
     li, ls : (n, G) banda PUNTUAL de nivel `nivel`. No es simultánea: cubre
         cada tau por separado, de modo que la probabilidad de contener la curva
         entera es menor que el nominal.
+    X_prev : (n, G) opcional, la curva UN PERÍODO ANTES de cada extracto -el
+        origen `t-1`, alineado fila a fila con `X_true`-. Sirve para leer POR
+        QUÉ el modelo erró: si el extracto es de una ventana con error alto, ver
+        de qué curva se partió (¿ya era atípica?) es el primer diagnóstico. Se
+        dibuja gris punteada, detrás de todo lo demás.
 
     El título de cada panel indica el bloque y la fracción del dominio cubierta
     por la banda en ese período, que es lo que permite ver de un vistazo si el
@@ -308,6 +314,9 @@ def plot_extractos_curvas(X_true: np.ndarray, X_pred: np.ndarray,
     for ax, i in zip(planos, idx):
         es_test = t[i] > T0
         color = C_TEST if es_test else C_TRAIN
+        if X_prev is not None:
+            ax.plot(tau, np.atleast_2d(X_prev)[i], color="0.45", lw=1.0,
+                    ls="--", alpha=0.85, zorder=1)
         ax.fill_between(tau, L[i], U[i], color=color, alpha=0.22, lw=0)
         if X_obs is not None:
             ax.plot(tau, np.atleast_2d(X_obs)[i], ".", color="0.65", ms=2.2,
@@ -342,6 +351,9 @@ def plot_extractos_curvas(X_true: np.ndarray, X_pred: np.ndarray,
     if X_obs is not None:
         manijas.append(plt.Line2D([], [], color="0.65", marker=".", ls="",
                                   label="datos observados (con ruido)"))
+    if X_prev is not None:
+        manijas.append(plt.Line2D([], [], color="0.45", lw=1.0, ls="--",
+                                  label="curva anterior (t-1)"))
     fig.legend(handles=manijas, loc="lower center", ncol=len(manijas),
                fontsize=9, frameon=False, bbox_to_anchor=(0.5, -0.01))
     fig.suptitle(f"{title} — un extracto cada {cada} períodos", fontsize=12)

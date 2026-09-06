@@ -113,6 +113,7 @@ from .metrics_distribucional import (
     lps_desde_log_densidad,
     winkler,
     indicador_cobertura,
+    indicador_cobertura_simultanea,
     picp,
     mpiw,
     resumen_intervalo,
@@ -204,6 +205,7 @@ __all__ = [
     # -- Bloque B: intervalos de prediccion --
     "winkler",
     "indicador_cobertura",
+    "indicador_cobertura_simultanea",
     "picp",
     "mpiw",
     "resumen_intervalo",
