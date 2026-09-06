@@ -117,6 +117,27 @@ def agrupar_muestras_cadenas(lista: Sequence[np.ndarray]) -> np.ndarray:
     return np.concatenate(arrs, axis=0)
 
 
+def curva_media_desde_scores(scores_std: np.ndarray, fpca, estandarizador
+                             ) -> np.ndarray:
+    """
+    Mapa DETERMINISTA scores estandarizados -> curva, sin muestreo.
+
+    scores_std : (n, M) en la escala en que se entreno el estandarizador.
+    fpca : objeto con `.reconstruct(SCORES)` -> (n, G).
+    estandarizador : objeto con `.inverse_transform(scores_std)` -> SCORES.
+
+    Es el caso `modo_residuo="ninguno"` de `PropagadorFuncional`, pero para UNA
+    sola curva por fila --la media condicional-- y no para extracciones de una
+    predictiva. No se instancia `PropagadorFuncional` para esto porque esa
+    clase esta pensada para (S, n, M) -S extracciones- y aqui no hay S: es
+    la reconstruccion de un solo punto por origen, que es lo que necesitan los
+    competidores de prediccion PUNTUAL (FAR, RF, GBT) para entrar en la misma
+    escala de curva que el PSBPM-FD.
+    """
+    S = estandarizador.inverse_transform(np.atleast_2d(scores_std))
+    return fpca.reconstruct(S)
+
+
 def bandas_puntuales(muestras: np.ndarray, nivel: float = 0.95):
     """Cuantiles empiricos simetricos punto a punto; retorna (li, ls)."""
     Z = np.asarray(muestras, dtype=float)

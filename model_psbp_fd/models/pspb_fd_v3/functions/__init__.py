@@ -18,6 +18,7 @@ from .propagation import (
     PropagadorFuncional,
     agrupar_muestras_cadenas,
     bandas_puntuales,
+    curva_media_desde_scores,
     muestrear_scores,
     residuos_representacion,
 )
@@ -29,6 +30,7 @@ __all__ = [
     "PropagadorFuncional",
     "agrupar_muestras_cadenas",
     "bandas_puntuales",
+    "curva_media_desde_scores",
     "muestrear_scores",
     "residuos_representacion",
 ]

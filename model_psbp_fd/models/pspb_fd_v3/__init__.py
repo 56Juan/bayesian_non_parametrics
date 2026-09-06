@@ -47,6 +47,7 @@ from .functions import (
     PropagadorFuncional,
     agrupar_muestras_cadenas,
     bandas_puntuales,
+    curva_media_desde_scores,
     medias_componente,
     muestrear_scores,
     pesos_probit,
@@ -69,5 +70,6 @@ __all__ = [
     "muestrear_scores",
     "agrupar_muestras_cadenas",
     "bandas_puntuales",
+    "curva_media_desde_scores",
     "residuos_representacion",
 ]
