@@ -64,6 +64,7 @@ def _sombrear_bloques(ax, T0: int, t_min: float, t_max: float) -> None:
 def plot_ventana_movil(tabla: pd.DataFrame, T0: int, metricas: Sequence[str],
                        columna_grupo: Optional[str] = None,
                        tablas_por_w: Optional[Dict[int, pd.DataFrame]] = None,
+                       estilos: Optional[Dict[str, dict]] = None,
                        title: str = "Evolución del error sobre ventana móvil",
                        save_path: Optional[str] = None,
                        verbose: bool = False):
@@ -77,6 +78,21 @@ def plot_ventana_movil(tabla: pd.DataFrame, T0: int, metricas: Sequence[str],
     tablas_por_w : {w: tabla} para superponer varios anchos de ventana. Sirve
         para mostrar que la conclusión no depende del w elegido a dedo; el w
         mayor va más opaco.
+    estilos : {nombre_de_grupo: kwargs de `ax.plot`} para dar estilo propio a
+        series concretas. Existe por un motivo concreto y vale la pena dejarlo
+        escrito: cuando dos series casi coinciden --el PSBPM-FD y el FAR en el
+        Escenario 1, donde la media condicional ES lineal y el competidor está
+        correctamente especificado-- la que se dibuja después TAPA a la otra,
+        con el mismo grosor y sin dejar rastro. Medido en la corrida 30 con
+        w=20: corr = 0.9998 y una separación máxima del 1.2 % del eje vertical
+        con M=1. El lector concluye que falta una curva cuando lo que ocurre es
+        que sobran píxeles. La solución es que la de abajo vaya discontinua y
+        más gruesa y la de arriba sólida y fina, de modo que se lean las dos.
+        Esconder una de ellas NO es la salida: aquí la coincidencia es el
+        resultado --el precio de la flexibilidad bajo especificación correcta--
+        y no un artefacto como lo era la redundancia VAR/FAR1.
+        Los grupos con estilo declarado se dibujan al final, en el orden en que
+        aparecen en `estilos`, para que el `zorder` sea el que se pide.
 
     verbose : imprime, por métrica y ancho de ventana, la mediana en train y en
         test excluyendo las ventanas que cruzan T0. Es la lectura numérica de la
@@ -107,20 +123,32 @@ def plot_ventana_movil(tabla: pd.DataFrame, T0: int, metricas: Sequence[str],
             grupos = ([(g, tw[tw[columna_grupo] == g])
                        for g in tw[columna_grupo].unique()]
                       if columna_grupo else [(None, tw)])
-            for i_g, (nombre, sub) in enumerate(grupos):
+            # El color se fija por la posicion ORIGINAL del grupo, de modo que
+            # reordenar el dibujo no le cambia el color a nadie.
+            color_de = {nombre: plt.cm.tab10(i % 10)
+                        for i, (nombre, _) in enumerate(grupos)}
+            if estilos:
+                # Las series con estilo declarado van al final: dibujar despues
+                # es quedar encima, y es justo lo que se quiere controlar.
+                grupos = ([g for g in grupos if g[0] not in estilos]
+                          + [g for nom in estilos for g in grupos if g[0] == nom])
+            for nombre, sub in grupos:
                 sub = sub.sort_values("t_centro")
-                color = (plt.cm.tab10(i_g % 10) if columna_grupo
+                color = (color_de[nombre] if columna_grupo
                          else (C_TRAIN if len(ws) == 1 else plt.cm.viridis(i_w / max(len(ws) - 1, 1))))
+                kw = dict(color=color, lw=1.5)
+                if estilos and nombre in estilos:
+                    kw.update(estilos[nombre])
                 etiqueta = " · ".join(
                     [s for s in [str(nombre) if nombre else "",
                                  f"w={w}" if len(ws) > 1 else ""] if s]) or None
-                ax.plot(sub["t_centro"], sub[met], color=color, lw=1.5,
-                        alpha=alpha, label=etiqueta)
-                # tramo que cruza el corte: mismo color, punteado
+                ax.plot(sub["t_centro"], sub[met], alpha=alpha, label=etiqueta,
+                        **kw)
+                # tramo que cruza el corte: mismo color y grosor, punteado
                 cruza = sub[sub["cruza_T0"]]
                 if not cruza.empty:
-                    ax.plot(cruza["t_centro"], cruza[met], color=color,
-                            lw=1.5, ls=":", alpha=alpha)
+                    kw_c = {**kw, "ls": ":"}
+                    ax.plot(cruza["t_centro"], cruza[met], alpha=alpha, **kw_c)
 
         ax.set_ylabel(met)
         if met in ("cobertura", "cobertura_puntual"):

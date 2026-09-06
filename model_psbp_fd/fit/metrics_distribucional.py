@@ -40,6 +40,12 @@ __all__ = [
     "diagnostico_pit",
     "lps_gaussiano",
     "lps_desde_log_densidad",
+    # -- Bloque B: intervalos de prediccion --
+    "winkler",
+    "indicador_cobertura",
+    "picp",
+    "mpiw",
+    "resumen_intervalo",
 ]
 
 
@@ -421,3 +427,169 @@ def lps_desde_log_densidad(y_obs, log_dens: Callable[[np.ndarray], np.ndarray]) 
         raise ValueError(
             f"log_dens debe retornar la forma de y ({y.shape}); recibido {ld.shape}.")
     return float(-np.mean(ld))
+
+
+# ==========================================================================
+# BLOQUE B - INTERVALOS DE PREDICCION
+# ==========================================================================
+#
+# Jerarquia de uso, fijada ANTES de ver resultados
+# -----------------------------------------------
+# El puntaje de Winkler (interval score) es la unica metrica PRIMARIA de este
+# bloque: es una regla de puntuacion PROPIA, de modo que no se puede mejorar
+# ensanchando ni estrechando el intervalo, y combina en una cifra el ancho y la
+# penalizacion por fallo ponderada por la DISTANCIA a la que quedo la
+# observacion. PICP y MPIW son DIAGNOSTICAS y nunca rankean: son la
+# descomposicion del Winkler, y su papel es decir, cuando este es malo, si fue
+# por cobertura insuficiente o por ancho excesivo. Un intervalo
+# arbitrariamente ancho alcanza la cobertura nominal sin informar nada, y por
+# eso PICP jamas se reporta sola.
+#
+# Para quien SI hay intervalos, y para quien no
+# ---------------------------------------------
+# Este bloque necesita (li, ls) por origen. En el estudio solo el PSBPM-FD los
+# tiene de forma nativa --por cuantiles empiricos de su predictiva muestral--;
+# el FAR, el RF, el GBT y las lineas base producen predicciones PUNTUALES y no
+# una predictiva, de modo que sus celdas del Bloque B quedan VACIAS y asi hay
+# que reportarlas. Rellenarlas con una banda gaussiana de residuos dentro de
+# muestra las haria parecer artificialmente angostas e inflaria el Winkler de
+# las referencias a favor del modelo propuesto: seria una comparacion decidida
+# por el supuesto y no por los datos. Dotar a las referencias de una predictiva
+# comparable --conformal por bloques sobre un tramo de calibracion, por
+# ejemplo-- es una tarea propia y previa, no parte de este bloque.
+
+def winkler(y_obs, li, ls, nivel: float = 0.95) -> np.ndarray:
+    """
+    Puntaje de Winkler (interval score) elemento a elemento. Menor es mejor.
+
+        IS_alpha(t) = (U_t - L_t)
+                      + (2/alpha) (L_t - y_t) 1{y_t < L_t}
+                      + (2/alpha) (y_t - U_t) 1{y_t > U_t}
+
+    con alpha = 1 - nivel. La penalizacion crece LINEALMENTE con la distancia a
+    la que quedo la observacion, de modo que fallar por poco cuesta poco: eso
+    es lo que la separa del indicador de cobertura, que trata igual un fallo
+    marginal y uno catastrofico.
+
+    Las formas se preservan: con entradas (n,) devuelve (n,), y con (n, G)
+    devuelve (n, G) --el puntaje puntual, un tau a la vez--. Agregarlo sobre el
+    dominio es cosa de `resumen_intervalo`, que lo integra con la cuadratura
+    comun y no con una suma simple.
+    """
+    if not 0.0 < nivel < 1.0:
+        raise ValueError(f"nivel={nivel} debe estar en (0, 1).")
+    y = np.asarray(y_obs, float)
+    L = np.asarray(li, float)
+    U = np.asarray(ls, float)
+    if not (y.shape == L.shape == U.shape):
+        raise ValueError(f"Formas incompatibles: y {y.shape}, li {L.shape}, "
+                         f"ls {U.shape}.")
+    if np.any(U < L):
+        raise ValueError("Hay intervalos con ls < li: revisar el orden de los "
+                         "cuantiles.")
+    alpha = 1.0 - nivel
+    return ((U - L)
+            + (2.0 / alpha) * np.maximum(L - y, 0.0)
+            + (2.0 / alpha) * np.maximum(y - U, 0.0))
+
+
+def indicador_cobertura(y_obs, li, ls) -> np.ndarray:
+    """
+    Indicador  I_t = 1{ L_t <= y_t <= U_t }, SIN agregar.
+
+    Se devuelve desagregado a proposito: es el insumo del analisis de
+    agrupamiento de las violaciones --si los fallos se concentran en rachas la
+    cobertura marginal puede ser nominal y el modelo estar mal calibrado
+    condicionalmente-- y de la cobertura por bloque, por horizonte o por
+    estrato del generador. `cobertura` promedia; esto no.
+    """
+    y = np.asarray(y_obs, float)
+    L = np.asarray(li, float)
+    U = np.asarray(ls, float)
+    if not (y.shape == L.shape == U.shape):
+        raise ValueError(f"Formas incompatibles: y {y.shape}, li {L.shape}, "
+                         f"ls {U.shape}.")
+    return ((y >= L) & (y <= U))
+
+
+def picp(y_obs, li, ls, nivel: float = 0.95) -> dict:
+    """
+    Cobertura empirica (PICP) con su error estandar y el desvio ACE.
+
+        PICP = (1/n) sum_t I_t        ACE = PICP - nivel
+
+    El error estandar es el binomial, sqrt(p(1-p)/n), y por eso viene con una
+    ADVERTENCIA que hay que arrastrar al reporte: supone indicadores
+    independientes, y los origenes de una serie no lo son. Con ventanas
+    solapadas lo son todavia menos. Es una cota OPTIMISTA del error, util para
+    descartar diferencias que ni siquiera lo superan, y para cuantificar en
+    serio la incertidumbre hay que usar el bootstrap de bloques de
+    `fit/incertidumbre.py`.
+
+    `n_efectivo` cuenta elementos, de modo que con entradas (n, G) son n*G
+    pares (origen, tau) y no n curvas: la cobertura es PUNTUAL, no simultanea
+    sobre la curva, y el error estandar que sale de ahi es aun mas optimista.
+    """
+    I = indicador_cobertura(y_obs, li, ls).astype(float)
+    n = int(I.size)
+    p = float(I.mean())
+    return {"picp": p,
+            "ee_picp": float(np.sqrt(max(p * (1.0 - p), 0.0) / max(n, 1))),
+            "ace": float(p - nivel),
+            "n_efectivo": n,
+            "ee_supone_independencia": True}
+
+
+def mpiw(li, ls) -> float:
+    """
+    Ancho medio del intervalo (MPIW). Siempre acompana a PICP.
+
+    Por si sola no ordena modelos: un intervalo mas angosto es mejor solo a
+    igualdad de cobertura, y sin la cobertura al lado el MPIW premia
+    exactamente al modelo sobreconfiado.
+    """
+    L = np.asarray(li, float)
+    U = np.asarray(ls, float)
+    if L.shape != U.shape:
+        raise ValueError(f"Formas incompatibles: li {L.shape}, ls {U.shape}.")
+    if np.any(U < L):
+        raise ValueError("Hay intervalos con ls < li.")
+    return float((U - L).mean())
+
+
+def resumen_intervalo(y_obs, li, ls, nivel: float = 0.95,
+                      tau: Optional[np.ndarray] = None) -> dict:
+    """
+    Las cuatro cifras del Bloque B en un dict, con la primaria marcada.
+
+    y_obs, li, ls : (n,) por score, o (n, G) sobre la curva.
+    tau : entregado junto a entradas (n, G), el Winkler y el ancho se INTEGRAN
+        sobre el dominio con la cuadratura comun --normalizada por la longitud
+        del dominio, para que la cifra siga en las unidades de la curva-- y
+        despues se promedian sobre los origenes. Sin `tau` se promedia
+        elemento a elemento, que con grilla regular difiere solo en el peso 1/2
+        de los extremos.
+
+    Claves: `winkler` (PRIMARIA), y `picp`, `ee_picp`, `ace`, `mpiw`
+    (DIAGNOSTICAS). El dict lleva `primaria` para que una tabla no pueda
+    ordenar modelos por una diagnostica sin haberlo decidido a proposito.
+    """
+    W = winkler(y_obs, li, ls, nivel=nivel)
+    L = np.asarray(li, float)
+    U = np.asarray(ls, float)
+    anchos = U - L
+
+    if tau is not None and W.ndim == 2:
+        w = pesos_trapezoidales(tau)
+        dominio = float(w.sum())
+        w_val = float(np.mean(integrar(W, tau) / dominio))
+        anc = float(np.mean(integrar(anchos, tau) / dominio))
+    else:
+        w_val = float(W.mean())
+        anc = float(anchos.mean())
+
+    d = picp(y_obs, li, ls, nivel=nivel)
+    return {"winkler": w_val,
+            "picp": d["picp"], "ee_picp": d["ee_picp"], "ace": d["ace"],
+            "mpiw": anc, "nivel": float(nivel), "n_efectivo": d["n_efectivo"],
+            "primaria": "winkler"}

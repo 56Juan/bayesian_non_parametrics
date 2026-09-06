@@ -52,6 +52,43 @@ Sobre que se calcula
 En simulacion la curva de referencia es la VERDADERA del generador, no la
 observada: el ruido de medicion sigma_eps no forma parte de lo que el modelo
 debe predecir, y compararse contra los datos lo cuenta como error del modelo.
+
+Horizonte
+---------
+Todo lo que hay aqui es a HORIZONTE h = 1, con los rezagos REALES en cada
+origen y nunca con predicciones encadenadas. La `h` de la especificacion de
+metricas --MAE(h), RMSE(h)-- es por tanto constante e igual a 1 en todo el
+recorrido, y no existe ninguna ponderacion sobre horizontes: la unica
+ponderacion viva es la del DOMINIO FUNCIONAL, que viaja como `pesos_tau` y esta
+documentada en `metrics_puntual.pesos_normalizados`. Los dos objetos se nombran
+distinto a proposito para que no puedan confundirse el dia que se agreguen
+horizontes: extender a h > 1 exigiria decidir antes entre iterado --propagar la
+predictiva muestra a muestra, que es lo unico coherente con el Bloque B-- y
+directo --un ajuste por horizonte--, y ninguna de las dos cosas esta
+implementada.
+
+Bloque A y Bloque B sobre la ventana
+------------------------------------
+`ventana_movil_funcional` emite, ademas del MISE de siempre:
+
+    Bloque A (error puntual, normas del mismo error e_t(tau)):
+        mae_f      ||e||_1 promediado sobre los origenes de la ventana
+        rmse_f     RAIZ DEL MSE AGREGADO, sqrt(mean_t int e_t^2 dw)
+        l2_medio   PROMEDIO de ||e_t||_2, que NO es lo mismo (Jensen)
+        linf_max, linf_medio, q95_abs, razon_linf_l1
+
+    Bloque B (intervalos; solo si se entregan li y ls):
+        winkler    PRIMARIA del bloque, regla de puntuacion propia
+        picp, mpiw DIAGNOSTICAS: la descomposicion del Winkler en cobertura y
+                   ancho. Nunca rankean modelos por si solas.
+
+ORDEN DE AGREGACION, que la especificacion de metricas exige cerrar: `rmse_f`
+es y sigue siendo `sqrt(mise)`, es decir la raiz del MSE agregado sobre
+(origenes, tau), y NO el promedio de los RMSE por origen. Las dos cifras
+difieren --por Jensen la segunda es menor-- y ambas se emiten: `l2_medio` es la
+segunda, y su razon con `rmse_f` mide cuan desigual es el error entre los
+origenes de la ventana. Se dejan las dos justamente para que la eleccion sea
+visible en la tabla en vez de quedar enterrada en una formula.
 """
 
 from __future__ import annotations
@@ -61,8 +98,8 @@ from typing import Callable, Dict, List, Optional, Sequence
 import numpy as np
 import pandas as pd
 
-from .metrics_distribucional import crps_muestral
-from .metrics_puntual import _2d
+from .metrics_distribucional import crps_muestral, winkler
+from .metrics_puntual import _2d, normas_error_por_origen, pesos_normalizados
 from ..utils.quadrature import pesos_trapezoidales
 from ..utils.progreso import Progreso
 
@@ -107,6 +144,26 @@ def indices_ventanas(n: int, w: int, paso: int = 1,
 def _bloque(t_centro: int, T0: int) -> str:
     """Etiqueta del bloque al que pertenece el origen `t_centro` (base-0)."""
     return "train" if t_centro < T0 else "test"
+
+
+def _columna(a) -> np.ndarray:
+    """
+    Lleva a (n, M) una entrada que puede venir aplanada por el punto M = 1.
+
+    NO es `_2d`, y la diferencia importa: `np.atleast_2d` interpreta un vector
+    (n,) como UNA FILA, es decir un solo origen con n componentes, que es
+    exactamente al reves de lo que ocurre en el punto M = 1 del barrido. Ahi un
+    vector plano es una SERIE de n origenes con una componente, y el repositorio
+    lo produce por tres caminos distintos ya documentados: `np.loadtxt` colapsa
+    a 1D con una sola columna, MATLAB elimina el eje singleton final al guardar
+    los `.mat`, y sklearn devuelve (n,) cuando el objetivo tiene una columna.
+    Con `_2d` la ventana movil no fallaba con una cifra rara --fallaba con
+    "w excede el largo de la serie n=1"--, pero el diagnostico no apuntaba a la
+    causa. Aqui la forma se arregla y el caso queda cubierto por
+    `tests/test_metricas_bloques_AB.py`.
+    """
+    A = np.asarray(a, dtype=float)
+    return A[:, None] if A.ndim == 1 else np.atleast_2d(A)
 
 
 # ==========================================================================
@@ -190,22 +247,31 @@ def ventana_movil_scores(y_obs: np.ndarray, y_pred: np.ndarray, T0: int,
                          li: Optional[np.ndarray] = None,
                          ls: Optional[np.ndarray] = None,
                          etiquetas: Optional[Sequence[str]] = None,
+                         nivel: float = 0.95,
                          verbose: bool = False
                          ) -> pd.DataFrame:
     """
     Evolucion del error por componente FPCA.
 
-    y_obs, y_pred : (n, M) observado y predicho a h=1, en la MISMA escala.
+    y_obs, y_pred : (n, M) observado y predicho a h=1, en la MISMA escala. Un
+        vector (n,) se admite y se lee como n origenes de UNA componente, que
+        es la forma que toman las cosas en el punto M = 1 del barrido.
     T0    : corte train/test en el indexado de `y_obs`.
     muestras : (S, n, M) opcional. Si se entrega se agrega `crps` a la tabla.
-    li, ls   : (n, M) opcional. Si se entregan se agrega `cobertura` y `ancho`.
+    li, ls   : (n, M) opcional. Si se entregan se agregan `cobertura` y `ancho`
+        y, con los mismos numeros, sus nombres del Bloque B `picp` y `mpiw`,
+        mas `winkler`, que es la metrica PRIMARIA de ese bloque.
+    nivel : nivel nominal de (li, ls). Solo lo usa el Winkler, cuya
+        penalizacion por fallo es (2/alpha) veces la distancia al intervalo: si
+        no coincide con el nivel con que se construyo la banda, la cifra deja
+        de ser interpretable.
     verbose : informa el avance ventana a ventana, con la componente en curso
         en la etiqueta. El costo es M veces el de `ventana_movil`, y con
         `muestras` cada ventana calcula el CRPS sobre las S extracciones.
 
     Retorna una tabla larga con una fila por (ventana, componente).
     """
-    Y, P = _2d(y_obs), _2d(y_pred)
+    Y, P = _columna(y_obs), _columna(y_pred)
     if Y.shape != P.shape:
         raise ValueError(f"y_obs {Y.shape} y y_pred {P.shape} no coinciden.")
     n, M = Y.shape
@@ -231,17 +297,36 @@ def ventana_movil_scores(y_obs: np.ndarray, y_pred: np.ndarray, T0: int,
         }
         if muestras is not None:
             Z = np.asarray(muestras, dtype=float)
+            # (S, n) es la forma que devuelve el muestreador en el punto M = 1.
+            if Z.ndim == 2 and M == 1 and Z.shape[1] == n:
+                Z = Z[:, :, None]
             if Z.ndim != 3 or Z.shape[1:] != (n, M):
                 raise ValueError(
                     f"muestras debe ser (S, {n}, {M}); recibido {Z.shape}.")
-            metricas["crps"] = lambda idx, z=Z[:, :, m], y=Y[:, m]: float(
-                crps_muestral(y[idx], z[:, idx]).mean())
+            # El CRPS se calcula UNA vez para toda la serie y las ventanas
+            # solo promedian: es una cifra POR ORIGEN, de modo que restringir
+            # las columnas antes o despues da exactamente el mismo numero. Con
+            # ventanas solapadas la diferencia de costo es de dos ordenes
+            # -habia un ordenamiento de S x w valores por ventana, y hay uno de
+            # S x n en total-, y con T grande era el cuello de botella del
+            # notebook de evaluacion.
+            crps_t = crps_muestral(Y[:, m], Z[:, :, m])          # (n,)
+            metricas["crps"] = lambda idx, c=crps_t: float(c[idx].mean())
         if li is not None and ls is not None:
-            L, U = _2d(li), _2d(ls)
+            L, U = _columna(li), _columna(ls)
+            # `cobertura` y `ancho` se conservan con sus nombres de siempre
+            # --hay figuras y CSV que los buscan asi-- y al lado van sus
+            # sinonimos del Bloque B, `picp` y `mpiw`, mas la metrica PRIMARIA
+            # del bloque, que es el Winkler. Duplicar dos columnas es el precio
+            # de no romper lo que ya consume esta tabla.
+            w_t = winkler(Y[:, m], L[:, m], U[:, m], nivel=nivel)     # (n,)
             metricas["cobertura"] = lambda idx, y=Y[:, m], a=L[:, m], b=U[:, m]: float(
                 np.mean((y[idx] >= a[idx]) & (y[idx] <= b[idx])))
             metricas["ancho"] = lambda idx, a=L[:, m], b=U[:, m]: float(
                 np.mean(b[idx] - a[idx]))
+            metricas["winkler"] = lambda idx, s=w_t: float(s[idx].mean())
+            metricas["picp"] = metricas["cobertura"]
+            metricas["mpiw"] = metricas["ancho"]
 
         tabla = ventana_movil(
             metricas, n, T0, w, paso, solapadas, t_offset,
@@ -265,6 +350,10 @@ def ventana_movil_funcional(X_obs: np.ndarray, X_pred: np.ndarray,
                             solapadas: bool = True, t_offset: int = 0,
                             li: Optional[np.ndarray] = None,
                             ls: Optional[np.ndarray] = None,
+                            pesos_tau: Optional[np.ndarray] = None,
+                            q_extremo: float = 0.95,
+                            nivel: float = 0.95,
+                            bloque_A: bool = True,
                             verbose: bool = False) -> pd.DataFrame:
     """
     Evolucion del error funcional: una sola serie que agrega las M componentes.
@@ -280,16 +369,45 @@ def ventana_movil_funcional(X_obs: np.ndarray, X_pred: np.ndarray,
         justamente lo que `utils.quadrature` existe para evitar.
     li, ls : (n, G) opcional, banda puntual. Agrega `cobertura_puntual`, que es
         la fraccion de pares (t, tau_g) cubiertos: NO es cobertura simultanea
-        de la curva y debe declararse asi al reportar.
+        de la curva y debe declararse asi al reportar. Con `bloque_A` agrega
+        ademas `winkler`, `picp` y `mpiw`.
+    pesos_tau : ponderacion opcional del dominio funcional, la MISMA para todos
+        los modelos que se comparan (ver `metrics_puntual.pesos_normalizados`).
+        Solo afecta a las metricas del Bloque A; `mise` conserva la cuadratura
+        sin normalizar de siempre para no cambiar cifras ya reportadas.
+    q_extremo : orden del cuantil de |e| sobre el dominio que sustituye al
+        supremo como cifra citable del peor caso.
+    nivel : nivel nominal de la banda; lo usa el Winkler.
+    bloque_A : emite las normas L^p del error y, si hay banda, el Bloque B.
+        En False la tabla es exactamente la de antes de esta extension.
     verbose : informa el avance ventana a ventana. No afecta al resultado.
 
     Metricas por ventana:
         mise   : (1/w) sum_t integral (X_t - Xhat_t)^2 dtau
-        rmse_f : sqrt(mise)
+        rmse_f : sqrt(mise)  <-- RAIZ DEL MSE AGREGADO, no promedio de RMSE
         mise_rel : mise dividido por la varianza funcional de X_obs en la
                    ventana. Adimensional, de modo que las ventanas con distinta
                    amplitud de senal son comparables entre si y entre
                    escenarios.
+
+    Con `bloque_A=True` se agregan, en este orden de lectura:
+        mae_f      norma L^1 del error, promediada sobre los origenes de la
+                   ventana. Estima la mediana condicional y es robusta.
+        l2_medio   promedio de ||e_t||_2 por origen. NO coincide con `rmse_f`:
+                   por Jensen l2_medio <= rmse_f, con igualdad solo si el error
+                   es constante entre origenes. Se emiten las dos a proposito.
+        razon_agregacion = l2_medio / rmse_f, en (0, 1]. Proxima a uno el error
+                   es homogeneo dentro de la ventana; baja, hay origenes que
+                   dominan el agregado.
+        linf_max, linf_medio, q95_abs, razon_linf_l1  (peor caso y
+                   concentracion del error; `q95_abs` es la cifra citable y
+                   `linf_max` la fragil, que depende de una sola evaluacion).
+        winkler, picp, mpiw  solo con banda. `winkler` es la PRIMARIA del
+                   Bloque B; las otras dos son su descomposicion y no rankean.
+
+    La cadena ||e||_1 <= ||e||_2 <= ||e||_inf se verifica con assert dentro de
+    `normas_error_por_origen`, antes de que ninguna de estas cifras llegue a la
+    tabla.
     """
     O, P = _2d(X_obs), _2d(X_pred)
     if O.shape != P.shape:
@@ -312,14 +430,48 @@ def ventana_movil_funcional(X_obs: np.ndarray, X_pred: np.ndarray,
 
     metricas: Dict[str, Callable[[np.ndarray], float]] = {
         "mise":     _mise,
+        # sqrt del MSE agregado sobre (origenes, tau). Declarado en el
+        # docstring porque NO es el promedio de los RMSE por origen.
         "rmse_f":   lambda idx: float(np.sqrt(err_t[idx].mean())),
         "mise_rel": _mise_rel,
     }
+
+    if bloque_A:
+        # Las tres normas se calculan UNA vez para toda la serie --son cifras
+        # por origen-- y las ventanas solo las indexan. Es lo que permite
+        # engancharse por el diccionario de callables sin tocar el motor: cada
+        # metrica del Bloque A es una media sobre `idx` de un vector ya
+        # calculado. La cadena L1 <= L2 <= Linf se verifica ahi dentro.
+        nm = normas_error_por_origen(O, P, tau, pesos_tau=pesos_tau,
+                                     q=q_extremo, verificar=True)
+        _qn = f"q{int(round(q_extremo * 100))}_abs"
+        metricas.update({
+            "mae_f":       lambda idx, v=nm["l1"]:   float(v[idx].mean()),
+            "l2_medio":    lambda idx, v=nm["l2"]:   float(v[idx].mean()),
+            "linf_max":    lambda idx, v=nm["linf"]: float(v[idx].max()),
+            "linf_medio":  lambda idx, v=nm["linf"]: float(v[idx].mean()),
+            _qn:           lambda idx, v=nm["q_abs"]: float(v[idx].mean()),
+            "razon_linf_l1": lambda idx, v=nm["razon_linf_l1"]: float(v[idx].mean()),
+            "razon_agregacion": lambda idx, a=nm["l2"]: float(
+                a[idx].mean() / max(float(np.sqrt((a[idx] ** 2).mean())), 1e-300)),
+        })
+
     if li is not None and ls is not None:
         L, U = _2d(li), _2d(ls)
         dentro = (O >= L) & (O <= U)                       # (n, G)
         metricas["cobertura_puntual"] = lambda idx: float(dentro[idx].mean())
         metricas["ancho_medio"] = lambda idx: float((U[idx] - L[idx]).mean())
+        if bloque_A:
+            # Winkler integrado sobre el dominio con los pesos NORMALIZADOS,
+            # de modo que queda en las unidades de la curva y es comparable con
+            # el ancho medio. `picp` y `mpiw` son los mismos numeros que
+            # `cobertura_puntual` y `ancho_medio`, con el nombre del bloque:
+            # se duplican para que una tabla del Bloque B se pueda leer sola.
+            wn = pesos_normalizados(tau, pesos_tau)
+            w_t = winkler(O, L, U, nivel=nivel) @ wn       # (n,)
+            metricas["winkler"] = lambda idx, v=w_t: float(v[idx].mean())
+            metricas["picp"] = metricas["cobertura_puntual"]
+            metricas["mpiw"] = metricas["ancho_medio"]
 
     salida = ventana_movil(metricas, n, T0, w, paso, solapadas, t_offset,
                            verbose=verbose,
