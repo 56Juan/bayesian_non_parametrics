@@ -1,0 +1,62 @@
+{
+  "sim_params": {
+    "L": 100,
+    "T": 800,
+    "burn_in": 200,
+    "sigma_obs": 0.25,
+    "R": 1,
+    "seed": 41232,
+    "media_fn": "media_senoidal",
+    "jitter": 1e-10,
+    "gamma": 0.3,
+    "hs_norm": 0.7,
+    "sigma_eps": 1.0,
+    "ell": 0.5
+  },
+  "diagnostico": {
+    "n_replicas": 1,
+    "n_curvas": 800,
+    "n_puntos_grilla": 100,
+    "todo_finito": true,
+    "media_empirica_global": -0.04830922939403797,
+    "media_ee_montecarlo": NaN,
+    "var_puntual_media": 1.4878658970840066,
+    "var_puntual_min": 1.2275712791864566,
+    "var_puntual_max": 1.6740133959667969,
+    "acf1_media": 0.5744540271741119,
+    "acf1_ee_montecarlo": NaN,
+    "razon_senal_ruido": 23.805854353344106,
+    "hs_norm_objetivo": 0.7,
+    "hs_norm_efectiva": 0.7,
+    "hs_norm_error_absoluto": 0.0,
+    "radio_espectral_operador": 0.6425676307024757,
+    "estacionariedad_garantizada": true
+  },
+  "tendencia": {
+    "forma": "cuadratica",
+    "deriva": 3.0,
+    "inclinacion": 0.0,
+    "sd_componente_estable": 1.3880349112322612,
+    "b_en_T0": 1.4684234517176509,
+    "b_en_T0_sobre_deriva": 0.4894744839058836,
+    "deriva_neta_en_sd": 2.1613289231584805,
+    "curvatura_en_sd": 0.3597706467835771,
+    "desfase_en_sd": 1.2264664757149173,
+    "acf1_nivel_bruto": 0.8063594905648813,
+    "acf1_nivel_destendenciado": 0.6479165894011776,
+    "estacionario": false
+  },
+  "replica_idx": 0,
+  "experiment_id": "escenario_T_1_r01_m02",
+  "escenario_id": 1,
+  "replica_id": 1,
+  "m_fpca": 2,
+  "m_fpca_list": [
+    1,
+    2,
+    3
+  ],
+  "seed": 41232,
+  "T": 800,
+  "G": 100
+}
