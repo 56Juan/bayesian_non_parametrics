@@ -1,13 +1,13 @@
 {
   "method": "bspline",
-  "n_basis": 4,
-  "order": 3,
+  "n_basis": 6,
+  "order": 4,
   "T": 800,
-  "K": 4,
+  "K": 6,
   "T0": 560,
   "prop_train": 0.7,
   "ajustado_en": "train",
   "center": false,
-  "n_basis_gcv": 4,
-  "order_gcv": 3
+  "n_basis_gcv": 6,
+  "order_gcv": 4
 }
