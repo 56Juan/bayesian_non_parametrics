@@ -1,0 +1,66 @@
+{
+  "sim_params": {
+    "L": 100,
+    "T": 800,
+    "burn_in": 200,
+    "sigma_obs": 0.25,
+    "R": 1,
+    "seed": 41232,
+    "media_fn": "media_senoidal",
+    "jitter": 1e-10,
+    "gamma": 0.3,
+    "hs_norm": 0.7,
+    "sigma_eps": 1.0,
+    "ell": 0.5
+  },
+  "diagnostico": {
+    "n_replicas": 1,
+    "n_curvas": 800,
+    "n_puntos_grilla": 100,
+    "todo_finito": true,
+    "media_empirica_global": -0.025111464293566123,
+    "media_ee_montecarlo": NaN,
+    "var_puntual_media": 1.747136122151486,
+    "var_puntual_min": 1.3381488154583723,
+    "var_puntual_max": 1.992383493721023,
+    "acf1_media": 0.04680783500435779,
+    "acf1_ee_montecarlo": NaN,
+    "razon_senal_ruido": 27.954177954423777
+  },
+  "escenario": {
+    "a_mapa": 3.7721111486916916,
+    "c_mapa": 0.7947823928674216,
+    "razon_senal": 0.9,
+    "sd_componente_estable": 1.335891178002023,
+    "acf1_destendenciado": 0.04680783500435779,
+    "r2_lineal_scores": -0.007539688410908019,
+    "r2_oraculo_scores": 0.4485608667073,
+    "brecha": 0.456100555118208,
+    "var_acum_1_2_3": [
+      0.829444766451622,
+      0.9741286965478247,
+      0.9964472457241695
+    ],
+    "forma_tendencia": "potencia p=3.0",
+    "deriva": 6.0,
+    "deriva_neta_en_sd": 4.4913838034125515,
+    "curvatura_en_sd": 1.3451673420303552,
+    "desfase_en_sd": 2.4634888318510875,
+    "b_en_T0_sobre_deriva": 0.34244835607432905,
+    "acf1_nivel_bruto": 0.693125253105912,
+    "estacionario": false
+  },
+  "replica_idx": 0,
+  "experiment_id": "escenario_R_1_r01_m01",
+  "escenario_id": 1,
+  "replica_id": 1,
+  "m_fpca": 1,
+  "m_fpca_list": [
+    1,
+    2,
+    3
+  ],
+  "seed": 41232,
+  "T": 800,
+  "G": 100
+}

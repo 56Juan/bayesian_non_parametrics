@@ -413,8 +413,12 @@ def ventana_movil_funcional(X_obs: np.ndarray, X_pred: np.ndarray,
         linf_max, linf_medio, q95_abs, razon_linf_l1  (peor caso y
                    concentracion del error; `q95_abs` es la cifra citable y
                    `linf_max` la fragil, que depende de una sola evaluacion).
-        winkler, picp, mpiw  solo con banda. `winkler` es la PRIMARIA del
-                   Bloque B; las otras dos son su descomposicion y no rankean.
+        winkler, winkler_max_medio, winkler_max_glob, picp, mpiw  solo con
+                   banda. `winkler` es la PRIMARIA del Bloque B; picp y mpiw
+                   son su descomposicion y no rankean. Las dos `_max` agregan
+                   el supremo del Winkler dentro de cada curva: `_medio` lo
+                   promedia sobre la ventana y `_glob` toma el peor de todos,
+                   que depende de una sola evaluacion y es la cifra fragil.
 
     La cadena ||e||_1 <= ||e||_2 <= ||e||_inf se verifica con assert dentro de
     `normas_error_por_origen`, antes de que ninguna de estas cifras llegue a la
@@ -483,14 +487,17 @@ def ventana_movil_funcional(X_obs: np.ndarray, X_pred: np.ndarray,
         dentro_curva = indicador_cobertura_simultanea(O, L, U)   # (n,)
         metricas["cobertura_simultanea"] = lambda idx: float(dentro_curva[idx].mean())
         if bloque_A:
-            # Winkler integrado sobre el dominio con los pesos NORMALIZADOS,
-            # de modo que queda en las unidades de la curva y es comparable con
-            # el ancho medio. `picp` y `mpiw` son los mismos numeros que
-            # `cobertura_puntual` y `ancho_medio`, con el nombre del bloque:
-            # se duplican para que una tabla del Bloque B se pueda leer sola.
+            # El Winkler puntual se calcula UNA vez; de el salen las tres
+            # cifras: la integrada sobre el dominio y las dos agregaciones de
+            # su supremo por curva. `picp` y `mpiw` duplican a
+            # `cobertura_puntual` y `ancho_medio` con el nombre del bloque.
             wn = pesos_normalizados(tau, pesos_tau)
-            w_t = winkler(O, L, U, nivel=nivel) @ wn       # (n,)
+            W_pt    = winkler(O, L, U, nivel=nivel)        # (n, G)
+            w_t     = W_pt @ wn                            # (n,) integrado
+            w_max_t = W_pt.max(axis=1)                     # (n,) peor tau por curva
             metricas["winkler"] = lambda idx, v=w_t: float(v[idx].mean())
+            metricas["winkler_max_medio"] = lambda idx, v=w_max_t: float(v[idx].mean())
+            metricas["winkler_max_glob"] = lambda idx, v=w_max_t: float(v[idx].max())
             metricas["picp"] = metricas["cobertura_puntual"]
             metricas["mpiw"] = metricas["ancho_medio"]
             metricas["picp_simultaneo"] = metricas["cobertura_simultanea"]

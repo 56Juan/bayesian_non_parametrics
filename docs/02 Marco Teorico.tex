@@ -385,7 +385,7 @@ En conjunto, estas limitaciones son de carácter estructural: no obedecen a defi
 
 \subsection{Criterios de Evaluación}
 \label{02_02_03_criterios_evaluacion}
-La evaluación del desempeño predictivo de un modelo de series de tiempo funcionales se organiza en tres niveles de análisis, correspondientes a la precisión en la predicción de los coeficientes de la representación funcional, al error sobre la curva completa reconstruida y a la calidad de la distribución predictiva en su conjunto. Los criterios que se presentan operan con independencia de la estructura del modelo evaluado, pues comparan predicciones contra observaciones sin asumir una forma particular para el mecanismo que las genera, lo que permite contrastar en igualdad de condiciones modelos de naturaleza distinta. Antes de definir las métricas, es necesario establecer sobre qué conjunto de observaciones se calculan, cuestión que en presencia de dependencia temporal no es indiferente y se aborda a continuación.
+La evaluación del desempeño predictivo de un modelo de series de tiempo funcionales se realiza, en esencia, a través de la curva, tal como en un modelo escalar se evalúa contrastando su predicción con la observación bajo distintos criterios, aquí ese contraste se extiende a la curva completa que se busca predecir.  
 
 \subsubsection{Esquema de evaluación temporal con ventana móvil}
 \label{02_02_03_01_esquema_evaluacion}
@@ -394,62 +394,98 @@ La evaluación de modelos de series de tiempo debe considerar la dependencia tem
 
 Para evaluar el desempeño predictivo del modelo se emplea un esquema de ventana móvil, que consiste en calcular las métricas de error a lo largo de la serie en bloques de observaciones consecutivos. Una vez separados los datos en un conjunto de entrenamiento y un conjunto de prueba, se define una ventana de evaluación de longitud fija, por ejemplo $40$. La ventana se sitúa inicialmente sobre las primeras observaciones del conjunto de prueba y se calcula la métrica de desempeño correspondiente; luego se desplaza un período hacia adelante y se recalcula la métrica, repitiendo el procedimiento hasta recorrer todo el conjunto de prueba. De esta manera se obtiene una secuencia de métricas que permite monitorear el desempeño del modelo a lo largo de la serie, en lugar de un único valor global, además de evaluar el deterioro en pasos futuros.
 
-\subsubsection{Métricas de error puntual}
+\subsubsection{Métricas de error}
 \label{02_02_03_02_metricas_error}
-Sea $n_h = T - h - T_0 + 1$ el número de orígenes de predicción del bloque de prueba para el horizonte $h$, y denótese por $\hat{X}_{t+h}$ la predicción puntual, entendida como la media de la distribución predictiva, generada desde el origen $t$.\\
 
-En el primer nivel, cuando las curvas se representan mediante un sistema de funciones base de dimensión finita, cada observación queda descrita por un vector de coeficientes $\boldsymbol{\alpha}_t \in \mathbb{R}^{K}$ conforme a la Sección~\ref{02_01_01_representacion_funcional}, y el error de predicción se evalúa componente a componente:
+Sea $\hat{X}_{t}$ la predicción de la curva en el instante $t$ a horizonte $h$, esto es, generada desde el origen $t-h$, el error de predicción queda expresado como:
 \begin{equation}
-    \mathrm{MSE}_{\alpha_j}(h) = \frac{1}{n_h}
-    \sum_{t=T_0}^{T-h}
-    \bigl(\alpha_{t+h,j} - \hat{\alpha}_{t+h,j}\bigr)^2,
-    \qquad j = 1, \dots, K,
+    e_{t}(\tau) = X_{t}(\tau) - \hat{X}_{t}(\tau).
 \end{equation}
-donde $\hat{\alpha}_{t+h,j}$ denota el $j$-ésimo coeficiente predicho a horizonte $h$ desde el origen $t$, y $\alpha_{t+h,j}$ el coeficiente empírico obtenido al representar la curva observada en el mismo sistema. Cabe precisar que estos coeficientes de referencia son a su vez cantidades estimadas y no valores poblacionales. La evaluación por componente resulta preferible a un promedio global sobre $j$, dado que la escala de los coeficientes depende del sistema empleado y sus varianzas pueden diferir en órdenes de magnitud, de modo que un promedio sin normalizar queda dominado por las componentes de mayor varianza y pierde capacidad diagnóstica; el caso del sistema de componentes principales funcionales ilustra este fenómeno, pues las varianzas de sus coeficientes decrecen según los valores propios del operador de covarianza (Sección~\ref{02_01_04_02_karhunen_loeve_scores}).\\
 
-En el segundo nivel, la curva predicha se reconstruye a partir de los coeficientes predichos en el sistema empleado, $\hat{X}_{t+h}(\tau) = \sum_{j=1}^{K} \hat{\alpha}_{t+h,j}\,\phi_j(\tau)$, y se compara contra la curva observada mediante el error cuadrático medio integrado de predicción:
-\begin{equation}\label{eq:mise_pred}
-    \mathrm{MISE}(h) = \frac{1}{n_h}\sum_{t=T_0}^{T-h}
-    \int_{\mathcal{T}}
-    \bigl(X_{t+h}(\tau) - \hat{X}_{t+h}(\tau)\bigr)^2\,d\tau.
-\end{equation}
-Este criterio captura simultáneamente el error de predicción en los coeficientes y el error de aproximación de la representación, por lo que constituye la medida global de calidad predictiva en el espacio funcional, con independencia del sistema mediante el cual se haya generado la predicción. En la práctica, las curvas se observan sobre una grilla discreta $\{\tau_l\}_{l=1}^{L}$, y la integral de \eqref{eq:mise_pred} se aproxima por su versión empírica
+Se define el MAE funcional como:
 \begin{equation}
-    \widehat{\mathrm{MISE}}(h) = \frac{|\mathcal{T}|}{n_h\,L}
-    \sum_{t=T_0}^{T-h}\sum_{l=1}^{L}
-    \bigl(X_{t+h}(\tau_l) - \hat{X}_{t+h}(\tau_l)\bigr)^2,
+    \mathrm{MAE}(h) = \frac{1}{N}\sum_{t=T_0}^{T_V}
+    \int_{\mathcal{T}} \bigl|e_{t}(\tau)\bigr| \, \frac{d\tau}{|\mathcal{T}|},
 \end{equation}
-donde $|\mathcal{T}|$ denota la longitud del dominio. Esta versión en grilla, además de operativa, es directamente comparable con las métricas de error cuadrático habituales en series de tiempo escalares, lo que facilita el contraste con modelos de referencia no funcionales.
-\subsubsection{Evaluación de la distribución predictiva}
-\label{02_02_03_03_distribucion_predictiva}
-Las métricas anteriores evalúan únicamente la predicción puntual. Un modelo que estima la distribución predictiva completa debe evaluarse, además, en la calidad de dicha distribución, para lo cual se emplean reglas de puntuación propias (\textit{proper scoring rules}), es decir, funciones que asignan un puntaje a cada par distribución--observación y cuyo valor esperado se optimiza únicamente cuando la distribución declarada coincide con la verdadera \cite{02_02_gneiting2007scoring}. Esta propiedad garantiza que ningún modelo pueda mejorar su puntaje declarando una distribución distinta de la que efectivamente estima.\\
+donde $N = T_V - T_0 + 1$ es el número de curvas evaluadas, esto es, los instantes $t = T_0, \dots, T_V$ comprendidos entre el inicio de al ventana $T_0$ y el instante final de esta $T_V$.
 
-La primera regla corresponde al puntaje logarítmico. Dado que en un espacio funcional de dimensión infinita no existe una densidad respecto de una medida de referencia común, el puntaje se define sobre la representación finito-dimensional de la curva, es decir, sobre el vector de coeficientes $\boldsymbol{\alpha}_{t+h} \in \mathbb{R}^{K}$ de la Sección~\ref{02_01_01_representacion_funcional}:
+Naturalmente, esta definición se extiende al RMSE funcional como:
 \begin{equation}
-    \mathrm{LPS}(h) = -\frac{1}{n_h}\sum_{t=T_0}^{T-h}
-    \log \hat{f}\bigl(\boldsymbol{\alpha}_{t+h} \mid \mathcal{F}_t\bigr),
+    \mathrm{RMSE}(h) = \left(\frac{1}{N}\sum_{t=T_0}^{T_V}
+    \int_{\mathcal{T}} \bigl(e_{t}(\tau)\bigr)^2 \, \frac{d\tau}{|\mathcal{T}|}
+    \right)^{1/2}.
 \end{equation}
-donde $\hat{f}(\cdot \mid \mathcal{F}_t)$ denota la densidad predictiva a horizonte $h$ del vector de coeficientes, condicional a la información $\mathcal{F}_t$ disponible en el origen $t$. El puntaje logarítmico es sensible a la forma completa de la distribución, de manera que un modelo cuya predictiva no capture asimetrías o multimodalidad presentes en los datos será penalizado aun cuando su predicción puntual sea competitiva.\\
 
-Como regla complementaria, más robusta frente al comportamiento de las colas, se emplea el puntaje de probabilidad de rango continuo (CRPS). Denótese por $\hat{F}_{t,\tau}$ la función de distribución predictiva a horizonte $h$ del valor de la curva en el punto $\tau$, condicional a $\mathcal{F}_t$, donde la dependencia del horizonte se omite en la notación por simplicidad. El puntaje evaluado en la observación admite la representación
+Por último, al evaluar la curva completa interesa conocer el peor error cometido a lo largo de su predicción. Para el instante $t$ se define el error máximo de la curva como:
 \begin{equation}
-    \mathrm{CRPS}\bigl(\hat{F}_{t,\tau},\, X_{t+h}(\tau)\bigr) =
-    \mathbb{E}\bigl|Z - X_{t+h}(\tau)\bigr| -
-    \tfrac{1}{2}\,\mathbb{E}\bigl|Z - Z'\bigr|,
-    \qquad Z, Z' \overset{\mathrm{iid}}{\sim} \hat{F}_{t,\tau},
+    \mathrm{E}_{\max}(t) = \sup_{\tau \in \mathcal{T}} \bigl|e_{t}(\tau)\bigr|,
 \end{equation}
-donde $Z$ y $Z'$ son variables auxiliares que denotan dos extracciones independientes de la distribución predictiva, de modo que el primer término mide la distancia esperada entre la predictiva y la observación y el segundo la dispersión interna de la predictiva. El puntaje es estimable directamente a partir de muestras de la distribución predictiva \cite{02_02_gneiting2007scoring}. Su agregación sobre el dominio, integrando sobre $\tau$, proporciona una medida funcional de calidad distribucional, mientras que el puntaje de energía (\textit{energy score}) generaliza el CRPS al caso multivariado tratando la curva evaluada en la grilla como un vector, con la ventaja de ser sensible a la estructura de dependencia entre puntos del dominio, que el CRPS integrado no captura \cite{02_02_gneiting2008energy}.\\
-
-La calibración de la incertidumbre se evalúa mediante dos instrumentos complementarios. El primero corresponde a la cobertura empírica puntual de los intervalos de credibilidad al nivel $(1-\gamma)$:
+esto es, el peor desajuste puntual dentro de la curva predicha en $t$. A partir de esta cantidad se derivan dos agregaciones sobre la ventana $\{T_0, \dots, T_V\}$. La primera es el promedio de los errores máximos por curva,
 \begin{equation}
-    \mathrm{Cob}_{1-\gamma}(h) = \frac{1}{n_h}\sum_{t=T_0}^{T-h}
-    \frac{1}{|\mathcal{T}|}\int_{\mathcal{T}}
-    \mathbf{1}\bigl(X_{t+h}(\tau) \in
-    \mathrm{IC}_{1-\gamma}(\tau \mid \mathcal{F}_t)\bigr)\,d\tau,
+    \overline{\mathrm{E}}_{\max}(h) = \frac{1}{N}\sum_{t=T_0}^{T_V}
+    \mathrm{E}_{\max}(t),
 \end{equation}
-donde $\mathrm{IC}_{1-\gamma}(\tau \mid \mathcal{F}_t)$ es el intervalo de credibilidad puntual derivado de la distribución predictiva. Una cobertura próxima al nivel nominal es condición necesaria de calibración, pero no suficiente, puesto que intervalos arbitrariamente anchos alcanzan cobertura nominal sin aportar información. Por ello la cobertura se reporta junto con el ancho medio del intervalo, de modo que entre modelos con cobertura comparable se prefiere el de intervalos más angostos. Cabe precisar que esta es una cobertura puntual promedio sobre el dominio, criterio menos exigente que la cobertura simultánea de una banda que contenga la curva completa.\\
+que indica, en promedio (en la ventana), cuál es la peor predicción a lo largo del recorrido de $\tau$ en cada curva. La segunda es el máximo de los errores máximos por curva,
+\begin{equation}
+    \mathrm{E}_{\max}^{\text{glob}}(h) = \max_{t \in \{T_0, \dots, T_V\}}
+    \mathrm{E}_{\max}(t),
+\end{equation}
+que corresponde al peor error puntual observado en toda la ventana.
 
-El segundo instrumento corresponde a la transformada integral de probabilidad (PIT), definida en cada origen $t$ y cada punto $\tau$ del dominio como $u_t(\tau) = \hat{F}_{t,\tau}\bigl(X_{t+h}(\tau)\bigr)$. Si la distribución predictiva está bien calibrada, los valores de la transformada se distribuyen aproximadamente uniformes en $[0,1]$, mientras que las desviaciones sistemáticas de la uniformidad son diagnósticas, ya que un histograma en forma de U indica subdispersión de la predictiva y una concentración central indica sobredispersión \cite{02_02_gneiting2007scoring}.
+\subsubsection{Calibración de los intervalos de credibilidad}
+\label{02_02_03_04_calibracion}
+Los intervalos de credibilidad $\mathrm{IC}_t(\tau) =[L_t(\tau),\, U_t(\tau)]$ al nivel $1-\gamma$ se construyen a partir de los cuantiles empíricos de las extracciones de la predictiva. Su calidad también debe ser medida.\\
+
+En primera se define  el ancho medio del intervalo alrededor de la curva, que se integra sobre el dominio para cada curva y se promedia sobre la ventana:
+\begin{equation}
+    \mathrm{MPIW}_N(h) = \frac{1}{N}\sum_{t=T_0}^{T_V}
+    \int_{\mathcal{T}} \bigl(U_t(\tau) - L_t(\tau)\bigr)
+    \, \frac{d\tau}{|\mathcal{T}|}.
+\end{equation}
+
+En segunda  se tiene  el porcentaje de cobertura alrededor de la curva. Para cada curva $t$ se calcula la fracción del dominio $\tau$ en que la observación queda dentro del intervalo,
+\begin{equation}
+    \mathrm{PICP}_t = \int_{\mathcal{T}}
+    \mathbf{1}\bigl(X_t(\tau) \in \mathrm{IC}_t(\tau)\bigr)
+    \, \frac{d\tau}{|\mathcal{T}|},
+\end{equation}
+y el PICP de la ventana es el promedio de estos porcentajes,
+\begin{equation}
+    \mathrm{PICP}^N(h) = \frac{1}{N}\sum_{t=T_0}^{T_V} \mathrm{PICP}_t.
+\end{equation}
+
+La tercera indica si la curva quedó cubierta en su totalidad o no. Por curva, es un indicador binario,
+\begin{equation}
+    \mathrm{PICPB}=
+    \mathbf{1}\Bigl(X_t(\tau) \in \mathrm{IC}_t(\tau)\ \ \forall\, \tau \in \mathcal{T}\Bigr),
+\end{equation}
+y su promedio en la ventana es el porcentaje de curvas completamente cubiertas:
+\begin{equation}
+    \mathrm{PICPB}^N = \frac{1}{N}\sum_{t=T_0}^{T_V}
+    \mathrm{PICPB}_t
+\end{equation}
+
+La cuarta y última es el puntaje de Winkler \cite{02_02_winkler1972decision, 02_02_gneiting2007scoring}, que combina cobertura y ancho en una única cifra, penalizando el ancho del intervalo linealmente y agregando una penalización proporcional a la distancia cuando la observación queda fuera:
+\begin{equation}
+    \mathrm{W}_t(\tau) = \bigl(U_t(\tau) - L_t(\tau)\bigr)
+    + \frac{2}{\gamma}\bigl(L_t(\tau) - X_t(\tau)\bigr)^{+}
+    + \frac{2}{\gamma}\bigl(X_t(\tau) - U_t(\tau)\bigr)^{+},
+\end{equation}
+con $(\cdot)^+ = \max(\cdot, 0)$. Esta expresión evalúa el puntaje en un punto $\tau$ lo que implica que el valor de Winkler para la curva completa se obtiene integrando sobre el dominio,
+\begin{equation}
+    \mathrm{W}_t = \int_{\mathcal{T}} \mathrm{W}_t(\tau)\, \frac{d\tau}{|\mathcal{T}|},
+\end{equation}
+y su promedio en la ventana es, por tanto, sobre las $N$ curvas, del promedio de $\mathrm{W}_t(\tau)$ a lo largo de cada una,
+\begin{equation}
+    \mathrm{W}(h) = \frac{1}{N}\sum_{t=T_0}^{T_V} \mathrm{W}_t.
+\end{equation}
+De forma análoga al error máximo, también puede reportarse el peor Winkler cometido dentro de cada curva, $\mathrm{W}_t^{\max} = \sup_{\tau \in \mathcal{T}} \mathrm{W}_t(\tau)$, y de ahí derivar dos agregaciones sobre la ventana.\\
+
+El promedio del peor, $\overline{\mathrm{W}}_{\max}(h) =
+\frac{1}{N}\sum_{t=T_0}^{T_V} \mathrm{W}_t^{\max}$, que describe cuán mal se penaliza, en promedio, el punto más comprometido de cada curva, y el peor de los peores, $\mathrm{W}_{\max}^{\text{glob}}(h) = \max_{t \in
+\{T_0,\dots,T_V\}} \mathrm{W}_t^{\max}$, que corresponde al peor punto observado en toda la ventana. 
+
+
 \section{Fundamentos de Inferencia Bayesiana}
 \label{02_03_00_inferencia_bayesiana}
 

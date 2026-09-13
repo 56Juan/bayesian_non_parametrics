@@ -226,8 +226,12 @@ def test_ventana_conserva_columnas_de_marco():
         assert c in t.columns, f"falta la columna {c}"
     for c in ["mae_f", "l2_medio", "razon_agregacion", "linf_max",
               "linf_medio", "q95_abs", "razon_linf_l1",
-              "winkler", "picp", "mpiw"]:
+              "winkler", "winkler_max_medio", "winkler_max_glob",
+              "picp", "mpiw"]:
         assert c in t.columns, f"falta la columna nueva {c}"
+    # El integrado nunca supera al promedio del supremo, ni este al peor global.
+    assert np.all(t["winkler"] <= t["winkler_max_medio"] + 1e-12)
+    assert np.all(t["winkler_max_medio"] <= t["winkler_max_glob"] + 1e-12)
     # picp y mpiw son los mismos numeros que cobertura_puntual y ancho_medio.
     assert np.allclose(t["picp"], t["cobertura_puntual"])
     assert np.allclose(t["mpiw"], t["ancho_medio"])
@@ -239,7 +243,7 @@ def test_ventana_sin_bloque_A_es_la_tabla_de_antes():
                                 bloque_A=False)
     assert list(t.columns) == _MARCO[:5] + ["cruza_T0", "mise", "rmse_f",
                                             "mise_rel", "cobertura_puntual",
-                                            "ancho_medio"]
+                                            "ancho_medio", "cobertura_simultanea"]
 
 
 def test_ventana_rmse_f_es_raiz_del_mse_agregado():

@@ -157,6 +157,22 @@ from .sim_escenario_T import (
     coeficiente_sarle_mezcla,
 )
 
+# --- Escenario J: cuatro rezagos, grado polinomial decreciente (diagnostico) ---
+from .sim_escenario_J import (
+    ConfigEscenarioJ,
+    generar_escenario_J,
+    resumen_escenario_J,
+)
+
+# --- Escenario K: heterocedasticidad condicional en tau (diagnostico) ---
+from .sim_escenario_K import (
+    ConfigEscenarioK,
+    generar_escenario_K,
+    resumen_escenario_K,
+    envolvente_extremos_centro,
+    simular_trayectoria_far_heterocedastico,
+)
+
 # ══════════════════════════════════════════════════════════════════════════
 # 2. CONTRATO DE ARTEFACTOS
 # ══════════════════════════════════════════════════════════════════════════
@@ -267,6 +283,16 @@ __all__ = [
     "forma_tendencia_lineal_en_tau",
     "nucleo_local",
     "coeficiente_sarle_mezcla",
+    # ── Escenario J: cuatro rezagos, grado polinomial decreciente ──
+    "ConfigEscenarioJ",
+    "generar_escenario_J",
+    "resumen_escenario_J",
+    # ── Escenario K: heterocedasticidad condicional en tau ──
+    "ConfigEscenarioK",
+    "generar_escenario_K",
+    "resumen_escenario_K",
+    "envolvente_extremos_centro",
+    "simular_trayectoria_far_heterocedastico",
     # ── Contrato de artefactos ──
     "ARCHIVOS",
     "ArtefactosFPCA",

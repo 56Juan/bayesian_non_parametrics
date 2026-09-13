@@ -1,0 +1,152 @@
+{
+  "sim_params": {
+    "L": 100,
+    "T": 800,
+    "burn_in": 500,
+    "sigma_obs": 0.25,
+    "R": 1,
+    "seed": 41232,
+    "media_fn": "media_senoidal",
+    "jitter": 1e-10,
+    "gamma": 0.3,
+    "hs_norm": 0.35,
+    "sigma_eps": 1.0,
+    "ell": 0.5,
+    "gamma_4": 0.3,
+    "hs_norm_4": 0.05,
+    "centros_lectura": [
+      0.2,
+      0.5,
+      0.8
+    ],
+    "centros_escritura": [
+      0.8,
+      0.2,
+      0.5
+    ],
+    "ancho_lectura": 0.1,
+    "ancho_escritura": 0.15,
+    "saturacion": 3.0,
+    "razon_terminos": [
+      0.75,
+      0.6,
+      0.45
+    ],
+    "n_dim_diagnostico": 5,
+    "n_pilot": 3000
+  },
+  "diagnostico": {
+    "n_replicas": 1,
+    "n_curvas": 800,
+    "n_puntos_grilla": 100,
+    "todo_finito": true,
+    "media_empirica_global": 0.07504885389532542,
+    "media_ee_montecarlo": NaN,
+    "var_puntual_media": 1.2528999093465578,
+    "var_puntual_min": 1.0585761109592937,
+    "var_puntual_max": 1.3522760881621805,
+    "acf1_media": 0.3305589694880954,
+    "acf1_ee_montecarlo": NaN,
+    "razon_senal_ruido": 20.046398549544925,
+    "hs_norm_rezago1_objetivo": 0.35,
+    "hs_norm_rezago1_efectiva": 0.35,
+    "hs_norm_rezago4_objetivo": 0.05,
+    "hs_norm_rezago4_efectiva": 0.05,
+    "hs_norm_suma": 0.39999999999999997,
+    "radio_espectral_rezago1": 0.3107619322853805,
+    "radio_espectral_rezago4": 0.04439456175505437,
+    "estacionariedad_garantizada": true,
+    "grados_no_lineales": [
+      4,
+      3,
+      2
+    ],
+    "razon_termino_objetivo": [
+      0.75,
+      0.6,
+      0.45
+    ],
+    "razon_termino_efectiva": [
+      23.37606179701715,
+      9.964393613663573,
+      4.097812491633626
+    ],
+    "fraccion_saturada": [
+      0.02,
+      0.03,
+      0.03125
+    ],
+    "cotas_saturacion": [
+      37.888487902932624,
+      12.820318772900539,
+      4.392117432549126
+    ],
+    "centrados_terminos": [
+      3.413894970368244,
+      0.0,
+      1.0395185299394134
+    ],
+    "centros_lectura": [
+      0.2,
+      0.5,
+      0.8
+    ],
+    "centros_escritura": [
+      0.8,
+      0.2,
+      0.5
+    ],
+    "n_dim_diagnostico": 5,
+    "n_lags_diagnostico": 4,
+    "r2_lineal_fuera_de_muestra": 0.15332297505610215,
+    "r2_lineal_dentro_de_muestra": 0.19138193553711003,
+    "r2_oraculo_fuera_de_muestra": 0.2781339739575096,
+    "brecha_oraculo_lineal": 0.12481099890140746,
+    "razon_oraculo_lineal": 1.8140397670716868,
+    "varianza_fpca_diagnostico": [
+      0.9570475534231321,
+      0.2482305409036186,
+      0.03804113966248991,
+      0.006565242245405638,
+      0.004523248654202811
+    ],
+    "fraccion_h_explicada_por_componente": [
+      [
+        0.4277486639312443,
+        0.466551202777552,
+        0.046962780952477176,
+        0.052188952687072326,
+        0.006380691598437151
+      ],
+      [
+        0.4513630672488973,
+        0.4483777049056019,
+        0.03403584957521739,
+        0.009154382518887911,
+        0.056514147300887836
+      ],
+      [
+        0.6208918103003599,
+        0.0002901439719447156,
+        0.34369152953971316,
+        0.003100864816062283,
+        0.03110081175968347
+      ]
+    ]
+  },
+  "replica_idx": 0,
+  "experiment_id": "escenario_J_1_r01_m04",
+  "escenario_id": 1,
+  "escenario_nombre": "J",
+  "replica_id": 1,
+  "m_fpca": 4,
+  "m_fpca_list": [
+    2,
+    3,
+    4
+  ],
+  "seed": 41232,
+  "n_lags_estudio": 1,
+  "T": 800,
+  "G": 100
+}

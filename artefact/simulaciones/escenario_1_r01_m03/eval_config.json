@@ -1,7 +1,7 @@
 {
   "scheme": "holdout_temporal",
-  "T": 800,
-  "T0": 560,
+  "T": 1000,
+  "T0": 700,
   "prop_train": 0.7,
   "horizons": [
     1
@@ -21,19 +21,18 @@
     "paso": 1,
     "solapadas": true
   },
-  "metrics_scores": [
-    "RMSE",
-    "R2",
-    "razon_dispersion"
+  "metricas_bloque_A": [
+    "mae_f",
+    "rmse_f",
+    "linf_medio",
+    "linf_max"
   ],
-  "metrics_curvas": [
-    "MISE",
-    "RMSE_funcional"
-  ],
-  "metrics_dist": [
-    "CRPS",
-    "energy_score",
-    "cobertura_95",
-    "PIT"
+  "metricas_bloque_B": [
+    "mpiw",
+    "picp",
+    "picp_simultaneo",
+    "winkler",
+    "winkler_max_medio",
+    "winkler_max_glob"
   ]
 }
