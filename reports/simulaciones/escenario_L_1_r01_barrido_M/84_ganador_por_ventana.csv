@@ -1,0 +1,49 @@
+metrica,bloque,M,pct_ventanas_ganadas,n_ventanas
+1. MAE  (L^1),train,1,0.024074074074074074,540
+1. MAE  (L^1),train,2,0.001851851851851852,540
+1. MAE  (L^1),train,3,0.06296296296296296,540
+1. MAE  (L^1),train,4,0.29444444444444445,540
+1. MAE  (L^1),train,5,0.2222222222222222,540
+1. MAE  (L^1),train,6,0.39444444444444443,540
+1. MAE  (L^1),test,1,0.02262443438914027,221
+1. MAE  (L^1),test,2,0.01809954751131222,221
+1. MAE  (L^1),test,3,0.14027149321266968,221
+1. MAE  (L^1),test,4,0.3031674208144796,221
+1. MAE  (L^1),test,5,0.2081447963800905,221
+1. MAE  (L^1),test,6,0.3076923076923077,221
+2. RMSE (L^2),train,1,0.007407407407407408,540
+2. RMSE (L^2),train,2,0.10555555555555556,540
+2. RMSE (L^2),train,3,0.1388888888888889,540
+2. RMSE (L^2),train,4,0.20925925925925926,540
+2. RMSE (L^2),train,5,0.23333333333333334,540
+2. RMSE (L^2),train,6,0.3055555555555556,540
+2. RMSE (L^2),test,1,0.07692307692307693,221
+2. RMSE (L^2),test,2,0.03167420814479638,221
+2. RMSE (L^2),test,3,0.11312217194570136,221
+2. RMSE (L^2),test,4,0.3438914027149321,221
+2. RMSE (L^2),test,5,0.19457013574660634,221
+2. RMSE (L^2),test,6,0.2398190045248869,221
+3. E_max promedio por curva,train,1,0.15185185185185185,540
+3. E_max promedio por curva,train,2,0.17222222222222222,540
+3. E_max promedio por curva,train,3,0.08518518518518518,540
+3. E_max promedio por curva,train,4,0.21296296296296297,540
+3. E_max promedio por curva,train,5,0.14074074074074075,540
+3. E_max promedio por curva,train,6,0.23703703703703705,540
+3. E_max promedio por curva,test,1,0.21266968325791855,221
+3. E_max promedio por curva,test,2,0.12217194570135746,221
+3. E_max promedio por curva,test,3,0.05429864253393665,221
+3. E_max promedio por curva,test,4,0.2171945701357466,221
+3. E_max promedio por curva,test,5,0.18552036199095023,221
+3. E_max promedio por curva,test,6,0.2081447963800905,221
+4. E_max peor de la ventana,train,1,0.2611111111111111,540
+4. E_max peor de la ventana,train,2,0.046296296296296294,540
+4. E_max peor de la ventana,train,3,0.15185185185185185,540
+4. E_max peor de la ventana,train,4,0.1037037037037037,540
+4. E_max peor de la ventana,train,5,0.13703703703703704,540
+4. E_max peor de la ventana,train,6,0.3,540
+4. E_max peor de la ventana,test,1,0.2669683257918552,221
+4. E_max peor de la ventana,test,2,0.17194570135746606,221
+4. E_max peor de la ventana,test,3,0.027149321266968326,221
+4. E_max peor de la ventana,test,4,0.2171945701357466,221
+4. E_max peor de la ventana,test,5,0.1085972850678733,221
+4. E_max peor de la ventana,test,6,0.2081447963800905,221

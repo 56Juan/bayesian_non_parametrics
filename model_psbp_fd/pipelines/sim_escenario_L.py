@@ -160,13 +160,34 @@ que predicen una constante por hoja, tienen que escalonar una recta empinada
 DESPUES de haber gastado cortes en la frontera. Ninguno de los dos alcanza el
 techo.
 
-Medido en el espacio de scores con M = 3, T0 = 560, una realizacion:
+Medido en scores con M = 3, T0 = 560, promediando OCHO replicas (+- error
+estandar). `TAR` es un modelo de umbral con frontera lineal: el sustituto
+estimable mas simple de lo que el gating probit puede representar, y por lo
+tanto una COTA INFERIOR de lo que el PSBPM-FD deberia alcanzar --su gating
+admite direcciones arbitrarias, mezcla suave y promediado posterior, mientras
+que el TAR solo prueba umbrales sobre una covariable a la vez--.
 
-    corrida   modo         FAR     RF   techo   techo-FAR   techo-RF
-      41      nivel      0.261  0.411   0.452      0.191      0.041
-      42      nivel      0.270  0.403   0.436      0.166      0.033
-      43      pendiente  0.205  0.275   0.352      0.147      0.077
-      44      pendiente  0.159  0.210   0.271      0.112      0.061
+    corrida   modo         FAR     RF     TAR   techo    TAR - RF
+      41      nivel      0.283  0.415   0.376   0.490   -0.040 +- 0.007
+      43      pendiente  0.173  0.230   0.245   0.311   +0.015 +- 0.007
+
+    contraste (TAR-RF)_43 - (TAR-RF)_41 = +0.055 +- 0.010
+
+En el 41 un metodo de frontera lineal le gana al FAR y PIERDE contra el arbol;
+en el 43 le gana a los dos. Ese es exactamente el papel de cada par.
+
+ADVERTENCIA sobre la columna `techo`. Es una regresion por regimen con el
+regimen VERDADERO conocido, de modo que ningun metodo que deba inferir la
+frontera lo alcanza: ni RF ni el PSBPM-FD. Una version anterior de este modulo
+reportaba `techo - RF` como si fuera el margen disponible para el modelo
+propuesto y concluyo, equivocadamente, que el 41 no servia como control: ese
+margen valia 0.074 en el 41 y 0.081 en el 43, indistinguibles entre si
+(+0.007 +- 0.011), porque mide lo que le falta a CUALQUIERA para el oraculo y
+no quien le gana a quien. La comparacion que decide es siempre directa entre
+metodos estimables.
+
+Con R = 1 el margen del 43 (+0.015) NO es concluyente; la perdida del 41
+(-0.040) si lo es. Ver la contradiccion abierta 8.9 de CLAUDE.md.
 
 `norma_cargas` NO separa corridas: es el nivel de senyal y vale 0.90 en las
 cuatro. Con 0.50 no hay nada que repartir --ningun modelo pasa de 0.07 de R^2--

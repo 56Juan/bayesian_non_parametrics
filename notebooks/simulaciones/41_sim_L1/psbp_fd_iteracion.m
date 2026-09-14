@@ -44,7 +44,7 @@ BASENAME     = "escenario_L";
 % [BARRIDO] componentes FPCA. DEBE coincidir con el M_FPCA_LIST de 41_01,
 % 41_03, 41_04 y 41_05. Cada valor tiene que estar procesado por 41_01 antes
 % de correr esto.
-M_FPCA_LIST  = [1 2 3];
+M_FPCA_LIST  = [1 2 3 4 5 6];
 
 % Con true, un M sin artefactos de 41_01 se SALTA con aviso en vez de abortar
 % todo el barrido. Con false, la falta de artefactos es un error.
