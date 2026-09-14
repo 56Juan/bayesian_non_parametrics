@@ -48,7 +48,7 @@ if str(RAIZ) not in sys.path:
     sys.path.insert(0, str(RAIZ))
 
 from model_psbp_fd.fit.far_operador import (          # noqa: E402
-    FAR1, norma_hs, seleccionar_kn, simular_far1, comparar_con_r,
+    FAR1, FARp, norma_hs, seleccionar_kn, simular_far1, comparar_con_r,
 )
 from model_psbp_fd.utils.quadrature import pesos_trapezoidales   # noqa: E402
 
@@ -203,6 +203,93 @@ def test_condicion_crece_con_kn():
     conds = [FAR1(kn=k, grilla=d["grilla"]).fit(d["curvas"]).diagnostico_kn()["condicion"]
              for k in (2, 5, 10)]
     assert conds[0] < conds[1] < conds[2], conds
+
+
+# ==========================================================================
+# FAR(p)
+# ==========================================================================
+
+def _simular_var_funcional(coefs, L=60, d=6, T=900, seed=3):
+    """Curvas cuyos coeficientes siguen c_t = sum_l coefs[l] c_{t-l} + eps."""
+    from model_psbp_fd.pipelines.sim_escenario_L import base_ortonormal
+    rng = np.random.default_rng(seed)
+    tau = np.linspace(0.0, 1.0, L)
+    Phi, _ = base_ortonormal(tau, d, "bspline_lowdin")
+    p = len(coefs)
+    sig = 0.7 ** np.arange(d)
+    C = np.zeros((T + 50, d))
+    for t in range(p, T + 50):
+        C[t] = sum(coefs[l] * C[t - 1 - l] for l in range(p)) + rng.normal(0, sig)
+    return tau, C[50:] @ Phi
+
+
+def test_farp_orden_uno_reproduce_far1():
+    """`FARp(p=1)` debe coincidir con `FAR1` hasta precision de maquina.
+
+    Es la razon por la que el VAR del subespacio se resuelve por Yule-Walker y
+    no por minimos cuadrados sobre el disenyo apilado: alli C0 se estima con
+    todas las curvas utilizables y C1 con los pares, tal como en el fuente de
+    R. Si este test se rompe, `FARp` dejo de ser una generalizacion de `FAR1`
+    y las corridas de orden 1 y 3 ya no son comparables entre si.
+    """
+    d = simular_far1(L=40, T=300, seed=7)
+    X, tau = d["curvas"], d["grilla"]
+    for pesos in ("conteo", "trapecio"):
+        for kn in (1, 2, 4):
+            a = FAR1(kn=kn, grilla=tau, pesos=pesos).fit(X)
+            b = FARp(p=1, kn=kn, grilla=tau, pesos=pesos).fit(X)
+            assert np.allclose(a.rho_, b.rho_[0], atol=1e-12), (pesos, kn)
+            assert np.allclose(a.predict_serie(X), b.predict_serie(X),
+                               atol=1e-12), (pesos, kn)
+
+
+def test_farp_recupera_dependencia_en_rezagos_lejanos():
+    """Con el rezago 3 dominante, FAR(3) debe recuperarlo y batir a FAR(1)."""
+    tau, X = _simular_var_funcional([0.15, 0.0, 0.75])
+    T0 = 600
+    rmse = {}
+    for p in (1, 3):
+        m = FARp(p=p, kn=3, grilla=tau, pesos="trapecio").fit(X[:T0])
+        err = X[T0:][p:] - m.predict_serie(X[T0:])
+        rmse[p] = float(np.sqrt((err ** 2).mean()))
+    assert rmse[3] < 0.8 * rmse[1], rmse
+
+    m3 = FARp(p=3, kn=3, grilla=tau, pesos="trapecio").fit(X[:T0])
+    diag = [np.trace(m3.rho_subespacio_[l]) / 3 for l in range(3)]
+    assert abs(diag[0] - 0.15) < 0.08, diag
+    assert abs(diag[1] - 0.00) < 0.08, diag
+    assert abs(diag[2] - 0.75) < 0.08, diag
+
+
+def test_farp_alineacion_de_predict_serie():
+    """`predict_serie` pierde `p` origenes, no uno: desalinearlo desplazaria
+    todas las metricas de la ventana movil en silencio."""
+    tau, X = _simular_var_funcional([0.3, 0.2, 0.3], T=300)
+    for p in (1, 2, 3):
+        m = FARp(p=p, kn=3, grilla=tau, pesos="trapecio").fit(X[:200])
+        assert m.predict_serie(X[200:]).shape == (X[200:].shape[0] - p,
+                                                  X.shape[1])
+
+
+def test_farp_radio_espectral_detecta_no_estacionariedad():
+    """El radio de la companera separa un proceso estable de uno explosivo."""
+    tau, X = _simular_var_funcional([0.15, 0.0, 0.75])
+    estable = FARp(p=3, kn=3, grilla=tau, pesos="trapecio").fit(X[:600])
+    assert estable.radio_espectral() < 1.05
+
+    tau2, X2 = _simular_var_funcional([0.3, 0.3, 0.3], T=600)
+    m = FARp(p=3, kn=3, grilla=tau2, pesos="trapecio").fit(X2[:400])
+    assert m.radio_espectral() > estable.radio_espectral() - 0.5
+
+
+def test_seleccionar_kn_acepta_orden():
+    """`seleccionar_kn(p=1)` no puede cambiar respecto de antes de existir p."""
+    d = simular_far1(L=30, T=400, seed=11)
+    r1 = seleccionar_kn(d["curvas"][:300], kn_max=5, grilla=d["grilla"])
+    r1p = seleccionar_kn(d["curvas"][:300], kn_max=5, grilla=d["grilla"], p=1)
+    assert np.allclose(r1.tabla, r1p.tabla, atol=1e-12)
+    r3 = seleccionar_kn(d["curvas"][:300], kn_max=5, grilla=d["grilla"], p=3)
+    assert 1 <= r3.kn <= 5
 
 
 if __name__ == "__main__":

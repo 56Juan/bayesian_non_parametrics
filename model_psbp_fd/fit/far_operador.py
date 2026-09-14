@@ -154,6 +154,7 @@ from ..utils.quadrature import pesos_trapezoidales
 
 __all__ = [
     "FAR1",
+    "FARp",
     "ResultadoCV",
     "seleccionar_kn",
     "simular_far1",
@@ -493,6 +494,256 @@ class FAR1:
 
 
 # ==========================================================================
+# EL ESTIMADOR DE ORDEN p
+# ==========================================================================
+
+class FARp:
+    """
+    Estimador FAR(p): un operador por rezago, sobre la misma base propia.
+
+    Existe porque `FAR1` es de orden 1 fijo y las corridas con `N_LAGS = 3`
+    necesitan una referencia lineal BIEN ESPECIFICADA en rezagos. Enfrentar un
+    generador de tres rezagos contra un FAR(1) lo haria perder por
+    especificacion y no por el mecanismo que el escenario existe para poner a
+    prueba, que es la conmutacion; las dos causas quedarian confundidas y el
+    resultado seria facil de atacar.
+
+    El orden `p` NO se selecciona: se fija en `N_LAGS`, el mismo numero de
+    rezagos que ve el PSBPM-FD en su matriz de disenyo. Seleccionarlo daria al
+    FAR una ventaja o desventaja de la que los demas competidores no disponen.
+
+    Estimacion
+    ----------
+    Identica a `FAR1` hasta los scores: misma cuadratura, mismo centrado, misma
+    base propia de C0 truncada a `kn`, mismo criterio de pseudo-inversa. Lo que
+    cambia es que en el subespacio se resuelve un VAR(p) por Yule-Walker en vez
+    de una sola regresion,
+
+        [R_1 ... R_p] = [C_1 ... C_p] Gamma_p^+,
+
+    con `C_h` la covarianza cruzada de los scores a rezago h y `Gamma_p` la
+    matriz block-Toeplitz cuyo bloque (i, j) es `C_{j-i}` (y `C_{-h} = C_h'`).
+
+    Se resuelve por Yule-Walker y no por minimos cuadrados sobre el disenyo
+    apilado porque asi `p = 1` reproduce `FAR1` EXACTAMENTE, hasta precision de
+    maquina: alli `Gamma_1 = C_0` estimada sobre todas las curvas utilizables y
+    `C_1` sobre los pares completos, que es justamente el `Delta pinv(G) *
+    nbobs/nbobs2` del fuente de R. Con minimos cuadrados ambas sumas usarian
+    solo los pares y el resultado diferiria en los bordes. `tests/` lo verifica.
+
+    Estabilidad
+    -----------
+    `radio_espectral()` devuelve el de la matriz companera del VAR(p) en el
+    subespacio, que es la condicion correcta de estacionariedad para orden
+    mayor que uno: exigir `||R_l|| < 1` rezago a rezago no basta ni hace falta.
+
+    Parametros y atributos siguen la convencion de `FAR1`; `rho_` pasa a ser
+    (p, L, L), un operador de accion por rezago.
+    """
+
+    def __init__(
+        self,
+        p: int = 1,
+        kn: int = 2,
+        grilla: Optional[np.ndarray] = None,
+        pesos: Union[str, np.ndarray, None] = None,
+        center: bool = True,
+    ) -> None:
+        if not isinstance(p, (int, np.integer)) or p < 1:
+            raise ValueError(f"p={p}: el orden debe ser un entero >= 1.")
+        if not isinstance(kn, (int, np.integer)) or kn < 1:
+            raise ValueError(f"kn={kn}: debe ser un entero >= 1.")
+        self.p = int(p)
+        self.kn = int(kn)
+        self.grilla = None if grilla is None else np.asarray(grilla, dtype=float)
+        self.pesos = pesos
+        self.center = bool(center)
+
+    # ----------------------------------------------------------------------
+
+    def fit(self, X: np.ndarray, na_rm: bool = True) -> "FARp":
+        """
+        Estima los `p` operadores con `X` de forma (T, L).
+
+        SOLO se le pasa el bloque de entrenamiento, por la misma razon que en
+        `FAR1`: la clase no conoce `T0` para que no pueda mirar mas alla de lo
+        que recibe.
+        """
+        X = np.asarray(X, dtype=float)
+        if X.ndim != 2:
+            raise ValueError(f"X debe ser 2D (T, L); recibido {X.shape}.")
+        T, L = X.shape
+        if T < self.p + 2:
+            raise ValueError(
+                f"Hacen falta al menos p + 2 = {self.p + 2} curvas; recibidas {T}."
+            )
+        if self.kn > min(L, T):
+            raise ValueError(
+                f"kn={self.kn} excede min(L, T) = {min(L, T)}: no hay tantas "
+                "direcciones estimables."
+            )
+
+        w = _resolver_pesos(self.pesos, self.grilla, L)
+        self.pesos_ = w
+
+        ok = np.all(np.isfinite(X), axis=1) if na_rm else np.ones(T, dtype=bool)
+        nbobs = int(ok.sum())
+        if nbobs < self.p + 2:
+            raise ValueError("Quedan demasiadas pocas curvas completas tras na_rm.")
+        self.n_curvas_ = nbobs
+
+        self.media_ = X[ok].mean(axis=0) if self.center else np.zeros(L)
+        Xc = np.where(np.isfinite(X), X - self.media_[None, :], 0.0)
+
+        raiz_w = np.sqrt(w)
+        Y = Xc[ok] * raiz_w[None, :]
+        valores, vectores = np.linalg.eigh((Y.T @ Y) / nbobs)
+        orden = np.argsort(valores)[::-1]
+        valores, vectores = valores[orden], vectores[:, orden]
+        self.valores_propios_ = valores
+        V = vectores[:, : self.kn] / raiz_w[:, None]
+        self.base_ = V
+
+        S = (Xc * w[None, :]) @ V                        # (T, kn)
+        self.scores_ = S
+
+        # C_h = E[s_t s_{t-h}'], cada una con su propio numero de pares
+        # completos: la convencion de `far`, que normaliza C_0 con todas las
+        # curvas utilizables y las cruzadas con los pares.
+        kn = self.kn
+        C = {0: (S[ok].T @ S[ok]) / nbobs}
+        pares = {}
+        for h in range(1, self.p + 1):
+            par_h = ok[h:] & ok[:-h]
+            n_h = int(par_h.sum())
+            if n_h < 2:
+                raise ValueError(
+                    f"No hay suficientes pares completos a rezago {h} "
+                    f"(hay {n_h}); reduzca p o revise los faltantes."
+                )
+            pares[h] = n_h
+            C[h] = (S[h:][par_h].T @ S[:-h][par_h]) / n_h
+        self.n_pares_ = pares
+
+        Gamma = np.empty((self.p * kn, self.p * kn))
+        for i in range(self.p):
+            for j in range(self.p):
+                h = j - i
+                bloque = C[h] if h >= 0 else C[-h].T
+                Gamma[i * kn:(i + 1) * kn, j * kn:(j + 1) * kn] = bloque
+        D = np.hstack([C[h] for h in range(1, self.p + 1)])   # (kn, p*kn)
+
+        R = D @ _pinv_far(Gamma)
+        self.rho_subespacio_ = np.stack(
+            [R[:, l * kn:(l + 1) * kn] for l in range(self.p)])   # (p, kn, kn)
+
+        VW = (V * w[:, None]).T
+        self.rho_ = np.stack([V @ self.rho_subespacio_[l] @ VW
+                              for l in range(self.p)])           # (p, L, L)
+        return self
+
+    # ----------------------------------------------------------------------
+
+    def predict(self, lags: np.ndarray) -> np.ndarray:
+        """
+        Prediccion a un paso desde los `p` rezagos ya observados.
+
+        `lags` es (n, p, L) con `lags[:, 0]` la curva en t-1, `lags[:, 1]` la
+        de t-2, y asi. Con `p = 1` se acepta tambien (n, L), de modo que la
+        firma sea intercambiable con la de `FAR1`.
+
+        No es recursivo: cada fila usa sus propios rezagos observados, que es
+        el conjunto de informacion de los demas competidores del `_05`.
+        """
+        self._verificar_ajustado()
+        lags = np.asarray(lags, dtype=float)
+        if lags.ndim == 1:
+            lags = lags[None, None, :]
+        elif lags.ndim == 2:
+            if self.p != 1:
+                raise ValueError(
+                    f"Con p={self.p}, `lags` debe ser (n, p, L); recibido "
+                    f"{lags.shape}. La forma (n, L) solo vale para p = 1."
+                )
+            lags = lags[:, None, :]
+        if lags.shape[1] != self.p or lags.shape[2] != self.rho_.shape[1]:
+            raise ValueError(
+                f"`lags` es {lags.shape} y se esperaba (n, {self.p}, "
+                f"{self.rho_.shape[1]})."
+            )
+        Zc = lags - self.media_[None, None, :]
+        out = np.zeros((lags.shape[0], self.rho_.shape[1]))
+        for l in range(self.p):
+            out += Zc[:, l, :] @ self.rho_[l].T
+        return out + self.media_[None, :]
+
+    def predict_serie(self, X: np.ndarray) -> np.ndarray:
+        """
+        Prediccion a un paso a lo largo de `X` (T, L): devuelve (T-p, L), la
+        prediccion de la curva `t` hecha con las `p` anteriores.
+
+        Alinea con `X[p:]`, no con `X[1:]`: con `p = 3` se pierden tres
+        origenes al principio y no uno. Es la forma que consume la ventana
+        movil, y desalinearla desplaza todas las metricas en silencio.
+        """
+        X = np.asarray(X, dtype=float)
+        T = X.shape[0]
+        if T <= self.p:
+            raise ValueError(f"Hacen falta mas de p={self.p} curvas; hay {T}.")
+        lags = np.stack([X[self.p - l: T - l] for l in range(1, self.p + 1)],
+                        axis=1)                                   # (T-p, p, L)
+        return self.predict(lags)
+
+    # ----------------------------------------------------------------------
+
+    def norma_hs(self) -> np.ndarray:
+        """||rho_l||_HS por rezago, con la convencion de `sim_comun`."""
+        self._verificar_ajustado()
+        return np.array([norma_hs(self.rho_[l], self.pesos_)
+                         for l in range(self.p)])
+
+    def radio_espectral(self) -> float:
+        """
+        Radio espectral de la matriz companera del VAR(p) en el subespacio.
+
+        Es la condicion de estacionariedad correcta para orden mayor que uno.
+        Un valor >= 1 no impide predecir a un paso --lo que hace el `_05`-- pero
+        avisa de que el operador ajustado no define un proceso estacionario y
+        de que simular con el diverge.
+        """
+        self._verificar_ajustado()
+        kn, p = self.kn, self.p
+        comp = np.zeros((p * kn, p * kn))
+        comp[:kn] = np.hstack([self.rho_subespacio_[l] for l in range(p)])
+        if p > 1:
+            comp[kn:, :-kn] = np.eye((p - 1) * kn)
+        return float(np.abs(np.linalg.eigvals(comp)).max())
+
+    def diagnostico_kn(self) -> dict:
+        """Mismas cifras que `FAR1.diagnostico_kn`, mas el orden y el radio."""
+        self._verificar_ajustado()
+        val = self.valores_propios_
+        val_pos = val[val > 0]
+        return {
+            "p": self.p,
+            "kn": self.kn,
+            "lambda_1": float(val[0]),
+            "lambda_min_retenido": float(val[self.kn - 1]),
+            "condicion": float(val[0] / val[self.kn - 1])
+            if val[self.kn - 1] > 0 else np.inf,
+            "varianza_retenida": float(val[: self.kn].sum() / val_pos.sum()),
+            "norma_hs_por_rezago": self.norma_hs().tolist(),
+            "radio_espectral": self.radio_espectral(),
+            "n_curvas": self.n_curvas_,
+            "n_pares": dict(self.n_pares_),
+        }
+
+    def _verificar_ajustado(self) -> None:
+        if not hasattr(self, "rho_"):
+            raise RuntimeError("El estimador no esta ajustado; llame a fit().")
+
+
+# ==========================================================================
 # SELECCION DE kn
 # ==========================================================================
 
@@ -524,6 +775,7 @@ def seleccionar_kn(
     grilla: Optional[np.ndarray] = None,
     pesos: Union[str, np.ndarray, None] = None,
     center: bool = True,
+    p: int = 1,
 ) -> ResultadoCV:
     """
     Elige `kn` por error de prediccion a un paso, replicando `far::far.cv`.
@@ -544,6 +796,13 @@ def seleccionar_kn(
     Los seis criterios son los de R: L1, L2 y Linf del error, promediados sobre
     las curvas del hold-out, y los mismos tres sobre el maximo de cada curva
     (`*max`), que miden el error en el pico y no en promedio.
+
+    Con `p > 1` se selecciona `kn` para un `FARp` del mismo orden. El orden NO
+    se selecciona aqui ni en ninguna parte: se fija en `N_LAGS` (ver `FARp`).
+    Notese que el hold-out pierde `p` origenes en vez de uno, de modo que los
+    criterios de ordenes distintos se evaluan sobre bloques de tamanyo distinto
+    y no son comparables entre si; dentro de un mismo `p` si lo son, que es
+    para lo que sirve la tabla.
     """
     X_train = np.asarray(X_train, dtype=float)
     n = X_train.shape[0]
@@ -560,11 +819,24 @@ def seleccionar_kn(
             f"kn_max={kn_max} excede min(L, n_ajuste) = {min(X_train.shape[1], n1)}."
         )
 
+    if p < 1:
+        raise ValueError(f"p={p}: el orden debe ser un entero >= 1.")
+    if n_validacion <= p:
+        raise ValueError(
+            f"n_validacion={n_validacion} no deja origenes con p={p}."
+        )
+
     filas = []
     for k in range(1, kn_max + 1):
-        mod = FAR1(kn=k, grilla=grilla, pesos=pesos, center=center).fit(aprende)
-        err = valida[1:] - mod.predict(valida[:-1])      # (ncv-1, L)
-        pico = valida[1:].max(axis=1) - mod.predict(valida[:-1]).max(axis=1)
+        if p == 1:
+            mod = FAR1(kn=k, grilla=grilla, pesos=pesos,
+                       center=center).fit(aprende)
+        else:
+            mod = FARp(p=p, kn=k, grilla=grilla, pesos=pesos,
+                       center=center).fit(aprende)
+        pred = mod.predict_serie(valida)                 # (ncv-p, L)
+        err = valida[p:] - pred
+        pico = valida[p:].max(axis=1) - pred.max(axis=1)
         filas.append((
             k,
             np.mean(np.abs(err)),                        # L1

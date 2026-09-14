@@ -173,6 +173,15 @@ from .sim_escenario_K import (
     simular_trayectoria_far_heterocedastico,
 )
 
+from .sim_escenario_L import (
+    ConfigEscenarioL,
+    base_ortonormal,
+    construir_regimenes,
+    generar_escenario_L,
+    resumen_escenario_L,
+    simular_coeficientes,
+)
+
 # ══════════════════════════════════════════════════════════════════════════
 # 2. CONTRATO DE ARTEFACTOS
 # ══════════════════════════════════════════════════════════════════════════
@@ -291,6 +300,12 @@ __all__ = [
     "ConfigEscenarioK",
     "generar_escenario_K",
     "resumen_escenario_K",
+    "ConfigEscenarioL",
+    "generar_escenario_L",
+    "resumen_escenario_L",
+    "base_ortonormal",
+    "construir_regimenes",
+    "simular_coeficientes",
     "envolvente_extremos_centro",
     "simular_trayectoria_far_heterocedastico",
     # ── Contrato de artefactos ──
