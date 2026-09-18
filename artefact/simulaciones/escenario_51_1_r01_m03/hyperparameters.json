@@ -23,25 +23,25 @@
       "arg_objetivo": 2.0,
       "taupsij": 0.5,
       "atau": 2.5,
-      "e_tau_objetivo": 8.0
+      "e_tau_objetivo": 3.0
     },
     "1": {
       "arg_objetivo": 1.5,
       "taupsij": 1.0,
       "atau": 2.0,
-      "e_tau_objetivo": 8.0
+      "e_tau_objetivo": 3.0
     },
     "2": {
       "arg_objetivo": 1.0,
       "taupsij": 2.0,
       "atau": 1.5,
-      "e_tau_objetivo": 5.0
+      "e_tau_objetivo": 3.0
     }
   },
   "escala_probit": 6.624934817406682,
   "mcmc_config": {
     "nsim": 2500,
-    "burn": 1000,
+    "burn": 2000,
     "N": 35,
     "M": 50
   },
@@ -75,7 +75,7 @@
       "fpc_idx": 1,
       "hyperparams": {
         "atau": 2.5,
-        "btau": 0.3125,
+        "btau": 0.8333333333333334,
         "ag": 2.0,
         "bg": 0.5,
         "mumu": 0.0,
@@ -108,7 +108,7 @@
       "fpc_idx": 2,
       "hyperparams": {
         "atau": 2.0,
-        "btau": 0.25,
+        "btau": 0.6666666666666666,
         "ag": 2.0,
         "bg": 0.5,
         "mumu": 0.0,
@@ -141,7 +141,7 @@
       "fpc_idx": 3,
       "hyperparams": {
         "atau": 1.5,
-        "btau": 0.3,
+        "btau": 0.5,
         "ag": 2.0,
         "bg": 0.5,
         "mumu": 0.0,
