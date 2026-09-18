@@ -1,0 +1,49 @@
+M,metrica,columna,bloque,banda,pct_ventanas_ganadas,n_ventanas,criterio
+1,5. MPIW,mpiw,train,FAR (IC del modelo AR),1.0,680,menor es mejor
+1,5. MPIW,mpiw,test,FAR (IC del modelo AR),1.0,281,menor es mejor
+1,6. PICP puntual,picp,train,FAR (IC del modelo AR),1.0,680,|valor - nominal|
+1,6. PICP puntual,picp,test,FAR (IC del modelo AR),1.0,281,|valor - nominal|
+1,7. PICPB curva completa,picp_simultaneo,train,FAR (IC del modelo AR),1.0,680,|valor - nominal|
+1,7. PICPB curva completa,picp_simultaneo,test,FAR (IC del modelo AR),1.0,281,|valor - nominal|
+1,8. Winkler,winkler,train,FAR (IC del modelo AR),1.0,680,menor es mejor
+1,8. Winkler,winkler,test,FAR (IC del modelo AR),1.0,281,menor es mejor
+1,9. Winkler max promedio,winkler_max_medio,train,FAR (IC del modelo AR),1.0,680,menor es mejor
+1,9. Winkler max promedio,winkler_max_medio,test,FAR (IC del modelo AR),1.0,281,menor es mejor
+1,10. Winkler max peor ventana,winkler_max_glob,train,FAR (IC del modelo AR),1.0,680,menor es mejor
+1,10. Winkler max peor ventana,winkler_max_glob,test,FAR (IC del modelo AR),1.0,281,menor es mejor
+2,5. MPIW,mpiw,train,FAR (IC del modelo AR),1.0,680,menor es mejor
+2,5. MPIW,mpiw,test,FAR (IC del modelo AR),1.0,281,menor es mejor
+2,6. PICP puntual,picp,train,FAR (IC del modelo AR),1.0,680,|valor - nominal|
+2,6. PICP puntual,picp,test,FAR (IC del modelo AR),1.0,281,|valor - nominal|
+2,7. PICPB curva completa,picp_simultaneo,train,FAR (IC del modelo AR),1.0,680,|valor - nominal|
+2,7. PICPB curva completa,picp_simultaneo,test,FAR (IC del modelo AR),1.0,281,|valor - nominal|
+2,8. Winkler,winkler,train,FAR (IC del modelo AR),1.0,680,menor es mejor
+2,8. Winkler,winkler,test,FAR (IC del modelo AR),1.0,281,menor es mejor
+2,9. Winkler max promedio,winkler_max_medio,train,FAR (IC del modelo AR),1.0,680,menor es mejor
+2,9. Winkler max promedio,winkler_max_medio,test,FAR (IC del modelo AR),1.0,281,menor es mejor
+2,10. Winkler max peor ventana,winkler_max_glob,train,FAR (IC del modelo AR),1.0,680,menor es mejor
+2,10. Winkler max peor ventana,winkler_max_glob,test,FAR (IC del modelo AR),1.0,281,menor es mejor
+3,5. MPIW,mpiw,train,FAR (IC del modelo AR),1.0,680,menor es mejor
+3,5. MPIW,mpiw,test,FAR (IC del modelo AR),1.0,281,menor es mejor
+3,6. PICP puntual,picp,train,FAR (IC del modelo AR),1.0,680,|valor - nominal|
+3,6. PICP puntual,picp,test,FAR (IC del modelo AR),1.0,281,|valor - nominal|
+3,7. PICPB curva completa,picp_simultaneo,train,FAR (IC del modelo AR),1.0,680,|valor - nominal|
+3,7. PICPB curva completa,picp_simultaneo,test,FAR (IC del modelo AR),1.0,281,|valor - nominal|
+3,8. Winkler,winkler,train,FAR (IC del modelo AR),1.0,680,menor es mejor
+3,8. Winkler,winkler,test,FAR (IC del modelo AR),1.0,281,menor es mejor
+3,9. Winkler max promedio,winkler_max_medio,train,FAR (IC del modelo AR),1.0,680,menor es mejor
+3,9. Winkler max promedio,winkler_max_medio,test,FAR (IC del modelo AR),1.0,281,menor es mejor
+3,10. Winkler max peor ventana,winkler_max_glob,train,FAR (IC del modelo AR),1.0,680,menor es mejor
+3,10. Winkler max peor ventana,winkler_max_glob,test,FAR (IC del modelo AR),1.0,281,menor es mejor
+4,5. MPIW,mpiw,train,FAR (IC del modelo AR),1.0,680,menor es mejor
+4,5. MPIW,mpiw,test,FAR (IC del modelo AR),1.0,281,menor es mejor
+4,6. PICP puntual,picp,train,FAR (IC del modelo AR),1.0,680,|valor - nominal|
+4,6. PICP puntual,picp,test,FAR (IC del modelo AR),1.0,281,|valor - nominal|
+4,7. PICPB curva completa,picp_simultaneo,train,FAR (IC del modelo AR),1.0,680,|valor - nominal|
+4,7. PICPB curva completa,picp_simultaneo,test,FAR (IC del modelo AR),1.0,281,|valor - nominal|
+4,8. Winkler,winkler,train,FAR (IC del modelo AR),1.0,680,menor es mejor
+4,8. Winkler,winkler,test,FAR (IC del modelo AR),1.0,281,menor es mejor
+4,9. Winkler max promedio,winkler_max_medio,train,FAR (IC del modelo AR),1.0,680,menor es mejor
+4,9. Winkler max promedio,winkler_max_medio,test,FAR (IC del modelo AR),1.0,281,menor es mejor
+4,10. Winkler max peor ventana,winkler_max_glob,train,FAR (IC del modelo AR),1.0,680,menor es mejor
+4,10. Winkler max peor ventana,winkler_max_glob,test,FAR (IC del modelo AR),1.0,281,menor es mejor

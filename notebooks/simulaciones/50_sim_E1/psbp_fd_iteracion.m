@@ -38,7 +38,7 @@ clear; clc; close all;
 N_WORKERS    = 8;            % workers del pool
 ESCENARIO_ID = 1;            % Algoritmo del anexo
 REPLICA_ID   = 1;            % replica Monte Carlo
-BASENAME     = "escenario_50_c";
+BASENAME     = "escenario_50_d";
 
 % [BARRIDO] componentes FPCA. DEBE coincidir con el M_FPCA_LIST de 50_01,
 % 50_03, 50_04 y 50_05. Cada valor tiene que estar procesado por 50_01 antes

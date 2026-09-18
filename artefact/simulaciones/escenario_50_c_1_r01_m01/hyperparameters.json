@@ -9,15 +9,19 @@
     "pwj": 0.5
   },
   "by_type": {
-    "own_lag1": null,
-    "cross_lag": null
+    "own_lag1": {
+      "apij": 1.0,
+      "bpij": 0.1111111111111111
+    },
+    "cross_lag": {
+      "apij": 1.0,
+      "bpij": 5.0
+    }
   },
   "escalera": {
     "0": {
       "arg_objetivo": 2.0,
       "taupsij": 0.5,
-      "apij": 5.0,
-      "bpij": 5.0,
       "atau": 2.5,
       "e_tau_objetivo": 8.0
     }
@@ -62,10 +66,10 @@
         "taumu": 1.0,
         "pwj": 0.5,
         "apij": [
-          5.0
+          1.0
         ],
         "bpij": [
-          5.0
+          0.1111111111111111
         ],
         "mupsij": [
           1.9859276815684532
