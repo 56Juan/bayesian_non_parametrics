@@ -1,0 +1,247 @@
+ESCENARIOS SIMULADOS EN notebooks/simulaciones/
+================================================================================
+Fuente: los _01_simulaciones.ipynb de cada carpeta y los docstrings de
+model_psbp_fd/pipelines/sim_escenario_*.py. Cada entrada da: corrida(s), a qué
+generador apunta, y el mecanismo generador.
+
+NOTACION COMUN
+  tau in [0,1] grilla regular de L puntos.  t = 1..T curvas.  <f,g> = int f g dtau.
+  Observación:  x_tl = X_t(tau_l) + e_tl,  e_tl ~ N(0, sigma_obs^2)  (ruido de medición).
+  mu(tau) = sin(2 pi tau) (media_senoidal) salvo indicación.
+  Psi = operador integral  (Psi f)(tau) = int psi(tau,s) f(s) ds,
+        psi(tau,s) = c exp{-(tau-s)^2 / (2 gamma^2)},  c calibrada a ||Psi||_HS = hs_norm < 1
+        (condición suficiente de estacionariedad, Bosq 2000).
+  Innovación gaussiana:  Cov(eps(tau), eps(s)) = sigma_eps^2 exp{-(tau-s)^2/(2 ell^2)}.
+  Phi(.) = cdf normal estándar.  Y_t = X_t - mu.
+
+ÍNDICE
+  A. Algoritmos del anexo (E1-E6)
+  B. Escenarios de diagnóstico (A, B, T-familia C..I, J, K, R)
+  C. Escenarios sobre coeficientes de una base ortonormal (L, CE, LD)
+  D. Tabla corrida -> escenario
+  E. Notas / inconsistencias encontradas
+
+================================================================================
+A. ALGORITMOS DEL ANEXO
+================================================================================
+
+--- Escenario 1 · FAR(1) lineal gaussiano (Algoritmo 1)   [generador: sim_escenario_1.py]
+  X_t(tau) = mu(tau) + int psi(tau,s) (X_{t-1}(s) - mu(s)) ds + eps_t(tau)
+  eps_t ~ campo gaussiano con covarianza exp cuadrática (sigma_eps, ell).
+  Ley condicional gaussiana, unimodal, homogénea: el FAR está bien especificado.
+  Es el CONTROL del estudio (resultado negativo acotado esperado).
+  Corridas: 04 (prelim.), 05, 11, 20, 30 (plantilla), 40, 50.
+    05:  L=75, T=400, sigma_obs=0.5, gamma=0.3, hs=0.7, ell=0.2
+    11:  L=100, T=800, sigma_obs=0.25, gamma=0.3, hs=0.7, ell=0.5
+    20:  igual que 11 (ell=0.5)
+    30/40/50: gamma=0.1, hs=0.85, ell=0.1, burn_in 400 (30,40) / 600 (50)
+  Corridas 17 (EA) y 32 (R) parten de este mismo generador con añadidos (ver B).
+
+--- Escenario 2 · FGARCH(1,1) funcional (Algoritmo 2)      [sim_escenario_2.py]
+  X_t(tau) = mu(tau) + sigma_t(tau) eta_t(tau)
+  sigma_t^2(tau) = delta(tau) + int beta(tau,s) (X_{t-1}(s)-mu(s))^2 ds
+                              + int gamma(tau,s) sigma_{t-1}^2(s) ds
+  beta, gamma >= 0 (=> sigma_t^2 > 0). Existencia estacionaria: radio espectral de
+  (B+Gamma) < 1. Parametrización: persistencia = rho(B+Gamma), prop_arch = fracción
+  atribuible a beta, var_objetivo = nivel estacionario v; delta = (I - B - Gamma) v.
+  Media condicional constante = mu; toda la dependencia está en el 2º momento.
+  Corridas: 06 (persistencia .92, prop_arch .45, sigma_obs .05), 12 (persist .85,
+  prop_arch .25, alcance_beta .15, alcance_gamma .30, ell .5).
+
+--- Escenario 3 · FAR con cambio de régimen (Algoritmo 3)  [sim_escenario_3.py]
+  X_t = mu + d_{S_t} + int psi_{S_t}(tau,s)(X_{t-1}(s)-mu(s)) ds + eps_t
+  Cada régimen j=1..J tiene su Psi_j (||Psi_j||_HS objetivo), desplazamiento d_j y
+  escala sigma_j. Mecanismos de S_t:
+    "probit": P(S_t <= j | X_{t-1}) = Phi( nitidez (umbral_j - z_{t-1}) ),
+              z_{t-1} = <X_{t-1}-mu, e>_{L2}, ||e||=1.  Mezcla con pesos dependientes
+              del estado (el que reproduce lo que el PSBPM-FD estima).
+    "markov": cadena de Markov oculta, pesos independientes del estado.
+    "quiebre": cambio determinista en instantes fijos (no estacionario).
+  Estacionariedad: max_j ||Psi_j||_HS < 1.
+  Corridas: 07 (hs=(.30,.85), d=(-1.5,1.5), probit, nitidez 2), 13 (hs=(.30,.80)).
+
+--- Escenario 4 · FAR con innovación skew-normal / mezcla de escala (Algoritmo 4)
+                                                          [sim_escenario_4.py]
+  Dinámica idéntica al E1; cambia la innovación:
+  eps_t = W_t^{-1/2} ( Delta |U_0t| + Gamma^{1/2} U_1t ) - k_1 sqrt(2/pi) Delta
+  U_0t ~ N(0,1) escalar, U_1t ~ N_L(0,I), W_t > 0 independiente. Familia (Lachos et al. 2011):
+    sn: W=1 | st: W~Gamma(nu/2,nu/2) | sl: W~Beta(nu,1) | scn: W contaminada.
+  k_1 = E[W^{-1/2}] centra la innovación (media = mu).
+  Calibración: delta_l = Delta_l/sqrt(Delta_l^2+Gamma_ll) in (-1,1) fijo, Var(eps_l)=sigma_eps^2
+  exacta. Media condicional lineal, ley condicional asimétrica / colas pesadas.
+  Corridas: 08 (sn, delta .9, hs .6), 14 (st, delta .85, nu 5, hs .7).
+
+--- Escenario 5 · Predictibilidad en componente subordinada (Algoritmo 5)
+                                                          [sim_escenario_5.py]
+  a_tj = phi_j a_{t-1,j} + e_tj,  e_tj ~ N(0, lambda_j (1 - phi_j^2))
+  X_t(tau) = mu(tau) + sum_{j=1}^J a_tj varphi_j(tau)   (base de Fourier fija, J términos)
+  lambda_j = razon^(j-1) (espectro geométrico, razon .5). phi_1=phi_2=0, phi_3=0.9.
+  La var. marginal de a_j es exactamente lambda_j sea cual sea phi_j. La única dirección
+  predecible es la 3ª en varianza: truncar en M=2 (por % de varianza) descarta la señal.
+  Corridas: 09 (J=10), 15 (J=10, razon .5, indice_predecible 3, phi 0.9).
+
+--- Escenario 6 · Covarianza no estacionaria (Algoritmo 6)  [sim_escenario_6.py]
+  a_tj = phi_j a_{t-1,j} + e_tj,  e_tj ~ N(0, lambda_j(t)(1 - phi_j^2))
+  X_t = mu + sum_j a_tj varphi_j(tau)   (misma construcción del E5)
+  lambda_j(t) determinista, interpola entre espectro inicial y final (se intercambian
+  las componentes 1 y 2). modo "quiebre" (salto en t* dentro del test) o "lineal" (deriva).
+  phi común 0.7. Corridas: 10, 16 (quiebre en T0).
+
+================================================================================
+B. ESCENARIOS DE DIAGNÓSTICO
+================================================================================
+
+--- Escenario A · E1 + tendencia determinista                [corrida 17, generador E1]
+  X_t(tau) = mu(tau) + b(t) g(tau) + Y_t(tau),  Y_t = FAR(1) del E1
+  (b(t): perfil de tendencia acumulando "deriva" entre t=1 y t=T; g(tau): forma espacial;
+  se superpone al proceso del E1 mediante g_tendencia / perfil_tendencia definidos en el
+  notebook). Muestra que centrado FPCA/estandarizador ajustados en train dejan de valer en test.
+
+--- Escenario B · AR funcional con SIGNO CONMUTADO           [18; sim_escenario_B.py]
+  Y_t = s_t Psi Y_{t-1} + eps_t,   X_t = mu + Y_t
+  P(s_t=+1 | X_{t-1}) = Phi( nitidez (z_{t-1} - umbral) ) ,  s_t = -1 en caso contrario
+  z_{t-1} = <Y_{t-1}, e>,  e(tau) ∝ sin(2 pi tau).  Regímenes antisimétricos Psi y -Psi.
+  Media condicional fuertemente no lineal; el mejor predictor lineal ≈ media incondicional
+  (C_1 = Psi E[s(Y) Y ⊗ Y] ≈ 0 por paridad/imparidad). R² lineal ≈ 0.00 vs oráculo ≈ 0.34.
+  Parámetros 18: gamma=.60, hs=.90, ell=.5, nitidez=4, umbral=0.
+  Estacionariedad: ||Psi||_HS < 1 (|s_t|=1).
+
+--- Familia T (Escenarios C, D, E, F, G, H, I)               [19, 22-27; sim_escenario_T.py]
+  Y_t = m(Y_{t-1}, S_t) + eps_t
+  X_t(tau) = mu(tau) + b_{S_t}(t) g(tau) + Y_t(tau)
+  Dos ejes (diseño factorial 2x2 en C-F):
+   Eje 1 forma_tendencia b(t): lineal | cuadrática | potencia u^p (p=3) | sinusoidal_creciente
+         | logarítmica | por tramos (27).  "deriva" = desplazamiento total entre t=1 y T.
+   Eje 2 mecanismo:
+    "interaccion" (unimodal):
+       m(Y) = Psi Y + lambda sum_j w_j s_j tanh( (Y(a_j) Y(b_j) - c_j)/s_j ) h_j
+       Y(a) = promedio local (núcleo normalizado) en torno a tau=a; h_j = forma de respuesta.
+       Con a=b es el cuadrado del nivel local. tanh acota las colas (recursión bilineal
+       sin acotar es explosiva). razon_interaccion=0.6 (peso frente a la parte lineal).
+       interacciones ((.25,.75),(.5,.5)), ancho_lectura .10, ancho_respuesta .15, saturacion 3.
+    "mezcla" (multimodal):
+       m(Y,S) = factor_S Psi Y,   b_S(t) = deriva_S perfil(t),  S por probit sobre <Y_{t-1},e>
+       Cada rama con su propia tendencia => la separación entre modas crece con t.
+  Corridas:
+    19 (C): interacción + tendencia lineal, deriva 3
+    22 (D): interacción + potencia p=3, deriva 4.5
+    23 (E): mezcla 2 ramas, factores (1,-1), derivas_regimen (1,.25), lineal deriva 6
+    24 (F): igual que E con potencia p=3, deriva 8
+    25 (G): mezcla 3 ramas, factores (.9, 0, -.9), derivas (1,.6,.2), umbrales (-.17,.17),
+            formas por rama: cuadrática / sinusoidal creciente / logarítmica
+    26 (H): como E con tendencia sinusoidal_creciente (2 ciclos, amplitud .18) VOLÁTIL
+            (factor estocástico AR(1) persistencia .97, sd relativa .5)
+    27 (I): 3 ramas, factores (.9,.3,-.9), tendencia CAMBIA de régimen dos veces
+            (cuadrática hasta .45, logarítmica hasta .75, sinusoidal después)
+  NINGUNO es estacionario (la tendencia lo impide). Diagnóstico reporta todo en bruto y
+  destendenciado (r2_oraculo vs r2_oraculo_destendenciado).
+
+--- Escenario J · cuatro rezagos, no linealidad polinomial de grado decreciente
+                                                  [33; sim_escenario_J.py]
+  Y_t = Psi Y_{t-1} + term_1(Y_{t-1}) + term_2(Y_{t-2}) + term_3(Y_{t-3}) + Psi_4 Y_{t-4} + eps_t
+  X_t = mu + Y_t.   term_k de grado p_k = 5-k  (4, 3, 2), lectura y escritura LOCALES:
+    lectura: promedio local z = <Y_{t-k}, nucleo_local(centro_lectura_k)>
+    escritura sobre forma localizada de norma L2 unitaria en otro punto del dominio
+    centros lectura (.2,.5,.8), escritura (.8,.2,.5), razon_terminos (.75,.60,.45)
+    Grados PARES: raw_k(z) = z^p - c_k (sin corregir signo => Cov(z,z^p)=0 => invisible
+    al predictor lineal); grado impar (3): z^3. Saturación tanh a 3 sd (evita explosión).
+  Cuarto rezago: cola lineal Psi_4 pequeña. gamma=.30, hs=.35, ell=.5.
+  Nota: el generador exige N_LAGS=4; el notebook 33 usa N_LAGS=1 deliberadamente.
+
+--- Escenario K · varianza condicional con FORMA en tau conmutada     [34; sim_escenario_K.py]
+  Y_t(tau) = (Psi Y_{t-1})(tau) + s(tau; z_{t-1}) xi_t(tau)
+  z_{t-1} = <Y_{t-1}, e>,  e = dirección constante (nivel)
+  s(tau; z) = sqrt( 1 + kappa tanh(nitidez z / sd_z) v(tau) ),   v(tau) = cos(2 pi tau)
+  xi_t gaussiana correlacionada (ell); covarianza condicional Diag(s) K Diag(s).
+  La media condicional es la del E1 (Psi Y_{t-1}); solo cambia la FORMA de la varianza:
+  z>0 => varianza en los extremos; z<0 => en el centro. kappa=.90, nitidez=5, hs=.70.
+  Analogo del B sobre el canal de varianza.
+
+--- Escenario R · recursión PAR + tendencia potencia         [32; definido DENTRO del notebook]
+  Y_t = a [ ( (Psi Y_{t-1})^2 + delta^2 )^{p/2} - c ] + eps_t     (p = 1/2, delta = .25)
+  X_t(tau) = mu(tau) + b(t) g(tau) + Y_t(tau),   b(t): potencia exponente 3, deriva 6
+  Mapa par => Cov(|Y|,Y)=0 exacto => mejor lineal R²≈0 mientras oráculo ≈ .45.
+  a se calibra por punto fijo para que sd_L2(parte determinista)/sd_L2(innov)=RAZON_SENAL
+  (.90); c centra el mapa: c = E[((Psi Y)^2+delta^2)^{p/2}].
+  Hereda Psi e innovación del E1 (gamma .3, hs .7, ell .5).
+
+================================================================================
+C. ESCENARIOS SOBRE COEFICIENTES DE UNA BASE ORTONORMAL
+================================================================================
+Estado = vector de coeficientes c_t in R^d (d=10 B-spline Lowdin orden 4; d=11 Fourier
+en CE). La curva sale a la grilla una sola vez:  X_t(tau) = mu(tau) + sum_j c_tj phi_j(tau).
+La base generadora ES la de representación => error de representación ≈ 0.
+
+--- Escenario L · mezcla de regresiones sobre coeficientes      [41-45; sim_escenario_L.py]
+  c_t = sum_{(l,J,B) in R_{s_t}} B c_{t-l,J} + eps_t,   eps_t ~ N(0, diag(sigma_c)^2),
+  sigma_c_j = decaimiento^j
+  z_t = <w, c_{t-1}> / sd(z);   s_t = 1 si z_t < -c0;  2 si |z_t| <= c0;  3 si z_t > c0
+  Régimen determinista del estado rezagado (regímenes 1 y 2 leen el mismo bloque bajo del
+  rezago 1 con carga de signo opuesto; el 3 usa otra carga y activa además un bloque alto,
+  del rezago 3 si n_lags=3). El rezago lejano (n_lags=3) entra en los tres regímenes.
+  Estacionariedad: sum_l ||A_s^(l)||_2 = norma_cargas = 0.90 < 1 para todo régimen s.
+  Predictiva verdadera gaussiana homocedástica (el régimen es función del pasado).
+  Variantes:
+    41: modo nivel (cambia el intercepto; pendiente común, salto_nivel=2), n_lags=1
+    42: nivel, n_lags=3
+    43: modo pendiente (interceptos nulos; cambia la matriz de regresión), n_lags=1
+    44: pendiente, n_lags=3
+    45: pendiente, n_lags=3 (misma configuración que 44; re-corrida)
+
+--- Escenario CE · composición de estados con duración         [46_sim_CE1; sim_escenario_CE.py]
+  c_t | estado ~ N(mu(estado), Sigma(estado)); c_t = mu_t + phi (c_{t-1}-mu_{t-1}) + eps_t,
+  eps_t ~ N(0, (1-phi^2) diag(sigma_t)^2)  (varianza estacionaria = sigma_t^2), phi=0.2.
+  Cuatro fases en ciclo:
+    BASE (0): (mu_1,Sigma_1), sale cuando z_t = <w,c_{t-1}>/sd_1 > c_in,  sd_1 = sqrt(w' Sigma_1 w)
+    SUBIDA (1): interpolación LINEAL de (mu_1,Sigma_1) a (mu_2,Sigma_2) en D_1 períodos
+    MESETA (2): (mu_2,Sigma_2) durante D_2 períodos
+    BAJADA (3): retorno EXPONENCIAL frac(k) = (tol^{k/D_3} - tol)/(1 - tol), cierra en 0 exacto
+  D_i = d_min + Poisson(lambda_i) (2 + Poisson(3,4,3)). Base Fourier d=11; el salto (3.0)
+  va en la coordenada constante. Sigma_2 = razon_sigma^2 Sigma_1 (razon 1.6), sigma_j = .45^j.
+  Predictiva = mezcla sum_s P(s|pasado) N(mu_s, Sigma_s) con varianzas distintas => el
+  Bloque B (calibración) tiene algo que medir.
+
+--- Escenario LD · histéresis + duración aleatoria            [46_sim_LD1]
+  Mismo generador que L (pendiente, n_lags=3, norma_cargas .90); cambia SOLO el mecanismo
+  que decide el régimen: regla con histéresis (entra si |z| > c_in=.85, sale si |z| < c_out=.45)
+  y permanencia aleatoria D = d_min + Poisson(lambda_dur) (3 + Poisson(2)), durante la cual
+  la regla no se evalúa. Régimen NO medible respecto del pasado => p(c_t | pasado) es una
+  mezcla con pesos dependientes del pasado (inflación de varianza 1.01-1.66).
+  ATENCIÓN: el notebook importa ConfigEscenarioLD / generar_escenario_LD, pero en
+  model_psbp_fd/pipelines/ NO existe sim_escenario_LD.py (ver notas).
+
+================================================================================
+D. TABLA CORRIDA -> ESCENARIO
+================================================================================
+  03      03_Modelo (flujo inicial, sin generador específico)
+  04, 05  E1 (04 = versión preliminar)
+  06      E2 FGARCH            07  E3 régimen probit     08  E4 skew-normal
+  09      E5 subordinada       10  E6 no estacionaria
+  11      E1                   12  E2                    13  E3          14  E4 (skew-t)
+  15      E5                   16  E6
+  17      EA  E1 + tendencia   18  EB  signo conmutado   19  EC  interacción + lineal
+  20      E1                   22  ED  interacción + potencia
+  23      EE  mezcla 2 ramas + lineal      24  EF  mezcla 2 ramas + potencia
+  25      EG  mezcla 3 ramas               26  EH  mezcla + tendencia sinusoidal volátil
+  27      EI  tendencia por tramos + 3 ramas
+  30      E1 (PLANTILLA)       32  R1 recursión par + tendencia
+  33      EJ cuatro rezagos    34  EK varianza conmutada en tau
+  40      E1 (misma config. que 30)
+  41-45   L (nivel/pendiente, n_lags 1/3)
+  46_CE1  CE                   46_LD1  LD
+  50      E1 (corrida viva actual; gamma .1, hs .85, ell .1, burn_in 600)
+  00_Estudio_Modelo: notebooks de validación del modelo (no son escenarios).
+
+================================================================================
+E. NOTAS / INCONSISTENCIAS
+================================================================================
+ 1. CLAUDE.md lista 31_sim_T1 (núcleo cuadrático + tendencia cuadrática) y 33/34/32
+    como "vivas", pero no existe carpeta 31_sim_T1 y 32-34 están en 02_Antiguas_pruebas.
+ 2. sim_escenario_LD.py no existe en model_psbp_fd/pipelines/ aunque 46_LD1 lo importa.
+ 3. El notebook 32 define su generador en el propio .ipynb (mapa_par, trayectoria,
+    calibrar) partiendo de ConfigEscenario1; no es reutilizable ni testeable fuera de él.
+ 4. 40_sim_E1 y 30_sim_E1 tienen configuración idéntica; 44 y 45 también.
+ 5. Los parámetros de 09/10 (E5/E6) son los defaults del dataclass (solo se pasa
+    seed y R=20).
+ 6. Parámetros exactos de la tendencia de 17 (EA) y de las corridas 03/04 no se
+    detallaron aquí; ver sus notebooks.

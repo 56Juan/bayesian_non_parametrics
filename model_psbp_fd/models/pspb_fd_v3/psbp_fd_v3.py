@@ -32,6 +32,7 @@ from typing import Dict, List, Optional, Sequence
 
 import numpy as np
 
+from ...utils.trazas import normalizar_trazas_mat
 from .functions.predict import PSBPPredictor
 from .functions.propagation import (
     PropagadorFuncional,
@@ -154,10 +155,16 @@ class ModeloTraza:
     datasets del proyecto son tablas cuya primera columna es el objetivo y el
     resto las covariables. `ModeloTraza` hace esa traduccion en un solo lugar.
 
-    Conserva `traces` sin tocar a proposito: las probabilidades de inclusion
-    (`fit.inclusion`) se calculan sobre las trazas crudas --`osumout`,
-    `gammajhout`-- y no sobre el predictor, de modo que descartarlas aqui
-    obligaria a releer el `.mat`.
+    Conserva `traces` a proposito: las probabilidades de inclusion
+    (`fit.inclusion`) se calculan sobre las trazas --`osumout`, `gammajhout`--
+    y no sobre el predictor, de modo que descartarlas aqui obligaria a releer
+    el `.mat`. Se guardan NORMALIZADAS: con p = 1 MATLAB colapsa el eje final y
+    `betajhout` llega (nsim, N). Crudas, `fit.tabla_diagnosticos` leia
+    `shape[-1]` = N y diagnosticaba los N ATOMOS como si fueran N covariables,
+    con `extraer_traza_variable` cayendo en su rama 2D --un atomo fijo, sin
+    promediar-- de modo que R-hat media el etiquetado de la mezcla y no la
+    convergencia. `normalizar_trazas_mat` es idempotente: con p >= 2 no toca
+    nada.
 
     Uso
     ---
@@ -169,7 +176,7 @@ class ModeloTraza:
 
     def __init__(self, traces: Dict[str, np.ndarray], burn: int,
                  feature_names: Sequence[str]):
-        self.traces = traces
+        self.traces = normalizar_trazas_mat(traces)
         self.feature_names_ = list(feature_names)
         self.burn = int(burn)
         self.predictor_ = PSBPPredictor(traces=traces, burn=burn)

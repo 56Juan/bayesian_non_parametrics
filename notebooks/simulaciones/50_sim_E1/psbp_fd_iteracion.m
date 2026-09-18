@@ -38,12 +38,12 @@ clear; clc; close all;
 N_WORKERS    = 8;            % workers del pool
 ESCENARIO_ID = 1;            % Algoritmo del anexo
 REPLICA_ID   = 1;            % replica Monte Carlo
-BASENAME     = "escenario_50";
+BASENAME     = "escenario_50_b";
 
 % [BARRIDO] componentes FPCA. DEBE coincidir con el M_FPCA_LIST de 50_01,
 % 50_03, 50_04 y 50_05. Cada valor tiene que estar procesado por 50_01 antes
 % de correr esto.
-M_FPCA_LIST  = [1 2 3];
+M_FPCA_LIST  = [1 2 3 4];
 
 % Con true, un M sin artefactos de 50_01 se SALTA con aviso en vez de abortar
 % todo el barrido. Con false, la falta de artefactos es un error.
@@ -70,10 +70,6 @@ n_saltados = 0;
 
 for M_FPCA = M_FPCA_LIST
 
-    % EXPERIMENT_ID incluye la replica y M:
-    %   <basename>_<escenario>_r<replica a 2 digitos>_m<M a 2 digitos>
-    % Debe coincidir EXACTAMENTE con el de 50_01_simulaciones.ipynb. M viaja en
-    % el ID porque cada valor del barrido escribe sus propios artefactos.
     EXPERIMENT_ID = sprintf("%s_%d_r%02d_m%02d", ...
                             BASENAME, ESCENARIO_ID, REPLICA_ID, M_FPCA);
     paths         = config_paths(EXPERIMENT_ID);
@@ -82,9 +78,6 @@ for M_FPCA = M_FPCA_LIST
     manifest_path = fullfile(paths.functional, "datasets_manifest.json");
 
     if ~isfile(hp_path) || ~isfile(manifest_path)
-        % OJO ["a" "b"] es un ARRAY de strings 1x2, no una concatenacion, y
-        % sprintf/fprintf/assert exigen un formato UNICO. La concatenacion de
-        % literales multilinea en MATLAB va con comillas simples: ['a' 'b'].
         msg = sprintf(['M=%d (%s): faltan artefactos de 50_01.\n' ...
                        '    hyperparameters.json: %d\n' ...
                        '    datasets_manifest.json: %d'], ...
@@ -105,10 +98,6 @@ for M_FPCA = M_FPCA_LIST
     assert(isfield(hp_json, "mcmc_config"), ...
         "[M=%d] hyperparameters.json no contiene 'mcmc_config'.", M_FPCA);
 
-    % [FIX] SEED_BASE se LEE del JSON. En las corridas 03-10 estaba escrita a
-    % mano en este archivo (4123) mientras el JSON registraba otra (41232), de
-    % modo que la semilla documentada no reproducia la corrida y ningun
-    % resultado era reproducible a partir de sus artefactos. Una sola fuente.
     assert(isfield(hp_json, "seed_base"), ...
         "[M=%d] hyperparameters.json no contiene 'seed_base'; regenera con 50_01.", ...
         M_FPCA);
@@ -183,8 +172,11 @@ for M_FPCA = M_FPCA_LIST
             job.feature_names = fname_cell{k};
             job.mcmc          = mcmc_M;   % viaja con el job: cada M lee el suyo
 
-            job.hp.atau    = hp_json.global.atau;
-            job.hp.btau    = hp_json.global.btau;
+            % [ESCALERA] atau/btau pueden venir POR COMPONENTE.
+            if isfield(hp_k, "atau"), job.hp.atau = hp_k.atau;
+            else,                     job.hp.atau = hp_json.global.atau; end
+            if isfield(hp_k, "btau"), job.hp.btau = hp_k.btau;
+            else,                     job.hp.btau = hp_json.global.btau; end
             job.hp.ag      = hp_json.global.ag;
             job.hp.bg      = hp_json.global.bg;
             job.hp.mumu    = hp_json.global.mumu;
@@ -211,8 +203,7 @@ assert(n_jobs > 0, ...
      '50_01_simulaciones.ipynb para cada M de M_FPCA_LIST.']);
 
 % La semilla es SEED_BASE + chain*9973 + k*31, y SEED_BASE sale del JSON de
-% cada M. Si dos M comparten seed_base, sus jobs comparten semilla: no es un
-% error -son datos distintos- pero conviene saberlo al reportar.
+% cada M
 seeds_por_job = cellfun(@(j) j.seed, jobs);
 if numel(unique(seeds_por_job)) < n_jobs
     fprintf(['i Hay semillas repetidas ENTRE puntos del barrido (mismo ' ...
