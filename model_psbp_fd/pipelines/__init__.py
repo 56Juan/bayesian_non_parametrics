@@ -182,6 +182,14 @@ from .sim_escenario_L import (
     simular_coeficientes,
 )
 
+from .sim_escenario_CE import (
+    ConfigEscenarioCE,
+    FASES,
+    generar_escenario_CE,
+    resumen_escenario_CE,
+    simular_coeficientes_CE,
+)
+
 # ══════════════════════════════════════════════════════════════════════════
 # 2. CONTRATO DE ARTEFACTOS
 # ══════════════════════════════════════════════════════════════════════════
@@ -306,6 +314,13 @@ __all__ = [
     "base_ortonormal",
     "construir_regimenes",
     "simular_coeficientes",
+    # -- Escenario CE: composicion de estados en cuatro fases (base, subida,
+    #    meseta, bajada) con duracion Poisson desplazada por fase --
+    "ConfigEscenarioCE",
+    "FASES",
+    "generar_escenario_CE",
+    "resumen_escenario_CE",
+    "simular_coeficientes_CE",
     "envolvente_extremos_centro",
     "simular_trayectoria_far_heterocedastico",
     # ── Contrato de artefactos ──

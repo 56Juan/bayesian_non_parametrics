@@ -1,0 +1,33 @@
+M,metrica,columna,bloque,modelo,pct_ventanas_ganadas,n_ventanas
+4,1. MAE  (L^1),mae_f,train,FAR,0.029565217391304348,575
+4,1. MAE  (L^1),mae_f,train,RF,0.0,575
+4,1. MAE  (L^1),mae_f,train,GBT,0.9704347826086956,575
+4,1. MAE  (L^1),mae_f,train,PSBPM-FD,0.0,575
+4,1. MAE  (L^1),mae_f,test,FAR,0.19915254237288135,236
+4,1. MAE  (L^1),mae_f,test,RF,0.00423728813559322,236
+4,1. MAE  (L^1),mae_f,test,GBT,0.00847457627118644,236
+4,1. MAE  (L^1),mae_f,test,PSBPM-FD,0.788135593220339,236
+4,2. RMSE (L^2),rmse_f,train,FAR,0.02608695652173913,575
+4,2. RMSE (L^2),rmse_f,train,RF,0.0,575
+4,2. RMSE (L^2),rmse_f,train,GBT,0.9739130434782609,575
+4,2. RMSE (L^2),rmse_f,train,PSBPM-FD,0.0,575
+4,2. RMSE (L^2),rmse_f,test,FAR,0.2457627118644068,236
+4,2. RMSE (L^2),rmse_f,test,RF,0.038135593220338986,236
+4,2. RMSE (L^2),rmse_f,test,GBT,0.0,236
+4,2. RMSE (L^2),rmse_f,test,PSBPM-FD,0.7161016949152542,236
+4,3. E_max promedio por curva,linf_medio,train,FAR,0.020869565217391306,575
+4,3. E_max promedio por curva,linf_medio,train,RF,0.0017391304347826088,575
+4,3. E_max promedio por curva,linf_medio,train,GBT,0.9773913043478261,575
+4,3. E_max promedio por curva,linf_medio,train,PSBPM-FD,0.0,575
+4,3. E_max promedio por curva,linf_medio,test,FAR,0.5550847457627118,236
+4,3. E_max promedio por curva,linf_medio,test,RF,0.0423728813559322,236
+4,3. E_max promedio por curva,linf_medio,test,GBT,0.0,236
+4,3. E_max promedio por curva,linf_medio,test,PSBPM-FD,0.4025423728813559,236
+4,4. E_max peor de la ventana,linf_max,train,FAR,0.07130434782608695,575
+4,4. E_max peor de la ventana,linf_max,train,RF,0.12695652173913044,575
+4,4. E_max peor de la ventana,linf_max,train,GBT,0.7373913043478261,575
+4,4. E_max peor de la ventana,linf_max,train,PSBPM-FD,0.06434782608695652,575
+4,4. E_max peor de la ventana,linf_max,test,FAR,0.2669491525423729,236
+4,4. E_max peor de la ventana,linf_max,test,RF,0.3135593220338983,236
+4,4. E_max peor de la ventana,linf_max,test,GBT,0.17372881355932204,236
+4,4. E_max peor de la ventana,linf_max,test,PSBPM-FD,0.2457627118644068,236
