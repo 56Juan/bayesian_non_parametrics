@@ -1,0 +1,112 @@
+{
+  "sim_params": {
+    "L": 75,
+    "T": 100,
+    "burn_in": 2000,
+    "sigma_obs": 0.25,
+    "R": 1,
+    "seed": 41232,
+    "media_fn": "media_nula",
+    "jitter": 1e-10,
+    "gamma": 0.1,
+    "hs_norm": 0.85,
+    "sigma_eps": 1.0,
+    "ell": 0.5,
+    "deriva": 3.0,
+    "forma_tendencia": "lineal",
+    "inclinacion": 0.0,
+    "ciclos_sinusoidal": 1.5,
+    "amplitud_sinusoidal": 0.15,
+    "curvatura_log": 9.0,
+    "exponente_potencia": 2.0,
+    "curvatura_exponencial": 3.0,
+    "centro_logistica": 0.5,
+    "pendiente_logistica": 10.0,
+    "fraccion_escalon": 0.6,
+    "tramos_tendencia": null,
+    "volatilidad_tendencia": 0.0,
+    "persistencia_volatilidad": 0.95,
+    "mecanismo": "mezcla",
+    "interacciones": [
+      [
+        0.25,
+        0.75
+      ],
+      [
+        0.5,
+        0.5
+      ]
+    ],
+    "pesos_interaccion": [
+      1.0,
+      1.0
+    ],
+    "ancho_lectura": 0.1,
+    "ancho_respuesta": 0.15,
+    "razon_interaccion": 0.6,
+    "saturacion": 3.0,
+    "factores_operador": [
+      1.0,
+      -1.0
+    ],
+    "derivas_regimen": [
+      1.0,
+      0.5
+    ],
+    "formas_regimen": null,
+    "nitidez": 4.0,
+    "umbral": 0.0,
+    "umbrales": null,
+    "direccion_fn": null,
+    "n_dim_diagnostico": 5,
+    "prop_train_referencia": 0.7,
+    "n_pilot": 2000,
+    "cota": 100.0,
+    "pendiente": 0.4,
+    "nivel0": 0.0,
+    "medias_regimen_fn": [
+      "mu_A",
+      "mu_B"
+    ]
+  },
+  "diagnostico": {
+    "n_replicas": 1,
+    "n_curvas": 100,
+    "n_puntos_grilla": 75,
+    "todo_finito": true,
+    "media_empirica_global": 19.818568234297153,
+    "media_ee_montecarlo": NaN,
+    "var_puntual_media": 134.2810278688777,
+    "var_puntual_min": 133.28845170086697,
+    "var_puntual_max": 134.61281226261121,
+    "acf1_media": 0.9575302510416568,
+    "acf1_ee_montecarlo": NaN,
+    "razon_senal_ruido": 2148.496445902043,
+    "mecanismo": "mezcla",
+    "cota": 100.0,
+    "pendiente": 0.4,
+    "n_regimenes_nivel": 1,
+    "t_cruces_base0": [],
+    "cruces_en_train": [],
+    "cruces_en_test": [],
+    "nivel_en_T0": 27.599999999999966,
+    "nivel_min": 0.0,
+    "nivel_max": 39.59999999999992,
+    "salto_media_L2_por_cruce": [],
+    "sd_Y": 1.284767363386039,
+    "razon_cota_sd_Y": 77.83510295315045
+  },
+  "replica_idx": 0,
+  "experiment_id": "escenario_53_1_r01_m03",
+  "escenario_id": 1,
+  "replica_id": 1,
+  "m_fpca": 3,
+  "m_fpca_list": [
+    1,
+    2,
+    3
+  ],
+  "seed": 41232,
+  "T": 100,
+  "G": 75
+}

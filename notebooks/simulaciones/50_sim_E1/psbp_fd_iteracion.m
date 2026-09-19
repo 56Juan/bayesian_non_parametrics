@@ -38,12 +38,12 @@ clear; clc; close all;
 N_WORKERS    = 8;            % workers del pool
 ESCENARIO_ID = 1;            % Algoritmo del anexo
 REPLICA_ID   = 1;            % replica Monte Carlo
-BASENAME     = "escenario_50_d";
+BASENAME     = "escenario_50";
 
 % [BARRIDO] componentes FPCA. DEBE coincidir con el M_FPCA_LIST de 50_01,
 % 50_03, 50_04 y 50_05. Cada valor tiene que estar procesado por 50_01 antes
 % de correr esto.
-M_FPCA_LIST  = [1 2 3 4];
+M_FPCA_LIST  = [4 5 6];
 
 % Con true, un M sin artefactos de 50_01 se SALTA con aviso en vez de abortar
 % todo el barrido. Con false, la falta de artefactos es un error.

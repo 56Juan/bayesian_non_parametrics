@@ -157,6 +157,14 @@ from .sim_escenario_T import (
     coeficiente_sarle_mezcla,
 )
 
+# --- Escenario TS: familia T con cambio de simulador por umbral de nivel ---
+from .sim_escenario_TS import (
+    ConfigEscenarioTS,
+    generar_escenario_TS,
+    resumen_escenario_TS,
+    trayectoria_nivel_acotada,
+)
+
 # --- Escenario J: cuatro rezagos, grado polinomial decreciente (diagnostico) ---
 from .sim_escenario_J import (
     ConfigEscenarioJ,
@@ -295,6 +303,10 @@ __all__ = [
     "ConfigEscenarioT",
     "generar_escenario_T",
     "resumen_escenario_T",
+    "ConfigEscenarioTS",
+    "generar_escenario_TS",
+    "resumen_escenario_TS",
+    "trayectoria_nivel_acotada",
     "perfil_tendencia",
     "perfil_tramos",
     "forma_tendencia_lineal_en_tau",

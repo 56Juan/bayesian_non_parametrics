@@ -1,0 +1,40 @@
+{
+  "scheme": "holdout_temporal",
+  "T": 1511,
+  "T0": 1057,
+  "prop_train": 0.7,
+  "horizons": [
+    1
+  ],
+  "n_lags": 1,
+  "m_fpca": 2,
+  "scores_scale": "raw_fpca_scores",
+  "fuente": "datos observados (estación hidrológica)",
+  "variable": "Nivel de Agua (m)",
+  "objetivo_evaluacion": "curva_observada",
+  "modo_residuo": "empirico",
+  "nivel_credibilidad": 0.95,
+  "ventana_movil": {
+    "w": [
+      10,
+      20,
+      40
+    ],
+    "paso": 1,
+    "solapadas": true
+  },
+  "metricas_bloque_A": [
+    "mae_f",
+    "rmse_f",
+    "linf_medio",
+    "linf_max"
+  ],
+  "metricas_bloque_B": [
+    "mpiw",
+    "picp",
+    "picp_simultaneo",
+    "winkler",
+    "winkler_max_medio",
+    "winkler_max_glob"
+  ]
+}

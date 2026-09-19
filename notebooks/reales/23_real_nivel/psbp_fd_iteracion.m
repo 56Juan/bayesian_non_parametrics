@@ -43,7 +43,7 @@ VENTANA_ID   = 4;            % ventana temporal;  DEBE coincidir con 23_01
 % [BARRIDO] componentes FPCA. DEBE coincidir con el M_FPCA_LIST de 23_01,
 % 23_03, 23_04 y 23_05. Cada valor tiene que estar procesado por 23_01 antes
 % de correr esto.
-M_FPCA_LIST  = [3 4 5];
+M_FPCA_LIST  = [1 2 3];
 
 % Con true, un M sin artefactos de 23_01 se SALTA con aviso en vez de abortar
 % todo el barrido. Con false, la falta de artefactos es un error.

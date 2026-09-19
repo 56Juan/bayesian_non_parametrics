@@ -972,7 +972,7 @@ def _calibrar_interaccion(
 # GENERADOR PRINCIPAL
 # ==========================================================================
 
-def generar_escenario_T(cfg: ConfigEscenarioT) -> SalidaSimulacion:
+def generar_escenario_T(cfg: ConfigEscenarioT, diagnosticar: bool = True) -> SalidaSimulacion:
     """
     Genera R replicas independientes. Los objetos que no dependen de la
     realizacion ---operador, factorizacion de la innovacion, nucleos de
@@ -1124,7 +1124,8 @@ def generar_escenario_T(cfg: ConfigEscenarioT) -> SalidaSimulacion:
         observaciones=observaciones, curvas=curvas, grilla=tau, media=mu,
         semillas=registro, config=cfg, internos=internos,
     )
-    salida.diagnostico = resumen_escenario_T(salida)
+    if diagnosticar:
+        salida.diagnostico = resumen_escenario_T(salida)
     return salida
 
 
