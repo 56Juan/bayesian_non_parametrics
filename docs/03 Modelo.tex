@@ -38,7 +38,9 @@ Por tanto, la brecha de investigación que este trabajo busca cubrir consiste en
  
 \section{Probit Stick-Breaking Process Mixture}
 \label{03_03_00_psbp}
-Esta sección presenta el Probit Stick-Breaking Process (PSBP) y el modelo de mezcla construido sobre él, el PSBP Mixture (PSBPM), siguiendo el desarrollo de \citet{03_02_chung2009nonparametric}; salvo indicación en contrario, las definiciones, resultados y el esquema de inferencia expuestos a continuación provienen de dicho trabajo. El PSBP define una colección de distribuciones dependientes del predictor $\mathcal{P}_{\mathcal{X}} = \{P_x : x \in \mathcal{X}\}$ mediante una modificación del proceso stick-breaking estándar en la que las variables de quiebre se construyen a través de un modelo probit. La motivación de esta construcción parte de la representación estándar del DP:
+Esta sección presenta el Probit Stick-Breaking Process (PSBP) y el modelo de mezcla construido sobre él, el PSBP Mixture (PSBPM), desarrollado por \citet{03_02_chung2009nonparametric}. Salvo indicación en contrario, las definiciones, resultados y el esquema de inferencia expuestos en esta secciónprovienen de dicho trabajo.\\
+
+El PSBP define una colección de distribuciones dependientes del predictor $\mathcal{P}_{\mathcal{X}} = \{P_x : x \in \mathcal{X}\}$ mediante una modificación del proceso stick-breaking estándar en la que las variables de quiebre se construyen a través de un modelo probit. La motivación de esta construcción parte de la representación estándar del DP:
 \begin{equation}
     P = \sum_{h=1}^{\infty} \pi_h\, \delta_{\theta_h},
     \qquad \pi_h = V_h \prod_{l < h}(1 - V_l),
@@ -72,7 +74,7 @@ donde $\rho_{hj} \geq 0$ controla la tasa de decaimiento de la dependencia para 
         \delta_{\Gamma_{jl}^*}(\Gamma_{hj})
     \right\},
 \end{equation}
-donde $\mathcal{N}^+$ denota una distribución normal truncada en cero por abajo, garantizando $\rho_{hj} \geq 0$, y $\{\Gamma_{jl}^*\}_{l=1}^{L_j}$ es una grilla discreta de puntos de referencia para el $j$-ésimo predictor. La interpretación geométrica es directa: si $x$ se encuentra lejos del centro $\boldsymbol{\Gamma}_h = \{\Gamma_{hj}\}_{j=1}^{p}$, entonces $f_h(x)$ toma valores negativos de gran magnitud, $\Phi(\eta_h(x)) \approx 0$, y el $h$-ésimo componente contribuye con peso reducido en $x$, favoreciendo a los componentes cuyos centros son más próximos al punto de evaluación.
+donde $\mathcal{N}^+$ denota una distribución normal truncada en cero por abajo, garantizando $\rho_{hj} \geq 0$, y $\{\Gamma_{jl}^*\}_{l=1}^{L_j}$ es una grilla discreta de puntos de referencia para el $j$-ésimo predictor. La interpretación geométrica es directa, si $x$ se encuentra lejos del centro $\boldsymbol{\Gamma}_h = \{\Gamma_{hj}\}_{j=1}^{p}$, entonces $f_h(x)$ toma valores negativos de gran magnitud, $\Phi(\eta_h(x)) \approx 0$, y el $h$-ésimo componente contribuye con peso reducido en $x$, favoreciendo a los componentes cuyos centros son más próximos al punto de evaluación.
  
 \subsection{Especificación del modelo de mezclas}
 \label{03_03_01_especificacion_modelo_mezclas}
@@ -266,19 +268,18 @@ Los autores recomiendan estandarizar $y$ y $x$ antes del análisis y proponen lo
 \label{03_03_03_propiedades}
 El PSBP y el modelo de mezcla construido sobre él presentan un conjunto de propiedades que los distinguen de otras formulaciones de procesos stick-breaking dependientes y que justifican su adopción en problemas de modelamiento de distribuciones condicionales.\\
  
-La primera propiedad es la conjugación del PSBPM. La estructura probit de las variables de quiebre, combinada con el aumento de datos mediante las variables latentes $Z_{il}^*$, produce condicionales completas de forma cerrada para todos los parámetros del modelo. Esto contrasta con formulaciones alternativas como el KSBP \cite{02_06_dunson2008kernel}, cuya inferencia requiere pasos de Metropolis--Hastings. La conjugación es especialmente relevante para el cálculo de probabilidades de inclusión de variables, ya que permite marginalizar analíticamente $\rho_{hj}$ y $\beta_{hj}^*$ en el paso de actualización de $\gamma_{hj}$.\\
- 
+La primera propiedad es la conjugación del PSBPM. La estructura probit de las variables de quiebre, combinada con el aumento de datos mediante las variables latentes $Z_{il}^*$, produce condicionales completas de forma cerrada para todos los parámetros del modelo. Esto contrasta con formulaciones alternativas como el KSBP \cite{02_06_dunson2008kernel}, cuya inferencia requiere pasos de Metropolis--Hastings y en consecuencia da un muestreador mas eficiente.\\
+
 La segunda propiedad es la adaptación local del PSBP al espacio de predictores. Los pesos $\pi_h(x)$ concentran su masa en torno al centro $\boldsymbol{\Gamma}_h$, de modo que cada componente de la mezcla domina en una región distinta del espacio $\mathcal{X}$. La tasa de decaimiento $\rho_{hj}$ controla cuán rápidamente decrece la influencia del $h$-ésimo componente al alejarse de su centro, permitiendo que la estructura de mezcla se adapte a la heterogeneidad local de los datos sin imponer una forma global paramétrica.\\
  
 La tercera propiedad es la selección de variables en dos niveles del PSBPM. El indicador $\gamma_{hj}$ actúa simultáneamente sobre los pesos $\pi_h(x)$ ---a través de $\rho_{hj}$--- y sobre la media condicional del componente a través de $\beta_{hj}^*$. Esto permite distinguir entre predictores que afectan la forma de la distribución condicional de manera local (en ciertas regiones de $\mathcal{X}$) y predictores con efectos globales sobre toda la distribución, mediante el indicador de inclusión global $w_j$.\\
  
-La cuarta propiedad es la coherencia del prior. El Lema~1 de \citet{03_02_chung2009nonparametric} garantiza que $\sum_{h=1}^{\infty}\pi_h(x) = 1$ casi seguramente para todo $x \in \mathcal{X}$, condición necesaria para que $P_x$ sea una distribución de probabilidad válida para cada valor del predictor. Esta propiedad no es automática en procesos stick-breaking dependientes y requiere verificación explícita para cada elección del proceso de quiebre en la ecuación~\eqref{eq:ddp_sb_general}.\\
+La cuarta  y ultima propiedad de interes es la coherencia del prior. El Lema~1 de \citet{03_02_chung2009nonparametric} garantiza que $\sum_{h=1}^{\infty}\pi_h(x) = 1$ casi seguramente para todo $x \in \mathcal{X}$, condición necesaria para que $P_x$ sea una distribución de probabilidad válida para cada valor del predictor. Esta propiedad no es automática en procesos stick-breaking dependientes y requiere verificación explícita para cada elección del proceso de quiebre en la ecuación~\eqref{eq:ddp_sb_general}.
  
-En conjunto, estas propiedades hacen del PSBPM una herramienta adecuada para el modelamiento no paramétrico de distribuciones condicionales en contextos donde la forma de la distribución, y no solo su media, varía con los predictores, y donde la selección parsimoniosa de variables es parte integral del análisis.
 \section{Modelo PSBPM-FD}
 \label{03_04_00_modelo_propuesto_psbpm_fd}
 
-El modelo PSBPM-FD traslada la construcción de la Sección~\ref{03_03_00_psbp} al espacio de los scores funcionales obtenidos mediante la descomposición B-spline + FPCA descrita en el Capítulo~2.\\
+El modelo PSBPM-FD traslada la construcción de la Sección~\ref{03_03_00_psbp} al espacio de los scores funcionales obtenidos mediante la descomposición de FPCA descrita en el Capítulo~2.\\
 
 Sea $\{X_t\}$ una serie de tiempo funcional con valores en $L^2(\mathcal{T})$ y sea
 \begin{equation}\label{eq:expansion_kl_truncada}
@@ -489,47 +490,24 @@ El intervalo así construido es puntual y no simultáneo, esto es, satisface el 
 
 \section{Diseño del Estudio de Simulación}
 \label{03_06_00_diseno_estudio_simulacion}
-El estudio evalúa el desempeño predictivo del PSBPM-FD sobre procesos generadores conocidos, con el fin de determinar bajo qué rasgos de la ley condicional la flexibilidad de la construcción se traduce en ganancia efectiva y bajo cuáles no. La evaluación se organiza en tres ejes:
+
+El presente estudio de simulación evalúa el desempeño predictivo del PSBPM-FD en dos ejes complementarios. El primero examina el comportamiento interno del modelo, comparando su rendimiento a medida que se incorpora un número creciente de scores de la representación funcional, con el fin de analizar cómo la dimensión de la representación incide en la calidad de las predicciones.\\
+
+El segundo eje contrasta el desempeño del PSBPM-FD frente a los siguientes modelos de referencia:
+
 \begin{itemize}
-    \item Desempeño puntual y sensibilidad a $M$: Se reportan sobre el bloque de prueba las métricas de la Sección~\ref{02_02_03_criterios_evaluacion} para distintos valores del número de componentes retenidas, contrastando el modelo con los de referencia sobre la misma representación. El barrido en $M$ es informativo porque esta cantidad interviene dos veces, como número de mezclas y como dimensión $p = qM$ del predictor. Se acompaña de la evolución del error sobre una ventana móvil que recorre entrenamiento y prueba, lo que permite localizar los períodos en que los métodos se separan.
-    \item Calibración condicional: Se evalúa si los intervalos de credibilidad cubren el valor observado, estratificando los orígenes según el estado verdadero del generador. La cobertura marginal no distingue un modelo calibrado de uno cuyos intervalos son demasiado anchos en calma y demasiado angostos en estrés, ya que ambos errores se compensan al promediar.
-    \item Interpretabilidad: Se contrastan las probabilidades posteriores de inclusión de \eqref{eq:gamma_prior} contra la estructura de dependencia empleada por el generador, conocida en cada escenario.
+    \item Modelo autorregresivo funcional (FAR): El modelo se ajusta sobre los  coeficientes de la representación de las curvas.
+    \item Random Forest y XGBoost: Ajustados sobre los scores, aumentando el número de scores utilizados de manera análoga al primer eje, de modo que la comparación con el PSBPM-FD se realice bajo la misma dimensión de  representación.
 \end{itemize}
-Los diagnósticos de convergencia del muestreador y la verificación de los generadores se reportan en el Anexo~\ref{ane_01_00_00_algoritmos}.
+
+Para este fin, se realizan simulaciones bajo distintos escenarios, en las que el desempeño se evalúa de dos maneras. Por un lado, la calidad de las predicciones sobre las curvas se mide, para el PSBPM-FD, el FAR, Random Forest y XGBoost, mediante las métricas de error presentadas en la Sección~\ref{02_02_03_02_metricas_error}. Por otro lado, dado que solo el FAR y el PSBPM-FD permiten construir intervalos, la evaluación de la incertidumbre se restringe a estos dos modelos y se realiza exclusivamente a través de las medidas de evaluación descritas en la Sección~\ref{02_02_03_04_calibracion}.
 
 \subsection{Escenarios}
 \label{03_06_01_escenarios}
-Se emplean los seis procesos generadores del Anexo~\ref{ane_01_00_00_algoritmos}, organizados en dos bloques. Los Algoritmos~1 a 4 intervienen la ley condicional dejando intactos los supuestos de la representación, y los Algoritmos~5 y 6 comprometen la reducción de dimensión sin salir de lo que el modelo puede representar. El Cuadro~\ref{tab:escenarios} resume el rasgo que introduce cada uno y los parámetros empleados.\\
 
-Todos los escenarios comparten la configuración del esquema de observación y de la muestra: grilla de $L = 48$ puntos, ruido de medición $\sigma_\epsilon = 0.1$, tamaño muestral $T = 300$ con $200$ períodos de calentamiento, $R = 50$ réplicas por escenario y bloque de entrenamiento $T_0 = 240$, esto es, el ochenta por ciento de la serie. La función media es común, $\mu(\tau) = \sin(2\pi\tau)$, y las innovaciones gaussianas emplean $\sigma_\varepsilon = 1$ con longitud de correlación $\ell = 0.2$, valor que produce trayectorias suaves sin agotar la variabilidad en el primer modo. En los Algoritmos~5 y 6 el sistema ortonormal es la base de Fourier truncada en $J = 10$ términos.
 
-\begin{table}[H]
-\centering
-\small
-\begin{tabular}{p{1.4cm} p{3.2cm} p{3.4cm} p{5.4cm}}
-\hline
-\textbf{Alg.} & \textbf{Rasgo estructural} & \textbf{Supuesto comprometido} & \textbf{Parámetros} \\
-\hline
-1 & Dinámica lineal gaussiana homogénea & Ninguno (control) &
-$\|\Psi\|_{\mathcal{HS}} = 0.6$, $\gamma = 0.3$ \\[2pt]
-2 & Heterocedasticidad condicional & Homogeneidad de la varianza condicional &
-$\delta(\tau) = 0.1$, núcleos $\beta$ y $\gamma$ gaussianos de alcance $0.3$ con masas $0.25$ y $0.60$, radio espectral $0.85$ \\[2pt]
-3 & Multimodalidad condicional al estado & Unimodalidad de la ley condicional &
-$\|\Psi^{(1)}\|_{\mathcal{HS}} = 0.3$, $\|\Psi^{(2)}\|_{\mathcal{HS}} = 0.8$, enlace $\phi = \Phi$, dirección $e = \psi_1$ \\[2pt]
-4 & Asimetría en las innovaciones & Simetría de la ley condicional &
-$\delta = 0.8$, $U_t \equiv 1$ \\[2pt]
-5 & Predictibilidad en componente subordinada & Orden de varianza igual a orden de predictibilidad &
-$\lambda_j = 2^{-(j-1)}$, $\phi_1 = \phi_2 = 0$, $\phi_3 = 0.9$, $\phi_j = 0$ para $j \geq 4$ \\[2pt]
-6 & Covarianza no estacionaria & Estacionariedad de segundo orden &
-$\phi_j = 0.7$ para todo $j$; espectro inicial $\lambda_j^{(0)} = 2^{-(j-1)}$ y final con las dos primeras componentes intercambiadas, quiebre abrupto en $t^* = 270$ \\
-\hline
-\end{tabular}
-\caption{Escenarios del estudio de simulación.}
-\label{tab:escenarios}
-\end{table}
 
-La lectura de ambos bloques es distinta. En el primero la comparación relevante es entre el PSBPM-FD y los modelos de referencia. En el segundo la degradación alcanza por igual a todo método que opere sobre la misma representación, de modo que el resultado no discrimina entre especificaciones dinámicas sino que acota el alcance de la reducción sobre la que todas descansan.
-
+\
 \section{Resultados}
 \label{03_07_00_resultados}
 

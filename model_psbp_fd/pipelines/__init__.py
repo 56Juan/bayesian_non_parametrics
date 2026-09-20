@@ -190,6 +190,16 @@ from .sim_escenario_L import (
     simular_coeficientes,
 )
 
+# --- Escenario A-1: ARFIMA(0,d,0) de memoria larga, segmentado en curvas ---
+from .sim_escenario_A1 import (
+    ConfigEscenarioA1,
+    autocorrelacion_arfima,
+    varianza_innovacion_arfima,
+    simular_davies_harte,
+    generar_escenario_A1,
+    resumen_escenario_A1,
+)
+
 from .sim_escenario_CE import (
     ConfigEscenarioCE,
     FASES,
@@ -335,6 +345,13 @@ __all__ = [
     "simular_coeficientes_CE",
     "envolvente_extremos_centro",
     "simular_trayectoria_far_heterocedastico",
+    # ── Escenario A-1: ARFIMA(0,d,0) de memoria larga (anexo, Algoritmo A-1) ──
+    "ConfigEscenarioA1",
+    "autocorrelacion_arfima",
+    "varianza_innovacion_arfima",
+    "simular_davies_harte",
+    "generar_escenario_A1",
+    "resumen_escenario_A1",
     # ── Contrato de artefactos ──
     "ARCHIVOS",
     "ArtefactosFPCA",

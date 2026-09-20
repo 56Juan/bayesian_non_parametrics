@@ -1,10 +1,8 @@
 \chapter{Marco Teórico}
 \label{02_00_00_fundamentos_teoricos_metodologicos}
-El presente capítulo desarrolla los fundamentos teóricos que sustentan la metodología propuesta en este trabajo.\\
+El presente capítulo desarrolla los fundamentos teóricos que sustentan la metodología propuesta en este trabajo. El primer bloque, la Sección~\ref{02_01_00_datos_funcionales}, introduce la noción de dato funcional y su representación mediante sistemas de funciones base, junto con los criterios para seleccionar la dimensión de dicha representación. Se discuten las propiedades que debe satisfacer el sistema de base, en particular la ortogonalidad y ortonormalidad, y se presentan las B-splines como familia de funciones base predeterminada. El bloque cierra con el Análisis de Componentes Principales Funcional (FPCA), que mediante la descomposición espectral del operador de covarianza y la representación de Karhunen--Loève provee el sistema ortonormal óptimo derivado de los propios datos.\\
 
-El primer bloque, la Sección~\ref{02_01_00_datos_funcionales}, introduce la noción de dato funcional y su representación mediante sistemas de funciones base, junto con los criterios para seleccionar la dimensión de dicha representación. Se discuten las propiedades que debe satisfacer el sistema de base, en particular la ortogonalidad y ortonormalidad, y se presentan las B-splines como familia de funciones base predeterminada. El bloque cierra con el Análisis de Componentes Principales Funcional (FPCA), que mediante la descomposición espectral del operador de covarianza y la representación de Karhunen--Loève provee el sistema ortonormal óptimo derivado de los propios datos.\\
-
-El segundo bloque, la Sección~\ref{02_02_00_series_tiempo_funcionales}, extiende la noción de serie de tiempo al caso funcional. Se presentan los modelos FAR, FMA y FARMA como generalizaciones de los modelos clásicos al espacio $L^2(\mathcal{T})$, y se identifican sus limitaciones estructurales: homogeneidad temporal, linealidad de la forma y supuestos distribucionales rígidos sobre las innovaciones, las cuales motivan la búsqueda de enfoques no paramétricos para modelar la dinámica del proceso. El bloque incorpora, además, los criterios de evaluación del desempeño predictivo, que comprenden el esquema de evaluación temporal, las métricas de error puntual sobre los coeficientes y la curva reconstruida, y la evaluación de la distribución predictiva mediante reglas de puntuación propias.\\
+El segundo bloque, la Sección~\ref{02_02_00_series_tiempo_funcionales}, extiende la noción de serie de tiempo al caso funcional. Se presentan los modelos FAR, FMA y FARMA como generalizaciones de los modelos clásicos al espacio $L^2(\mathcal{T})$, y se identifican sus limitaciones estructurales: homogeneidad temporal, linealidad de la forma y supuestos distribucionales rígidos sobre las innovaciones, las cuales motivan la búsqueda de enfoques no paramétricos para modelar la dinámica del proceso. El bloque incorpora, además, los criterios de evaluación del desempeño predictivo, que comprenden el esquema de evaluación temporal, las métricas de error sobre la curva reconstruida, y la evaluación de la distribución predictiva mediante criterios.\\
 
 El tercer bloque, la Sección~\ref{02_03_00_inferencia_bayesiana}, presenta los fundamentos de la inferencia bayesiana que sostienen el resto del trabajo. Se introducen el Teorema de Bayes, la modelación jerárquica y los métodos MCMC empleados en la estimación, en particular los algoritmos de Metropolis--Hastings, el muestreador de Gibbs y el Slice Sampling.\\
 
@@ -432,7 +430,7 @@ que indica, en promedio (en la ventana), cuál es la peor predicción a lo largo
 \end{equation}
 que corresponde al peor error puntual observado en toda la ventana.
 
-\subsubsection{Calibración de los intervalos de credibilidad}
+\subsubsection{Evaluación de la intervalos de credibilidad}
 \label{02_02_03_04_calibracion}
 Los intervalos de credibilidad $\mathrm{IC}_t(\tau) =[L_t(\tau),\, U_t(\tau)]$ al nivel $1-\gamma$ se construyen a partir de los cuantiles empíricos de las extracciones de la predictiva. Su calidad también debe ser medida.\\
 

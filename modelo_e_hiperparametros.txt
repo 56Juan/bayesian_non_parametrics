@@ -1,0 +1,203 @@
+================================================================================
+PSBPM-FD — MODELO E HIPERPARÁMETROS
+Corrida de referencia: notebooks/simulaciones/53_sim_TS  (escenario_53_1_r01_m*)
+Fuentes: docs/03 Modelo.tex §03_03–§03_05 · 53_01_simulaciones.ipynb §1.1
+         psbp_train.m · artefact/.../hyperparameters.json
+================================================================================
+
+--------------------------------------------------------------------------------
+1. MODELO
+--------------------------------------------------------------------------------
+
+1.1 Representación funcional  (§03_04, eq:expansion_kl_truncada)
+
+    X_t^(M)(tau) = mu(tau) + sum_{m=1..M} xi_tm psi_m(tau)
+
+    mu y {psi_m} se estiman SOLO en el bloque de entrenamiento y se tratan como
+    conocidas. Toda la aleatoriedad queda en los scores xi_t en R^M.
+
+1.2 Supuesto markoviano y factorización  (eq:factorizacion)
+
+    z_t = (xi_{t-1}', ..., xi_{t-q}')'  de dimensión p = qM   [aquí q = N_LAGS = 1 => p = M]
+
+    f(xi_t | z_t) = prod_{m=1..M} f(xi_tm | z_t)
+
+    Sólo restringe la dependencia contemporánea entre componentes: cada factor
+    admite la historia completa. => M muestreadores independientes.
+
+1.3 Cada factor: PSBPM (mezcla de regresiones normales con pesos dependientes)
+    (eq:psbpm_fd_componente, eq:eta_psbpm_fd)
+
+    f(xi_tm | z_t) = sum_{h=1..N} pi_hm(z_t) · N( xi_tm ; beta0*_hm + z_t' beta*_hm , nu*_hm^{-1} )
+
+    eta_hm(z_t) = alpha_hm - sum_{j=1..p} rho_hmj |z_tj - Gamma_hmj|   (gating por DISTANCIA)
+
+    pi_hm(z) = Phi(eta_hm(z)) · prod_{l<h} { 1 - Phi(eta_lm(z)) }      (stick-breaking probit)
+
+    Truncamiento en N: se fija Phi(eta_Nm) = 1 => sum_h pi_hm(z) = 1.
+
+1.4 Priors  (§03_03_01; implementados en psbp_train.m)
+
+    nu*_h            ~ Gamma(a_nu, b_nu)                        [tau_h en el código]
+    beta*_{gamma_h,h} | nu*_h ~ N( 0 , Sigma_{gamma_h,h} )
+    Sigma_{gamma_h,h} = (n/g) (X_h' X_h)^{-1} / nu*_h           g-prior de Zellner
+    g                ~ Gamma(a_g, b_g)
+    alpha_h          ~ N(mu, 1) ,  mu ~ N(mu_mu, 1/tau_mu)
+    rho_hj           ~ N_+( mu_rho_j , 1/nu_rho_j ) truncada en [0, inf)
+                       y rho_hj = 0 si gamma_hj = 0
+    Gamma_hj         ~ Unif{ G* } ,  G* grilla discreta de |G*| puntos
+    gamma_hj         ~ Bernoulli(kappa_j)
+    kappa_j          ~ (1-w_j) delta_0 + w_j Beta(a_kappa_j, b_kappa_j)
+    w_j              ~ Bernoulli(p_w)
+
+    Selección en dos niveles: gamma_hj = 0 apaga SIMULTÁNEAMENTE el regresor
+    (beta*_hj = 0) y el gating (rho_hj = 0) de esa coordenada en ese átomo;
+    w_j = 0 excluye el predictor j del modelo completo.
+
+1.5 Inferencia y predicción  (§03_04_01, §03_05)
+
+    Gibbs con aumento de datos (probit) sobre los T0 - q pares de entrenamiento,
+    un muestreador por componente m, N_CHAINS cadenas concatenadas tras burn.
+    Predictiva por score: mezcla de mezclas promediada sobre las S extracciones
+    (eq:predictiva_posteriori_score), muestreada como
+        h^(s) ~ Categórica(pi_1m^(s),...,pi_Nm^(s)) ,  xi^(s) ~ N(átomo h^(s))
+    Reconstrucción funcional (eq:reconstruccion_fpca), mapa afín determinista:
+        X_t^(M)(tau_g) = mu(tau_g) + sum_m ( d_m xi~_tm + c_m ) psi_m(tau_g)
+
+--------------------------------------------------------------------------------
+2. NOTACIÓN: .tex  <->  código
+--------------------------------------------------------------------------------
+
+  Objeto                     docs/03 Modelo.tex     psbp_train.m / JSON      Python
+  ------------------------------------------------------------------------------
+  respuesta                  y_i , xi_tm            y                        SCORES[:,k]
+  predictores sin intercepto x_i , z_t              Xnoint  (n,p)            dataset_fpc_*
+  diseño con intercepto      x_0 = (1,x')'          X = [ones, Xnoint]
+  nº átomos (truncamiento)   N                      mcmc.N                   MCMC_CONFIG["N"]
+  grilla de localización G*  {Gamma*_jl}            Gstar, mcmc.M            MCMC_CONFIG["M"]
+  intercepto del átomo       beta*_{0,h}            beta0h / beta0hout
+  pendientes del átomo       beta*_h                betajh / betajhout
+  precisión residual         nu*_h                  tauh / tauhout
+    su prior                 Gamma(a_nu, b_nu)      atau, btau
+  parámetro g-prior          g                      g ; ag, bg
+  intercepto probit          alpha_h                alphah / alphahout       (N-1 entradas)
+  media de alpha             mu ~ N(mu_mu,1/nu_mu)  mu ; mumu, taumu
+  DECAIMIENTO DEL GATING     rho_hj                 psijh / psijhout         <-- nombres distintos
+    su prior                 N_+(mu_rho, 1/nu_rho)  mupsij, taupsij          <-- ídem
+  centro de referencia       Gamma_hj               Gammajh / Gammajhout
+  indicador de inclusión     gamma_hj               gammajh / gammajhout
+  prob. de inclusión         kappa_j                pij / pijout ; apij,bpij <-- kappa != pi de pesos
+  inclusión global           w_j ~ Bern(0.5)        wj / wjout ; pwj
+  pesos de la mezcla         pi_h(x)                phx (interno)
+  asignación                 S_i                    Si
+  aumento de datos probit    Z_ih*                  Zil, Wil
+
+  AVISOS DE NOTACIÓN
+  · rho (tex) = psi (código). En el código "psi" NO son las autofunciones
+    psi_m(tau) del FPCA; son los coeficientes de decaimiento del gating.
+  · kappa_j (tex) = pij (código). No confundir con pi_h(x), los pesos.
+  · nu*_h (tex) = tauh (código); sus hiperparámetros se llaman atau/btau, no a_nu/b_nu.
+  · M tiene DOS sentidos: componentes FPCA retenidas (M_FPCA) y |G*| en mcmc.M.
+  · MATLAB colapsa la dimensión singleton final: con M=1 betajhout/psijhout/
+    Gammajhout/gammajhout llegan 2D; utils/trazas.py lo restaura.
+
+--------------------------------------------------------------------------------
+3. HIPERPARÁMETROS DE LA CORRIDA 53  (hyperparameters.json)
+--------------------------------------------------------------------------------
+
+3.1 Diseño y MCMC
+    T = 1000 ,  T0 = 700 (prop_train = 0.70) ,  n_train_eff = 699 , n_test_eff = 300
+    N_LAGS (q) = 1        => p = M
+    M_FPCA barrido: 1, 2, 3
+    MCMC: nsim = 4000 , burn = 2000 , N = 35 , M(|G*|) = 50 , n_iter (cadenas) = 2
+    => (4000-2000) x 2 = 4000 draws posteriores por score
+    seed_base = 41232 ; semilla por job = seed_base + chain*9973 + k*31
+    scores_scale = "raw_fpca_scores"   (ver §4)
+
+3.2 Priors globales (iguales en toda componente)
+    atau   = 2.0 (base; se sobreescribe por la escalera)
+    btau   = 0.5 (base; se DESPEJA de E[tau] por componente)
+    ag     = 2.0      bg    = 0.5        (g ~ Gamma(ag,bg))
+    mumu   = 0.0      taumu = 1.0        (mu ~ N(0,1))
+    pwj    = 0.5                         (w_j ~ Bern(0.5))
+
+3.3 Inclusión por TIPO de covariable (no por componente)
+    own_lag1   : apij = 1.0 , bpij = 1/9 = 0.1111  -> E[kappa] = 0.900
+    cross_lag  : apij = 1.0 , bpij = 5.0           -> E[kappa] = 0.167  (Chung & Dunson)
+    apij = 1 es deliberado: w_j = 0 es estado absorbente y la tasa de escape
+    decae como N^(-apij); con apij = 5 el retorno tardaría ~8620 iteraciones.
+
+3.4 Escalera por componente FPCA (k base-0)
+    k  arg_objetivo  taupsij  atau  E[tau]_objetivo
+    0      2.0         0.5     2.5       3.0
+    1      1.0         1.0     2.0       3.0
+    2      1.0         2.0     0.5       2.0
+    3      1.0         2.0     0.5       2.0     (definido; no usado con M<=3)
+
+    mupsij_j = arg_objetivo / E[ sum_j |x_j - Gamma_j| ]
+    escala_probit = E[ sum_j |x_j - Gamma_j| ] = 40.5157893501  (punto M=3)
+    btau = atau / E[tau]_objetivo
+
+3.5 Valores efectivos escritos al JSON (punto M = 3)
+    k=0 (fpc_idx 1): atau 2.5  btau 0.8333  mupsij 0.049363  taupsij 0.5
+                     apij [1,1,1]  bpij [1/9, 5, 5]
+    k=1 (fpc_idx 2): atau 2.0  btau 0.6667  mupsij 0.024682  taupsij 1.0
+                     apij [1,1,1]  bpij [5, 1/9, 5]
+    k=2 (fpc_idx 3): atau 0.5  btau 0.2500  mupsij 0.024682  taupsij 2.0
+                     apij [1,1,1]  bpij [5, 5, 1/9]
+    El 1/9 viaja en la diagonal: para la componente k el "propio rezago" es la
+    columna j = k. Los priors son vectores de largo p, uno por covariable.
+
+3.6 Contraste con Chung & Dunson (references/Case1_01.m)
+    cte        Chung        corrida 53
+    N            20            35
+    |G*|         50            50
+    atau        0.5        2.5 / 2.0 / 0.5
+    btau        0.5        despejado de E[tau]
+    ag, bg   0.5, 0.5       2.0, 0.5
+    mumu/taumu  0 / 1        0 / 1
+    mupsij       0        despejado de arg_objetivo (gating ENCENDIDO a priori)
+    taupsij      1         0.5 / 1 / 2
+    apij, bpij  1, 5      1, 1/9 (propio) · 1, 5 (cruzado)
+    pwj         0.5           0.5
+    Chung corre sobre datos ESTANDARIZADOS; aquí los scores van CRUDOS, con
+    var(xi_k) = lambda_k. Las constantes en unidades de y (atau/btau) NO son
+    comparables directamente; las adimensionales (apij/bpij, ag/bg, pwj) sí.
+
+--------------------------------------------------------------------------------
+4. DISCREPANCIAS ENTRE EL MARCO TEÓRICO Y EL CÓDIGO  (no resueltas)
+--------------------------------------------------------------------------------
+
+ 1) ESCALA DE LOS SCORES. §03_04_01 declara que la implementación opera sobre
+    scores ESTANDARIZADOS xi~_tm = (xi_tm - c_m)/d_m, y lo justifica: la grilla
+    G* y el prior de rho presuponen predictores en escala comparable. La corrida
+    53 entrega los scores CRUDOS (§4.2 del _01 fija mean=0, std=1 y verifica que
+    la transformación sea la identidad; el JSON registra
+    scores_scale = "raw_fpca_scores"). CLAUDE.md §6.6 exige
+    "standardized_zscore_ddof0". Es la divergencia de fondo: el .tex describe
+    otra implementación. La compensación en el código es que mupsij se despeja
+    de E[sum|x-Gamma|], es decir que el gating se recalibra a la escala real,
+    y que G* se construye sobre [min(Xnoint), max(Xnoint)] en vez del
+    (-3.5, 3.5) fijo de Chung. Hay que alinear el .tex o el notebook.
+
+ 2) GRILLA G*. El .tex (§03_03_02, párrafo de valores por defecto) describe
+    50 puntos equiespaciados en (-3.5, 3.5); psbp_train.m la construye sobre el
+    rango empírico de Xnoint. Coherente con (1), pero no está escrito.
+
+ 3) TRUNCAMIENTO. El .tex cita N = 20 como valor por defecto; la corrida usa 35.
+
+ 4) NOMBRES. El .tex llama rho_hj al decaimiento y kappa_j a la probabilidad de
+    inclusión; el código los llama psijh y pij. Ninguna sección del .tex declara
+    el diccionario. Conviene agregarlo (o renombrar en el .m).
+
+ 5) PRIOR DE rho. El .tex escribe rho_hj ~ N_+(mu_rho_j, nu_rho_j) con valores
+    por defecto mu_rho = 0, nu_rho = 100 (nu como VARIANZA). El código usa
+    N_+(mupsij, 1/taupsij), es decir taupsij como PRECISIÓN, con mupsij > 0.
+    Signo del parámetro y convención varianza/precisión no coinciden.
+
+ 6) NO ESTÁ EN EL .tex la escalera por componente (arg_objetivo, e_tau_objetivo)
+    ni la distinción own_lag1 / cross_lag de apij-bpij; ambas son decisiones de
+    la implementación con efecto sustantivo sobre el posterior.
+
+ 7) El comentario de la tabla de referencia del _01 cita nsim=2500 / burn=1000,
+    pero MCMC_CONFIG usa 4000 / 2000. Comentario desactualizado.
