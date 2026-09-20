@@ -200,6 +200,36 @@ from .sim_escenario_A1 import (
     resumen_escenario_A1,
 )
 
+# --- Series de tiempo clasicas: mecanismo comun a A-1, A-2 y A-3 ---
+from .sim_series_clasicas import (
+    acf_empirica_serie,
+    bloques_de_serie,
+    diagnostico_serie_escalar,
+    generar_serie_segmentada,
+    oraculo_lineal_un_rezago,
+    r2_empirico_media_condicional,
+)
+
+# --- Escenario A-2: AR con cambio de regimen markoviano ---
+from .sim_escenario_A2 import (
+    ConfigEscenarioA2,
+    autocovarianza_cambio_regimen,
+    filtrar_regimen,
+    generar_escenario_A2,
+    media_condicional_regimen,
+    resumen_escenario_A2,
+    simular_cambio_regimen,
+)
+
+# --- Escenario A-3: AR-GARCH(1,1) ---
+from .sim_escenario_A3 import (
+    ConfigEscenarioA3,
+    generar_escenario_A3,
+    resumen_escenario_A3,
+    sd_condicional_bloque,
+    simular_ar_garch,
+)
+
 from .sim_escenario_CE import (
     ConfigEscenarioCE,
     FASES,
@@ -352,6 +382,27 @@ __all__ = [
     "simular_davies_harte",
     "generar_escenario_A1",
     "resumen_escenario_A1",
+    # ── Series de tiempo clasicas: mecanismo comun a A-1, A-2 y A-3 ──
+    "acf_empirica_serie",
+    "bloques_de_serie",
+    "diagnostico_serie_escalar",
+    "generar_serie_segmentada",
+    "oraculo_lineal_un_rezago",
+    "r2_empirico_media_condicional",
+    # ── Escenario A-2: AR con cambio de regimen markoviano (anexo, Algoritmo A-2) ──
+    "ConfigEscenarioA2",
+    "autocovarianza_cambio_regimen",
+    "filtrar_regimen",
+    "generar_escenario_A2",
+    "media_condicional_regimen",
+    "resumen_escenario_A2",
+    "simular_cambio_regimen",
+    # ── Escenario A-3: AR-GARCH(1,1) (anexo, Algoritmo A-3) ──
+    "ConfigEscenarioA3",
+    "generar_escenario_A3",
+    "resumen_escenario_A3",
+    "sd_condicional_bloque",
+    "simular_ar_garch",
     # ── Contrato de artefactos ──
     "ARCHIVOS",
     "ArtefactosFPCA",

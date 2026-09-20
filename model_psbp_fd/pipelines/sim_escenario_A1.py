@@ -106,17 +106,17 @@ import math
 from dataclasses import dataclass
 
 import numpy as np
-from scipy.linalg import cho_factor, cho_solve, toeplitz
 
 from .sim_comun import (
     ConfigObservacion,
     SalidaSimulacion,
-    aplicar_ruido_observacion,
-    diagnostico_comun,
-    evaluar_media,
-    grilla_regular,
     pesos_trapezoidales,
-    semillas_replicas,
+)
+from .sim_series_clasicas import (
+    diagnostico_serie_escalar,
+    generar_serie_segmentada,
+    oraculo_lineal_un_rezago,
+    r2_empirico_media_condicional,
 )
 
 __all__ = [
@@ -240,23 +240,6 @@ class ConfigEscenarioA1(ConfigObservacion):
 # GENERADOR
 # ==========================================================================
 
-def _oraculo_un_rezago(gamma: np.ndarray, L: int, jitter: float
-                       ) -> tuple[np.ndarray, np.ndarray]:
-    """
-    Operador del predictor optimo del bloque t dado el bloque t-1, y la
-    covarianza de su residuo.
-
-    Retorna (A, Sigma_resid) con A = Sigma_21 Sigma_11^{-1}, de forma (L, L).
-    """
-    S22 = toeplitz(gamma[:L])                                  # (L, L)
-    S11 = S22 + jitter * max(gamma[0], 1.0) * np.eye(L)
-    idx = np.arange(L)
-    S21 = gamma[np.abs(L + idx[:, None] - idx[None, :])]       # (L, L)
-    c, low = cho_factor(S11, lower=True)
-    A = cho_solve((c, low), S21.T).T                           # Sigma_21 S11^{-1}
-    return A, S22 - A @ S21.T
-
-
 def generar_escenario_A1(cfg: ConfigEscenarioA1,
                          diagnosticar: bool = True) -> SalidaSimulacion:
     """
@@ -264,61 +247,34 @@ def generar_escenario_A1(cfg: ConfigEscenarioA1,
 
     Cada replica simula UNA trayectoria escalar de largo (burn_in + T) * L por
     Davies-Harte, descarta los primeros `burn_in` bloques y corta el resto en T
-    bloques contiguos sin traslape.
+    bloques contiguos sin traslape (la segmentacion es comun a A-1, A-2 y A-3 y
+    vive en `sim_series_clasicas`).
     """
     cfg.validar()
-    L, T, R = int(cfg.L), int(cfg.T), int(cfg.R)
-    burn = int(cfg.burn_in)
-    n_bloques = burn + T
-    n_total = n_bloques * L
-
-    tau = grilla_regular(L)
-    media = evaluar_media(cfg.media_fn, tau)
+    L = int(cfg.L)
+    n_total = (int(cfg.burn_in) + int(cfg.T)) * L
 
     # gamma(k) para k = 0..n_total-1: la cola completa, sin truncar.
     gamma = cfg.sigma_Z ** 2 * autocorrelacion_arfima(cfg.d, n_total - 1)
-    A_orac, S_resid = _oraculo_un_rezago(gamma, L, cfg.jitter)
+    A_orac, S_resid = oraculo_lineal_un_rezago(gamma, L, cfg.jitter)
 
-    hijas, registro = semillas_replicas(cfg.seed, R)
-    curvas = np.empty((R, T, L))
-    observaciones = np.empty((R, T, L))
-    medias_cond = np.empty((R, T, L))
-    series = np.empty((R, n_total))
+    def simulador(rng, n):
+        return simular_davies_harte(gamma, n, rng), {}
 
-    for r, hija in enumerate(hijas):
-        rng = np.random.default_rng(hija)
-        Z = simular_davies_harte(gamma, n_total, rng)
-        todos = Z.reshape(n_bloques, L)
-        bloques = todos[burn:]                                  # (T, L)
-        # Predictor del bloque t a partir del t-1. Con burn_in > 0 el bloque
-        # anterior al primero retenido EXISTE y se usa; sin calentamiento el
-        # primer origen no tiene predictor y va en cero.
-        prev = (todos[burn - 1:-1] if burn > 0
-                else np.vstack([np.zeros((1, L)), bloques[:-1]]))
+    def oraculos(prev, Z, lat, ctx):
+        return {"media_condicional": prev @ A_orac.T}
 
-        curvas[r] = bloques + media
-        medias_cond[r] = prev @ A_orac.T + media
-        observaciones[r] = aplicar_ruido_observacion(curvas[r], cfg.sigma_obs, rng)
-        series[r] = Z
-
-    salida = SalidaSimulacion(
-        observaciones=observaciones,
-        curvas=curvas,
-        grilla=tau,
-        media=media,
-        semillas=registro,
-        config=cfg,
-        internos={
-            "serie_escalar": series,
+    return generar_serie_segmentada(
+        cfg, simulador,
+        oraculos=oraculos,
+        internos_extra={
             "autocovarianzas": gamma[:max(2 * L + 1, 3)],
             "operador_oraculo": A_orac,
             "cov_residuo_oraculo": S_resid,
-            "media_condicional": medias_cond,
         },
+        resumen=resumen_escenario_A1 if diagnosticar else None,
+        diagnosticar=diagnosticar,
     )
-    if diagnosticar:
-        salida.diagnostico = resumen_escenario_A1(salida)
-    return salida
 
 
 # ==========================================================================
@@ -336,19 +292,11 @@ def resumen_escenario_A1(salida: SalidaSimulacion) -> dict:
     y su distancia contra el techo escalar de pasado infinito.
     """
     cfg = salida.config
-    L, T = int(cfg.L), int(cfg.T)
+    L = int(cfg.L)
     gamma = salida.internos["autocovarianzas"]
     rho = gamma / gamma[0]
     S_resid = salida.internos["cov_residuo_oraculo"]
-    Z = salida.internos["serie_escalar"]
-
-    def acf_emp(k: int) -> float:
-        vals = []
-        for r in range(Z.shape[0]):
-            z = Z[r] - Z[r].mean()
-            den = float((z * z).sum())
-            vals.append(float((z[:-k] * z[k:]).sum() / den) if den > 0 else np.nan)
-        return float(np.nanmean(vals))
+    diag = diagnostico_serie_escalar(salida)
 
     sigma_zeta2 = varianza_innovacion_arfima(cfg.d, cfg.sigma_Z)
     r2_1rezago = float(1.0 - np.trace(S_resid) / (L * gamma[0]))
@@ -364,34 +312,20 @@ def resumen_escenario_A1(salida: SalidaSimulacion) -> dict:
     A = salida.internos["operador_oraculo"]
     hs2 = float(np.sum((w_cuad[:, None] / w_cuad[None, :]) * A ** 2))
 
-    # El mismo R^2, medido sobre las curvas generadas: es la cifra que un
-    # metodo con n_lags = 1 puede aspirar a igualar, y no mas.
-    X = salida.curvas - salida.media
-    Mc = salida.internos["media_condicional"] - salida.media
-    sse = float(((X[:, 1:] - Mc[:, 1:]) ** 2).sum())
-    sst = float((X[:, 1:] ** 2).sum())
-
     return {
-        **diagnostico_comun(salida),
+        **diag,
         "d": float(cfg.d),
         "sigma_Z": float(cfg.sigma_Z),
         "sigma_zeta2_teorica": float(sigma_zeta2),
         "rho_teorica_lag1": float(rho[1]),
         "rho_teorica_lagL": float(rho[L]),
         "rho_teorica_lag2L": float(rho[min(2 * L, rho.size - 1)]),
-        "rho_empirica_lag1": acf_emp(1),
-        "rho_empirica_lagL": acf_emp(L),
-        "rho_empirica_lag2L": acf_emp(2 * L),
         "r2_oraculo_1rezago": r2_1rezago,
-        "r2_oraculo_1rezago_empirico": (float(1.0 - sse / sst) if sst > 0
-                                        else float("nan")),
+        # El mismo R^2, medido sobre las curvas generadas.
+        "r2_oraculo_1rezago_empirico": r2_empirico_media_condicional(salida),
         "r2_oraculo_pasado_infinito_escalar": float(
             1.0 - sigma_zeta2 / cfg.sigma_Z ** 2),
         "hs_oraculo_L2": float(np.sqrt(hs2)),
-        "sd_Z_empirica": float(Z.std()),
-        "T0_referencia": int(np.floor(cfg.prop_train_referencia * T)),
-        "burn_in_bloques": int(cfg.burn_in),
         "nota_burn_in": ("Davies-Harte es exacto: burn_in no corrige nada, se "
                          "respeta por contrato de ConfigObservacion."),
-        "todo_finito": bool(np.all(np.isfinite(salida.curvas))),
     }
