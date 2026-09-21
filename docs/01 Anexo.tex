@@ -13,7 +13,7 @@ Los algoritmos se agrupan según el nivel en que se especifica la dinámica del 
 \label{ane_00_01_metodos_series_tiempo}
 Este primer enfoque genera las curvas a partir de una serie de tiempo escalar ``clásica''. La idea es simular una única trayectoria muy larga de un proceso univariado discreto $\{Z_s\}$ y luego segmentarla en bloques consecutivos de igual longitud, de modo que cada bloque se interprete como una curva. Esto reproduce la manera en que suelen construirse series de tiempo funcionales a partir de registros de alta frecuencia, donde el registro se divide en sus unidades naturales de observación (por ejemplo, el día) y cada unidad se trata como una realización funcional.\\
 
-Los escenarios de esta sección comparten el mecanismo de segmentación y difieren únicamente en el proceso escalar generador. Sea $L$ el número de puntos de la grilla, que en este enfoque coincide con la longitud de cada bloque. Cada algoritmo simula una trayectoria $Z_1, \dots, Z_{TL}$ y la divide en $T$ bloques contiguos y sin traslape, de modo que la curva $t$ queda formada por $Z_{(t-1)L+1}, \dots, Z_{tL}$ sobre la grilla $\{\tau_l\}_{l=1}^{L}$.\\
+Los escenarios de esta sección comparten el mecanismo de segmentación y difieren únicamente en el proceso escalar generador. Sea $L$ el número de puntos de la grilla, que en este enfoque coincide con la longitud de cada bloque. Cada algoritmo simula una trayectoria $Z_1, \dots, Z_{TL}$ y la divide en $T$ bloques contiguos y sin traslape, de modo que la curva $t$ queda formada por $Z_{(t-1)L+1}, \dots, Z_{tL}$ sobre la grilla $\{\tau_l\}_{l=1}^{L}$. Sobre las curvas así obtenidas se aplica el esquema de observación común.\\
 
 Los escenarios definidos son los siguientes:
 \begin{itemize}
@@ -101,7 +101,7 @@ $\phi$              & coeficiente autorregresivo común              & $0.5$ \\
 
 \subsection{Algoritmo A-3: Proceso AR-GARCH}
 \label{ane_00_01_03_alg_a3}
-Este algoritmo genera curvas a partir de un proceso autorregresivo con innovaciones GARCH$(1,1)$ \cite{ane_00_01_bollerslev1986generalized}, con el fin de inducir heterocedasticidad condicional persistente la dependencia entre curvas consecutivas opera sobre la escala de la serie y no sobre su nivel. Es el análogo escalar del Algoritmo~2. El proceso se define como
+Este algoritmo genera curvas a partir de un proceso autorregresivo con innovaciones GARCH$(1,1)$ \cite{ane_00_01_bollerslev1986generalized}, con el fin de inducir heterocedasticidad condicional persistente: la dependencia entre curvas consecutivas opera sobre la escala de la serie y no sobre su nivel. El proceso se define como
 \begin{equation}\label{eq:ane_algA3_argarch}
     Z_s = \phi\, Z_{s-1} + a_s,
     \qquad
@@ -133,18 +133,17 @@ Símbolo & Descripción & Valor \\
 $\phi$          & coeficiente autorregresivo                          & $0.5$ \\
 $\alpha_1$      & sensibilidad a la innovación reciente               & $0.08$ \\
 $\beta_1$       & persistencia de la varianza condicional pasada      & $0.90$ \\
-$\sigma_a^2$    & varianza incondicional de la innovación             & $1.0$ \[$\phantom{0}$\] \\
+$\sigma_a^2$    & varianza incondicional de la innovación             & $1.0$ \\
 \hline
 \end{tabular}
 \end{table}
 \section{Métodos basados en Procesos Funcionales}
 \label{ane_00_02_metodos_procesos_funcionales}
-Este segundo enfoque especifica la dinámica directamente sobre la curva completa, mediante un operador definido sobre el dominio $\mathcal{T}=[0,1]$. Los algoritmos parten del proceso autorregresivo funcional lineal del Algoritmo~B-1 y cada uno de los siguientes modifica un único componente, de modo que las diferencias de desempeño entre ellos sean atribuibles a ese cambio:
+Este segundo enfoque especifica la dinámica directamente sobre la curva completa, mediante un operador definido sobre el dominio $\mathcal{T}=[0,1]$. Los algoritmos son los siguientes:
 \begin{itemize}
-    \item El Algoritmo~B-1 es el proceso de referencia, con función media sinusoidal y núcleo autorregresivo gaussiano.
-    \item El Algoritmo~B-2 modifica la función media.
-    \item El Algoritmo~B-3 modifica el operador de dependencia.
-    \item El Algoritmo~B-4 agrega una tendencia determinista.
+    \item El Algoritmo~B-1 genera una dinámica lineal gaussiana homogénea mediante un proceso autorregresivo funcional con un núcleo de dependencia poco suave.
+    \item El Algoritmo~B-2 introduce un operador de dependencia que varía a lo largo de la serie mediante un proceso autorregresivo funcional de coeficientes variables en el tiempo (TV-FAR).
+    \item El Algoritmo~B-3 introduce un cambio estructural recurrente, en el que a intervalos regulares el proceso exhibe un comportamiento marcadamente distinto al habitual.
 \end{itemize}
 
 \subsection{Algoritmo B-1: Proceso autorregresivo funcional lineal}
@@ -154,12 +153,12 @@ Este algoritmo genera curvas desde un proceso autorregresivo funcional de orden 
     X_t(\tau) = \mu(\tau) + \int_{0}^{1} \psi(\tau, s)\,
     \bigl(X_{t-1}(s) - \mu(s)\bigr)\, ds + \varepsilon_t(\tau),
 \end{equation}
-con función media $\mu(\tau)$ y núcleo autorregresivo gaussiano
+con función media $\mu(\tau)$ y núcleo autorregresivo exponencial
 \begin{equation}\label{eq:ane_algB1_kernel}
     \psi(\tau, s) = c \cdot \exp\!\left\{
-    -\frac{(\tau - s)^2}{2\gamma^2}\right\},
+    -\frac{|\tau - s|}{\gamma}\right\},
 \end{equation}
-donde $\gamma > 0$ controla el alcance de la dependencia entre puntos del dominio, de modo que valores pequeños concentran la influencia de $X_{t-1}$ en un entorno estrecho de cada $\tau$ y valores grandes la distribuyen sobre todo el dominio, y la constante $c$ se calibra de modo que la norma de Hilbert--Schmidt del operador, $\|\Psi\|_{\mathcal{HS}} = \bigl(\int_0^1\!\int_0^1 \psi^2(\tau,s)\, d\tau\, ds\bigr)^{1/2}$, alcance un valor prefijado menor que uno, condición que garantiza la existencia de una solución estacionaria y determina la persistencia temporal del proceso \cite{02_02_bosq2000linear}. Las innovaciones $\{\varepsilon_t\}$ son trayectorias independientes de un proceso gaussiano de media cero con núcleo de covarianza exponencial cuadrático,
+donde $\gamma > 0$ controla el alcance de la dependencia entre puntos del dominio, de modo que valores pequeños concentran la influencia de $X_{t-1}$ en un entorno estrecho de cada $\tau$ y valores grandes la distribuyen sobre todo el dominio. A diferencia del núcleo gaussiano, el núcleo exponencial no es diferenciable en $\tau = s$, por lo que el operador suaviza menos y transmite a la curva siguiente más detalle fino de la anterior. La constante $c$ se calibra de modo que la norma de Hilbert--Schmidt del operador, $\|\Psi\|_{\mathcal{HS}} = \bigl(\int_0^1\!\int_0^1 \psi^2(\tau,s)\, d\tau\, ds\bigr)^{1/2}$, alcance un valor prefijado menor que uno, condición que garantiza la existencia de una solución estacionaria y determina la persistencia temporal del proceso \cite{02_02_bosq2000linear}. Las innovaciones $\{\varepsilon_t\}$ son trayectorias independientes de un proceso gaussiano de media cero con núcleo de covarianza exponencial cuadrático,
 \begin{equation}\label{eq:ane_algB1_innovacion}
     \mathrm{Cov}\bigl(\varepsilon_t(\tau),\, \varepsilon_t(s)\bigr)
     = \sigma_\varepsilon^2 \exp\!\left\{
@@ -193,81 +192,157 @@ $\ell$                      & longitud de correlación de la innovación  & $0.5
 \end{tabular}
 \end{table}
 
-\subsection{Algoritmo B-2: Proceso con función media modificada}
+\subsection{Algoritmo B-2: Proceso autorregresivo funcional de coeficientes variables (TV-FAR)}
 \label{ane_00_02_02_alg_b2}
-Este algoritmo genera curvas con la dinámica del Algoritmo~B-1, reemplazando la función media por
-\begin{equation}\label{eq:ane_algB2_media}
-    \mu_{\mathrm{B2}}(\tau) = [\text{forma funcional de la nueva media}],
+Este algoritmo genera curvas con la dinámica del Algoritmo~B-1, permitiendo que el operador de dependencia cambie a lo largo de la serie, con el fin de  evaluar el desempeño cuando la persistencia y el alcance de la dependencia no son constantes. La curva se define como
+\begin{equation}\label{eq:ane_algB2_tvfar}
+    X_t(\tau) = \mu(\tau) + \int_{0}^{1} \psi_t(\tau, s)\,
+    \bigl(X_{t-1}(s) - \mu(s)\bigr)\, ds + \varepsilon_t(\tau),
 \end{equation}
-con el fin de [propósito: por ejemplo, evaluar la sensibilidad de los métodos a la forma de la media]. El núcleo autorregresivo y la innovación se mantienen como en \eqref{eq:ane_algB1_kernel} y \eqref{eq:ane_algB1_innovacion}, y la curva se define como en \eqref{eq:ane_algB1_far} con $\mu_{\mathrm{B2}}$ en lugar de $\mu$. La generación sigue los pasos del Algoritmo~B-1.
+donde el núcleo autorregresivo interpola entre dos operadores de la forma \eqref{eq:ane_algB1_kernel},
+\begin{equation}\label{eq:ane_algB2_kernel}
+    \psi_t(\tau, s) = (1 - w_t)\, \psi^{(0)}(\tau, s) + w_t\, \psi^{(1)}(\tau, s),
+    \qquad
+    w_t = \frac{t}{T},
+\end{equation}
+con $\psi^{(0)}$ y $\psi^{(1)}$ calibrados por separado a sus respectivas normas objetivo y alcances. Como ambas normas son menores que uno, también lo es la de $\psi_t$ para todo $t$. La media y la innovación son las del Algoritmo~B-1, y la generación sigue sus pasos, evaluando $\psi_t$ en cada período.
 
 \begin{table}[H]
 \centering
-\caption{Parámetros del Algoritmo~B-2. La dinámica coincide con la del Cuadro~\ref{tab:ane_algB1}.}
+\caption{Parámetros del Algoritmo~B-2. La media y la innovación coinciden con las del Cuadro~\ref{tab:ane_algB1}.}
 \label{tab:ane_algB2}
 \begin{tabular}{llc}
 \hline
 Símbolo & Descripción & Valor \\
 \hline
-$\mu_{\mathrm{B2}}(\tau)$   & función media                             & [forma] \\
-[$\cdot$]                   & [parámetros de la media, si los hay]      & [valor] \\
+$\gamma^{(0)},\gamma^{(1)}$                 & alcance del núcleo inicial y final        & $0.3$, $0.3$ \\
+$\|\Psi^{(0)}\|_{\mathcal{HS}}$             & norma objetivo, operador inicial          & $0.30$ \\
+$\|\Psi^{(1)}\|_{\mathcal{HS}}$             & norma objetivo, operador final            & $0.80$ \\
 \hline
 \end{tabular}
 \end{table}
 
-\subsection{Algoritmo B-3: Proceso con operador de dependencia modificado}
+\subsection{Algoritmo B-3: Proceso con cambio estructural recurrente}
 \label{ane_00_02_03_alg_b3}
-Este algoritmo genera curvas con la función media y la innovación del Algoritmo~B-1, reemplazando el núcleo autorregresivo por
-\begin{equation}\label{eq:ane_algB3_kernel}
-    \psi_{\mathrm{B3}}(\tau, s) = [\text{forma funcional del nuevo núcleo}],
+Este algoritmo genera curvas que siguen la dinámica del Algoritmo~B-1, pero que a intervalos regulares atraviesan episodios de comportamiento marcadamente distinto, con el fin de evaluar cómo responden los métodos a cambios estructurales recurrentes. Sea
+\begin{equation}\label{eq:ane_algB3_episodios}
+    \mathcal{E} = \bigl\{\, t : ((t-1) \bmod P) < D \,\bigr\}
 \end{equation}
-con el fin de [propósito: por ejemplo, evaluar la sensibilidad de los métodos a la estructura de dependencia entre curvas]. La constante de escala de $\psi_{\mathrm{B3}}$ se calibra, como en el Algoritmo~B-1, para que la norma de Hilbert--Schmidt alcance el valor objetivo. La generación sigue los pasos del Algoritmo~B-1, con $\psi_{\mathrm{B3}}$ en lugar de $\psi$.
+el conjunto de períodos en episodio, donde $P$ es el número de períodos entre inicios consecutivos de episodios y $D < P$ es su duración. Durante un episodio la curva sufre un desplazamiento localizado y su variabilidad aumenta:
+\begin{equation}\label{eq:ane_algB3_curva}
+    X_t(\tau) = \mu(\tau) + \mathbf{1}(t \in \mathcal{E})\, A\, g(\tau) + Y_t(\tau),
+\end{equation}
+donde $A\,g(\tau)$ es el desplazamiento característico del episodio, con amplitud $A$ y forma $g$, y $\{Y_t\}$ es el proceso autorregresivo funcional centrado del Algoritmo~B-1,
+\begin{equation}\label{eq:ane_algB3_Y}
+    Y_t(\tau) = \int_{0}^{1} \psi(\tau, s)\, Y_{t-1}(s)\, ds + \kappa_t\, \varepsilon_t(\tau),
+    \qquad
+    \kappa_t = \kappa^{\mathbf{1}(t \in \mathcal{E})},
+\end{equation}
+con $\kappa \geq 1$ el factor que amplifica la escala de la innovación durante los episodios. El inicio y el fin de cada episodio no dependen de la dinámica del proceso, por lo que resultan impredecibles para un modelo que solo observa la curva anterior. La generación sigue los pasos del Algoritmo~B-1, agregando en cada período el término de episodio y la escala $\kappa_t$.
 
 \begin{table}[H]
 \centering
-\caption{Parámetros del Algoritmo~B-3. La media y la innovación coinciden con las del Cuadro~\ref{tab:ane_algB1}.}
+\caption{Parámetros del Algoritmo~B-3. La dinámica de $Y_t$ coincide con la del Cuadro~\ref{tab:ane_algB1}.}
 \label{tab:ane_algB3}
 \begin{tabular}{llc}
 \hline
 Símbolo & Descripción & Valor \\
 \hline
-[$\cdot$]                       & [parámetro de alcance del nuevo núcleo]   & [valor] \\
-$\|\Psi_{\mathrm{B3}}\|_{\mathcal{HS}}$ & norma objetivo del operador         & [valor] \\
+$P$         & períodos entre inicios de episodios       & $20$ \\
+$D$         & duración de cada episodio                 & $5$ \\
+$A$         & amplitud del desplazamiento               & $3.0$ \\
+$g(\tau)$   & forma del desplazamiento                  & $\exp\{-(\tau-0.5)^2/(2\cdot 0.1^2)\}$ \\
+$\kappa$    & factor de escala de la innovación         & $1.5$ \\
 \hline
 \end{tabular}
 \end{table}
 
-\subsection{Algoritmo B-4: Proceso con tendencia determinista}
-\label{ane_00_02_04_alg_b4}
-Este algoritmo genera curvas cuya media varía con el tiempo, agregando a la dinámica del Algoritmo~B-1 una tendencia determinista, con el fin de [propósito: por ejemplo, evaluar el desempeño de los métodos cuando se incumple la estacionariedad de la media]. La curva se define como
-\begin{equation}\label{eq:ane_algB4_tendencia}
-    X_t(\tau) = \mu(\tau) + m_t(\tau) + Y_t(\tau),
+\section{Métodos basados en Coeficientes de la Representación}
+\label{ane_00_03_metodos_coeficientes_bases}
+Este tercer enfoque simula directamente los coeficientes de la representación de las curvas. Sea $\{\varphi_j\}_{j=1}^{J}$ un sistema ortonormal fijo en $L^2(\mathcal{T})$, en este caso la base de Fourier, y $\mu(\tau)$ la función media. Cada curva se escribe como
+\begin{equation}\label{eq:ane_coef_curva}
+    X_t(\tau) = \mu(\tau) + \sum_{j=1}^{J} a_{tj}\,\varphi_j(\tau),
     \qquad
-    Y_t(\tau) = \int_{0}^{1} \psi(\tau, s)\, Y_{t-1}(s)\, ds + \varepsilon_t(\tau),
+    a_{tj} = \sqrt{\lambda_j}\;\tilde a_{tj},
 \end{equation}
-donde $\{Y_t\}$ es el proceso autorregresivo funcional centrado del Algoritmo~B-1 y $m_t(\tau)$ es la tendencia,
-\begin{equation}\label{eq:ane_algB4_m}
-    m_t(\tau) = \Bigl[\beta_1\,\tfrac{t}{T} + \beta_2\,\bigl(\tfrac{t}{T}\bigr)^2\Bigr]\, f(\tau),
-\end{equation}
-con $\beta_1, \beta_2 \in \mathbb{R}$ los coeficientes de la componente lineal y cuadrática, y $f:\mathcal{T}\to\mathbb{R}$ una forma [normalizada a máximo unitario] que determina en qué puntos del dominio actúa la tendencia. [Si se opta por otra forma de tendencia, reemplazar el término entre corchetes en \eqref{eq:ane_algB4_m}.] La generación sigue los pasos del Algoritmo~B-1, agregando $m_t(\tau)$ a cada curva antes de aplicar el esquema de observación.
+donde $a_{tj}$ es el coeficiente de la $j$-ésima componente, $\lambda_1 > \dots > \lambda_J > 0$ es un espectro prefijado que fija la varianza marginal de cada componente, y $\tilde a_{tj}$ es una serie de tiempo de media cero y varianza unitaria. Toda la dependencia temporal del proceso, lineal y no lineal, se especifica sobre las series $\{\tilde a_{tj}\}$.\\
+
+Como el sistema $\{\varphi_j\}$ es fijo y conocido, los coeficientes simulados se entregan directamente a los métodos, en el papel de los scores de la representación, sin construir las curvas ni aplicar el esquema de observación. De este modo se aísla el efecto de la estructura de dependencia y del número de scores retenidos, sin confundirlo con el error de estimar la representación ni con el ruido de medición. \\
+
+
+Los algoritmos son los siguientes:
+\begin{itemize}
+    \item El Algoritmo~C-1  tiene una dependencia lineal débil y dependencia no lineal entre las dos primeras componentes.
+    \item El Algoritmo~C-2 refuerza la dependencia lineal, dejando intacta la no lineal.
+    \item El Algoritmo~C-3 traslada la dependencia a componentes subordinadas.
+\end{itemize}
+
+\subsection{Algoritmo C-1: Proceso con dependencia no lineal entre coeficientes}
+\label{ane_00_03_01_alg_c1}
+Este algoritmo genera coeficientes cuya dependencia temporal es débil en el sentido lineal, pero fuerte en el no lineal, con el fin de evaluar la capacidad de los métodos para aprovechar dependencia que un modelo lineal no detecta. Sea $(j^\ast, j^\ast+1)$ el par de componentes que interactúan, y sean $\{e_{tj}\}$ variables gaussianas estándar independientes. La dinámica de las series $\tilde a_{tj}$ es
+\begin{align}
+    \tilde a_{t,j^\ast} &= \phi\, \tilde a_{t-1,j^\ast} + \sqrt{1-\phi^2}\; e_{t,j^\ast}, \label{eq:ane_algC1_lineal}\\
+    \tilde a_{t,j^\ast+1} &= c\, \tilde a_{t-1,j^\ast} + b\,\frac{\tilde a_{t-1,j^\ast}^{2}-1}{\sqrt{2}} + \sqrt{1-c^2-b^2}\; e_{t,j^\ast+1}, \label{eq:ane_algC1_cuadratica}
+\end{align}
+y $\tilde a_{tj} = e_{tj}$ para el resto de las componentes. La primera ecuación es un autorregresivo lineal de coeficiente $\phi$. En la segunda, $c$ es el coeficiente de la dependencia lineal cruzada y $b$ el de la dependencia cuadrática. Las varianzas de innovación se despejan para que cada $\tilde a_{tj}$ tenga varianza unitaria y el espectro marginal quede fijado en $\lambda_j$. Un predictor de $\tilde a_{t,j^\ast+1}$ lineal en $\tilde a_{t-1,j^\ast}$ explica una fracción $c^2$ de su varianza, mientras que uno que capture la relación cuadrática explica $c^2 + b^2$. Las demás autocorrelaciones lineales de rezago~1 entre componentes son de orden menor.\\
+
+La generación procede de la siguiente forma:
+\begin{enumerate}
+    \item Se fijan el espectro $\{\lambda_j\}_{j=1}^{J}$ y los parámetros $j^\ast$, $\phi$, $c$ y $b$.
+
+    \item Se extrae $\tilde a_{0,j^\ast} \sim \mathcal{N}(0,1)$ y se itera \eqref{eq:ane_algC1_lineal}--\eqref{eq:ane_algC1_cuadratica} durante $T$ períodos, obteniendo $\tilde{\mathbf{A}} \in \mathbb{R}^{T \times J}$, y se escalan las columnas para obtener $\mathbf{A} = \tilde{\mathbf{A}}\,\mathrm{diag}(\sqrt{\lambda_1}, \dots, \sqrt{\lambda_J})$.
+
+    \item La matriz de coeficientes $\mathbf{A}$ es el producto del algoritmo y se entrega directamente a los métodos.
+\end{enumerate}
 
 \begin{table}[H]
 \centering
-\caption{Parámetros del Algoritmo~B-4. La dinámica de $Y_t$ coincide con la del Cuadro~\ref{tab:ane_algB1}.}
-\label{tab:ane_algB4}
+\caption{Parámetros del Algoritmo~C-1.}
+\label{tab:ane_algC1}
 \begin{tabular}{llc}
 \hline
 Símbolo & Descripción & Valor \\
 \hline
-$\beta_1$   & coeficiente de la componente lineal       & [valor] \\
-$\beta_2$   & coeficiente de la componente cuadrática   & [valor] \\
-$f(\tau)$   & forma espacial de la tendencia            & [forma] \\
+$J$             & términos de la base de Fourier                            & $10$ \\
+$\rho$          & razón del espectro geométrico $\lambda_j=\rho^{\,j-1}$    & $0.5$ \\
+$j^\ast$        & primera componente del par que interactúa                 & $1$ \\
+$\phi$          & coeficiente autorregresivo de $\tilde a_{t,j^\ast}$       & $0.2$ \\
+$c$             & coeficiente de la dependencia lineal cruzada              & $0.15$ \\
+$b$             & coeficiente de la dependencia cuadrática                  & $0.5$ \\
 \hline
 \end{tabular}
 \end{table}
 
-\section{Métodos basados en Coeficientes de Bases}
-\label{ane_00_03_metodos_coeficientes_bases}
+\subsection{Algoritmo C-2: Proceso con dependencia lineal reforzada}
+\label{ane_00_03_02_alg_c2}
+Este algoritmo genera coeficientes con la misma construcción del Algoritmo~C-1, aumentando el coeficiente autorregresivo $\phi$ y dejando intacta la dependencia cuadrática, con el fin de aislar cuánto del desempeño de cada método proviene de la dependencia lineal y cuánto de la no lineal. La generación sigue los pasos del Algoritmo~C-1.
 
-Aca simulamos los coeficientes de difernetes maneras de diversas bases.
+\begin{table}[H]
+\centering
+\caption{Parámetros del Algoritmo~C-2. Coinciden con los del Cuadro~\ref{tab:ane_algC1}, salvo $\phi$.}
+\label{tab:ane_algC2}
+\begin{tabular}{llc}
+\hline
+Símbolo & Descripción & Valor \\
+\hline
+$\phi$  & coeficiente autorregresivo de $\tilde a_{t,j^\ast}$ & $0.45$ \\
+\hline
+\end{tabular}
+\end{table}
 
+\subsection{Algoritmo C-3: Proceso con dependencia en componentes subordinadas}
+\label{ane_00_03_03_alg_c3}
+Este algoritmo genera coeficientes con la misma construcción del Algoritmo~C-1, trasladando el par de componentes que interactúan a las componentes 3 y 4, con el fin de evaluar el desempeño de los métodos cuando la información sobre el futuro reside en componentes de menor varianza. Con el espectro geométrico empleado, las dos primeras componentes concentran cerca del $75\,\text{\%}$ de la varianza y estas dos, cerca del $19\,\text{\%}$, por lo que un método que retenga pocos scores no accede a la dependencia. La generación sigue los pasos del Algoritmo~C-1.
+
+\begin{table}[H]
+\centering
+\caption{Parámetros del Algoritmo~C-3. Coinciden con los del Cuadro~\ref{tab:ane_algC1}, salvo $j^\ast$.}
+\label{tab:ane_algC3}
+\begin{tabular}{llc}
+\hline
+Símbolo & Descripción & Valor \\
+\hline
+$j^\ast$    & primera componente del par que interactúa   & $3$ \\
+\hline
+\end{tabular}
+\end{table}

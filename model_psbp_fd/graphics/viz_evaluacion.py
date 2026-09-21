@@ -272,14 +272,16 @@ def plot_extractos_curvas(X_true: np.ndarray, X_pred: np.ndarray,
                           X_obs: Optional[np.ndarray] = None,
                           X_prev: Optional[np.ndarray] = None,
                           title: str = "Intervalos de credibilidad sobre la curva",
+                          etiqueta_objetivo: str = "curva verdadera",
                           save_path: Optional[str] = None,
                           verbose: bool = False):
     """
     Rejilla de curvas tomadas cada `cada` períodos, cada una con su banda.
 
-    X_true : (n, G) curva VERDADERA del generador, que es contra lo que se
-        evalúa. `X_obs` es opcional y se dibuja como puntos tenues para mostrar
-        dónde estaban los datos ruidosos; no es el objetivo de la predicción.
+    X_true : (n, G) OBJETIVO de evaluación, contra el que se mide el error.
+        `etiqueta_objetivo` nombra esa serie en la leyenda. `X_obs` es opcional
+        y se dibuja como puntos tenues para mostrar dónde estaban los datos
+        ruidosos; no es el objetivo de la predicción.
     li, ls : (n, G) banda PUNTUAL de nivel `nivel`. No es simultánea: cubre
         cada tau por separado, de modo que la probabilidad de contener la curva
         entera es menor que el nominal.
@@ -342,7 +344,7 @@ def plot_extractos_curvas(X_true: np.ndarray, X_pred: np.ndarray,
         ax.set_ylabel(r"$X_t(\tau)$", fontsize=9)
 
     manijas = [
-        plt.Line2D([], [], color=C_OBS, lw=1.3, label="curva verdadera"),
+        plt.Line2D([], [], color=C_OBS, lw=1.3, label=etiqueta_objetivo),
         plt.Line2D([], [], color=C_TRAIN, lw=1.4, label="predicción (train)"),
         plt.Line2D([], [], color=C_TEST, lw=1.4, label="predicción (test)"),
         plt.Rectangle((0, 0), 1, 1, fc="0.5", alpha=0.25,

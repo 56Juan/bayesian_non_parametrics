@@ -104,7 +104,10 @@ def ruta_traza(paths, fpc_idx: int, chain: int) -> Path:
     Ruta del `.mat` de una (componente FPCA, cadena), por la convencion unica
     del proyecto: `chain_fpc_<fpc_idx>_iter<chain a 2 digitos>.mat`.
 
-    paths : dict de rutas del experimento; se usa la clave `out_artefact`.
+    paths : dict de rutas del experimento; se usa la clave `trazas` si existe y,
+        si no, `out_artefact`. `trazas` apunta al directorio donde se entreno
+        cuando varios puntos del barrido en M comparten las mismas cadenas
+        (covariables = solo el rezago propio: la componente k no depende de M).
     fpc_idx : indice de la componente en BASE-1 (`component_idx[k] + 1`), que
         es como los nombra `psbp_fd_iteracion.m`. Pasar el base-0 apunta al
         archivo equivocado sin dar error.
@@ -115,7 +118,8 @@ def ruta_traza(paths, fpc_idx: int, chain: int) -> Path:
     error mas persistente del proyecto: un cambio de nombre en el muestreador
     obligaba a corregir a mano una copia por notebook.
     """
-    return Path(paths["out_artefact"]) / f"chain_fpc_{fpc_idx}_iter{chain:02d}.mat"
+    base = Path(paths.get("trazas", paths["out_artefact"]))
+    return base / f"chain_fpc_{fpc_idx}_iter{chain:02d}.mat"
 
 
 def leer_traza(ruta):

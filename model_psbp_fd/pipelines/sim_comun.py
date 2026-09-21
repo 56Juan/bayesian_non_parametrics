@@ -59,6 +59,7 @@ __all__ = [
     "norma_hilbert_schmidt",
     "pesos_trapezoidales",
     "matriz_operador_ar",
+    "NUCLEOS_AR",
     "matriz_covarianza_innovacion",
     "factor_cholesky",
     "generador_innovacion",
@@ -252,15 +253,20 @@ def norma_hilbert_schmidt(Psi: np.ndarray, pesos: np.ndarray) -> float:
     return float(np.sqrt(np.sum((pesos[:, None] * pesos[None, :]) * psi_mat ** 2)))
 
 
+NUCLEOS_AR = ("gaussiano", "exponencial")
+
+
 def matriz_operador_ar(
     tau: np.ndarray,
     gamma: float,
     hs_norm: float,
+    nucleo: str = "gaussiano",
 ) -> np.ndarray:
     """
-    Matriz Psi (L, L) del operador integral autorregresivo con nucleo gaussiano
+    Matriz Psi (L, L) del operador integral autorregresivo, con nucleo
 
-        psi(tau, s) = c exp{ -(tau - s)^2 / (2 gamma^2) },
+        gaussiano    : psi(tau, s) = c exp{ -(tau - s)^2 / (2 gamma^2) },
+        exponencial  : psi(tau, s) = c exp{ -|tau - s| / gamma },
 
     discretizado por cuadratura trapezoidal sobre la grilla con extremos:
 
@@ -270,6 +276,9 @@ def matriz_operador_ar(
     La constante c se calibra de modo que ||Psi||_HS coincida con `hs_norm`.
     Un valor menor que uno garantiza la existencia de una solucion
     estacionaria para el proceso autorregresivo funcional de orden uno.
+
+    El nucleo exponencial no es diferenciable en tau = s: suaviza menos que el
+    gaussiano y transmite a la curva siguiente mas detalle fino de la anterior.
 
     Parametros
     ----------
@@ -281,19 +290,28 @@ def matriz_operador_ar(
         de cada tau; valores grandes la distribuyen sobre todo el dominio.
     hs_norm : float
         Valor objetivo de la norma de Hilbert-Schmidt.
+    nucleo : {"gaussiano", "exponencial"}
+        Forma de psi. Por defecto "gaussiano" (Algoritmos 1 y siguientes del
+        primer bloque); el Algoritmo B-1 del anexo usa "exponencial".
     """
     if gamma <= 0:
         raise ValueError("gamma debe ser positivo.")
     if hs_norm <= 0:
         raise ValueError("hs_norm debe ser positivo.")
+    if nucleo not in NUCLEOS_AR:
+        raise ValueError(f"nucleo debe ser uno de {NUCLEOS_AR}; recibido {nucleo!r}.")
     w = pesos_trapezoidales(tau)
-    dist2 = (tau[:, None] - tau[None, :]) ** 2
-    nucleo = np.exp(-dist2 / (2.0 * gamma ** 2))       # psi sin la constante c
-    hs_nucleo = float(np.sqrt(np.sum((w[:, None] * w[None, :]) * nucleo ** 2)))
+    if nucleo == "gaussiano":
+        dist2 = (tau[:, None] - tau[None, :]) ** 2
+        nuc = np.exp(-dist2 / (2.0 * gamma ** 2))      # psi sin la constante c
+    else:
+        dist = np.abs(tau[:, None] - tau[None, :])
+        nuc = np.exp(-dist / gamma)
+    hs_nucleo = float(np.sqrt(np.sum((w[:, None] * w[None, :]) * nuc ** 2)))
     if hs_nucleo <= 0:
         raise RuntimeError("El nucleo discretizado resulto identicamente nulo.")
     c = hs_norm / hs_nucleo                            # calibracion de la constante
-    return (c * nucleo) * w[None, :]                   # cuadratura en la variable s
+    return (c * nuc) * w[None, :]                      # cuadratura en la variable s
 
 
 # ==========================================================================

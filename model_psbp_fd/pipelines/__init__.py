@@ -28,24 +28,11 @@ El paquete agrupa tres responsabilidades:
    Comprueba la consistencia entre manifest, hiperparametros y artefactos FPCA
    antes de que el analisis comience.
 
-Los seis algoritmos del anexo estan implementados. Los Algoritmos 1 a 4
-(primer bloque) intervienen la ley condicional y operan sobre la grilla
-mediante operadores integrales. Los Algoritmos 5 y 6 (segundo bloque) dejan la
-ley condicional dentro de lo representable y comprometen la reduccion de
-dimension; se definen sobre los coeficientes de un sistema ortonormal fijo, de
-modo que comparten con los anteriores el esquema de observacion, las replicas y
-las semillas, pero NO la maquinaria de operadores integrales, cuadratura de la
-dinamica ni factorizacion de la innovacion funcional.
-
-Ademas de los seis, `sim_escenario_B.py` implementa un escenario de DIAGNOSTICO
----no es un Algoritmo del anexo, igual que el Escenario A de la corrida 17---
-construido para que la clase lineal homogenea falle: un FAR(1) cuyo operador
-cambia de SIGNO segun un umbral sobre el estado rezagado. La antisimetria de
-los dos regimenes cancela la covarianza cruzada, de modo que el mejor predictor
-lineal no supera a la media incondicional mientras un tercio de la varianza
-sigue siendo predecible. Es el unico escenario del estudio en que el MISE
-discrimina entre la clase lineal y un metodo capaz de representar una media
-condicional no lineal.
+Generadores oficiales: `sim_escenario_1` (base del B-1), `sim_series_clasicas`
+y los Algoritmos A-1, A-2 y A-3 (series clasicas) y B-1, B-2 y B-3 (procesos
+funcionales) del anexo. Los generadores de corridas retiradas (Escenarios 2-6,
+B, C-F, TS, J, K, L y CE) viven en `pipelines/deprecated/`: siguen importables
+desde ahi, no desde este paquete, y no forman parte del estudio oficial.
 """
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -78,116 +65,6 @@ from .sim_escenario_1 import (
     generar_escenario_1,
     resumen_escenario_1,
     simular_trayectoria_far1,
-)
-
-# --- Escenario 2: FGARCH(1,1) ---
-from .sim_escenario_2 import (
-    ConfigEscenario2,
-    generar_escenario_2,
-    resumen_escenario_2,
-    simular_trayectoria_fgarch,
-    construir_operadores_garch,
-    matriz_kernel_no_negativo,
-    radio_espectral,
-)
-
-# --- Escenario 3: FAR con cambio de regimen (multimodalidad condicional) ---
-from .sim_escenario_3 import (
-    ConfigEscenario3,
-    generar_escenario_3,
-    resumen_escenario_3,
-    simular_trayectoria_far_regimen,
-    direccion_constante,
-)
-
-# --- Escenario 4: innovaciones skew-normal (SMSN) ---
-from .sim_escenario_4 import (
-    ConfigEscenario4,
-    generar_escenario_4,
-    resumen_escenario_4,
-    simular_trayectoria_far_smsn,
-    momentos_mezcla_escala,
-    extraer_factor_escala,
-    construir_componentes_smsn,
-    generador_innovacion_smsn,
-)
-
-# --- Escenario 5: predictibilidad en componente subordinada ---
-from .sim_escenario_5 import (
-    ConfigEscenario5,
-    generar_escenario_5,
-    resumen_escenario_5,
-    simular_coeficientes_ar1,
-    base_fourier,
-    frecuencia_maxima_base,
-    espectro_geometrico,
-    phis_componente_predecible,
-    media_senoidal,
-)
-
-# --- Escenario 6: covarianza no estacionaria ---
-from .sim_escenario_6 import (
-    ConfigEscenario6,
-    generar_escenario_6,
-    resumen_escenario_6,
-    simular_coeficientes_ar1_no_estacionario,
-    trayectoria_espectro,
-    espectro_intercambiado,
-)
-
-# --- Escenario B: FAR con signo conmutado por umbral (diagnostico) ---
-from .sim_escenario_B import (
-    ConfigEscenarioB,
-    generar_escenario_B,
-    resumen_escenario_B,
-    simular_trayectoria_far_signo,
-    direccion_oscilatoria,
-    coeficiente_sarle_mezcla_simetrica,
-)
-
-# --- Escenarios C-F: tendencia + no linealidad intra-curva (diagnostico) ---
-from .sim_escenario_T import (
-    ConfigEscenarioT,
-    generar_escenario_T,
-    resumen_escenario_T,
-    perfil_tendencia,
-    perfil_tramos,
-    forma_tendencia_lineal_en_tau,
-    nucleo_local,
-    coeficiente_sarle_mezcla,
-)
-
-# --- Escenario TS: familia T con cambio de simulador por umbral de nivel ---
-from .sim_escenario_TS import (
-    ConfigEscenarioTS,
-    generar_escenario_TS,
-    resumen_escenario_TS,
-    trayectoria_nivel_acotada,
-)
-
-# --- Escenario J: cuatro rezagos, grado polinomial decreciente (diagnostico) ---
-from .sim_escenario_J import (
-    ConfigEscenarioJ,
-    generar_escenario_J,
-    resumen_escenario_J,
-)
-
-# --- Escenario K: heterocedasticidad condicional en tau (diagnostico) ---
-from .sim_escenario_K import (
-    ConfigEscenarioK,
-    generar_escenario_K,
-    resumen_escenario_K,
-    envolvente_extremos_centro,
-    simular_trayectoria_far_heterocedastico,
-)
-
-from .sim_escenario_L import (
-    ConfigEscenarioL,
-    base_ortonormal,
-    construir_regimenes,
-    generar_escenario_L,
-    resumen_escenario_L,
-    simular_coeficientes,
 )
 
 # --- Escenario A-1: ARFIMA(0,d,0) de memoria larga, segmentado en curvas ---
@@ -230,12 +107,27 @@ from .sim_escenario_A3 import (
     simular_ar_garch,
 )
 
-from .sim_escenario_CE import (
-    ConfigEscenarioCE,
-    FASES,
-    generar_escenario_CE,
-    resumen_escenario_CE,
-    simular_coeficientes_CE,
+# --- Algoritmos B-1, B-2 y B-3: procesos funcionales (anexo, seccion B) ---
+from .sim_escenario_B1 import (
+    ConfigEscenarioB1,
+    generar_escenario_B1,
+    generar_far_funcional,
+    media_seno,
+    resumen_escenario_B1,
+    simular_far_centrado,
+)
+from .sim_escenario_B2 import (
+    ConfigEscenarioB2,
+    generar_escenario_B2,
+    pesos_deriva_operador,
+    resumen_escenario_B2,
+)
+from .sim_escenario_B3 import (
+    ConfigEscenarioB3,
+    forma_desplazamiento,
+    generar_escenario_B3,
+    indicador_episodio,
+    resumen_escenario_B3,
 )
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -276,8 +168,6 @@ __all__ = [
     "pesos_trapezoidales",
     "norma_hilbert_schmidt",
     "matriz_operador_ar",
-    "matriz_kernel_no_negativo",
-    "radio_espectral",
     # ── Innovacion funcional gaussiana ──
     "matriz_covarianza_innovacion",
     "factor_cholesky",
@@ -294,87 +184,6 @@ __all__ = [
     "generar_escenario_1",
     "resumen_escenario_1",
     "simular_trayectoria_far1",
-    # ── Escenario 2: FGARCH(1,1) ──
-    "ConfigEscenario2",
-    "generar_escenario_2",
-    "resumen_escenario_2",
-    "simular_trayectoria_fgarch",
-    "construir_operadores_garch",
-    # ── Escenario 3: FAR con cambio de regimen ──
-    "ConfigEscenario3",
-    "generar_escenario_3",
-    "resumen_escenario_3",
-    "simular_trayectoria_far_regimen",
-    "direccion_constante",
-    # ── Escenario 4: innovaciones skew-normal (SMSN) ──
-    "ConfigEscenario4",
-    "generar_escenario_4",
-    "resumen_escenario_4",
-    "simular_trayectoria_far_smsn",
-    "momentos_mezcla_escala",
-    "extraer_factor_escala",
-    "construir_componentes_smsn",
-    "generador_innovacion_smsn",
-    # ── Escenario 5: predictibilidad en componente subordinada ──
-    "ConfigEscenario5",
-    "generar_escenario_5",
-    "resumen_escenario_5",
-    "simular_coeficientes_ar1",
-    "base_fourier",
-    "frecuencia_maxima_base",
-    "espectro_geometrico",
-    "phis_componente_predecible",
-    "media_senoidal",
-    # ── Escenario 6: covarianza no estacionaria ──
-    "ConfigEscenario6",
-    "generar_escenario_6",
-    "resumen_escenario_6",
-    "simular_coeficientes_ar1_no_estacionario",
-    "trayectoria_espectro",
-    "espectro_intercambiado",
-    # ── Escenario B: FAR con signo conmutado por umbral (diagnostico) ──
-    "ConfigEscenarioB",
-    "generar_escenario_B",
-    "resumen_escenario_B",
-    "simular_trayectoria_far_signo",
-    "direccion_oscilatoria",
-    "coeficiente_sarle_mezcla_simetrica",
-    # ── Escenarios C-F: tendencia + no linealidad intra-curva (diagnostico) ──
-    "ConfigEscenarioT",
-    "generar_escenario_T",
-    "resumen_escenario_T",
-    "ConfigEscenarioTS",
-    "generar_escenario_TS",
-    "resumen_escenario_TS",
-    "trayectoria_nivel_acotada",
-    "perfil_tendencia",
-    "perfil_tramos",
-    "forma_tendencia_lineal_en_tau",
-    "nucleo_local",
-    "coeficiente_sarle_mezcla",
-    # ── Escenario J: cuatro rezagos, grado polinomial decreciente ──
-    "ConfigEscenarioJ",
-    "generar_escenario_J",
-    "resumen_escenario_J",
-    # ── Escenario K: heterocedasticidad condicional en tau ──
-    "ConfigEscenarioK",
-    "generar_escenario_K",
-    "resumen_escenario_K",
-    "ConfigEscenarioL",
-    "generar_escenario_L",
-    "resumen_escenario_L",
-    "base_ortonormal",
-    "construir_regimenes",
-    "simular_coeficientes",
-    # -- Escenario CE: composicion de estados en cuatro fases (base, subida,
-    #    meseta, bajada) con duracion Poisson desplazada por fase --
-    "ConfigEscenarioCE",
-    "FASES",
-    "generar_escenario_CE",
-    "resumen_escenario_CE",
-    "simular_coeficientes_CE",
-    "envolvente_extremos_centro",
-    "simular_trayectoria_far_heterocedastico",
     # ── Escenario A-1: ARFIMA(0,d,0) de memoria larga (anexo, Algoritmo A-1) ──
     "ConfigEscenarioA1",
     "autocorrelacion_arfima",
@@ -403,6 +212,22 @@ __all__ = [
     "resumen_escenario_A3",
     "sd_condicional_bloque",
     "simular_ar_garch",
+    # ── Algoritmos B-1, B-2 y B-3: procesos funcionales (anexo, seccion B) ──
+    "ConfigEscenarioB1",
+    "generar_escenario_B1",
+    "resumen_escenario_B1",
+    "generar_far_funcional",
+    "simular_far_centrado",
+    "media_seno",
+    "ConfigEscenarioB2",
+    "generar_escenario_B2",
+    "resumen_escenario_B2",
+    "pesos_deriva_operador",
+    "ConfigEscenarioB3",
+    "generar_escenario_B3",
+    "resumen_escenario_B3",
+    "indicador_episodio",
+    "forma_desplazamiento",
     # ── Contrato de artefactos ──
     "ARCHIVOS",
     "ArtefactosFPCA",

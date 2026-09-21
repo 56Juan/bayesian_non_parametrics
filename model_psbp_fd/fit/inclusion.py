@@ -181,7 +181,7 @@ def contraste_con_verdad(pip: pd.DataFrame, verdad: Dict[str, Sequence[str]],
         if col not in verdad:
             continue
         activas = set(verdad[col])
-        p = pip[col]
+        p = pip[col].dropna()
         y = np.array([v in activas for v in p.index], dtype=bool)
         sel = (p.to_numpy() >= umbral)
 

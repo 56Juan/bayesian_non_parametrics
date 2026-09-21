@@ -232,15 +232,17 @@ function psbp_train(y, Xnoint, hp, mcmc, out_path, feature_names, seed)
                 if gammajh(h,j) == 1
                     pm = zeros(M, 1);
                     for m_idx = 1:M
-                        % [FIX] eliminado el factor exp(1.2*kh): constante en
-                        % m_idx, se cancela en pm/sum(pm) y arriesga overflow.
-                        pm(m_idx) = exp(sum(log(normpdf(Zil(Si>=h,h), ...
+                        % [FIX 2] log-verosimilitud, no exp(sum(log)): con kh >~ 500
+                        % exp(.) vale 0 en toda la grilla, pm queda constante y
+                        % Gamma se sortea sin mirar los datos. Se normaliza abajo.
+                        pm(m_idx) = sum(log(normpdf(Zil(Si>=h,h), ...
                             alphah(h) ...
                             - sum(repmat(psijh(h,1:j-1),   kh,1) .* abs(Xnoint(Si>=h,1:j-1)   - repmat(Gammajh(h,1:j-1),   kh,1)), 2) ...
                             - sum(repmat(psijh(h,j+1:end), kh,1) .* abs(Xnoint(Si>=h,j+1:end) - repmat(Gammajh(h,j+1:end), kh,1)), 2) ...
                             - repmat(psijh(h,j), kh,1) .* abs(Xnoint(Si>=h,j) - Gstar(m_idx)), ...
-                            1) + realmin))) + realmin;
+                            1) + realmin));
                     end
+                    pm           = exp(pm - max(pm));
                     pm1          = pm / sum(pm);
                     Gammajh(h,j) = Gstar(rdiscrete(pm1));
                 end
