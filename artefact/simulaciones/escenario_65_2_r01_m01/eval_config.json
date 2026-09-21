@@ -1,0 +1,39 @@
+{
+  "scheme": "holdout_temporal",
+  "T": 1000,
+  "T0": 700,
+  "prop_train": 0.7,
+  "horizons": [
+    1
+  ],
+  "n_lags": 1,
+  "m_fpca": 1,
+  "scores_scale": "raw_fpca_scores",
+  "objetivo_evaluacion": "curva_suavizada",
+  "objetivo_secundario": "representacion_fpca",
+  "modo_residuo": "ninguno",
+  "nivel_credibilidad": 0.95,
+  "ventana_movil": {
+    "w": [
+      20,
+      30,
+      40
+    ],
+    "paso": 1,
+    "solapadas": true
+  },
+  "metricas_bloque_A": [
+    "mae_f",
+    "rmse_f",
+    "linf_medio",
+    "linf_max"
+  ],
+  "metricas_bloque_B": [
+    "mpiw",
+    "picp",
+    "picp_simultaneo",
+    "winkler",
+    "winkler_max_medio",
+    "winkler_max_glob"
+  ]
+}

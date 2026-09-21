@@ -211,7 +211,7 @@ def test_condicion_crece_con_kn():
 
 def _simular_var_funcional(coefs, L=60, d=6, T=900, seed=3):
     """Curvas cuyos coeficientes siguen c_t = sum_l coefs[l] c_{t-l} + eps."""
-    from model_psbp_fd.pipelines.sim_escenario_L import base_ortonormal
+    from model_psbp_fd.pipelines.deprecated.sim_escenario_L import base_ortonormal
     rng = np.random.default_rng(seed)
     tau = np.linspace(0.0, 1.0, L)
     Phi, _ = base_ortonormal(tau, d, "bspline_lowdin")
