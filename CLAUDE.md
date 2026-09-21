@@ -99,9 +99,11 @@ en `T0`, el piso de truncamiento), no métricas reportables: no están en
 
 ### 3.2 Ventanas temporales — la segmentación es fija
 
-- Anchos `w ∈ {10, 20, 40}`, `paso = 1`, solapadas.
-- Ancho de referencia: `W_REF = VENTANAS_W[len // 2]` = **20**. Las figuras
+- Anchos `w ∈ {20, 30, 40}`, `paso = 1`, solapadas.
+- Ancho de referencia: `W_REF = VENTANAS_W[len // 2]` = **30**. Las figuras
   superponen los tres anchos; las tablas usan `W_REF`.
+- Las corridas históricas anteriores a la 60 usaban `{10, 20, 40}` y `W_REF = 20`:
+  sus cifras por ventana **no son comparables una a una** con las de ahora.
 - **Las ventanas que cruzan `T0` se excluyen** de todo agregado (`cruza_T0`).
 - Partición: `PROP_TRAIN = 0.70`, `T0` marca el corte y va en el manifest.
 - Se **leen** de `eval_config.json["ventana_movil"]`; **no se redeclaran** en
@@ -134,9 +136,9 @@ localización G\* del stick-breaking (ahí `N` es el truncamiento de átomos).
 
 ---
 
-## 4. Estructura canónica: la corrida 30
+## 4. Estructura canónica: la corrida 61
 
-**`notebooks/simulaciones/30_sim_E1/` es la plantilla.** Toda simulación nueva
+**`notebooks/simulaciones/61_sim_A1/` es la plantilla.** Toda simulación nueva
 sigue **esa misma estructura, sin agregados**: se cambian parámetros o
 escenario, no la arquitectura del pipeline.
 
@@ -145,15 +147,15 @@ archivos en disco:
 
 | Paso | Archivo | Qué hace |
 |---|---|---|
-| 1 | `30_01_simulaciones.ipynb` | **Genera los datos** y los prepara: simulación, partición temporal, base B-spline por GCV, FPCA, estandarizador, datasets AR, contrato. Un juego de artefactos por cada `M`. |
+| 1 | `61_01_simulaciones.ipynb` | **Genera los datos** y los prepara: simulación, partición temporal, base B-spline por GCV, FPCA, estandarizador, datasets AR, contrato. Un juego de artefactos por cada `M`. |
 | 2 | `psbp_fd_iteracion.m` | **Entrena.** Lee el contrato, arma los jobs y llama a `psbp_train.m`. Sólo con el bloque train. No tiene notebook. |
-| 3 | `30_03_convergencia.ipynb` | **Evaluación de convergencia.** No toca el bloque de prueba. |
-| 4 | `30_04_evaluacion.ipynb` | **Evaluación propia del modelo**: las 7 métricas sobre la ventana móvil, PIP, monitoreo por componente. |
-| 5 | `30_05_comparacion.ipynb` | **Comparación** contra los modelos de referencia. |
+| 3 | `61_03_convergencia.ipynb` | **Evaluación de convergencia.** No toca el bloque de prueba. |
+| 4 | `61_04_evaluacion.ipynb` | **Evaluación propia del modelo**: las diez métricas sobre la ventana móvil, PIP, monitoreo por componente. |
+| 5 | `61_05_comparacion.ipynb` | **Comparación** contra los modelos de referencia. |
 
-> **Corrección respecto de la formulación informal de esta regla:** `30_01` no
-> es "el entrenamiento" — genera los datos. El entrenamiento es el paso MATLAB.
-> El "mapa base" es la carpeta `30_sim_E1/` completa, no el notebook `30_01`.
+> `61_01` **no** es "el entrenamiento": genera los datos. El entrenamiento es el
+> paso MATLAB. El "mapa base" es la carpeta `61_sim_A1/` completa, no el
+> notebook `61_01`.
 
 Si las cadenas no convergen, los números de `_04` no significan nada: ésa es la
 razón de que `_03` sea un notebook aparte y con su propia condición de parada.
@@ -173,7 +175,8 @@ barrido.
 `_04`: §1 artefactos · §2 trazas · §3 predicción a `h=1` (§3.1 persistencia) ·
 §4 Bloque A sobre la ventana móvil (§4.1 qué `M` gana cada ventana) · §5 Bloque
 B · §6 muestra de predicciones · §7 PIP · §8 resumen mín/máx/promedio · §9
-monitoreo univariado por componente FPCA.
+monitoreo univariado por componente FPCA · §10 banda de credibilidad de cada
+`xi_k`, métricas de intervalo por componente y dispersión `xi_hat` contra `xi`.
 
 `_05`: §1 artefactos · §2 validaciones · §3 competidores (§3.1 FAR sobre
 coeficientes B-spline, §3.1.1 contraste con el estimador retirado, §3.2 RF/GBT,
@@ -207,15 +210,15 @@ modelo" de "gana por la forma de la predictiva".
 ## 5. Cómo trabajar conmigo
 
 - Si una instrucción mía rompe los invariantes (§3) o la estructura de la
-  corrida 30 (§4), **avisar antes de ejecutar**.
+  corrida 61 (§4), **avisar antes de ejecutar**.
 - **No agregar pasos, métricas ni etapas** al pipeline sin que yo lo pida
   explícitamente.
 - Ser conciso: priorizar código, comandos y diagnósticos sobre explicaciones
   largas.
 - No leer ni escribir artefactos a mano desde un notebook: usar
   `pipelines/artifacts.py` y `utils/rutas.py` (§6.3).
-- `notebooks/simulaciones/30_sim_E1/` es la plantilla y se edita con cuidado.
-  Las corridas archivadas (§7) no se tocan.
+- `notebooks/simulaciones/61_sim_A1/` es la plantilla y se edita con cuidado.
+  Lo histórico (§7) no se toca.
 
 ---
 
@@ -293,7 +296,8 @@ abajo. **No redefinir la convención de nombres de traza en un notebook**: usar
 `curva_media_desde_scores` es el mapa determinista (`modo_residuo="ninguno"`, sin
 muestreo) que necesitan los competidores para entrar en la misma escala de curva
 que el PSBPM-FD. `residuos_representacion` estima el residuo de representación
-para el modo `"empirico"` — sólo sobre el bloque de entrenamiento.
+para el modo `"empirico"`, que **el estudio no usa** (§6.5): se conserva porque
+es la única salida si alguna vez se evalúa contra la curva sin representar.
 
 `v1` / `v2` son heredadas. `models/__init__.py` las importa de forma tolerante
 pero trazable (`v1` depende de un `.pyd` compilado por plataforma); usar
@@ -304,28 +308,56 @@ posterior *de la media condicional*; en v3 devuelve la **predictiva** (ley de
 varianza total). La cantidad vieja sigue disponible como `sd_centro`. Usar la de
 v2 como banda produce subcobertura que se confunde con fracaso del modelo.
 
-### 6.5 El error se mide contra la curva verdadera
+### 6.5 El error se mide contra la curva, no contra la grilla cruda
 
-`SalidaSimulacion` distingue `observaciones` (con ruido `sigma_obs`) de `curvas`
-(la curva verdadera `X_t(tau)`).
+**La fuente de verdad es `docs/03 Modelo.tex §03_05_00`**, que define dos
+objetivos de evaluación y **ninguno de los dos es el dato crudo de la grilla**:
 
-- `guardar_curvas(paths, X, grilla, X_true=...)` persiste las dos por separado;
-  `cargar_curvas_true()` la lee y **falla si no existe**.
-- La **observada** es el único objeto que alimenta la estimación: base, FPCA,
-  estandarizador, scores. La **verdadera** entra sólo como objetivo de
-  evaluación.
-- Se combina con `modo_residuo="ninguno"`: la banda cubre la curva **proyectada**
-  sobre las `M` autofunciones y se contrasta con `X_t(tau)`, de modo que lo que
-  queda fuera es truncamiento FPCA puro — cantidad interpretable y acotable
-  subiendo `M`. **Declararlo al reportar.**
-- `objetivo_evaluacion` y `modo_residuo` se registran en `eval_config.json`
-  desde `_01`; **no se deciden en el notebook de evaluación**.
+| objetivo | qué es | quién se mide contra él |
+|---|---|---|
+| **curva suavizada** | `fr.reconstruct(fr.transform(X_obs))`, la representación B-spline de la observada, con sus `K` coeficientes | **todos**: FAR, PSBPM-FD, RF, GBT y las líneas base |
+| **representación FPCA** `X_t^(M)` | `mu + sum_{m<=M} xi_tm psi_m`, la expansión truncada | sólo los métodos que operan **sobre scores**: PSBPM-FD, RF, GBT |
 
-En datos reales no hay curva verdadera: el objetivo es la observada y
-`modo_residuo="empirico"`, porque el error de representación forma parte de lo
-que la banda tiene que cubrir. **Las cifras de simulación y de datos reales no
-son comparables**: allí el denominador excluye el ruido de medición y aquí lo
-incluye.
+El primero es fijo entre puntos del barrido —la base es común a todos los `M`—,
+de modo que las cifras **sí** son comparables entre `M` y contra el FAR, que
+vive en los `K` coeficientes. El segundo cambia con `M` y aísla la dinámica
+sobre los scores: contra él, *toda* discrepancia entre predicción y objetivo
+proviene del modelo y no de la representación.
+
+- El **Bloque A** se reporta contra la curva suavizada.
+- El **Bloque B** se reporta contra **los dos**, en una tabla con una columna
+  que declara el objetivo. La banda del FAR vive en `K` y la del PSBPM-FD en
+  `M`: contra un objetivo único uno de los dos paga un truncamiento que el otro
+  no paga, y la tabla doble deja eso a la vista en vez de esconderlo.
+
+`modo_residuo` **no es una perilla**: es `"ninguno"` por construcción del
+modelo. `docs §03_05_00` es explícito —"no interviene por tanto ningún término
+adicional de incertidumbre, en correspondencia con la ausencia de error aditivo
+externo"—: la variabilidad vive dentro de la mezcla, no en un error aditivo.
+Sigue escrito en `eval_config.json` porque el `PropagadorFuncional` lo consume,
+pero no se cambia.
+
+**El objetivo se construye desde la curva OBSERVADA**, no desde la verdadera:
+es lo que ya está en `THETA` y en `SCORES`, es lo único que existe en datos
+reales, y es lo que `docs` llama `X_t` sin distinguir. El suavizado ya filtra
+casi todo el ruido de medición —medido en la corrida 65, deja `0.018` de MISE
+contra `0.062` del dato crudo—, así que el objetivo es limpio de todos modos.
+Esto hace que las cifras de simulación y de datos reales **sí** sean comparables
+en su definición.
+
+`SalidaSimulacion` sigue distinguiendo `observaciones` (con ruido `sigma_obs`)
+de `curvas` (la verdadera `X_t(tau)`), y `guardar_curvas` / `cargar_curvas_true`
+siguen persistiendo las dos. La **verdadera ya no es objetivo de evaluación**:
+queda como diagnóstico del generador y como referencia en las figuras.
+
+`objetivo_evaluacion` se registra en `eval_config.json` desde `_01`; **no se
+decide en el notebook de evaluación**.
+
+> **Histórico.** Hasta la corrida 65 el objetivo era `X_true` cruda con
+> `modo_residuo="ninguno"`, justificado como "truncamiento FPCA puro, acotable
+> subiendo `M`". En la 65 se midió que eso es falso: de `0.651` de error de
+> representación en `M=8`, `0.357` es piso de la base B-spline, **invariante en
+> `M`**. Las corridas 61-64, 66 y 71-73 todavía llevan el objetivo viejo.
 
 ### 6.6 Convenciones
 
@@ -408,11 +440,6 @@ incluye.
   deliberadas contra la implementación original (grid G\* sobre `Xnoint` sin el
   intercepto, `randi` que ignoraba parte del rango, factores `exp(1.2*·)`
   eliminados). **No revertirlos sin entender el motivo.**
-- **`pipelines/real_pipeline.py` es un stub `TODO`** de seis líneas. El flujo de
-  datos reales vive en `notebooks/reales/`.
-- **`versioning/` está obsoleto**: `changelog.md` describe un Gibbs de 8 pasos
-  con prior MNIW y un directorio `configs/` que no existen en el diseño actual;
-  `experiment_registry.md` está vacío.
 
 ### 6.8 Terminología
 
@@ -430,34 +457,61 @@ superior de lo alcanzable.
 
 ## 7. Estado del repositorio
 
+**Se trabaja sobre las corridas de la 60 en adelante.** Todo lo anterior existe
+en el repo y no se borra, pero es **historia**: no es plantilla, no se edita y
+no se cita como estado actual.
+
 ### Corridas vivas — `notebooks/simulaciones/`
 
-| Carpeta | Escenario | `BASENAME` | `M_FPCA_LIST` |
-|---|---|---|---|
-| `30_sim_E1` | Algoritmo 1 del anexo (FAR(1) lineal gaussiano) | `escenario` | `(1, 2, 3)` |
-| `31_sim_T1` | núcleo cuadrático + tendencia cuadrática | `escenario_T` | `(1, 2, 3)` |
-| `32_sim_R1` | recursión **par** + tendencia cúbica | `escenario_R` | `(1, 2, 3)` |
-| `33_sim_EJ` | Escenario J: cuatro rezagos, grado polinomial decreciente | `escenario_J` | `(2, 3, 4)` |
-| `34_sim_EK` | Escenario K: heterocedasticidad condicional en tau | `escenario_K` | `(1, 2, 3)` |
-
-`30_sim_E1` es la plantilla. Los cinco comparten esquema de observación,
+Dos familias, una por sección del anexo. Comparten esquema de observación,
 `mcmc_config`, priors y `N_CHAINS`: cambiarlos convertiría la comparación entre
 escenarios en una comparación entre ajustes.
+
+**Sección A del anexo — series de tiempo clásicas** (`ane_00_01`):
+
+| Carpeta | Algoritmo | `BASENAME` | `ESCENARIO_ID` | `M_FPCA_LIST` | covariables |
+|---|---|---|---|---|---|
+| `61_sim_A1` | A-1: ARFIMA(0, d, 0) de memoria larga | `escenario_61` | 1 | `(1, 2, 3, 4)` | todos los rezagos |
+| `62_sim_A2` | A-2: AR con cambio de régimen markoviano | `escenario_62` | 2 | `(1, 2, 3, 4)` | todos los rezagos |
+| `63_sim_A3` | A-3: AR-GARCH(1,1) | `escenario_63` | 3 | `(20,)` | todos los rezagos |
+| `64_sim_A1` | A-1, sólo rezago propio | `escenario_64` | 1 | `(1, …, 8)` | **rezago propio** |
+| `65_sim_A2` | A-2, sólo rezago propio | `escenario_65` | 2 | `(1, …, 8)` | **rezago propio** |
+| `66_sim_A3` | A-3, sólo rezago propio | `escenario_66` | 3 | `(1, …, 8)` | **rezago propio** |
+
+**Sección B del anexo — procesos funcionales** (`ane_00_02`):
+
+| Carpeta | Algoritmo | `BASENAME` | `ESCENARIO_ID` | `M_FPCA_LIST` |
+|---|---|---|---|---|
+| `71_sim_B1` | B-1: FAR(1) lineal, núcleo **exponencial** | `escenario_71` | 1 | `(2, 3, 4)` |
+| `72_sim_B2` | B-2: TV-FAR, operador que deriva de 0.30 a 0.80 | `escenario_72` | 2 | `(2, 3, 4)` |
+| `73_sim_B3` | B-3: cambio estructural recurrente | `escenario_73` | 3 | `(2, 3, 4, 5)` |
+
+`61_sim_A1` es la plantilla (§4).
+
+**Las corridas 64-66 entrenan una sola vez.** Con covariable de rezago propio el
+score `xi_k` no depende de `M` —`fpca.transform` devuelve siempre la misma
+columna `k`—, la grilla `G*` se calibra por componente y la semilla es
+`seed_base + chain*9973 + k*31`, idéntica en todo `M`. Por eso MATLAB corre
+**sólo** `M_ENTRENO = max(M_FPCA_LIST) = 8` y los `M` menores reutilizan esas
+trazas vía `hyperparameters.json["trazas_en"]`. Es válido **únicamente** con
+rezago propio: con rezagos cruzados el diseño cambia con `M` y hay que entrenar
+cada punto.
 
 **Configuración común de las corridas vivas** (leída de los `_01`):
 
 | Cantidad | Valor |
 |---|---|
-| `L_GRILLA` | **100** |
-| `T_CURVAS` | **800** (⇒ `T0 = 560`, test = 240) |
+| `L_GRILLA` | **75** |
+| `T_CURVAS` | **1000** (⇒ `T0 = 700`, test = 300) |
 | `PROP_TRAIN` | 0.70 |
 | `SIGMA_OBS` | 0.25 |
-| `mu(tau)` | `sin(2 pi tau)` (salvo `31`, que usa una media cuadrática) |
 | `SEED` | 41232 |
 | `N_LAGS` | 1 |
+| `REPLICA_ID` / `R` | 1 |
 | `N_CHAINS` | 2 |
-| `MCMC_CONFIG` | `{"nsim": 2500, "burn": 500, "N": 35, "M": 35}` ⇒ 4000 draws posteriores por score |
-| priors | `E[pi] = 0.90` sobre el propio rezago, `0.50` sobre los cruzados |
+| `MCMC_CONFIG` | `{"nsim": 2600, "burn": 600, "N": 25, "M": 50}`; las `63` y `66` usan `{"nsim": 3500, "burn": 1500, …}`. Ambas dan **4000 draws** posteriores por score |
+| ventanas | `w ∈ {20, 30, 40}`, `W_REF = 30` |
+| scores | **sin estandarizar**: `scores_scale = "raw_fpca_scores"` |
 | `M` (regla) | primera `M` con varianza acumulada `>= 95 %`; el barrido la rodea |
 | base B-spline | elegida por **GCV en cada escenario** ⇒ `K` no es invariante y **acota el barrido en `M`** |
 
@@ -467,21 +521,23 @@ artefacto de una base corta, y no mide lo mismo que en uno con `K` grande.
 
 ### Datos reales — `notebooks/reales/`
 
-`21_real_nivel/` sigue la misma arquitectura (`21_01_datos`, `21_03`, `21_04`,
-`21_05`). Serie: nivel diario del RÍO MAPOCHO EN LOS ALMENDROS, 48 mediciones
-por día, cada día una curva. Reportes existentes: `real_nivel_v01_m03`,
-`real_nivel_v02_m03`, más varias corridas `datos_{nivel,caudal}_*`.
+`21_real_nivel/`, `22_real_nivel_escalera/` y `23_real_nivel/` siguen la misma
+arquitectura (`_01_datos`, `_03`, `_04`, `_05`). Serie: nivel diario del RÍO
+MAPOCHO EN LOS ALMENDROS, 48 mediciones por día, cada día una curva.
 `Ejemplo_{1,2,3}/` siguen la arquitectura antigua y no se usan.
 
-### Archivadas — no se editan
+### Historia — no se edita ni se cita como estado actual
 
-- `notebooks/simulaciones/00_Estudio_Modelo/` — validaciones del modelo.
-- `notebooks/simulaciones/01_Inicio_Formato/` — corridas `03`–`10`, formato
-  antiguo (evaluación completa en un solo `_03`, eje `tt`).
-- `notebooks/simulaciones/02_Antiguas_pruebas/` — corridas `11`–`27`: los seis
-  Algoritmos del anexo, el Escenario B y la familia con tendencia (C–I), más la
-  `20`. Sus generadores siguen en `pipelines/` (`sim_escenario_1`…`_6`, `_B`,
-  `_T`) y son reutilizables; los notebooks no son plantilla.
+- `notebooks/simulaciones/00_Estudio_Modelo/`, `01_Inicio_Formato/`,
+  `02_Antiguas_pruebas/`, `03_04_Antiguas_pruebas/`, `05_Testeo_hiperparametros/`
+  — corridas `03`–`27` y pruebas de hiperparámetros, en formato antiguo.
+- Las corridas `30`–`34` (Escenarios E1, T1, R1, J, K) y `50`–`53`: sus datos,
+  reportes y artefactos siguen en disco. **No son plantilla.**
+- `model_psbp_fd/pipelines/deprecated/` — los doce generadores de esas corridas
+  (`sim_escenario_2`…`_6`, `_B`, `_CE`, `_J`, `_K`, `_L`, `_T`, `_TS`). Siguen
+  importables desde ahí, **no** desde `pipelines` directamente.
+- `versioning/` — `changelog.md` describe un Gibbs de 8 pasos con prior MNIW y
+  un `configs/` que no existen; `experiment_registry.md` está vacío.
 
 ---
 
@@ -489,43 +545,30 @@ por día, cada día una curva. Reportes existentes: `real_nivel_v01_m03`,
 
 Señaladas, no resueltas. **Preguntar antes de codificar contra ellas.**
 
-1. **Las corridas `31`–`34` y la de datos reales siguen con el conjunto viejo de
-   métricas.** La alineación con `§02_02_03` se hizo sólo en la corrida `30`:
-   falta propagar a los otros cuatro `_01` el bloque `metricas_bloque_A/B` del
-   `eval_config`, y a sus `_04`/`_05` las listas `METRICAS_A`/`METRICAS_B`. Sus
-   `eval_config.json` ya escritos todavía declaran `metrics_scores`,
-   `metrics_curvas` y `metrics_dist` (`CRPS`, `energy_score`, `PIT`), que ningún
-   notebook consume; se regeneran al re-correr el `_01`.
-2. **Escenario J: el módulo pide `N_LAGS = 4` y el notebook usa `1`.** El
-   docstring de `sim_escenario_J.py` advierte que con `N_LAGS = 1` el diseño AR
-   no contiene las columnas de los rezagos 2–4 y "el escenario queda roto en
-   silencio". `33_01` usa `N_LAGS = 1` **deliberadamente** —para que todos los
-   escenarios entrenen con la misma máquina— y lo registra como
-   `n_lags_estudio: 1`. La decisión está tomada; lo que falta es que el
-   docstring deje de contradecirla.
-3. **Las corridas `31` y `32` definen su generador dentro del notebook**
-   (`nucleo_cuadratico`, `mapa_par`, `trayectoria`, `calibrar`) en vez de en
-   `pipelines/sim_escenario_*.py`, partiendo de `ConfigEscenario1`. Es una
-   desviación del patrón: el generador no es reutilizable ni testeable fuera del
-   notebook.
-4. **Las corridas `33` y `34` agregan secciones** que la `30` no tiene: §9.1 en
-   el `_04` (error y cobertura por cuartil del rezago 1 no lineal) y §10 en el
-   `_05` (techo del oráculo, `fraccion_brecha_recuperada`). Son específicas del
-   escenario y están justificadas, pero **son agregados** respecto de la
-   plantilla de §4. Si la regla "sin agregados" es estricta, hay que decidir si
-   suben a la plantilla o bajan a un apéndice.
-5. **`docs/03 Modelo.tex` referencia `\ref{03_06_04_objetivos_evaluacion}`
-   (línea 371) y ese label no existe.** Las subsecciones de §03_06 sobre modelos
+1. **El objetivo de evaluación nuevo (§6.5) sólo está en la corrida `65`.** Las
+   `61`–`64`, `66` y `71`–`73` todavía evalúan contra `X_true` cruda. Sus cifras
+   de Bloque A y B **no son comparables** con las de la `65` hasta que se
+   propague.
+2. **La corrida `63` tiene el `ESCENARIO_ID` roto.** `63_01` y el `.m` declaran
+   `3` —y los artefactos son `escenario_63_3_r01_m0X`— pero `63_03`, `63_04` y
+   `63_05` declaran `1`, de modo que buscan `escenario_63_1_r01_*`. Además su
+   `M_FPCA_LIST = (20,)` no corresponde a los artefactos existentes (`m01`–`m04`).
+3. **`docs/03 Modelo.tex` referencia `
+ef{03_06_04_objetivos_evaluacion}`
+   (línea 371) y ese label no existe.** Es justamente donde `docs` promete
+   definir el segundo objetivo de evaluación, el contraste contra la curva
+   suavizada, que §6.5 ya implementa. Las subsecciones de §03_06 sobre modelos
    de referencia, métricas y objetivo de evaluación están sin escribir.
-6. **`§03_07 Resultados` es un bloque `% [PENDIENTE]`** con la organización
+4. **`§03_07 Resultados` es un bloque `% [PENDIENTE]`** con la organización
    propuesta en seis puntos.
-7. Los criterios de evaluación se citan como `§02_02_03` del Capítulo 2.
-8. **El Cuadro `tab:escenarios` de `docs/` no describe las corridas vivas**
+5. **El Cuadro `tab:escenarios` de `docs/` no describe las corridas vivas**
    (`L = 48`, `sigma_eps = 0.1`, `T = 300`, `T0 = 240`, `R = 50` contra
-   `L = 100`, `0.25`, `800`, `560`, `R = 1`). La divergencia es deliberada
+   `L = 75`, `T = 1000`, `T0 = 700`, `R = 1`). La divergencia es deliberada
    —`docs/` es referencia, no contrato— pero el cuadro sigue sin actualizarse.
-9. **`R = 50` réplicas no está implementado.** `REPLICA_ID` existe y viaja en el
+6. **`R = 50` réplicas no está implementado.** `REPLICA_ID` existe y viaja en el
    `EXPERIMENT_ID`, pero siempre vale 1. Con `R = 1` una diferencia de pocos
    puntos porcentuales entre modelos es indistinguible del ruido Monte Carlo:
    **ninguna afirmación comparativa es concluyente hoy**, y así hay que
    presentarla.
+7. **`pipelines/real_pipeline.py` es un stub `TODO`** de seis líneas. El flujo
+   de datos reales vive en `notebooks/reales/`.
