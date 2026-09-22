@@ -82,7 +82,6 @@ La generación procede de la siguiente forma:
 
     \item Se inicializa $u_0 = 0$ y se itera \eqref{eq:ane_algA2_ms}, obteniendo $Z_1, \dots, Z_{TL}$. La cadena latente $\{S_s\}$ no se entrega a los métodos.
 \end{enumerate}
-
 \begin{table}[H]
 \centering
 \caption{Parámetros del Algoritmo~A-2.}
@@ -131,12 +130,13 @@ La generación procede de la siguiente forma:
 Símbolo & Descripción & Valor \\
 \hline
 $\phi$          & coeficiente autorregresivo                          & $0.5$ \\
-$\alpha_1$      & sensibilidad a la innovación reciente               & $0.08$ \\
-$\beta_1$       & persistencia de la varianza condicional pasada      & $0.90$ \\
+$\alpha_1$      & sensibilidad a la innovación reciente               & $0.02$ \\
+$\beta_1$       & persistencia de la varianza condicional pasada      & $0.975$ \\
 $\sigma_a^2$    & varianza incondicional de la innovación             & $1.0$ \\
 \hline
 \end{tabular}
 \end{table}
+
 \section{Métodos basados en Procesos Funcionales}
 \label{ane_00_02_metodos_procesos_funcionales}
 Este segundo enfoque especifica la dinámica directamente sobre la curva completa, mediante un operador definido sobre el dominio $\mathcal{T}=[0,1]$. Los algoritmos son los siguientes:

@@ -130,6 +130,20 @@ from .sim_escenario_B3 import (
     resumen_escenario_B3,
 )
 
+# --- Algoritmos C-1, C-2 y C-3: coeficientes de la representacion (seccion C) ---
+from .sim_escenario_C import (
+    ConfigEscenarioC,
+    base_fourier,
+    config_C1,
+    config_C2,
+    config_C3,
+    contabilidad_varianzas,
+    correlaciones_impulsor,
+    curvas_truncadas,
+    generar_escenario_C,
+    resumen_escenario_C,
+)
+
 # ══════════════════════════════════════════════════════════════════════════
 # 2. CONTRATO DE ARTEFACTOS
 # ══════════════════════════════════════════════════════════════════════════
@@ -228,6 +242,17 @@ __all__ = [
     "resumen_escenario_B3",
     "indicador_episodio",
     "forma_desplazamiento",
+    # ── Algoritmos C-1, C-2 y C-3: coeficientes de la representacion ──
+    "ConfigEscenarioC",
+    "config_C1",
+    "config_C2",
+    "config_C3",
+    "generar_escenario_C",
+    "resumen_escenario_C",
+    "base_fourier",
+    "curvas_truncadas",
+    "contabilidad_varianzas",
+    "correlaciones_impulsor",
     # ── Contrato de artefactos ──
     "ARCHIVOS",
     "ArtefactosFPCA",

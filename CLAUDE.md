@@ -34,7 +34,7 @@ decisión numérica y suelen traer la respuesta antes que el código.
 
 - En `docs/` está el material actual de la tesis (`01 Anexo.tex`,
   `02 Marco Teorico.tex`, `03 Modelo.tex`).
-- Ese material es **referencia, no contrato**: se puede modificar. De ahí salen
+- Ese material es **referencia, de lo que se v ahacer**: se puede modificar. De ahí salen
   indicaciones, no obligaciones.
 - El foco experimental son **escenarios donde el modelo puede ganar**. El diseño
   se orienta a caracterizar *cuándo y por qué* el PSBPM-FD supera a las
@@ -477,6 +477,9 @@ escenarios en una comparación entre ajustes.
 | `64_sim_A1` | A-1, sólo rezago propio | `escenario_64` | 1 | `(1, …, 8)` | **rezago propio** |
 | `65_sim_A2` | A-2, sólo rezago propio | `escenario_65` | 2 | `(1, …, 8)` | **rezago propio** |
 | `66_sim_A3` | A-3, sólo rezago propio | `escenario_66` | 3 | `(1, …, 8)` | **rezago propio** |
+| `101_sim_A1` | A-1, rezago propio de orden `N_LAGS` | `escenario_101` | 1 | `(1, 2, 3, 4)` | **rezago propio, 1-3** |
+| `102_sim_A2` | A-2, rezago propio de orden `N_LAGS` | `escenario_102` | 2 | `(1, 2, 3, 4)` | **rezago propio, 1-3** |
+| `103_sim_A3` | A-3, rezago propio de orden `N_LAGS` | `escenario_103` | 3 | `(1, 2, 3, 4)` | **rezago propio, 1-3** |
 
 **Sección B del anexo — procesos funcionales** (`ane_00_02`):
 
@@ -487,6 +490,38 @@ escenarios en una comparación entre ajustes.
 | `73_sim_B3` | B-3: cambio estructural recurrente | `escenario_73` | 3 | `(2, 3, 4, 5)` |
 
 `61_sim_A1` es la plantilla (§4).
+
+**Las corridas 101-103 son las 64-66 con el rezago propio generalizado.** Mismo
+generador y misma calibración del gating; lo que cambia es que `N_LAGS` es una
+perilla de `[CONFIG]` que admite **1, 2 o 3**, de modo que la componente `k` se
+predice con `xi_{k,t-1}, …, xi_{k,t-N_LAGS}` y con nada más. `HP_BY_TYPE` tiene
+un peldaño de `apij`/`bpij` por rezago (`own_lag1`/`2`/`3`, con `E[pi]` bajando
+de 0.90 a 0.25) y `_clasificar` lee el rezago del nombre `fpc_<idx>_lag<l>` en
+vez de devolver `own_lag1` fijo. Arrancan en `N_LAGS = 1`, que reproduce las
+64-66. Las tres evalúan contra `curva_suavizada` (§6.5) y entrenan sólo en
+`M_ENTRENO = 4`. Conviven con las 61-66: no las reemplazan.
+
+**El FAR del `_05` usa `FARp(p=N_LAGS)`, no `FAR1`.** `far_operador.py` ya
+traía `FARp` (VAR(p) por Yule-Walker en las `kn` direcciones espectrales de la
+curva; con `p=1` reproduce `FAR1` exacto) con la decisión ya escrita en su
+docstring de que **`p` se fija en `N_LAGS` y no se selecciona**: seleccionarlo
+le daría al FAR una ventaja de especificación que el PSBPM-FD no tiene (que
+también usa `N_LAGS` fijo, no barre órdenes). `seleccionar_kn(..., p=N_LAGS)`
+sigue el mismo criterio. Con `N_LAGS=1` esto reproduce exactamente el FAR(1) de
+las 61-66.
+
+**RF y GBT sí barren orden**: cada uno compite `1..N_LAGS` rezagos sobre los
+scores (subconjunto de columnas de `Z`, que está en orden lag-mayor) y se
+queda con el que gana más **ventanas del bloque TRAIN** en `mae_f` — nunca
+test, para no fugar la elección del orden a la métrica que se reporta. Con
+`N_LAGS=1` no hay barrido real y el resultado es idéntico al de siempre.
+`e["ml_orden_rf"]` / `e["ml_orden_gbt"]` quedan registrados por si se quiere
+citar qué orden ganó en cada `M`.
+
+**`103` usa `MCMC_CONFIG = {"nsim": 2600, "burn": 600, …}`, no el `{3500, 1500}`
+de la `63`/`66`.** Ese burn largo se justificaba por `p = 20` (rezagos
+cruzados); con rezago propio (`p = N_LAGS <= 3`) no aplica, así que `103` sigue
+la config común de la tabla de abajo en vez de heredar la de su plantilla.
 
 **Las corridas 64-66 entrenan una sola vez.** Con covariable de rezago propio el
 score `xi_k` no depende de `M` —`fpca.transform` devuelve siempre la misma
