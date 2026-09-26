@@ -593,10 +593,37 @@ artefacto de una base corta, y no mide lo mismo que en uno con `K` grande.
 
 ### Datos reales — `notebooks/reales/`
 
-`21_real_nivel/`, `22_real_nivel_escalera/` y `23_real_nivel/` siguen la misma
-arquitectura (`_01_datos`, `_03`, `_04`, `_05`). Serie: nivel diario del RÍO
-MAPOCHO EN LOS ALMENDROS, 48 mediciones por día, cada día una curva.
-`Ejemplo_{1,2,3}/` siguen la arquitectura antigua y no se usan.
+`21_real_nivel/`, `22_real_nivel_escalera/`, `23_real_nivel/` y `24_real_nivel/`
+siguen la misma arquitectura (`_01_datos`, `_03`, `_04`, `_05`). Serie: nivel
+diario del RÍO MAPOCHO EN LOS ALMENDROS, 48 mediciones por día, cada día una
+curva. `Ejemplo_{1,2,3}/` siguen la arquitectura antigua y no se usan.
+
+**`24_real_nivel` es la corrida viva de datos reales**: el diseño de 101-106
+llevado a la serie observada. Mismo rango (`2022-01-01` → `2026-05-31`) y
+`PROP_TRAIN = 0.70` que el 23; `VENTANA_ID = 5`, `EXPERIMENT_ID =
+real_nivel_v05_m<NN>`, `M_FPCA_LIST = (1, 2, 3)`.
+
+- **Rezago propio**, `N_LAGS` en `[CONFIG]` (admite 1-7, arranca en 7: una
+  semana de días); `HP_BY_TYPE` = `own_lag1..7` con `apij=1, bpij=5` constante
+  (Chung & Dunson). Entrena sólo `M_ENTRENO = max(M_FPCA_LIST)` y los demás `M`
+  leen sus trazas vía `trazas_en`.
+- **Gating por dispersión** (`sd_gate_objetivo = 0.8`, `cv_psi = 1.0`, `G*` por
+  componente), igual que 101. `HP_ESCALERA` es la del 101 salvo `k=0`, con
+  `razon_Etau_lambda = 20`: `xi_1` es el nivel, casi raíz unitaria (R² AR(1) de
+  train 0.976), y 2.5 le daba un prior de varianza residual ~17x la medida.
+- `MCMC_CONFIG = {"nsim": 3000, "burn": 1000, "N": 30, "M": 50}`, `N_CHAINS = 2`.
+- `objetivo_evaluacion = "curva_suavizada"`, `modo_residuo = "ninguno"`,
+  ventanas `(20, 30, 40)`; Bloque B contra los dos objetivos.
+- `_05`: `FARp(p=N_LAGS)`; RF/GBT barren orden `1..N_LAGS` en ventanas de train.
+  Sin §3.1.1 ni norma HS contra `kn` (como el 101).
+- `_01 §3.6`: comparación de tres curvas (cruda, B-spline, FPCA_M), prefijo `10_`.
+  Es diagnóstico: separa el piso de la base del truncamiento FPCA.
+- `_03`: sin contraste PIP con generador; se reporta `pip_media`.
+
+**21-23 siguen con el objetivo y el gating anteriores** (23: rezagos cruzados,
+gating por media del argumento, `objetivo_evaluacion = "curva_observada"` —la
+grilla cruda—, `modo_residuo = "empirico"`, ventanas `(10, 20, 40)`, FAR1, sin
+`[FIX 2]`). **Sus cifras no son comparables con las del 24.**
 
 ### Historia — no se edita ni se cita como estado actual
 
@@ -617,10 +644,12 @@ MAPOCHO EN LOS ALMENDROS, 48 mediciones por día, cada día una curva.
 
 Señaladas, no resueltas. **Preguntar antes de codificar contra ellas.**
 
-1. **El objetivo de evaluación nuevo (§6.5) sólo está en la corrida `65`.** Las
-   `61`–`64`, `66` y `71`–`73` todavía evalúan contra `X_true` cruda. Sus cifras
-   de Bloque A y B **no son comparables** con las de la `65` hasta que se
-   propague.
+1. **El objetivo de evaluación nuevo (§6.5) no está en todas las corridas.** Lo
+   usan la `65`, las `101`–`106` y la real `24`. Las `61`–`64`, `66` y `71`–`73`
+   todavía evalúan contra `X_true` cruda, y las reales `21`–`23` contra la
+   grilla cruda observada (`objetivo_evaluacion = "curva_observada"`). Sus
+   cifras de Bloque A y B **no son comparables** con las de las corridas
+   nuevas hasta que se propague.
 2. **La corrida `63` tiene el `ESCENARIO_ID` roto.** `63_01` y el `.m` declaran
    `3` —y los artefactos son `escenario_63_3_r01_m0X`— pero `63_03`, `63_04` y
    `63_05` declaran `1`, de modo que buscan `escenario_63_1_r01_*`. Además su

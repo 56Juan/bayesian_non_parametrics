@@ -6,14 +6,14 @@ Los algoritmos se agrupan según el nivel en que se especifica la dinámica del 
 \begin{itemize}
     \item Métodos basados en series de tiempo clásicas.
     \item Métodos basados en procesos funcionales.
-    \item Métodos basados en coeficientes de bases.
+    \item Métodos basados en scores de la representación funcional.
 \end{itemize}
 
 \section{Métodos basados en Series de Tiempo Clásicas}
 \label{ane_00_01_metodos_series_tiempo}
-Este primer enfoque genera las curvas a partir de una serie de tiempo escalar ``clásica''. La idea es simular una única trayectoria muy larga de un proceso univariado discreto $\{Z_s\}$ y luego segmentarla en bloques consecutivos de igual longitud, de modo que cada bloque se interprete como una curva. Esto reproduce la manera en que suelen construirse series de tiempo funcionales a partir de registros de alta frecuencia, donde el registro se divide en sus unidades naturales de observación (por ejemplo, el día) y cada unidad se trata como una realización funcional.\\
+Este primer enfoque genera las curvas a partir de una serie de tiempo escalar ``clásica'', reproduciendo la manera en que suelen construirse series de tiempo funcionales a partir de registros de alta frecuencia: el registro se divide en sus unidades naturales de observación (por ejemplo, el día) y cada unidad se trata como una realización funcional.\\
 
-Los escenarios de esta sección comparten el mecanismo de segmentación y difieren únicamente en el proceso escalar generador. Sea $L$ el número de puntos de la grilla, que en este enfoque coincide con la longitud de cada bloque. Cada algoritmo simula una trayectoria $Z_1, \dots, Z_{TL}$ y la divide en $T$ bloques contiguos y sin traslape, de modo que la curva $t$ queda formada por $Z_{(t-1)L+1}, \dots, Z_{tL}$ sobre la grilla $\{\tau_l\}_{l=1}^{L}$. Sobre las curvas así obtenidas se aplica el esquema de observación común.\\
+Los escenarios de esta sección comparten el mecanismo de segmentación de una trayectoria larga de un proceso escalar discreto $\{Z_s\}$, y difieren únicamente en el proceso generador. Sea $L$ el número de puntos de la grilla, que en este enfoque coincide con la longitud de cada bloque. Cada algoritmo simula una trayectoria $Z_1, \dots, Z_{TL}$ y la divide en $T$ bloques contiguos y sin traslape, de modo que la curva $t$ queda formada por $Z_{(t-1)L+1}, \dots, Z_{tL}$ sobre la grilla $\{\tau_l\}_{l=1}^{L}$. Sobre las curvas así obtenidas se aplica el esquema de observación común.\\
 
 Los escenarios definidos son los siguientes:
 \begin{itemize}
@@ -140,7 +140,7 @@ $\sigma_a^2$    & varianza incondicional de la innovación             & $1.0$ \
 \section{Métodos basados en Procesos Funcionales}
 \label{ane_00_02_metodos_procesos_funcionales}
 
-Este segundo enfoque genera directamente las curvas funcionales y permite que la relación entre observaciones consecutivas dependa de distintos mecanismos de generación. A diferencia de los métodos basados en series de tiempo clásicas, la dinámica se especifica sobre la curva completa, de modo que cada período puede ser generado mediante un mecanismo funcional diferente. En particular, los escenarios consideran una estructura de mezcla en la que una variable latente determina el mecanismo que genera la curva siguiente.\\
+Este segundo enfoque genera directamente las curvas funcionales. A diferencia de los métodos basados en series de tiempo clásicas, la dinámica se especifica sobre la curva completa, de modo que cada período puede ser generado mediante un mecanismo funcional diferente. En particular, los escenarios consideran una estructura de mezcla en la que una variable latente determina el mecanismo que genera la curva siguiente.\\
 
 Sea $Z_t \in \{1,\ldots,K\}$ el mecanismo asociado al período $t$. Condicionalmente a $Z_t=k$, la curva se genera mediante:
 
@@ -242,7 +242,7 @@ $\beta_{kj}(\tau)$ & coeficientes funcionales & prefijados \\
 \subsection{Algoritmo B-2: Mezcla de mecanismos funcionales no lineales}
 \label{ane_00_02_02_alg_b2}
 
-Este algoritmo extiende el escenario anterior incorporando mecanismos cuya relación entre los rasgos de la curva anterior y la curva futura puede ser no lineal. El objetivo es evaluar el comportamiento de los métodos cuando la heterogeneidad no se limita a diferencias en los parámetros de una relación lineal, sino que los distintos mecanismos presentan formas funcionales de dependencia diferentes.
+Este algoritmo extiende el escenario anterior incorporando mecanismos cuya relación entre los rasgos de la curva anterior y la curva futura puede ser no lineal. El objetivo es evaluar el comportamiento de los métodos cuando la heterogeneidad no se limita a diferencias en los parámetros de una relación lineal, sino que los distintos mecanismos presentan formas funcionales de dependencia diferentes.\\
 
 La curva se genera mediante
 
@@ -391,42 +391,128 @@ $f_k$ & mecanismo funcional no lineal & prefijado \\
 \end{tabular}
 \end{table}
 
-\section{Métodos basados en Coeficientes de la Representación}
-\label{ane_00_03_metodos_coeficientes_bases}
-Este tercer enfoque simula directamente los coeficientes de la representación de las curvas. Sea $\{\varphi_j\}_{j=1}^{J}$ un sistema ortonormal fijo en $L^2(\mathcal{T})$, en este caso la base de Fourier, y $\mu(\tau)$ la función media. Cada curva se escribe como
-\begin{equation}\label{eq:ane_coef_curva}
-    X_t(\tau) = \mu(\tau) + \sum_{j=1}^{J} a_{tj}\,\varphi_j(\tau),
-    \qquad
-    a_{tj} = \sqrt{\lambda_j}\;\tilde a_{tj},
+\section{Métodos basados en Scores de la Representación FPCA}
+\label{ane_00_03_metodos_scores_fpca}
+
+Este tercer enfoque especifica directamente la estructura generadora sobre los scores. Sea $\{\varphi_j\}_{j=1}^{J}$ el conjunto de funciones propias y sea $\mu(\tau)$ la función media. Cada curva se representa como
+
+\begin{equation}
+\label{eq:ane_coef_curva}
+X_t(\tau)
+=
+\mu(\tau)
++
+\sum_{j=1}^{J}
+\xi_{tj}\,\varphi_j(\tau),
 \end{equation}
-donde $a_{tj}$ es el coeficiente de la $j$-ésima componente, $\lambda_1 > \dots > \lambda_J > 0$ es un espectro prefijado que fija la varianza marginal de cada componente, y $\tilde a_{tj}$ es una serie de tiempo de media cero y varianza unitaria. Toda la dependencia temporal del proceso, lineal y no lineal, se especifica sobre las series $\{\tilde a_{tj}\}$.\\
 
-Como el sistema $\{\varphi_j\}$ es fijo y conocido, los coeficientes simulados se entregan directamente a los métodos, en el papel de los scores de la representación, sin construir las curvas ni aplicar el esquema de observación. De este modo se aísla el efecto de la estructura de dependencia y del número de scores retenidos, sin confundirlo con el error de estimar la representación ni con el ruido de medición. \\
+donde $\xi_{tj}$ corresponde al score asociado a la $j$-ésima componente principal funcional en el período $t$. En este enfoque, los scores constituyen las variables sobre las cuales se especifica directamente la estructura de dependencia temporal.\\
 
+La generación de los datos se realiza directamente en el espacio de los scores. En particular, se consideran mecanismos de generación cuya importancia relativa varía en el tiempo, dado que su probabilidad de selección depende dinámicamente de la historia reciente del proceso.\\
 
-Los algoritmos son los siguientes:
+Una vez generados los scores, las curvas funcionales se reconstruyen mediante la Ecuación~\ref{eq:ane_coef_curva}. De esta manera, la estructura temporal se especifica en el espacio de los scores y posteriormente se obtiene la representación funcional correspondiente.\\
+
+Los algoritmos se organizan en:
+
 \begin{itemize}
-    \item El Algoritmo~C-1  tiene una dependencia lineal débil y dependencia no lineal entre las dos primeras componentes.
-    \item El Algoritmo~C-2 refuerza la dependencia lineal, dejando intacta la no lineal.
-    \item El Algoritmo~C-3 traslada la dependencia a componentes subordinadas.
+    \item El Algoritmo~C-1 introduce una distribución multimodal mediante distintos mecanismos de generación, cuya selección depende de múltiples scores correspondientes a distintos rezagos.
+
+    \item El Algoritmo~C-2 conserva el mismo esquema de asignación del Algoritmo~C-1, pero incorpora estructuras de dependencia temporal diferentes entre los mecanismos: éstos pueden diferir no solo en los valores de sus parámetros, sino también en los rezagos y scores que determinan la evolución futura.
+
+    \item El Algoritmo~C-3 añade relaciones no lineales tanto en la dinámica de los mecanismos como en la estructura de asignación, cuya probabilidad de selección depende de múltiples características de los scores correspondientes a varios rezagos, permitiendo transiciones entre mecanismos determinadas por distintas regiones del espacio de la historia reciente.
 \end{itemize}
 
-\subsection{Algoritmo C-1: Proceso con dependencia no lineal entre coeficientes}
+
+\subsection{Algoritmo C-1: Multimodalidad con dependencia temporal dinámica}
 \label{ane_00_03_01_alg_c1}
-Este algoritmo genera coeficientes cuya dependencia temporal es débil en el sentido lineal, pero fuerte en el no lineal, con el fin de evaluar la capacidad de los métodos para aprovechar dependencia que un modelo lineal no detecta. Sea $(j^\ast, j^\ast+1)$ el par de componentes que interactúan, y sean $\{e_{tj}\}$ variables gaussianas estándar independientes. La dinámica de las series $\tilde a_{tj}$ es
-\begin{align}
-    \tilde a_{t,j^\ast} &= \phi\, \tilde a_{t-1,j^\ast} + \sqrt{1-\phi^2}\; e_{t,j^\ast}, \label{eq:ane_algC1_lineal}\\
-    \tilde a_{t,j^\ast+1} &= c\, \tilde a_{t-1,j^\ast} + b\,\frac{\tilde a_{t-1,j^\ast}^{2}-1}{\sqrt{2}} + \sqrt{1-c^2-b^2}\; e_{t,j^\ast+1}, \label{eq:ane_algC1_cuadratica}
-\end{align}
-y $\tilde a_{tj} = e_{tj}$ para el resto de las componentes. La primera ecuación es un autorregresivo lineal de coeficiente $\phi$. En la segunda, $c$ es el coeficiente de la dependencia lineal cruzada y $b$ el de la dependencia cuadrática. Las varianzas de innovación se despejan para que cada $\tilde a_{tj}$ tenga varianza unitaria y el espectro marginal quede fijado en $\lambda_j$. Un predictor de $\tilde a_{t,j^\ast+1}$ lineal en $\tilde a_{t-1,j^\ast}$ explica una fracción $c^2$ de su varianza, mientras que uno que capture la relación cuadrática explica $c^2 + b^2$. Las demás autocorrelaciones lineales de rezago~1 entre componentes son de orden menor.\\
+
+Este algoritmo genera una distribución multimodal en el espacio de los scores mediante distintos mecanismos de generación, cuya selección depende de múltiples características de la historia reciente del proceso. El objetivo es evaluar la capacidad de los métodos para representar distribuciones condicionales multimodales generadas por mecanismos que no se seleccionan de forma independiente entre sí.\\
+
+Sea $Z_t\in\{1,\ldots,K\}$ la variable latente que identifica el mecanismo utilizado en el período $t$. Condicionalmente a $Z_t=k$, el vector de scores se genera mediante
+
+\begin{equation}
+\label{eq:ane_algC1}
+\boldsymbol{\xi}_t
+=
+\boldsymbol{\mu}_{Z_t}
++
+\sum_{\ell=1}^{L}
+A_{Z_t,\ell}
+\boldsymbol{\xi}_{t-\ell}
++
+\boldsymbol{\varepsilon}_t,
+\end{equation}
+
+donde $\boldsymbol{\xi}_t=(\xi_{t1},\ldots,\xi_{tJ})^\top$ es el vector de scores, $\boldsymbol{\mu}_{Z_t}$ representa el componente asociado al mecanismo seleccionado, $A_{Z_t,\ell}$ corresponde a la matriz de dependencia asociada al $\ell$-ésimo rezago y $\boldsymbol{\varepsilon}_t$ es un vector de innovaciones.\\
+
+La selección del mecanismo depende de los scores correspondientes a múltiples rezagos. En particular, las probabilidades condicionales se definen mediante
+
+\begin{equation}
+\label{eq:ane_algC1_asignacion}
+P
+\left(
+Z_t=k
+\mid
+\boldsymbol{\xi}_{t-1},
+\ldots,
+\boldsymbol{\xi}_{t-L}
+\right)
+=
+\frac{
+\exp\left\{
+q_k
+\left(
+\boldsymbol{\xi}_{t-1},
+\ldots,
+\boldsymbol{\xi}_{t-L}
+\right)
+\right\}
+}{
+\displaystyle
+\sum_{h=1}^{K}
+\exp\left\{
+q_h
+\left(
+\boldsymbol{\xi}_{t-1},
+\ldots,
+\boldsymbol{\xi}_{t-L}
+\right)
+\right\}
+},
+\end{equation}
+
+donde $q_k(\cdot)$ determina la probabilidad de seleccionar el mecanismo $k$  a partir de la historia reciente de los scores.\\
+
+En este escenario, las funciones $q_k(\cdot)$ se especifican de forma lineal respecto de los scores considerados. De esta manera, la multimodalidad proviene de la existencia de distintos mecanismos de generación, mientras que la asignación probabilística determina cuál de ellos genera la observación en cada período. En consecuencia, una misma trayectoria puede permanecer durante varios períodos bajo un mismo mecanismo o transitar hacia otro, dependiendo de los valores observados en los rezagos.\\
+
+Para incorporar dependencia temporal de más de un período, se consideran $L=2$ rezagos. Así, tanto la selección del mecanismo como la generación de los scores utilizan información proveniente de $\boldsymbol{\xi}_{t-1}$ y $\boldsymbol{\xi}_{t-2}$.\\
+
+Una vez generado el vector de scores, la curva funcional correspondiente se obtiene mediante
+
+\begin{equation}
+\label{eq:ane_algC1_curve}
+X_t(\tau)
+=
+\mu(\tau)
++
+\sum_{j=1}^{J}
+\xi_{tj}\varphi_j(\tau).
+\end{equation}
 
 La generación procede de la siguiente forma:
+
 \begin{enumerate}
-    \item Se fijan el espectro $\{\lambda_j\}_{j=1}^{J}$ y los parámetros $j^\ast$, $\phi$, $c$ y $b$.
+    \item Se fijan la función media $\mu(\tau)$, las funciones propias $\{\varphi_j\}_{j=1}^{J}$ y el número de mecanismos $K$.
 
-    \item Se extrae $\tilde a_{0,j^\ast} \sim \mathcal{N}(0,1)$ y se itera \eqref{eq:ane_algC1_lineal}--\eqref{eq:ane_algC1_cuadratica} durante $T$ períodos, obteniendo $\tilde{\mathbf{A}} \in \mathbb{R}^{T \times J}$, y se escalan las columnas para obtener $\mathbf{A} = \tilde{\mathbf{A}}\,\mathrm{diag}(\sqrt{\lambda_1}, \dots, \sqrt{\lambda_J})$.
+    \item Se especifican los vectores $\boldsymbol{\mu}_k$, las matrices $A_{k,\ell}$ y las funciones de asignación $q_k(\cdot)$ correspondientes a cada mecanismo.
 
-    \item La matriz de coeficientes $\mathbf{A}$ es el producto del algoritmo y se entrega directamente a los métodos.
+    \item Se calculan las probabilidades condicionales de los mecanismos mediante \eqref{eq:ane_algC1_asignacion}, utilizando los scores correspondientes a los dos rezagos anteriores.
+
+    \item Se genera $Z_t$ a partir de las probabilidades condicionales obtenidas.
+
+    \item Se genera $\boldsymbol{\xi}_t$ mediante \eqref{eq:ane_algC1}, utilizando los parámetros correspondientes al mecanismo seleccionado.
+
+    \item Se reconstruye la curva $X_t(\tau)$ mediante \eqref{eq:ane_algC1_curve}.
 \end{enumerate}
 
 \begin{table}[H]
@@ -437,46 +523,228 @@ La generación procede de la siguiente forma:
 \hline
 Símbolo & Descripción & Valor \\
 \hline
-$J$             & términos de la base de Fourier                            & $10$ \\
-$\rho$          & razón del espectro geométrico $\lambda_j=\rho^{\,j-1}$    & $0.5$ \\
-$j^\ast$        & primera componente del par que interactúa                 & $1$ \\
-$\phi$          & coeficiente autorregresivo de $\tilde a_{t,j^\ast}$       & $0.2$ \\
-$c$             & coeficiente de la dependencia lineal cruzada              & $0.15$ \\
-$b$             & coeficiente de la dependencia cuadrática                  & $0.5$ \\
+$J$ & número de scores utilizados & $10$ \\
+$K$ & número de mecanismos & $3$ \\
+$L$ & número de rezagos utilizados & $2$ \\
+$q_k$ & función de asignación del mecanismo $k$ & lineal \\
+$\boldsymbol{\mu}_k$ & localización del mecanismo $k$ & prefijada \\
+$A_{k,\ell}$ & matriz de dependencia & prefijada \\
 \hline
 \end{tabular}
 \end{table}
 
-\subsection{Algoritmo C-2: Proceso con dependencia lineal reforzada}
+
+\subsection{Algoritmo C-2: Dinámicas diferenciadas entre mecanismos}
 \label{ane_00_03_02_alg_c2}
-Este algoritmo genera coeficientes con la misma construcción del Algoritmo~C-1, aumentando el coeficiente autorregresivo $\phi$ y dejando intacta la dependencia cuadrática, con el fin de aislar cuánto del desempeño de cada método proviene de la dependencia lineal y cuánto de la no lineal. La generación sigue los pasos del Algoritmo~C-1.
+
+A diferencia del Algoritmo~C-1, donde todos los mecanismos comparten la misma estructura de dependencia temporal, este algoritmo permite que dicha estructura difiera entre mecanismos. El objetivo es evaluar la capacidad de los métodos para representar situaciones en las que la relación entre los scores actuales y sus valores pasados cambia según el mecanismo activo. La selección del mecanismo conserva el mismo esquema de asignación dependiente de la historia reciente empleado en el Algoritmo~C-1.\\
+
+Sea $Z_t\in\{1,\ldots,K\}$ la variable latente que identifica el mecanismo utilizado en el período $t$. Las probabilidades condicionales de selección se definen mediante
+
+\begin{equation}
+\label{eq:ane_algC2_asignacion}
+P
+\left(
+Z_t=k
+\mid
+\boldsymbol{\xi}_{t-1},
+\ldots,
+\boldsymbol{\xi}_{t-L}
+\right)
+=
+\frac{
+\exp\left\{
+q_k
+\left(
+\boldsymbol{\xi}_{t-1},
+\ldots,
+\boldsymbol{\xi}_{t-L}
+\right)
+\right\}
+}{
+\displaystyle
+\sum_{h=1}^{K}
+\exp\left\{
+q_h
+\left(
+\boldsymbol{\xi}_{t-1},
+\ldots,
+\boldsymbol{\xi}_{t-L}
+\right)
+\right\}
+}.
+\end{equation}
+
+Una vez seleccionado el mecanismo, los scores se generan de acuerdo con una dinámica específica,
+
+\begin{equation}
+\label{eq:ane_algC2}
+\boldsymbol{\xi}_t
+=
+f_{Z_t}
+\left(
+\boldsymbol{\xi}_{t-1},
+\ldots,
+\boldsymbol{\xi}_{t-L}
+\right)
++
+\boldsymbol{\varepsilon}_t,
+\end{equation}
+
+donde $f_k(\cdot)$ representa la estructura de dependencia temporal asociada al mecanismo $k$.\\
+
+En este escenario, las funciones $f_k$ pueden diferir tanto en los rezagos que intervienen en la generación como en la forma en que los distintos scores contribuyen a la evolución futura. Por ejemplo, un mecanismo puede presentar una dependencia principalmente asociada al primer rezago, mientras que otro puede depender principalmente del segundo o de una combinación diferente de los scores. Por tanto, la heterogeneidad no se limita a cambios en la magnitud de los parámetros, sino que puede involucrar diferencias en la propia estructura de dependencia temporal.\\
+
+Como en el Algoritmo~C-1, la transición entre mecanismos depende de la historia reciente del proceso; la diferencia radica en que, una vez seleccionado el mecanismo, la evolución de los scores sigue la dinámica $f_k$ específica de ese mecanismo, en lugar de una estructura común a todos.\\
+
+Para este escenario se consideran $L=2$ rezagos. La generación procede de la siguiente forma:
+
+\begin{enumerate}
+    \item Se fijan la función media $\mu(\tau)$ y las funciones propias $\{\varphi_j\}_{j=1}^{J}$.
+
+    \item Se definen las funciones de dependencia $f_1,\ldots,f_K$, permitiendo estructuras temporales diferentes entre mecanismos.
+
+    \item Se especifican las funciones de asignación $q_1,\ldots,q_K$.
+
+    \item Se calculan las probabilidades condicionales de los mecanismos mediante \eqref{eq:ane_algC2_asignacion}.
+
+    \item Se genera $Z_t$ a partir de dichas probabilidades.
+
+    \item Se generan los scores $\boldsymbol{\xi}_t$ mediante \eqref{eq:ane_algC2}, utilizando la dinámica correspondiente al mecanismo seleccionado.
+
+    \item Se reconstruye la curva funcional mediante
+    \begin{equation}
+    X_t(\tau)
+    =
+    \mu(\tau)
+    +
+    \sum_{j=1}^{J}
+    \xi_{tj}\varphi_j(\tau).
+    \end{equation}
+\end{enumerate}
 
 \begin{table}[H]
 \centering
-\caption{Parámetros del Algoritmo~C-2. Coinciden con los del Cuadro~\ref{tab:ane_algC1}, salvo $\phi$.}
+\caption{Parámetros del Algoritmo~C-2.}
 \label{tab:ane_algC2}
 \begin{tabular}{llc}
 \hline
 Símbolo & Descripción & Valor \\
 \hline
-$\phi$  & coeficiente autorregresivo de $\tilde a_{t,j^\ast}$ & $0.45$ \\
+$J$ & número de scores utilizados & $10$ \\
+$K$ & número de mecanismos & $3$ \\
+$L$ & número de rezagos utilizados & $2$ \\
+$q_k$ & función de asignación del mecanismo $k$ & lineal \\
+$f_k$ & dinámica del mecanismo $k$ & diferenciada \\
 \hline
 \end{tabular}
 \end{table}
 
-\subsection{Algoritmo C-3: Proceso con dependencia en componentes subordinadas}
+
+\subsection{Algoritmo C-3: Dinámicas no lineales con asignación multivariada}
 \label{ane_00_03_03_alg_c3}
-Este algoritmo genera coeficientes con la misma construcción del Algoritmo~C-1, trasladando el par de componentes que interactúan a las componentes 3 y 4, con el fin de evaluar el desempeño de los métodos cuando la información sobre el futuro reside en componentes de menor varianza. Con el espectro geométrico empleado, las dos primeras componentes concentran cerca del $75\,\text{\%}$ de la varianza y estas dos, cerca del $19\,\text{\%}$, por lo que un método que retenga pocos scores no accede a la dependencia. La generación sigue los pasos del Algoritmo~C-1.
+
+Este algoritmo suma la no linealidad, tanto en la evolución de cada mecanismo como en el esquema de asignación, el cual ahora depende de múltiples características de los scores correspondientes a varios rezagos. El objetivo es evaluar situaciones en las que tanto la evolución dentro de cada mecanismo como las transiciones entre mecanismos presentan relaciones no lineales.\\
+
+Sea $Z_t\in\{1,\ldots,K\}$ la variable latente que identifica el mecanismo activo en el período $t$. La selección del mecanismo se define mediante
+
+\begin{equation}
+\label{eq:ane_algC3_asignacion}
+P
+\left(
+Z_t=k
+\mid
+\boldsymbol{\xi}_{t-1},
+\ldots,
+\boldsymbol{\xi}_{t-L}
+\right)
+=
+\frac{
+\exp\left\{
+q_k
+\left(
+\boldsymbol{\xi}_{t-1},
+\ldots,
+\boldsymbol{\xi}_{t-L}
+\right)
+\right\}
+}{
+\displaystyle
+\sum_{h=1}^{K}
+\exp\left\{
+q_h
+\left(
+\boldsymbol{\xi}_{t-1},
+\ldots,
+\boldsymbol{\xi}_{t-L}
+\right)
+\right\}
+},
+\end{equation}
+
+donde $q_k(\cdot)$ representa la función de asignación asociada al mecanismo $k$. A diferencia de los escenarios anteriores, estas funciones pueden incorporar términos no lineales e interacciones entre los scores de distintos rezagos.\\
+
+Una vez seleccionado el mecanismo, los scores se generan mediante
+
+\begin{equation}
+\label{eq:ane_algC3}
+\boldsymbol{\xi}_t
+=
+f_{Z_t}
+\left(
+\boldsymbol{\xi}_{t-1},
+\ldots,
+\boldsymbol{\xi}_{t-L}
+\right)
++
+\boldsymbol{\varepsilon}_t,
+\end{equation}
+
+donde $f_k(\cdot)$ corresponde a una función de transición no lineal específica para el mecanismo $k$.\\
+
+A diferencia de los Algoritmos~C-1 y C-2, donde las funciones $q_k(\cdot)$ son lineales, aquí tanto $f_k(\cdot)$ como $q_k(\cdot)$ incorporan relaciones no lineales. En consecuencia, la probabilidad de seleccionar un mecanismo varía según la región del espacio definida por los scores de la historia reciente, y no solo según una combinación lineal de éstos.\\
+
+Para este escenario se consideran $L=3$ rezagos. De esta forma, tanto la asignación como la dinámica de los scores pueden utilizar información proveniente de varios períodos anteriores, lo que permite representar transiciones en las que la permanencia o el cambio de mecanismo dependen simultáneamente de múltiples características de la trayectoria reciente.\\
+
+La generación procede de la siguiente forma:
+
+\begin{enumerate}
+    \item Se fijan la función media $\mu(\tau)$ y las funciones propias $\{\varphi_j\}_{j=1}^{J}$.
+
+    \item Se definen las funciones de transición no lineales $f_1,\ldots,f_K$ correspondientes a los distintos mecanismos.
+
+    \item Se definen las funciones de asignación $q_1,\ldots,q_K$, incorporando las características de los scores y sus interacciones relevantes.
+
+    \item Se calculan las probabilidades condicionales mediante \eqref{eq:ane_algC3_asignacion}, utilizando los scores correspondientes a los tres rezagos anteriores.
+
+    \item Se genera $Z_t$ a partir de las probabilidades condicionales.
+
+    \item Se generan los scores $\boldsymbol{\xi}_t$ mediante \eqref{eq:ane_algC3}, utilizando la dinámica no lineal correspondiente al mecanismo seleccionado.
+
+    \item Se reconstruye la curva funcional mediante
+    \begin{equation}
+    X_t(\tau)
+    =
+    \mu(\tau)
+    +
+    \sum_{j=1}^{J}
+    \xi_{tj}\varphi_j(\tau).
+    \end{equation}
+\end{enumerate}
 
 \begin{table}[H]
 \centering
-\caption{Parámetros del Algoritmo~C-3. Coinciden con los del Cuadro~\ref{tab:ane_algC1}, salvo $j^\ast$.}
+\caption{Parámetros del Algoritmo~C-3.}
 \label{tab:ane_algC3}
 \begin{tabular}{llc}
 \hline
 Símbolo & Descripción & Valor \\
 \hline
-$j^\ast$    & primera componente del par que interactúa   & $3$ \\
+$J$ & número de scores utilizados & $10$ \\
+$K$ & número de mecanismos & $3$ \\
+$L$ & número de rezagos utilizados & $3$ \\
+$q_k$ & función de asignación del mecanismo $k$ & no lineal \\
+$f_k$ & dinámica del mecanismo $k$ & no lineal \\
 \hline
 \end{tabular}
 \end{table}
