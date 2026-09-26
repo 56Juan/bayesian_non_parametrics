@@ -9,11 +9,35 @@ Los algoritmos se agrupan según el nivel en que se especifica la dinámica del 
     \item Métodos basados en scores de la representación funcional.
 \end{itemize}
 
+Todos los algoritmos comparten un mismo esquema de observación. Las curvas se evalúan sobre la grilla regular $\tau_l = (l-1)/(L-1)$, $l = 1, \dots, L$, común a todos los períodos, y lo que se entrega a los métodos no es la curva $X_t$ sino su versión contaminada con ruido de medición,
+\begin{equation}\label{eq:ane_observacion}
+    x_{tl} = X_t(\tau_l) + \epsilon_{tl},
+    \qquad
+    \epsilon_{tl} \overset{\mathrm{iid}}{\sim} \mathcal{N}(0,\, \sigma_{\mathrm{obs}}^2),
+\end{equation}
+con $\epsilon_{tl}$ independiente del proceso generador. Cada algoritmo genera además un período de calentamiento de $B$ curvas que se descartan antes de retener las $T$ curvas del estudio, de modo que las condiciones iniciales no influyan en los datos.\\
+
+\begin{table}[H]
+\centering
+\caption{Parámetros del esquema de observación común.}
+\label{tab:ane_observacion}
+\begin{tabular}{llc}
+\hline
+Símbolo & Descripción & Valor \\
+\hline
+$L$                   & número de puntos de la grilla                  & $75$ \\
+$T$                   & número de curvas retenidas                     & $1000$ \\
+$\sigma_{\mathrm{obs}}$ & desviación estándar del ruido de medición    & $0.25$ \\
+$B$                   & curvas de calentamiento (Algoritmos A / B)     & $50$ / $300$ \\
+\hline
+\end{tabular}
+\end{table}
+
 \section{Métodos basados en Series de Tiempo Clásicas}
 \label{ane_00_01_metodos_series_tiempo}
-Este primer enfoque genera las curvas a partir de una serie de tiempo escalar ``clásica'', reproduciendo la manera en que suelen construirse series de tiempo funcionales a partir de registros de alta frecuencia: el registro se divide en sus unidades naturales de observación (por ejemplo, el día) y cada unidad se trata como una realización funcional.\\
+Este primer enfoque genera las curvas a partir de una serie de tiempo escalar ``clásica'', reproduciendo la manera en que suelen construirse series de tiempo funcionales a partir de registros de alta frecuencia.\\
 
-Los escenarios de esta sección comparten el mecanismo de segmentación de una trayectoria larga de un proceso escalar discreto $\{Z_s\}$, y difieren únicamente en el proceso generador. Sea $L$ el número de puntos de la grilla, que en este enfoque coincide con la longitud de cada bloque. Cada algoritmo simula una trayectoria $Z_1, \dots, Z_{TL}$ y la divide en $T$ bloques contiguos y sin traslape, de modo que la curva $t$ queda formada por $Z_{(t-1)L+1}, \dots, Z_{tL}$ sobre la grilla $\{\tau_l\}_{l=1}^{L}$. Sobre las curvas así obtenidas se aplica el esquema de observación común.\\
+Los escenarios de esta sección comparten el mecanismo de segmentación de una trayectoria larga de un proceso escalar discreto $\{Y_s\}$, y difieren únicamente en el proceso generador. El número de puntos de la grilla, $L$, coincide en este enfoque con la longitud de cada bloque. Cada algoritmo simula una trayectoria $Y_1, \dots, Y_{(B+T)L}$, la divide en bloques contiguos y sin traslape y descarta los $B$ primeros, de modo que la curva $t$ queda formada por $Y_{(B+t-1)L+1}, \dots, Y_{(B+t)L}$ sobre la grilla $\{\tau_l\}_{l=1}^{L}$. No se añade función media, por lo que $X_t(\tau_l)$ es directamente el valor de la serie. Sobre las curvas así obtenidas se aplica el esquema de observación \eqref{eq:ane_observacion}.\\
 
 Los escenarios definidos son los siguientes:
 \begin{itemize}
@@ -26,7 +50,7 @@ Los escenarios definidos son los siguientes:
 \label{ane_00_01_01_alg_a1}
 Este algoritmo genera curvas a partir de un proceso ARFIMA$(0,d,0)$ \cite{ane_00_01_granger1980introduction, ane_00_01_hosking1981fractional}, con el fin de que la dependencia entre curvas decaiga lentamente con la distancia. El proceso se define como
 \begin{equation}\label{eq:ane_algA1_arfima}
-    (1-B)^d\, Z_s = \zeta_s,
+    (1-B)^d\, Y_s = \zeta_s,
     \qquad
     \zeta_s \overset{\mathrm{iid}}{\sim} \mathcal{N}(0,\, \sigma_\zeta^2),
 \end{equation}
@@ -36,13 +60,13 @@ donde $B$ es el operador de rezago y $(1-B)^d$ es el operador de diferenciación
     \qquad
     \rho(k) = \rho(k-1)\,\frac{k-1+d}{k-d}, \quad k \geq 1,
 \end{equation}
-y la varianza de la innovación se despeja como $\sigma_\zeta^2 = \sigma_Z^2\,\Gamma(1-d)^2/\Gamma(1-2d)$, de modo que $\mathrm{Var}(Z_s) = \sigma_Z^2$ para todo $d$.\\
+y la varianza de la innovación se despeja como $\sigma_\zeta^2 = \sigma_Y^2\,\Gamma(1-d)^2/\Gamma(1-2d)$, de modo que $\mathrm{Var}(Y_s) = \sigma_Y^2$ para todo $d$.\\
 
 La generación procede de la siguiente forma:
 \begin{enumerate}
-    \item Se fijan $d$ y $\sigma_Z$, y se calculan las autocovarianzas $\gamma(k) = \sigma_Z^2\,\rho(k)$, $k = 0, \dots, TL-1$, mediante \eqref{eq:ane_algA1_acf}.
+    \item Se fijan $d$ y $\sigma_Y$, y se calculan las autocovarianzas $\gamma(k) = \sigma_Y^2\,\rho(k)$, $k = 0, \dots, (B+T)L-1$, mediante \eqref{eq:ane_algA1_acf}.
 
-    \item Se simula la trayectoria $Z_1, \dots, Z_{TL}$ de forma exacta mediante el método de Davies--Harte \cite{ane_00_01_davies1987tests}, que incrusta la matriz de covarianza en una matriz circulante y utiliza la transformada rápida de Fourier.
+    \item Se simula la trayectoria $Y_1, \dots, Y_{(B+T)L}$ de forma exacta mediante el método de Davies--Harte \cite{ane_00_01_davies1987tests}, que incrusta la matriz de covarianza en una matriz circulante y utiliza la transformada rápida de Fourier.
 \end{enumerate}
 
 \begin{table}[H]
@@ -54,7 +78,7 @@ La generación procede de la siguiente forma:
 Símbolo & Descripción & Valor \\
 \hline
 $d$          & parámetro de memoria larga                & $0.4$ \\
-$\sigma_Z$   & desviación estándar marginal de $Z_s$     & $0.5$ \\
+$\sigma_Y$   & desviación estándar marginal de $Y_s$     & $0.5$ \\
 \hline
 \end{tabular}
 \end{table}
@@ -63,7 +87,7 @@ $\sigma_Z$   & desviación estándar marginal de $Z_s$     & $0.5$ \\
 \label{ane_00_01_02_alg_a2}
 Este algoritmo genera curvas a partir de un proceso autorregresivo con cambio de régimen markoviano \cite{ane_00_01_hamilton1989new}, con el fin de inducir una ley condicional de mezcla cuyo régimen persiste a lo largo de varias curvas. El proceso se define como
 \begin{equation}\label{eq:ane_algA2_ms}
-    Z_s = m_{S_s} + u_s,
+    Y_s = m_{S_s} + u_s,
     \qquad
     u_s = \phi\, u_{s-1} + \sigma_{S_s}\, \varepsilon_s,
     \qquad
@@ -78,9 +102,9 @@ Los regímenes se distinguen por su nivel, $m_1 = -m$ y $m_2 = +m$, y por su esc
 
 La generación procede de la siguiente forma:
 \begin{enumerate}
-    \item Se simula la cadena $S_1, \dots, S_{TL}$, extrayendo $S_1$ de su distribución estacionaria, $(1/2, 1/2)$, y cada estado posterior desde la fila de $\mathbf{P}$ correspondiente al estado anterior.
+    \item Se simula la cadena $S_1, \dots, S_{(B+T)L}$, extrayendo $S_1$ de su distribución estacionaria, $(1/2, 1/2)$, y cada estado posterior desde la fila de $\mathbf{P}$ correspondiente al estado anterior.
 
-    \item Se inicializa $u_0 = 0$ y se itera \eqref{eq:ane_algA2_ms}, obteniendo $Z_1, \dots, Z_{TL}$. La cadena latente $\{S_s\}$ no se entrega a los métodos.
+    \item Se inicializa $u_0 = 0$ y se itera \eqref{eq:ane_algA2_ms}, obteniendo $Y_1, \dots, Y_{(B+T)L}$. La cadena latente $\{S_s\}$ no se entrega a los métodos.
 \end{enumerate}
 \begin{table}[H]
 \centering
@@ -102,7 +126,7 @@ $\phi$              & coeficiente autorregresivo común              & $0.5$ \\
 \label{ane_00_01_03_alg_a3}
 Este algoritmo genera curvas a partir de un proceso autorregresivo con innovaciones GARCH$(1,1)$ \cite{ane_00_01_bollerslev1986generalized}, con el fin de inducir heterocedasticidad condicional persistente: la dependencia entre curvas consecutivas opera sobre la escala de la serie y no sobre su nivel. El proceso se define como
 \begin{equation}\label{eq:ane_algA3_argarch}
-    Z_s = \phi\, Z_{s-1} + a_s,
+    Y_s = \phi\, Y_{s-1} + a_s,
     \qquad
     a_s = \sqrt{h_s}\, z_s,
     \qquad
@@ -112,13 +136,13 @@ con varianza condicional
 \begin{equation}\label{eq:ane_algA3_recursion}
     h_s = \alpha_0 + \alpha_1\, a_{s-1}^2 + \beta_1\, h_{s-1},
 \end{equation}
-donde $\alpha_1$ gobierna la sensibilidad de la varianza futura a la innovación más reciente y $\beta_1$ la persistencia de la varianza condicional pasada. La estacionariedad de segundo orden requiere $\alpha_1 + \beta_1 < 1$, y esta persistencia total determina cuántas curvas se extiende la agrupación de volatilidad. El nivel base se despeja de la varianza incondicional de la innovación como $\alpha_0 = \sigma_a^2\,(1-\alpha_1-\beta_1)$, y $\phi$, con $|\phi|<1$, determina la suavidad de la trayectoria dentro de cada curva.\\
+donde $\alpha_1$ gobierna la sensibilidad de la varianza futura a la innovación más reciente y $\beta_1$ la persistencia de la varianza condicional pasada. La estacionariedad de segundo orden requiere $\alpha_1 + \beta_1 < 1$, y esta persistencia total fija la memoria de la varianza condicional, del orden de $1/(1-\alpha_1-\beta_1)$ observaciones. Con los valores del Cuadro~\ref{tab:ane_algA3} esa memoria es de unas $50$ observaciones, menor que $L$, de modo que la agrupación de volatilidad se transmite principalmente a la curva inmediatamente siguiente. El nivel base se despeja de la varianza incondicional de la innovación como $\alpha_0 = \sigma_a^2\,(1-\alpha_1-\beta_1)$, y $\phi$, con $|\phi|<1$, determina la suavidad de la trayectoria dentro de cada curva.\\
 
 La generación procede de la siguiente forma:
 \begin{enumerate}
     \item Se fijan $\phi$, $\alpha_1$, $\beta_1$ y $\sigma_a^2$, y se calcula $\alpha_0$.
 
-    \item Se inicializan $h_1 = \sigma_a^2$ y $Z_0 = 0$, y se itera \eqref{eq:ane_algA3_argarch}--\eqref{eq:ane_algA3_recursion}, obteniendo $Z_1, \dots, Z_{TL}$.
+    \item Se inicializan $h_1 = \sigma_a^2$ y $Y_0 = 0$, y se itera \eqref{eq:ane_algA3_argarch}--\eqref{eq:ane_algA3_recursion}, obteniendo $Y_1, \dots, Y_{(B+T)L}$.
 \end{enumerate}
 
 \begin{table}[H]
@@ -130,8 +154,8 @@ La generación procede de la siguiente forma:
 Símbolo & Descripción & Valor \\
 \hline
 $\phi$          & coeficiente autorregresivo                          & $0.5$ \\
-$\alpha_1$      & sensibilidad a la innovación reciente               & $0.02$ \\
-$\beta_1$       & persistencia de la varianza condicional pasada      & $0.975$ \\
+$\alpha_1$      & sensibilidad a la innovación reciente               & $0.08$ \\
+$\beta_1$       & persistencia de la varianza condicional pasada      & $0.90$ \\
 $\sigma_a^2$    & varianza incondicional de la innovación             & $1.0$ \\
 \hline
 \end{tabular}
@@ -153,7 +177,7 @@ f_k\!\left(R_{t-1,1},\ldots,R_{t-1,p}\right)(\tau)
 \varepsilon_t(\tau),
 \end{equation}
 
-donde $f_k$ representa el mecanismo funcional correspondiente al estado $k$, $R_{t-1,j}$ denota el $j$-ésimo rasgo obtenido de la curva anterior y $\varepsilon_t(\tau)$ corresponde al término de error funcional.\\
+donde $f_k$ representa el mecanismo funcional correspondiente al estado $k$, incluida su función media, $R_{t-1,j}$ denota el $j$-ésimo rasgo obtenido de la curva anterior y $\varepsilon_t(\tau)$ corresponde al término de error funcional.\\
 
 Los escenarios se organizan de forma progresiva según la complejidad de esta estructura:
 
@@ -168,7 +192,7 @@ Los escenarios se organizan de forma progresiva según la complejidad de esta es
 \subsection{Algoritmo B-1: Mezcla de mecanismos funcionales lineales}
 \label{ane_00_02_01_alg_b1}
 
-Este algoritmo genera curvas mediante una mezcla de mecanismos funcionales lineales. El objetivo es introducir heterogeneidad en la relación entre curvas consecutivas sin incorporar todavía efectos no lineales. Para ello, se consideran $K$ mecanismos de generación, cada uno caracterizado por una función media y un conjunto de coeficientes funcionales.\\
+Este algoritmo genera curvas mediante una mezcla de $K$ mecanismos funcionales lineales, con el fin de introducir heterogeneidad entre curvas consecutivas sin incorporar aún efectos no lineales.\\
 
 Sea $Z_t \in \{1,\ldots,K\}$ la variable latente que identifica el mecanismo utilizado en el período $t$. Condicionalmente a $Z_t=k$, la curva se genera como
 
@@ -184,9 +208,7 @@ X_t(\tau)
 \varepsilon_t(\tau),
 \end{equation}
 
-donde $\mu_k(\tau)$ representa la función media asociada al mecanismo $k$, $\beta_{kj}(\tau)$ es el efecto funcional del $j$-ésimo rasgo bajo dicho mecanismo y $R_{t-1,j}$ corresponde a una característica de la curva anterior. En este escenario se consideran $p=3$ rasgos funcionales, de manera que cada curva futura depende simultáneamente de tres características de $X_{t-1}$.\\
-
-Los rasgos se definen mediante funcionales lineales de la curva anterior,
+donde $\mu_k(\tau)$ es la función media del mecanismo $k$, $\beta_{kj}(\tau)$ el efecto funcional del $j$-ésimo rasgo bajo dicho mecanismo y $R_{t-1,j}$ una característica de la curva anterior, con $p=3$ rasgos funcionales. Los rasgos se definen mediante funcionales lineales de la curva anterior,
 
 \begin{equation}
 \label{eq:ane_algB1_rasgos}
@@ -196,7 +218,32 @@ R_{t-1,j}
 \qquad j=1,2,3,
 \end{equation}
 
-donde $w_j(s)$ son funciones de ponderación prefijadas. De esta forma, cada rasgo resume información de una región o característica particular de la curva anterior.\\
+donde $w_j(s)=\varphi_j(s)$ corresponden a los tres primeros polinomios de Legendre desplazados a $[0,1]$, ortonormales en $L^2([0,1])$:
+
+\begin{equation}
+\label{eq:ane_algB_legendre}
+\varphi_1(s)=1,\qquad
+\varphi_2(s)=\sqrt{3}\,(2s-1),\qquad
+\varphi_3(s)=\sqrt{5}\,(6s^2-6s+1),
+\end{equation}
+
+de modo que $R_{t-1,1}$, $R_{t-1,2}$ y $R_{t-1,3}$ corresponden al nivel, la pendiente y la curvatura de la curva anterior. Los rasgos se calculan sobre la curva $X_{t-1}$ y no sobre su versión observada con ruido. Los coeficientes funcionales se toman proporcionales al mismo modo, $\beta_{kj}(\tau)=b_{kj}\,\varphi_j(\tau)$, con $b_{kj}\in\mathbb{R}$ constantes.\\
+
+Las funciones medias de los mecanismos son
+\begin{equation}
+\label{eq:ane_algB_medias}
+\mu_1(\tau)=\sin(2\pi\tau),\qquad
+\mu_2(\tau)=\sin(2\pi\tau)+0.3\sin(4\pi\tau),\qquad
+\mu_3(\tau)=0.85\sin(2\pi\tau)-0.2,
+\end{equation}
+deliberadamente cercanas entre sí: como el mecanismo se sortea sin observar la curva anterior, la variabilidad debida a qué media se sorteó es irreducible para cualquier predictor, y medias muy distintas dominarían la varianza de $X_t$. La innovación $\varepsilon_t$ es un proceso gaussiano de media cero, independiente entre períodos y de $Z_t$, con núcleo exponencial cuadrático
+\begin{equation}
+\label{eq:ane_algB_innovacion}
+\mathrm{Cov}\bigl(\varepsilon_t(\tau),\varepsilon_t(s)\bigr)
+=
+\sigma_\varepsilon^2\exp\!\left\{-\frac{(\tau-s)^2}{2\ell^2}\right\},
+\end{equation}
+donde $\ell$ controla la suavidad de la innovación.\\
 
 La variable $Z_t$ se genera independientemente de las curvas, con probabilidades
 
@@ -207,19 +254,38 @@ P(Z_t=k)=\pi_k,
 \sum_{k=1}^{K}\pi_k=1.
 \end{equation}
 
-Por tanto, la heterogeneidad presente en las curvas proviene de la existencia de distintos mecanismos de generación, mientras que la asignación de cada período a un mecanismo no depende todavía de la curva anterior.\\
+La asignación de cada período a un mecanismo no depende todavía de la curva anterior, y la variable $Z_t$ no se entrega a los métodos.\\
 
 La generación procede de la siguiente forma:
 
 \begin{enumerate}
-    \item Se fijan los $K$ mecanismos, sus funciones medias $\mu_k(\tau)$ y sus coeficientes funcionales $\beta_{kj}(\tau)$.
+    \item Se fijan los $K$ mecanismos, sus funciones medias $\mu_k(\tau)$ y sus coeficientes funcionales $\beta_{kj}(\tau)$, y se inicializa $X_0 = \varepsilon_0$ con una extracción de la innovación.
 
     \item Se calculan los tres rasgos $R_{t-1,1}$, $R_{t-1,2}$ y $R_{t-1,3}$ a partir de la curva anterior.
 
-    \item Se genera $Z_t$ de acuerdo con las probabilidades $\{\pi_k\}_{k=1}^{K}$.
+    \item Se genera $Z_t$ de acuerdo con las probabilidades $\{\pi_k\}_{k=1}^{K}$ definidas en \eqref{eq:ane_algB1_mixture}.
 
     \item Se genera $X_t(\tau)$ mediante \eqref{eq:ane_algB1}, utilizando los parámetros correspondientes al mecanismo seleccionado.
 \end{enumerate}
+
+Los coeficientes $b_{kj}$ son
+
+\begin{equation}
+\label{eq:ane_algB1_bkj}
+(b_{kj})=
+\begin{pmatrix}
+\phantom{-}0.85 & 0.40 & 0.15\\
+\phantom{-}0.30 & 0.80 & 0.35\\
+-0.50 & 0.20 & 0.75
+\end{pmatrix},
+\end{equation}
+
+de modo que el mecanismo 1 responde sobre todo al nivel, el 2 a la pendiente y el 3 a la curvatura. Como $\beta_{kj}\propto\varphi_j$, por ortonormalidad
+\begin{equation}
+\label{eq:ane_algB1_rasgo_ar}
+R_{t,j} = \langle \varphi_j, \mu_{Z_t}\rangle + b_{Z_t,j}\,R_{t-1,j} + \langle \varphi_j, \varepsilon_t\rangle,
+\end{equation}
+de modo que cada rasgo evoluciona como un AR(1) escalar de coeficiente aleatorio $b_{Z_t,j}$ cuya media condicional no depende de los otros dos rasgos; sólo las innovaciones $\langle \varphi_j, \varepsilon_t\rangle$ quedan correlacionadas entre rasgos. La estacionariedad de segundo orden se cumple con $\max_j \mathbb{E}[b_{Z_t,j}^2]\approx0.35<1$.\\
 
 \begin{table}[H]
 \centering
@@ -232,12 +298,13 @@ Símbolo & Descripción & Valor \\
 $K$ & número de mecanismos funcionales & $3$ \\
 $p$ & número de rasgos funcionales & $3$ \\
 $\pi_k$ & probabilidad del mecanismo $k$ & $1/3$ \\
-$w_j(\tau)$ & funciones de ponderación & prefijadas \\
-$\beta_{kj}(\tau)$ & coeficientes funcionales & prefijados \\
+$\mu_k$ & función media del mecanismo $k$ & Ecuación~\eqref{eq:ane_algB_medias} \\
+$b_{kj}$ & coeficientes de $\beta_{kj}=b_{kj}\varphi_j$ & Ecuación~\eqref{eq:ane_algB1_bkj} \\
+$\sigma_\varepsilon$ & escala de la innovación funcional & $0.35$ \\
+$\ell$ & longitud de correlación de la innovación & $0.25$ \\
 \hline
 \end{tabular}
 \end{table}
-
 
 \subsection{Algoritmo B-2: Mezcla de mecanismos funcionales no lineales}
 \label{ane_00_02_02_alg_b2}
@@ -259,7 +326,7 @@ R_{t-1,1},R_{t-1,2},R_{t-1,3}
 \varepsilon_t(\tau),
 \end{equation}
 
-donde $f_k$ representa el mecanismo funcional asociado al estado $k$. Para introducir diferentes grados de no linealidad, se consideran mecanismos con estructuras distintas. Por ejemplo, un mecanismo puede presentar una relación lineal,
+donde $f_k$ representa el mecanismo funcional asociado al estado $k$. Los rasgos, las funciones medias $\mu_k$, la innovación $\varepsilon_t$ y las probabilidades $\pi_k$ son los del Algoritmo~B-1; sólo cambian los mecanismos. Para introducir diferentes grados de no linealidad, se consideran tres mecanismos con estructuras distintas. El primero conserva la relación lineal del Algoritmo~B-1,
 
 \begin{equation}
 f_1(R_1,R_2,R_3)(\tau)
@@ -271,7 +338,7 @@ f_1(R_1,R_2,R_3)(\tau)
 \beta_{13}(\tau)R_3,
 \end{equation}
 
-mientras que otros pueden incorporar términos cuadráticos o de interacción,
+mientras que los otros dos incorporan términos cuadráticos y de interacción,
 
 \begin{equation}
 f_2(R_1,R_2,R_3)(\tau)
@@ -295,9 +362,27 @@ f_3(R_1,R_2,R_3)(\tau)
 \beta_{33}(\tau)R_3^2.
 \end{equation}
 
-En este escenario, la asignación $Z_t$ mantiene probabilidades fijas, por lo que la complejidad adicional proviene exclusivamente de la forma de los mecanismos de generación.
+Con $\beta_{kj}(\tau)=b_{kj}\varphi_j(\tau)$ y
 
-La generación procede de forma análoga al Algoritmo~B-1, reemplazando la relación lineal por el mecanismo $f_{Z_t}$ correspondiente.
+\begin{equation}
+\label{eq:ane_algB2_bkj}
+(b_{kj})=
+\begin{pmatrix}
+0.85 & 0.40 & 0.15\\
+0.25 & 0.70 & 0.30\\
+0.30 & 0.30 & 0.25
+\end{pmatrix},
+\end{equation}
+
+donde $b_{kj}$ multiplica el $j$-ésimo término de $f_k$ (mecanismo 1 igual al de B-1). Los términos cuadráticos y de interacción rompen el desacople por rasgo del Algoritmo~B-1, por lo que la estacionariedad no se sigue de una condición cerrada.\\
+
+La generación procede de forma análoga al Algoritmo~B-1:
+\begin{enumerate}
+    \item Se fijan los $K$ mecanismos, sus funciones medias $\mu_k(\tau)$ y sus coeficientes funcionales $\beta_{kj}(\tau)$.
+    \item Se calculan los rasgos $R_{t-1,1}$, $R_{t-1,2}$ y $R_{t-1,3}$ a partir de la curva anterior.
+    \item Se genera $Z_t$ de acuerdo con las probabilidades $\{\pi_k\}_{k=1}^{K}$ definidas en \eqref{eq:ane_algB1_mixture}.
+    \item Se genera $X_t(\tau)$ mediante \eqref{eq:ane_algB2}, utilizando el mecanismo $f_{Z_t}$ seleccionado.
+\end{enumerate}
 
 \begin{table}[H]
 \centering
@@ -310,13 +395,11 @@ Símbolo & Descripción & Valor \\
 $K$ & número de mecanismos funcionales & $3$ \\
 $p$ & número de rasgos funcionales & $3$ \\
 $\pi_k$ & probabilidad del mecanismo $k$ & $1/3$ \\
-$f_1$ & mecanismo lineal & definido en el algoritmo \\
-$f_2$ & mecanismo cuadrático & definido en el algoritmo \\
-$f_3$ & mecanismo con interacciones & definido en el algoritmo \\
+$b_{kj}$ & coeficiente del $j$-ésimo término de $f_k$ & Ecuación~\eqref{eq:ane_algB2_bkj} \\
+$\mu_k$, $\sigma_\varepsilon$, $\ell$ & medias e innovación & iguales a B-1 \\
 \hline
 \end{tabular}
 \end{table}
-
 
 \subsection{Algoritmo B-3: Mezcla funcional con asignación dependiente de múltiples rasgos}
 \label{ane_00_02_03_alg_b3}
@@ -344,6 +427,17 @@ q_h(R_{t-1,1},R_{t-1,2},R_{t-1,3})
 
 donde $q_k(\cdot)$ determina cómo los distintos rasgos funcionales influyen en la probabilidad de seleccionar el mecanismo $k$.\\
 
+Las funciones de asignación son lineales en los rasgos, con el mecanismo 1 como referencia del softmax:
+
+\begin{equation}
+\label{eq:ane_algB3_qk}
+q_1(R)=0,\qquad
+q_2(R)=1.0\,R_1+0.8\,R_2,\qquad
+q_3(R)=-1.0\,R_1+0.8\,R_3.
+\end{equation}
+
+Así, el mecanismo 2 se favorece cuando la curva anterior tiene nivel y pendiente altos, y el mecanismo 3 cuando tiene nivel bajo o curvatura alta.\\
+
 Una vez seleccionado el mecanismo, la curva se genera mediante
 
 \begin{equation}
@@ -356,15 +450,17 @@ f_{Z_t}\!\left(
 R_{t-1,1},R_{t-1,2},R_{t-1,3}
 \right)(\tau)
 +
-\varepsilon_t(\tau).
+\varepsilon_t(\tau),
 \end{equation}
 
-De este modo, la dependencia temporal presenta dos niveles. Primero, la curva anterior determina probabilísticamente el mecanismo que será utilizado. Segundo, el mecanismo seleccionado determina la forma en que los rasgos de la curva anterior se transforman en la nueva curva. Por tanto, la distribución condicional de $X_t$ es una mezcla cuyos pesos dependen de múltiples características funcionales de $X_{t-1}$.\\
+donde los mecanismos $f_1$, $f_2$ y $f_3$, sus coeficientes \eqref{eq:ane_algB2_bkj}, las funciones medias $\mu_k$ y la innovación $\varepsilon_t$ son los del Algoritmo~B-2, de modo que B-3 difiere de B-2 únicamente en la asignación. Como en B-2, la estacionariedad no se sigue de una condición cerrada.\\
+
+De este modo, la dependencia temporal presenta dos niveles. Primero, la curva anterior determina probabilísticamente el mecanismo que será utilizado. Segundo, el mecanismo seleccionado determina la forma en que los rasgos de la curva anterior se transforman en la nueva curva.\\
 
 La generación procede de la siguiente forma:
 
 \begin{enumerate}
-    \item Se fijan los mecanismos $f_1,\ldots,f_K$ y sus correspondientes funciones medias.
+    \item Se fijan los mecanismos $f_1,\ldots,f_K$ del Algoritmo~B-2 y sus correspondientes funciones medias.
 
     \item Se calculan los rasgos funcionales $R_{t-1,1},R_{t-1,2},R_{t-1,3}$.
 
@@ -385,8 +481,9 @@ Símbolo & Descripción & Valor \\
 \hline
 $K$ & número de mecanismos funcionales & $3$ \\
 $p$ & número de rasgos funcionales & $3$ \\
-$q_k$ & función de asignación del mecanismo $k$ & prefijada \\
-$f_k$ & mecanismo funcional no lineal & prefijado \\
+$q_k$ & función de asignación del mecanismo $k$ & Ecuación~\eqref{eq:ane_algB3_qk} \\
+$f_k$, $b_{kj}$ & mecanismos y sus coeficientes & iguales a B-2 \\
+$\mu_k$, $\sigma_\varepsilon$, $\ell$ & medias e innovación & iguales a B-1 \\
 \hline
 \end{tabular}
 \end{table}

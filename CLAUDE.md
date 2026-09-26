@@ -463,7 +463,7 @@ no se cita como estado actual.
 
 ### Corridas vivas — `notebooks/simulaciones/`
 
-Dos familias, una por sección del anexo. Comparten esquema de observación,
+Tres familias, una por sección del anexo. Comparten esquema de observación,
 `mcmc_config`, priors y `N_CHAINS`: cambiarlos convertiría la comparación entre
 escenarios en una comparación entre ajustes.
 
@@ -491,6 +491,14 @@ escenarios en una comparación entre ajustes.
 | `104_sim_B1` | B-1, mezcla de mecanismos, rezago propio de orden `N_LAGS` | `escenario_104` | 1 | `(2, 3, 4)` |
 | `105_sim_B2` | B-2, mezcla de mecanismos, rezago propio de orden `N_LAGS` | `escenario_105` | 2 | `(2, 3, 4)` |
 | `106_sim_B3` | B-3, mezcla de mecanismos, rezago propio de orden `N_LAGS` | `escenario_106` | 3 | `(2, 3, 4, 5)` |
+
+**Sección C del anexo — scores de la representación FPCA** (`ane_00_03`):
+
+| Carpeta | Algoritmo | `BASENAME` | `ESCENARIO_ID` | `M_FPCA_LIST` | covariables |
+|---|---|---|---|---|---|
+| `107_sim_C1` | C-1: mezcla de 3 mecanismos lineales, patrón común | `escenario_107` | 1 | `(3, 4, 5, 6)` | **todos los rezagos, `N_LAGS = L = 2`** |
+| `108_sim_C2` | C-2: patrón de dependencia distinto por mecanismo | `escenario_108` | 2 | `(3, 4, 5, 6)` | **todos los rezagos, `N_LAGS = L = 2`** |
+| `109_sim_C3` | C-3: dinámica y asignación no lineales | `escenario_109` | 3 | `(3, 4, 5, 6)` | **todos los rezagos, `N_LAGS = L = 3`** |
 
 `61_sim_A1` es la plantilla (§4).
 
@@ -560,6 +568,43 @@ ocupación de un átomo crece), y 71-73 predatan ese fix.
 `objetivo == "curva_suavizada"` antes de pivotear) y usan `FARp(p=N_LAGS)` en
 el `_05`, igual que 101-103.
 
+**Las corridas 107-109 son la sección C del anexo: mezcla de $K=3$ mecanismos
+en el espacio de scores.** $X_t = \mu + \sum_{j\le 10} \xi_{tj}\varphi_j$ con
+base de Fourier y $\mu = \sin(2\pi\tau)$ fijas; $Z_t$ se sortea con
+$\mathrm{softmax}_k\, q_k(\xi_{t-1..t-L})$ sobre el VECTOR de scores. Generadores
+en `pipelines/sim_escenario_C1/C2/C3.py` (C1 aloja el motor común,
+`simular_mezcla_scores`, y el control de calidad, `resumen_mezcla_scores`).
+Lo interpretado del anexo, la calibración y las cifras (ocupación, rachas,
+R² oráculo contra lineal, alineación FPCA, estabilidad) están en sus
+docstrings. Lo esencial: en C-1 los mecanismos comparten el PATRÓN de
+$A_{k,l}$ y difieren en valores (ambigüedad del anexo, resuelta así); en C-2
+difiere el patrón (f_k afines); en C-3 f_k y q_k son no lineales con
+interacciones entre rezagos. La dinámica distintiva vive en $\xi_1..\xi_4$;
+$\xi_5..\xi_{10}$ son AR(1) propios comunes, así que `M = 4` es el primer `M`
+que ve toda la dinámica. `internos` trae `mecanismo`, `pi`, `scores`,
+`media_condicional` (oráculo de Bayes exacto) y `soporte` (J, L, J), que el
+`_03 §6.1` y el `_04 §7` usan como `VERDAD` del contraste de PIP.
+
+Mismos fixes que 101-106 —`psbp_train.m`/`config_paths.m` de 101 (`[FIX 2]`),
+gating por dispersión, `apij=1, bpij=5` para todas las covariables (un solo
+tipo en `HP_BY_TYPE`, sin `cross_lag`), `curva_suavizada` con `assert` en
+`_04` y `_05`, `FARp(p=N_LAGS)`, RF/GBT con orden elegido en train, pivot
+filtrado, `MCMC_CONFIG = {3000, 1000, 30, 50}`, `N_CHAINS = 2`— **salvo el
+diseño de covariables**: la componente $k$ usa $\xi_{m,t-l}$ para $m \le M$,
+$l \le$ `N_LAGS` (`p = M·L`, `cov_names` lag-mayor, `G*` global desde la matriz
+común, como la 62), porque la dependencia del anexo es ENTRE scores y un
+rezago propio no la ve. `N_LAGS` es el `L` del anexo, no una perilla. Como el
+diseño depende de `M`, **MATLAB entrena cada `M`** del barrido (sin
+`trazas_en`). `HP_ESCALERA`: `razon_Etau_lambda = max(1, 1/(2(1−R²)))` con el
+R² del AR(L) propio de train (1.3 / 1.3 / 1.1 en `k=0`, 1.0 en el resto),
+`atau` 2.5 / 2.0.
+
+`pipelines/sim_escenario_C.py` implementa **otro** diseño de la sección C
+(impulsor AR(p) con respuesta cuadrática sobre coeficientes de Fourier, sin
+mecanismos ni $Z_t$) que no coincide con el anexo vigente. Sigue exportado
+(`generar_escenario_C`, `ConfigEscenarioC`) pero **ninguna corrida viva lo usa**;
+de él sólo se reutiliza `base_fourier`.
+
 **Las corridas 64-66 entrenan una sola vez.** Con covariable de rezago propio el
 score `xi_k` no depende de `M` —`fpca.transform` devuelve siempre la misma
 columna `k`—, la grilla `G*` se calibra por componente y la semilla es
@@ -611,7 +656,8 @@ real_nivel_v05_m<NN>`, `M_FPCA_LIST = (1, 2, 3)`.
   componente), igual que 101. `HP_ESCALERA` es la del 101 salvo `k=0`, con
   `razon_Etau_lambda = 20`: `xi_1` es el nivel, casi raíz unitaria (R² AR(1) de
   train 0.976), y 2.5 le daba un prior de varianza residual ~17x la medida.
-- `MCMC_CONFIG = {"nsim": 3000, "burn": 1000, "N": 30, "M": 50}`, `N_CHAINS = 2`.
+- `MCMC_CONFIG = {"nsim": 5000, "burn": 2000, "N": 40, "M": 60}`, `N_CHAINS = 2`
+  (es lo que tienen el `24_01` y sus artefactos; antes decía `{3000, 1000, 30, 50}`).
 - `objetivo_evaluacion = "curva_suavizada"`, `modo_residuo = "ninguno"`,
   ventanas `(20, 30, 40)`; Bloque B contra los dos objetivos.
 - `_05`: `FARp(p=N_LAGS)`; RF/GBT barren orden `1..N_LAGS` en ventanas de train.
@@ -624,6 +670,67 @@ real_nivel_v05_m<NN>`, `M_FPCA_LIST = (1, 2, 3)`.
 gating por media del argumento, `objetivo_evaluacion = "curva_observada"` —la
 grilla cruda—, `modo_residuo = "empirico"`, ventanas `(10, 20, 40)`, FAR1, sin
 `[FIX 2]`). **Sus cifras no son comparables con las del 24.**
+
+**`25_real_cripto` es la misma arquitectura del 24 sobre otra serie**: BTCUSDT
+spot de Binance en velas de 5 min, `2020-01-01` → `2026-08-31` (UTC). Cada día
+UTC es una curva de **288** barras. `SERIE_ID = "btcusdt"`, `VENTANA_ID = 1`,
+`EXPERIMENT_ID = real_btcusdt_v01_m<NN>`, `M_FPCA_LIST = (1, 2, 3, 4)`,
+`M_ENTRENO = 4`. Del 24 conserva sin cambios: rezago propio con `N_LAGS = 7`
+(1-7), `apij=1, bpij=5`, gating por dispersión, `MCMC_CONFIG = {5000, 2000, 40,
+60}`, `N_CHAINS = 2`, curva suavizada, `FARp(p=N_LAGS)`, RF/GBT con orden en
+train, `psbp_train.m` con `[FIX 2]` (idéntico al de 101).
+
+- **Carga** (`_01 §2`): los CSV anuales `cripto_binance/BTCUSDT/5m/anual/`
+  (klines sin header, 12 columnas). `open_time` viene en **milisegundos hasta
+  2024 y en microsegundos desde 2025**: la unidad se detecta por archivo
+  (`> 1e14` ⇒ µs) y se verifica que el año de la primera fila coincida con el
+  del nombre. El consolidado `BTCUSDT_5m_20200101_20260831.csv` sólo se
+  contrasta: mismas 700 818 filas, precios, volumen y marcas idénticos
+  (`quote_volume` / `taker_buy_quote` difieren en < 1e-7 por redondeo).
+- **Calidad**: huecos en 2020 (8), 2021 (6) y 2023 (1); 42 barras con volumen 0
+  (barras sin transacciones, se conservan). Días con más de `MAX_HUECO_DIA =
+  0.20` de barras ausentes se descartan (sólo `2020-02-19`); en el resto se
+  interpola el **log-precio** linealmente dentro del día (392 barras). Queda
+  `T = 2434`, 1 salto en la secuencia de días, `T0 = 1703` (train hasta
+  `2024-08-30`).
+- **Curva** (`CURVA` en `[CONFIG]` de `_01 §1.1`, que fija `VENTANA_ID` vía
+  `CURVAS_VENTANA`; `_03`/`_04`/`_05` y el `.m` declaran ese mismo número): por
+  defecto `"retorno_acumulado"` (v01), `X_t(tau_m) = log C_{t,m} − log O_{t,1}`;
+  `"log_parkinson"` (v02), la **volatilidad intradía**, `log σ_{t,m}` con
+  `σ = (log H − log L)/sqrt(4 log 2)` por barra (barras con `H = L` o
+  ausentes se interpolan en log-vol); `"log_precio"` (v03) y `"retorno_barra"`
+  (v04) sólo como referencia. No se usa el precio en nivel: con el corte 70/30 el test
+  cae en niveles fuera del rango de train y ni el FAR ni la FPCA (ajustados en
+  train) extrapolan. El objetivo `curva_suavizada` sale de la curva de `CURVA`.
+- **Base**: el GCV queda en el **borde** del rango `n_basis <= 29` (`nb=29`,
+  orden 3; su mínimo está cerca de `nb≈120`). No se amplió el rango; el piso de
+  la base es chico (MISE cruda-B-spline `~5e-6` contra `5.5e-4` de varianza
+  total) y `§3.6` lo muestra. `K = 29`, `M` al 95 % = 4.
+- **Escalera** (`ESCALERAS[CURVA]`): para el retorno acumulado, la de 103 (A-3):
+  `sd_gate_objetivo = 1.2`, `cv_psi = 0.7`, `razon_Etau_lambda = 1.0`, `atau`
+  2.5 / 2.0; sus scores son casi ruido blanco en media (R² AR(1) de train ≤ 0.01,
+  AR(7) ≤ 0.02 en `k = 1..5`). Para `log_parkinson`, `k = 0` es el nivel de
+  volatilidad del día, persistente (R² AR(7) de train 0.77, fuera de muestra
+  0.71): gating del 101 (0.8 / 1.0) y `razon = 2.0`, prior ~2x el residuo lineal;
+  `k >= 1` (R² AR(7) ≤ 0.18) como el retorno. En `log_parkinson` el 95 % pide
+  `M = 16` (con `M = 4`, 85 %) y la base deja ~30 % de la varianza como ruido
+  barra a barra (MISE cruda-B-spline 0.25 contra 0.82).
+- **`_04 §3` propaga a la curva por tramos** de `BLOQUE_ORIG = 200` orígenes:
+  con `G = 288` el arreglo `(S_FUNC, n_orig, G)` completo pesa 5.6 GB. Sin
+  residuo la propagación es determinista y el resultado es idéntico.
+
+**Resultado esperado, no un fallo** (§2): la curva es un retorno acumulado y se
+comporta como un browniano. Las autofunciones coinciden con las de
+Karhunen-Loève, `sqrt(2) sin(pi (k − 1/2) tau)` (|cos| 0.999 / 0.996 / 0.969 /
+0.937 para `k = 1..4`), y los autovalores decaen como `1/(k − 1/2)^2`. La media
+de los scores no es predecible. La dependencia es de **segundo orden**: la
+volatilidad realizada diaria tiene ACF(1) 0.41 (log: 0.72, con pico en el rezago
+7 por el fin de semana), y `xi_1^2` retiene una parte (ACF(1) 0.155). Dividida
+por la vol del día, `xi_1` queda blanca también en segundo orden. Si el PSBPM-FD
+gana algo aquí, debería ser en el Bloque B y no en el A. El test (desde
+sep-2024) cae en un régimen de **menor volatilidad**: `var(xi_1)` test/train
+= 0.44. **Sus cifras no son comparables con las de 21-24** (otra serie, otra
+grilla).
 
 ### Historia — no se edita ni se cita como estado actual
 
@@ -645,7 +752,7 @@ grilla cruda—, `modo_residuo = "empirico"`, ventanas `(10, 20, 40)`, FAR1, sin
 Señaladas, no resueltas. **Preguntar antes de codificar contra ellas.**
 
 1. **El objetivo de evaluación nuevo (§6.5) no está en todas las corridas.** Lo
-   usan la `65`, las `101`–`106` y la real `24`. Las `61`–`64`, `66` y `71`–`73`
+   usan la `65`, las `101`–`109` y las reales `24` y `25`. Las `61`–`64`, `66` y `71`–`73`
    todavía evalúan contra `X_true` cruda, y las reales `21`–`23` contra la
    grilla cruda observada (`objetivo_evaluacion = "curva_observada"`). Sus
    cifras de Bloque A y B **no son comparables** con las de las corridas

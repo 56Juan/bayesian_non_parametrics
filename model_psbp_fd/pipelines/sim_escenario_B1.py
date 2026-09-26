@@ -51,8 +51,8 @@ terminos cuadraticos y de interaccion, y se calibran por separado.
 Las medias mu_k
 ----------------
 Tres formas distintas pero DELIBERADAMENTE CERCANAS entre si (`media_seno` es
-el `mu(tau) = sin(2 pi tau)` que ya usan A-1/A-2/A-3 y C-1..C-3; aqui es
-ademas `mu_1`):
+el `mu(tau) = sin(2 pi tau)` que tambien importa `sim_escenario_C`; A-1/A-2/A-3
+no suman media, `media_fn = None`; aqui es ademas `mu_1`):
 
     mu_1(tau) = sin(2 pi tau)
     mu_2(tau) = sin(2 pi tau) + 0.3 sin(4 pi tau)
@@ -190,7 +190,7 @@ def calcular_rasgos(X: np.ndarray, pesos: np.ndarray, Phi: np.ndarray) -> np.nda
 
 
 def media_seno(tau: np.ndarray) -> np.ndarray:
-    """mu_1(tau) = sin(2 pi tau): la media que ya comparten A-1..A-3 y C-1..C-3."""
+    """mu_1(tau) = sin(2 pi tau): la media de B-1..B-3, que tambien usa C-1..C-3."""
     return np.sin(2.0 * np.pi * np.asarray(tau, dtype=float))
 
 

@@ -1,0 +1,70 @@
+{
+  "fuente": [
+    "C:\\Users\\56jua\\Desktop\\git_tesis\\bayesian_non_parametrics-1\\data\\reales\\raw\\cripto_binance\\BTCUSDT\\5m\\anual\\BTCUSDT-5m-2020.csv",
+    "C:\\Users\\56jua\\Desktop\\git_tesis\\bayesian_non_parametrics-1\\data\\reales\\raw\\cripto_binance\\BTCUSDT\\5m\\anual\\BTCUSDT-5m-2021.csv",
+    "C:\\Users\\56jua\\Desktop\\git_tesis\\bayesian_non_parametrics-1\\data\\reales\\raw\\cripto_binance\\BTCUSDT\\5m\\anual\\BTCUSDT-5m-2022.csv",
+    "C:\\Users\\56jua\\Desktop\\git_tesis\\bayesian_non_parametrics-1\\data\\reales\\raw\\cripto_binance\\BTCUSDT\\5m\\anual\\BTCUSDT-5m-2023.csv",
+    "C:\\Users\\56jua\\Desktop\\git_tesis\\bayesian_non_parametrics-1\\data\\reales\\raw\\cripto_binance\\BTCUSDT\\5m\\anual\\BTCUSDT-5m-2024.csv",
+    "C:\\Users\\56jua\\Desktop\\git_tesis\\bayesian_non_parametrics-1\\data\\reales\\raw\\cripto_binance\\BTCUSDT\\5m\\anual\\BTCUSDT-5m-2025.csv",
+    "C:\\Users\\56jua\\Desktop\\git_tesis\\bayesian_non_parametrics-1\\data\\reales\\raw\\cripto_binance\\BTCUSDT\\5m\\anual\\BTCUSDT-5m-2026.csv"
+  ],
+  "mercado": "Binance spot BTCUSDT 5m, UTC",
+  "curva": "retorno_acumulado",
+  "variable": "retorno log acumulado intradía",
+  "serie_id": "btcusdt",
+  "ventana_id": 1,
+  "fecha_inicio_pedida": "2020-01-01",
+  "fecha_fin_pedida": "2026-08-31",
+  "fecha_inicio": "2020-01-01",
+  "fecha_fin": "2026-08-31",
+  "T": 2434,
+  "G": 288,
+  "prop_train": 0.7,
+  "barras_dia": 288,
+  "max_hueco_dia": 0.2,
+  "interpolacion": "lineal en log-precio dentro del dia",
+  "dias_descartados": [
+    {
+      "dia": "2020-02-19",
+      "frac_ausente": 0.24305555555555555,
+      "motivo": "> 20% de barras ausentes"
+    }
+  ],
+  "diagnostico": {
+    "T": 2434,
+    "G": 288,
+    "curva": "retorno_acumulado",
+    "acf1_nivel_diario": -0.087427,
+    "acf1_retorno_diario": -0.071078,
+    "acf1_vol_realizada": 0.418079,
+    "sd_entre_dias": 0.017237,
+    "sd_intra_dia_media": 0.009821,
+    "razon_intra_entre": 0.56978,
+    "asimetria_nivel": -0.826915,
+    "exceso_curtosis_nivel": 10.015277,
+    "dias_descartados": 1,
+    "saltos_secuencia_dias": 1,
+    "duplicados_open_time": 0,
+    "barras_interpoladas": 392,
+    "barras_volumen_cero": 42,
+    "unidades_open_time": {
+      "BTCUSDT-5m-2020.csv": "ms",
+      "BTCUSDT-5m-2021.csv": "ms",
+      "BTCUSDT-5m-2022.csv": "ms",
+      "BTCUSDT-5m-2023.csv": "ms",
+      "BTCUSDT-5m-2024.csv": "ms",
+      "BTCUSDT-5m-2025.csv": "us",
+      "BTCUSDT-5m-2026.csv": "us"
+    }
+  },
+  "experiment_id": "real_btcusdt_v01_m03",
+  "m_fpca": 3,
+  "m_fpca_list": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "seed": 41232,
+  "procesado": "2026-09-26 12:48:06"
+}

@@ -29,8 +29,10 @@ El paquete agrupa tres responsabilidades:
    antes de que el analisis comience.
 
 Generadores oficiales: `sim_escenario_1` (base del B-1), `sim_series_clasicas`
-y los Algoritmos A-1, A-2 y A-3 (series clasicas) y B-1, B-2 y B-3 (procesos
-funcionales) del anexo. Los generadores de corridas retiradas (Escenarios 2-6,
+y los Algoritmos A-1, A-2 y A-3 (series clasicas), B-1, B-2 y B-3 (procesos
+funcionales) y C-1, C-2 y C-3 (`sim_escenario_C1/C2/C3`, mezcla de mecanismos
+en el espacio de scores) del anexo. `sim_escenario_C` implementa un diseno
+anterior de la seccion C que no coincide con el anexo vigente. Los generadores de corridas retiradas (Escenarios 2-6,
 B, C-F, TS, J, K, L y CE) viven en `pipelines/deprecated/`: siguen importables
 desde ahi, no desde este paquete, y no forman parte del estudio oficial.
 """
@@ -147,6 +149,27 @@ from .sim_escenario_C import (
     generar_escenario_C,
     resumen_escenario_C,
 )
+# --- Algoritmos C-1, C-2 y C-3 del anexo vigente: mezcla de mecanismos en el
+#     espacio de scores (corridas 107-109). `sim_escenario_C` es otro diseno.
+from .sim_escenario_C1 import (
+    ConfigEscenarioC1,
+    MecanismoScores,
+    generar_escenario_C1,
+    generar_mezcla_scores,
+    resumen_escenario_C1,
+    resumen_mezcla_scores,
+    simular_mezcla_scores,
+)
+from .sim_escenario_C2 import (
+    ConfigEscenarioC2,
+    generar_escenario_C2,
+    resumen_escenario_C2,
+)
+from .sim_escenario_C3 import (
+    ConfigEscenarioC3,
+    generar_escenario_C3,
+    resumen_escenario_C3,
+)
 
 # ══════════════════════════════════════════════════════════════════════════
 # 2. CONTRATO DE ARTEFACTOS
@@ -261,6 +284,20 @@ __all__ = [
     "curvas_truncadas",
     "contabilidad_varianzas",
     "correlaciones_impulsor",
+    # ── Algoritmos C-1, C-2 y C-3: mezcla de mecanismos en el espacio de scores ──
+    "ConfigEscenarioC1",
+    "generar_escenario_C1",
+    "resumen_escenario_C1",
+    "ConfigEscenarioC2",
+    "generar_escenario_C2",
+    "resumen_escenario_C2",
+    "ConfigEscenarioC3",
+    "generar_escenario_C3",
+    "resumen_escenario_C3",
+    "MecanismoScores",
+    "simular_mezcla_scores",
+    "generar_mezcla_scores",
+    "resumen_mezcla_scores",
     # ── Contrato de artefactos ──
     "ARCHIVOS",
     "ArtefactosFPCA",

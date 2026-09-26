@@ -1,0 +1,200 @@
+{
+  "global": {
+    "atau": 2.0,
+    "btau": 0.5,
+    "ag": 2.0,
+    "bg": 0.5,
+    "mumu": 0.0,
+    "taumu": 1.0,
+    "pwj": 0.5
+  },
+  "by_type": {
+    "own_lag1": {
+      "apij": 1.0,
+      "bpij": 5.0
+    },
+    "own_lag2": {
+      "apij": 1.0,
+      "bpij": 5.0
+    },
+    "own_lag3": {
+      "apij": 1.0,
+      "bpij": 5.0
+    },
+    "own_lag4": {
+      "apij": 1.0,
+      "bpij": 5.0
+    }
+  },
+  "escalera": {
+    "0": {
+      "sd_gate_objetivo": 1.2,
+      "cv_psi": 0.7,
+      "atau": 2.5,
+      "razon_Etau_lambda": 1.0
+    },
+    "1": {
+      "sd_gate_objetivo": 1.2,
+      "cv_psi": 0.7,
+      "atau": 2.0,
+      "razon_Etau_lambda": 1.0
+    },
+    "2": {
+      "sd_gate_objetivo": 1.2,
+      "cv_psi": 0.7,
+      "atau": 2.0,
+      "razon_Etau_lambda": 1.0
+    }
+  },
+  "escala_probit": [
+    0.41385792058785476,
+    0.08094157872377487,
+    0.06069153833038259
+  ],
+  "mcmc_config": {
+    "nsim": 5000,
+    "burn": 2000,
+    "N": 40,
+    "M": 60
+  },
+  "n_iter": 2,
+  "seed_scheme": "seed_base + chain*9973 + k*31",
+  "serie_id": "btcusdt",
+  "ventana_id": 1,
+  "m_fpca": 3,
+  "m_entrenamiento": 4,
+  "trazas_en": "real_btcusdt_v01_m04",
+  "covariables": "rezago_propio",
+  "seed_base": 41232,
+  "scores_scale": "raw_fpca_scores",
+  "partition": {
+    "T": 2434,
+    "T0": 1703,
+    "prop_train": 0.7,
+    "n_train_eff": 1699,
+    "n_test_eff": 731,
+    "train_files": [
+      "dataset_fpc_1_train.csv",
+      "dataset_fpc_2_train.csv",
+      "dataset_fpc_3_train.csv"
+    ],
+    "test_files": [
+      "dataset_fpc_1_test.csv",
+      "dataset_fpc_2_test.csv",
+      "dataset_fpc_3_test.csv"
+    ]
+  },
+  "hyperparams_list": [
+    {
+      "component_k": 0,
+      "fpc_idx": 1,
+      "hyperparams": {
+        "atau": 2.5,
+        "btau": 0.0010957949213412023,
+        "ag": 2.0,
+        "bg": 0.5,
+        "mumu": 0.0,
+        "taumu": 1.0,
+        "pwj": 0.5,
+        "apij": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "bpij": [
+          5.0,
+          5.0,
+          5.0,
+          5.0
+        ],
+        "mupsij": [
+          30.707106741323834,
+          30.22124420758383,
+          31.014666806745375,
+          30.702706868637293
+        ],
+        "taupsij": [
+          0.0021643431735049548,
+          0.002234494239808017,
+          0.0021216301588814716,
+          0.00216496354335002
+        ]
+      }
+    },
+    {
+      "component_k": 1,
+      "fpc_idx": 2,
+      "hyperparams": {
+        "atau": 2.0,
+        "btau": 0.00010663937135147991,
+        "ag": 2.0,
+        "bg": 0.5,
+        "mumu": 0.0,
+        "taumu": 1.0,
+        "pwj": 0.5,
+        "apij": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "bpij": [
+          5.0,
+          5.0,
+          5.0,
+          5.0
+        ],
+        "mupsij": [
+          91.66518354895332,
+          92.38281173660435,
+          88.80694346365428,
+          91.48017470893483
+        ],
+        "taupsij": [
+          0.0002428818684420423,
+          0.00023912311946313217,
+          0.00025876770507327973,
+          0.00024386526689508905
+        ]
+      }
+    },
+    {
+      "component_k": 2,
+      "fpc_idx": 3,
+      "hyperparams": {
+        "atau": 2.0,
+        "btau": 3.374845230446286e-05,
+        "ag": 2.0,
+        "bg": 0.5,
+        "mumu": 0.0,
+        "taumu": 1.0,
+        "pwj": 0.5,
+        "apij": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "bpij": [
+          5.0,
+          5.0,
+          5.0,
+          5.0
+        ],
+        "mupsij": [
+          159.42725776368246,
+          158.07699907290404,
+          156.2712938973073,
+          157.89172576782627
+        ],
+        "taupsij": [
+          8.029320023114046e-05,
+          8.167075202309772e-05,
+          8.356905744273912e-05,
+          8.186253266051048e-05
+        ]
+      }
+    }
+  ]
+}

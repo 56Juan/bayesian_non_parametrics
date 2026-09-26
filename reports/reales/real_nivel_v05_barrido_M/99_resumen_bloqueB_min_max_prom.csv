@@ -1,0 +1,109 @@
+M,metrica,columna,banda,bloque,minimo,maximo,promedio
+1,5. MPIW,mpiw,FAR (IC del modelo AR),test,0.17472376397776274,0.17472376397776276,0.17472376397776274
+1,5. MPIW,mpiw,FAR (IC del modelo AR),train,0.17472376397776274,0.17472376397776276,0.17472376397776274
+1,5. MPIW,mpiw,"PSBPM-FD (IC gaussiano, mismo mecanismo)",test,0.22366182718331673,0.22366182718331673,0.22366182718331673
+1,5. MPIW,mpiw,"PSBPM-FD (IC gaussiano, mismo mecanismo)",train,0.22366182718331673,0.22366182718331673,0.22366182718331673
+1,5. MPIW,mpiw,PSBPM-FD (predictiva bayesiana),test,0.22994642675328417,0.35924889181746916,0.26264813101809625
+1,5. MPIW,mpiw,PSBPM-FD (predictiva bayesiana),train,0.21112118391763596,1.2326882205371346,0.3083413091391239
+1,6. PICP puntual,picp,FAR (IC del modelo AR),test,0.9170068027210885,1.0,0.9935553168635876
+1,6. PICP puntual,picp,FAR (IC del modelo AR),train,0.6714285714285714,1.0,0.9690163575249425
+1,6. PICP puntual,picp,"PSBPM-FD (IC gaussiano, mismo mecanismo)",test,0.9653061224489796,1.0,0.9973914377781187
+1,6. PICP puntual,picp,"PSBPM-FD (IC gaussiano, mismo mecanismo)",train,0.4387755102040816,1.0,0.955170976481716
+1,6. PICP puntual,picp,PSBPM-FD (predictiva bayesiana),test,0.9836734693877551,1.0,0.9981970231701703
+1,6. PICP puntual,picp,PSBPM-FD (predictiva bayesiana),train,0.6646258503401361,1.0,0.9763743046315149
+1,7. PICPB curva completa,picp_simultaneo,FAR (IC del modelo AR),test,0.7666666666666667,1.0,0.9680451127819549
+1,7. PICPB curva completa,picp_simultaneo,FAR (IC del modelo AR),train,0.13333333333333333,1.0,0.8938727415553811
+1,7. PICPB curva completa,picp_simultaneo,"PSBPM-FD (IC gaussiano, mismo mecanismo)",test,0.9,1.0,0.9887218045112782
+1,7. PICPB curva completa,picp_simultaneo,"PSBPM-FD (IC gaussiano, mismo mecanismo)",train,0.03333333333333333,1.0,0.900026184865148
+1,7. PICPB curva completa,picp_simultaneo,PSBPM-FD (predictiva bayesiana),test,0.9666666666666667,1.0,0.9924812030075187
+1,7. PICPB curva completa,picp_simultaneo,PSBPM-FD (predictiva bayesiana),train,0.13333333333333333,1.0,0.8825085100811731
+1,8. Winkler,winkler,FAR (IC del modelo AR),test,0.17386810542832698,0.401248732470502,0.1884092822258084
+1,8. Winkler,winkler,FAR (IC del modelo AR),train,0.17386810542832698,1.6891559272603074,0.28444775884677587
+1,8. Winkler,winkler,"PSBPM-FD (IC gaussiano, mismo mecanismo)",test,0.22275804161254936,0.33306377909686535,0.2294719937133318
+1,8. Winkler,winkler,"PSBPM-FD (IC gaussiano, mismo mecanismo)",train,0.22275804161254936,2.492032005739058,0.38322610231110515
+1,8. Winkler,winkler,PSBPM-FD (predictiva bayesiana),test,0.23049727007746693,0.3590244846211539,0.2662029643405849
+1,8. Winkler,winkler,PSBPM-FD (predictiva bayesiana),train,0.21446536909180075,1.965855974819658,0.39311836953390417
+1,9. Winkler max promedio,winkler_max_medio,FAR (IC del modelo AR),test,0.2976318472237039,0.9228779248731179,0.34786638283663135
+1,9. Winkler max promedio,winkler_max_medio,FAR (IC del modelo AR),train,0.2976318472237039,5.086012114695842,0.7216296012730888
+1,9. Winkler max promedio,winkler_max_medio,"PSBPM-FD (IC gaussiano, mismo mecanismo)",test,0.3193115779949428,0.6984867402015768,0.34664138798934907
+1,9. Winkler max promedio,winkler_max_medio,"PSBPM-FD (IC gaussiano, mismo mecanismo)",train,0.31931157799494275,6.9616335444823205,0.8905217112208639
+1,9. Winkler max promedio,winkler_max_medio,PSBPM-FD (predictiva bayesiana),test,0.23857117493947347,0.5033278401009367,0.2870445802323765
+1,9. Winkler max promedio,winkler_max_medio,PSBPM-FD (predictiva bayesiana),train,0.24616931080818177,5.253959931096568,0.7453720892280236
+1,10. Winkler max peor ventana,winkler_max_glob,FAR (IC del modelo AR),test,0.29763184722370406,11.828878969510434,1.194032794868852
+1,10. Winkler max peor ventana,winkler_max_glob,FAR (IC del modelo AR),train,0.29763184722370406,75.80527968825078,5.138995585299765
+1,10. Winkler max peor ventana,winkler_max_glob,"PSBPM-FD (IC gaussiano, mismo mecanismo)",test,0.3193115779949428,10.90841184913802,1.005100380501944
+1,10. Winkler max peor ventana,winkler_max_glob,"PSBPM-FD (IC gaussiano, mismo mecanismo)",train,0.3193115779949427,74.88107053111146,5.431260667183132
+1,10. Winkler max peor ventana,winkler_max_glob,PSBPM-FD (predictiva bayesiana),test,0.299136757850647,7.200587497091667,0.8215718933807985
+1,10. Winkler max peor ventana,winkler_max_glob,PSBPM-FD (predictiva bayesiana),train,0.33109039068222046,72.68575543664906,5.613377074434478
+2,5. MPIW,mpiw,FAR (IC del modelo AR),test,0.17472376397776274,0.17472376397776276,0.17472376397776274
+2,5. MPIW,mpiw,FAR (IC del modelo AR),train,0.17472376397776274,0.17472376397776276,0.17472376397776274
+2,5. MPIW,mpiw,"PSBPM-FD (IC gaussiano, mismo mecanismo)",test,0.21460737722014067,0.21460737722014075,0.21460737722014067
+2,5. MPIW,mpiw,"PSBPM-FD (IC gaussiano, mismo mecanismo)",train,0.21460737722014067,0.21460737722014075,0.21460737722014067
+2,5. MPIW,mpiw,PSBPM-FD (predictiva bayesiana),test,0.24540565622096158,0.37484118387001714,0.27828316406603754
+2,5. MPIW,mpiw,PSBPM-FD (predictiva bayesiana),train,0.2311632994891835,1.261625400952184,0.33310087401667504
+2,6. PICP puntual,picp,FAR (IC del modelo AR),test,0.9170068027210885,1.0,0.9935553168635876
+2,6. PICP puntual,picp,FAR (IC del modelo AR),train,0.6714285714285714,1.0,0.9690163575249425
+2,6. PICP puntual,picp,"PSBPM-FD (IC gaussiano, mismo mecanismo)",test,0.9605442176870749,1.0,0.9965474911769219
+2,6. PICP puntual,picp,"PSBPM-FD (IC gaussiano, mismo mecanismo)",train,0.34285714285714286,1.0,0.954867445800001
+2,6. PICP puntual,picp,PSBPM-FD (predictiva bayesiana),test,0.9850340136054422,1.0,0.9989258861439313
+2,6. PICP puntual,picp,PSBPM-FD (predictiva bayesiana),train,0.8959183673469387,1.0,0.9871202526572295
+2,7. PICPB curva completa,picp_simultaneo,FAR (IC del modelo AR),test,0.7666666666666667,1.0,0.9680451127819549
+2,7. PICPB curva completa,picp_simultaneo,FAR (IC del modelo AR),train,0.13333333333333333,1.0,0.8938727415553811
+2,7. PICPB curva completa,picp_simultaneo,"PSBPM-FD (IC gaussiano, mismo mecanismo)",test,0.9,1.0,0.9906015037593985
+2,7. PICPB curva completa,picp_simultaneo,"PSBPM-FD (IC gaussiano, mismo mecanismo)",train,0.0,1.0,0.8948153967007069
+2,7. PICPB curva completa,picp_simultaneo,PSBPM-FD (predictiva bayesiana),test,0.9666666666666667,1.0,0.9943609022556391
+2,7. PICPB curva completa,picp_simultaneo,PSBPM-FD (predictiva bayesiana),train,0.4,1.0,0.908929039015449
+2,8. Winkler,winkler,FAR (IC del modelo AR),test,0.17386810542832698,0.401248732470502,0.1884092822258084
+2,8. Winkler,winkler,FAR (IC del modelo AR),train,0.17386810542832698,1.6891559272603074,0.28444775884677587
+2,8. Winkler,winkler,"PSBPM-FD (IC gaussiano, mismo mecanismo)",test,0.21344370921662476,0.32765930365407386,0.22064103881464747
+2,8. Winkler,winkler,"PSBPM-FD (IC gaussiano, mismo mecanismo)",train,0.21344370921662476,2.6269545002708794,0.3602795465486129
+2,8. Winkler,winkler,PSBPM-FD (predictiva bayesiana),test,0.24534435243242314,0.3746902282660206,0.2816676280403811
+2,8. Winkler,winkler,PSBPM-FD (predictiva bayesiana),train,0.23346173512311755,1.6918756494501068,0.38174837742205703
+2,9. Winkler max promedio,winkler_max_medio,FAR (IC del modelo AR),test,0.2976318472237039,0.9228779248731179,0.34786638283663135
+2,9. Winkler max promedio,winkler_max_medio,FAR (IC del modelo AR),train,0.2976318472237039,5.086012114695842,0.7216296012730888
+2,9. Winkler max promedio,winkler_max_medio,"PSBPM-FD (IC gaussiano, mismo mecanismo)",test,0.3251768064984384,0.7102045703553937,0.3528078057268114
+2,9. Winkler max promedio,winkler_max_medio,"PSBPM-FD (IC gaussiano, mismo mecanismo)",train,0.3251768064984384,6.828427046818291,0.872985366967279
+2,9. Winkler max promedio,winkler_max_medio,PSBPM-FD (predictiva bayesiana),test,0.26220860282580055,0.5348353659423317,0.3129950825323371
+2,9. Winkler max promedio,winkler_max_medio,PSBPM-FD (predictiva bayesiana),train,0.2681580486615579,4.717301564188893,0.6558789408280373
+2,10. Winkler max peor ventana,winkler_max_glob,FAR (IC del modelo AR),test,0.29763184722370406,11.828878969510434,1.194032794868852
+2,10. Winkler max peor ventana,winkler_max_glob,FAR (IC del modelo AR),train,0.29763184722370406,75.80527968825078,5.138995585299765
+2,10. Winkler max peor ventana,winkler_max_glob,"PSBPM-FD (IC gaussiano, mismo mecanismo)",test,0.3251768064984385,11.05122097823291,1.0080568847992992
+2,10. Winkler max peor ventana,winkler_max_glob,"PSBPM-FD (IC gaussiano, mismo mecanismo)",train,0.3251768064984384,74.66910942883032,5.389579044758612
+2,10. Winkler max peor ventana,winkler_max_glob,PSBPM-FD (predictiva bayesiana),test,0.33944278955459595,7.351372049188988,0.8226821929062029
+2,10. Winkler max peor ventana,winkler_max_glob,PSBPM-FD (predictiva bayesiana),train,0.34695863723754883,72.69568461679432,5.036425282622318
+3,5. MPIW,mpiw,FAR (IC del modelo AR),test,0.17472376397776274,0.17472376397776276,0.17472376397776274
+3,5. MPIW,mpiw,FAR (IC del modelo AR),train,0.17472376397776274,0.17472376397776276,0.17472376397776274
+3,5. MPIW,mpiw,"PSBPM-FD (IC gaussiano, mismo mecanismo)",test,0.21035337062227974,0.2103533706222798,0.21035337062227977
+3,5. MPIW,mpiw,"PSBPM-FD (IC gaussiano, mismo mecanismo)",train,0.21035337062227974,0.2103533706222798,0.21035337062227977
+3,5. MPIW,mpiw,PSBPM-FD (predictiva bayesiana),test,0.25663442469778514,0.38728420215399084,0.2915969985542709
+3,5. MPIW,mpiw,PSBPM-FD (predictiva bayesiana),train,0.24825174293550503,1.2754356095028825,0.3490189530271407
+3,6. PICP puntual,picp,FAR (IC del modelo AR),test,0.9170068027210885,1.0,0.9935553168635876
+3,6. PICP puntual,picp,FAR (IC del modelo AR),train,0.6714285714285714,1.0,0.9690163575249425
+3,6. PICP puntual,picp,"PSBPM-FD (IC gaussiano, mismo mecanismo)",test,0.9625850340136054,1.0,0.9963940463403406
+3,6. PICP puntual,picp,"PSBPM-FD (IC gaussiano, mismo mecanismo)",train,0.3653061224489796,1.0,0.9567735971057708
+3,6. PICP puntual,picp,PSBPM-FD (predictiva bayesiana),test,0.9850340136054422,1.0,0.9988875249347859
+3,6. PICP puntual,picp,PSBPM-FD (predictiva bayesiana),train,0.9170068027210885,1.0,0.9918821574191342
+3,7. PICPB curva completa,picp_simultaneo,FAR (IC del modelo AR),test,0.7666666666666667,1.0,0.9680451127819549
+3,7. PICPB curva completa,picp_simultaneo,FAR (IC del modelo AR),train,0.13333333333333333,1.0,0.8938727415553811
+3,7. PICPB curva completa,picp_simultaneo,"PSBPM-FD (IC gaussiano, mismo mecanismo)",test,0.9,1.0,0.9887218045112782
+3,7. PICPB curva completa,picp_simultaneo,"PSBPM-FD (IC gaussiano, mismo mecanismo)",train,0.0,1.0,0.8979575805184603
+3,7. PICPB curva completa,picp_simultaneo,PSBPM-FD (predictiva bayesiana),test,0.9666666666666667,1.0,0.9962406015037594
+3,7. PICPB curva completa,picp_simultaneo,PSBPM-FD (predictiva bayesiana),train,0.7,1.0,0.9400628436763551
+3,8. Winkler,winkler,FAR (IC del modelo AR),test,0.17386810542832698,0.401248732470502,0.1884092822258084
+3,8. Winkler,winkler,FAR (IC del modelo AR),train,0.17386810542832698,1.6891559272603074,0.28444775884677587
+3,8. Winkler,winkler,"PSBPM-FD (IC gaussiano, mismo mecanismo)",test,0.20921753601561477,0.33401933724696165,0.2174426163516667
+3,8. Winkler,winkler,"PSBPM-FD (IC gaussiano, mismo mecanismo)",train,0.20921753601561477,2.585555088774098,0.3490043394093496
+3,8. Winkler,winkler,PSBPM-FD (predictiva bayesiana),test,0.25639824049754273,0.3870055526701941,0.2947146694426074
+3,8. Winkler,winkler,PSBPM-FD (predictiva bayesiana),train,0.2490549571894939,1.700521757329308,0.3884661274333676
+3,9. Winkler max promedio,winkler_max_medio,FAR (IC del modelo AR),test,0.2976318472237039,0.9228779248731179,0.34786638283663135
+3,9. Winkler max promedio,winkler_max_medio,FAR (IC del modelo AR),train,0.2976318472237039,5.086012114695842,0.7216296012730888
+3,9. Winkler max promedio,winkler_max_medio,"PSBPM-FD (IC gaussiano, mismo mecanismo)",test,0.312088094842778,0.7303683726488944,0.3437819224228675
+3,9. Winkler max promedio,winkler_max_medio,"PSBPM-FD (IC gaussiano, mismo mecanismo)",train,0.312088094842778,6.723218993319695,0.8289620481974084
+3,9. Winkler max promedio,winkler_max_medio,PSBPM-FD (predictiva bayesiana),test,0.2870450735092163,0.5519617354186501,0.3403246504497017
+3,9. Winkler max promedio,winkler_max_medio,PSBPM-FD (predictiva bayesiana),train,0.29917644063631693,4.634414592424799,0.6381180763159645
+3,10. Winkler max peor ventana,winkler_max_glob,FAR (IC del modelo AR),test,0.29763184722370406,11.828878969510434,1.194032794868852
+3,10. Winkler max peor ventana,winkler_max_glob,FAR (IC del modelo AR),train,0.29763184722370406,75.80527968825078,5.138995585299765
+3,10. Winkler max peor ventana,winkler_max_glob,"PSBPM-FD (IC gaussiano, mismo mecanismo)",test,0.3120880948427781,10.951020709554937,1.03038589686602
+3,10. Winkler max peor ventana,winkler_max_glob,"PSBPM-FD (IC gaussiano, mismo mecanismo)",train,0.312088094842778,75.19494887933354,5.391361677413883
+3,10. Winkler max peor ventana,winkler_max_glob,PSBPM-FD (predictiva bayesiana),test,0.3627859354019165,7.1978662470344466,0.8796330784135217
+3,10. Winkler max peor ventana,winkler_max_glob,PSBPM-FD (predictiva bayesiana),train,0.38173866271972656,72.70299929880116,4.736385361737979
