@@ -120,6 +120,24 @@ from .sim_escenario_CE import (
     simular_coeficientes_CE,
 )
 
+# --- Algoritmos B-1/B-2/B-3 HISTORICOS (usados por 71/72/73; el anexo los
+# redefinio como mezcla de mecanismos, ver pipelines.sim_escenario_B1/B2/B3) ---
+from .sim_escenario_B1_far import (
+    ConfigEscenarioB1 as ConfigEscenarioB1Far,
+    generar_escenario_B1 as generar_escenario_B1_far,
+    resumen_escenario_B1 as resumen_escenario_B1_far,
+)
+from .sim_escenario_B2_tvfar import (
+    ConfigEscenarioB2 as ConfigEscenarioB2TvFar,
+    generar_escenario_B2 as generar_escenario_B2_tvfar,
+    resumen_escenario_B2 as resumen_escenario_B2_tvfar,
+)
+from .sim_escenario_B3_cambio_estructural import (
+    ConfigEscenarioB3 as ConfigEscenarioB3CambioEstructural,
+    generar_escenario_B3 as generar_escenario_B3_cambio_estructural,
+    resumen_escenario_B3 as resumen_escenario_B3_cambio_estructural,
+)
+
 __all__ = [
     "ConfigEscenario2", "generar_escenario_2", "resumen_escenario_2",
     "simular_trayectoria_fgarch", "construir_operadores_garch",
@@ -151,4 +169,8 @@ __all__ = [
     "generar_escenario_L", "resumen_escenario_L", "simular_coeficientes",
     "ConfigEscenarioCE", "FASES", "generar_escenario_CE",
     "resumen_escenario_CE", "simular_coeficientes_CE",
+    "ConfigEscenarioB1Far", "generar_escenario_B1_far", "resumen_escenario_B1_far",
+    "ConfigEscenarioB2TvFar", "generar_escenario_B2_tvfar", "resumen_escenario_B2_tvfar",
+    "ConfigEscenarioB3CambioEstructural", "generar_escenario_B3_cambio_estructural",
+    "resumen_escenario_B3_cambio_estructural",
 ]

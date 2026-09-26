@@ -1,0 +1,145 @@
+w,metrica,columna,criterio,bloque,M,n_ventanas,pct_ventanas_ganadas
+20,5. MPIW,mpiw,menor es mejor,train,1,677,1.0
+20,5. MPIW,mpiw,menor es mejor,train,2,677,0.0
+20,5. MPIW,mpiw,menor es mejor,train,3,677,0.0
+20,5. MPIW,mpiw,menor es mejor,train,4,677,0.0
+20,5. MPIW,mpiw,menor es mejor,test,1,281,1.0
+20,5. MPIW,mpiw,menor es mejor,test,2,281,0.0
+20,5. MPIW,mpiw,menor es mejor,test,3,281,0.0
+20,5. MPIW,mpiw,menor es mejor,test,4,281,0.0
+20,6. PICP puntual,picp,|valor - nominal|,train,1,677,0.0
+20,6. PICP puntual,picp,|valor - nominal|,train,2,677,0.31610044313146235
+20,6. PICP puntual,picp,|valor - nominal|,train,3,677,0.1536189069423929
+20,6. PICP puntual,picp,|valor - nominal|,train,4,677,0.5302806499261448
+20,6. PICP puntual,picp,|valor - nominal|,test,1,281,0.0
+20,6. PICP puntual,picp,|valor - nominal|,test,2,281,0.17793594306049823
+20,6. PICP puntual,picp,|valor - nominal|,test,3,281,0.14590747330960854
+20,6. PICP puntual,picp,|valor - nominal|,test,4,281,0.6761565836298933
+20,7. PICPB curva completa,picp_simultaneo,|valor - nominal|,train,1,677,0.0
+20,7. PICPB curva completa,picp_simultaneo,|valor - nominal|,train,2,677,0.103397341211226
+20,7. PICPB curva completa,picp_simultaneo,|valor - nominal|,train,3,677,0.37370753323485967
+20,7. PICPB curva completa,picp_simultaneo,|valor - nominal|,train,4,677,0.5228951255539144
+20,7. PICPB curva completa,picp_simultaneo,|valor - nominal|,test,1,281,0.0
+20,7. PICPB curva completa,picp_simultaneo,|valor - nominal|,test,2,281,0.10320284697508897
+20,7. PICPB curva completa,picp_simultaneo,|valor - nominal|,test,3,281,0.2918149466192171
+20,7. PICPB curva completa,picp_simultaneo,|valor - nominal|,test,4,281,0.604982206405694
+20,8. Winkler,winkler,menor es mejor,train,1,677,0.0
+20,8. Winkler,winkler,menor es mejor,train,2,677,0.3293943870014771
+20,8. Winkler,winkler,menor es mejor,train,3,677,0.206794682422452
+20,8. Winkler,winkler,menor es mejor,train,4,677,0.4638109305760709
+20,8. Winkler,winkler,menor es mejor,test,1,281,0.0
+20,8. Winkler,winkler,menor es mejor,test,2,281,0.1103202846975089
+20,8. Winkler,winkler,menor es mejor,test,3,281,0.2597864768683274
+20,8. Winkler,winkler,menor es mejor,test,4,281,0.6298932384341637
+20,9. Winkler max promedio,winkler_max_medio,menor es mejor,train,1,677,0.0
+20,9. Winkler max promedio,winkler_max_medio,menor es mejor,train,2,677,0.0
+20,9. Winkler max promedio,winkler_max_medio,menor es mejor,train,3,677,0.03692762186115214
+20,9. Winkler max promedio,winkler_max_medio,menor es mejor,train,4,677,0.9630723781388478
+20,9. Winkler max promedio,winkler_max_medio,menor es mejor,test,1,281,0.0
+20,9. Winkler max promedio,winkler_max_medio,menor es mejor,test,2,281,0.0
+20,9. Winkler max promedio,winkler_max_medio,menor es mejor,test,3,281,0.0
+20,9. Winkler max promedio,winkler_max_medio,menor es mejor,test,4,281,1.0
+20,10. Winkler max peor ventana,winkler_max_glob,menor es mejor,train,1,677,0.0
+20,10. Winkler max peor ventana,winkler_max_glob,menor es mejor,train,2,677,0.047267355982274745
+20,10. Winkler max peor ventana,winkler_max_glob,menor es mejor,train,3,677,0.276218611521418
+20,10. Winkler max peor ventana,winkler_max_glob,menor es mejor,train,4,677,0.6765140324963073
+20,10. Winkler max peor ventana,winkler_max_glob,menor es mejor,test,1,281,0.0
+20,10. Winkler max peor ventana,winkler_max_glob,menor es mejor,test,2,281,0.0
+20,10. Winkler max peor ventana,winkler_max_glob,menor es mejor,test,3,281,0.11387900355871886
+20,10. Winkler max peor ventana,winkler_max_glob,menor es mejor,test,4,281,0.8861209964412812
+30,5. MPIW,mpiw,menor es mejor,train,1,667,1.0
+30,5. MPIW,mpiw,menor es mejor,train,2,667,0.0
+30,5. MPIW,mpiw,menor es mejor,train,3,667,0.0
+30,5. MPIW,mpiw,menor es mejor,train,4,667,0.0
+30,5. MPIW,mpiw,menor es mejor,test,1,271,1.0
+30,5. MPIW,mpiw,menor es mejor,test,2,271,0.0
+30,5. MPIW,mpiw,menor es mejor,test,3,271,0.0
+30,5. MPIW,mpiw,menor es mejor,test,4,271,0.0
+30,6. PICP puntual,picp,|valor - nominal|,train,1,667,0.0
+30,6. PICP puntual,picp,|valor - nominal|,train,2,667,0.2608695652173913
+30,6. PICP puntual,picp,|valor - nominal|,train,3,667,0.19640179910044978
+30,6. PICP puntual,picp,|valor - nominal|,train,4,667,0.5427286356821589
+30,6. PICP puntual,picp,|valor - nominal|,test,1,271,0.0
+30,6. PICP puntual,picp,|valor - nominal|,test,2,271,0.11439114391143912
+30,6. PICP puntual,picp,|valor - nominal|,test,3,271,0.14760147601476015
+30,6. PICP puntual,picp,|valor - nominal|,test,4,271,0.7380073800738007
+30,7. PICPB curva completa,picp_simultaneo,|valor - nominal|,train,1,667,0.0
+30,7. PICPB curva completa,picp_simultaneo,|valor - nominal|,train,2,667,0.017991004497751123
+30,7. PICPB curva completa,picp_simultaneo,|valor - nominal|,train,3,667,0.3148425787106447
+30,7. PICPB curva completa,picp_simultaneo,|valor - nominal|,train,4,667,0.6671664167916042
+30,7. PICPB curva completa,picp_simultaneo,|valor - nominal|,test,1,271,0.0
+30,7. PICPB curva completa,picp_simultaneo,|valor - nominal|,test,2,271,0.02952029520295203
+30,7. PICPB curva completa,picp_simultaneo,|valor - nominal|,test,3,271,0.18081180811808117
+30,7. PICPB curva completa,picp_simultaneo,|valor - nominal|,test,4,271,0.7896678966789668
+30,8. Winkler,winkler,menor es mejor,train,1,667,0.0
+30,8. Winkler,winkler,menor es mejor,train,2,667,0.29235382308845576
+30,8. Winkler,winkler,menor es mejor,train,3,667,0.20239880059970014
+30,8. Winkler,winkler,menor es mejor,train,4,667,0.5052473763118441
+30,8. Winkler,winkler,menor es mejor,test,1,271,0.0
+30,8. Winkler,winkler,menor es mejor,test,2,271,0.01845018450184502
+30,8. Winkler,winkler,menor es mejor,test,3,271,0.23616236162361623
+30,8. Winkler,winkler,menor es mejor,test,4,271,0.7453874538745388
+30,9. Winkler max promedio,winkler_max_medio,menor es mejor,train,1,667,0.0
+30,9. Winkler max promedio,winkler_max_medio,menor es mejor,train,2,667,0.0
+30,9. Winkler max promedio,winkler_max_medio,menor es mejor,train,3,667,0.022488755622188907
+30,9. Winkler max promedio,winkler_max_medio,menor es mejor,train,4,667,0.9775112443778111
+30,9. Winkler max promedio,winkler_max_medio,menor es mejor,test,1,271,0.0
+30,9. Winkler max promedio,winkler_max_medio,menor es mejor,test,2,271,0.0
+30,9. Winkler max promedio,winkler_max_medio,menor es mejor,test,3,271,0.0
+30,9. Winkler max promedio,winkler_max_medio,menor es mejor,test,4,271,1.0
+30,10. Winkler max peor ventana,winkler_max_glob,menor es mejor,train,1,667,0.0
+30,10. Winkler max peor ventana,winkler_max_glob,menor es mejor,train,2,667,0.050974512743628186
+30,10. Winkler max peor ventana,winkler_max_glob,menor es mejor,train,3,667,0.29685157421289354
+30,10. Winkler max peor ventana,winkler_max_glob,menor es mejor,train,4,667,0.6521739130434783
+30,10. Winkler max peor ventana,winkler_max_glob,menor es mejor,test,1,271,0.0
+30,10. Winkler max peor ventana,winkler_max_glob,menor es mejor,test,2,271,0.0
+30,10. Winkler max peor ventana,winkler_max_glob,menor es mejor,test,3,271,0.13653136531365315
+30,10. Winkler max peor ventana,winkler_max_glob,menor es mejor,test,4,271,0.8634686346863468
+40,5. MPIW,mpiw,menor es mejor,train,1,657,1.0
+40,5. MPIW,mpiw,menor es mejor,train,2,657,0.0
+40,5. MPIW,mpiw,menor es mejor,train,3,657,0.0
+40,5. MPIW,mpiw,menor es mejor,train,4,657,0.0
+40,5. MPIW,mpiw,menor es mejor,test,1,261,1.0
+40,5. MPIW,mpiw,menor es mejor,test,2,261,0.0
+40,5. MPIW,mpiw,menor es mejor,test,3,261,0.0
+40,5. MPIW,mpiw,menor es mejor,test,4,261,0.0
+40,6. PICP puntual,picp,|valor - nominal|,train,1,657,0.0
+40,6. PICP puntual,picp,|valor - nominal|,train,2,657,0.1993911719939117
+40,6. PICP puntual,picp,|valor - nominal|,train,3,657,0.2222222222222222
+40,6. PICP puntual,picp,|valor - nominal|,train,4,657,0.578386605783866
+40,6. PICP puntual,picp,|valor - nominal|,test,1,261,0.0
+40,6. PICP puntual,picp,|valor - nominal|,test,2,261,0.06513409961685823
+40,6. PICP puntual,picp,|valor - nominal|,test,3,261,0.14942528735632185
+40,6. PICP puntual,picp,|valor - nominal|,test,4,261,0.7854406130268199
+40,7. PICPB curva completa,picp_simultaneo,|valor - nominal|,train,1,657,0.0
+40,7. PICPB curva completa,picp_simultaneo,|valor - nominal|,train,2,657,0.0
+40,7. PICPB curva completa,picp_simultaneo,|valor - nominal|,train,3,657,0.2267884322678843
+40,7. PICPB curva completa,picp_simultaneo,|valor - nominal|,train,4,657,0.7732115677321156
+40,7. PICPB curva completa,picp_simultaneo,|valor - nominal|,test,1,261,0.0
+40,7. PICPB curva completa,picp_simultaneo,|valor - nominal|,test,2,261,0.007662835249042145
+40,7. PICPB curva completa,picp_simultaneo,|valor - nominal|,test,3,261,0.09578544061302682
+40,7. PICPB curva completa,picp_simultaneo,|valor - nominal|,test,4,261,0.896551724137931
+40,8. Winkler,winkler,menor es mejor,train,1,657,0.0
+40,8. Winkler,winkler,menor es mejor,train,2,657,0.197869101978691
+40,8. Winkler,winkler,menor es mejor,train,3,657,0.2450532724505327
+40,8. Winkler,winkler,menor es mejor,train,4,657,0.5570776255707762
+40,8. Winkler,winkler,menor es mejor,test,1,261,0.0
+40,8. Winkler,winkler,menor es mejor,test,2,261,0.022988505747126436
+40,8. Winkler,winkler,menor es mejor,test,3,261,0.20306513409961685
+40,8. Winkler,winkler,menor es mejor,test,4,261,0.7739463601532567
+40,9. Winkler max promedio,winkler_max_medio,menor es mejor,train,1,657,0.0
+40,9. Winkler max promedio,winkler_max_medio,menor es mejor,train,2,657,0.0
+40,9. Winkler max promedio,winkler_max_medio,menor es mejor,train,3,657,0.0076103500761035
+40,9. Winkler max promedio,winkler_max_medio,menor es mejor,train,4,657,0.9923896499238964
+40,9. Winkler max promedio,winkler_max_medio,menor es mejor,test,1,261,0.0
+40,9. Winkler max promedio,winkler_max_medio,menor es mejor,test,2,261,0.0
+40,9. Winkler max promedio,winkler_max_medio,menor es mejor,test,3,261,0.0
+40,9. Winkler max promedio,winkler_max_medio,menor es mejor,test,4,261,1.0
+40,10. Winkler max peor ventana,winkler_max_glob,menor es mejor,train,1,657,0.0
+40,10. Winkler max peor ventana,winkler_max_glob,menor es mejor,train,2,657,0.0624048706240487
+40,10. Winkler max peor ventana,winkler_max_glob,menor es mejor,train,3,657,0.3287671232876712
+40,10. Winkler max peor ventana,winkler_max_glob,menor es mejor,train,4,657,0.60882800608828
+40,10. Winkler max peor ventana,winkler_max_glob,menor es mejor,test,1,261,0.0
+40,10. Winkler max peor ventana,winkler_max_glob,menor es mejor,test,2,261,0.0
+40,10. Winkler max peor ventana,winkler_max_glob,menor es mejor,test,3,261,0.1417624521072797
+40,10. Winkler max peor ventana,winkler_max_glob,menor es mejor,test,4,261,0.8582375478927203

@@ -1,0 +1,70 @@
+{
+  "sim_params": {
+    "L": 75,
+    "T": 1000,
+    "burn_in": 300,
+    "sigma_obs": 0.25,
+    "R": 1,
+    "seed": 41232,
+    "media_fn": "media_nula",
+    "jitter": 1e-10,
+    "pi": [
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333
+    ],
+    "sigma_eps": 0.35,
+    "ell": 0.25,
+    "prop_train_referencia": 0.7
+  },
+  "diagnostico": {
+    "n_replicas": 1,
+    "n_curvas": 1000,
+    "n_puntos_grilla": 75,
+    "todo_finito": true,
+    "media_empirica_global": -0.08770471878160231,
+    "media_ee_montecarlo": NaN,
+    "var_puntual_media": 0.31883606613819987,
+    "var_puntual_min": 0.15733087509097313,
+    "var_puntual_max": 0.5662196362232783,
+    "acf1_media": 0.32629015990752125,
+    "acf1_ee_montecarlo": NaN,
+    "razon_senal_ruido": 5.101377058211198,
+    "pi_objetivo": [
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333
+    ],
+    "pi_empirica": [
+      0.319,
+      0.322,
+      0.359
+    ],
+    "pi_error_absoluto_max": 0.02566666666666667,
+    "max_abs_rasgos": 2.734584415772787,
+    "var_rasgos": [
+      0.08727882965910085,
+      0.18695185445877607,
+      0.023844425461490373
+    ],
+    "sigma_eps": 0.35,
+    "ell": 0.25,
+    "r2_oraculo_1rezago": 0.5012363159097291,
+    "r2_oraculo_1rezago_empirico": 0.5012363159097291,
+    "T0_referencia": 700
+  },
+  "replica_idx": 0,
+  "experiment_id": "escenario_104_1_r01_m04",
+  "escenario_id": 1,
+  "replica_id": 1,
+  "m_fpca": 4,
+  "m_fpca_list": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "seed": 41232,
+  "T": 1000,
+  "G": 75
+}

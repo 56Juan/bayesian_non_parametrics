@@ -477,9 +477,9 @@ escenarios en una comparación entre ajustes.
 | `64_sim_A1` | A-1, sólo rezago propio | `escenario_64` | 1 | `(1, …, 8)` | **rezago propio** |
 | `65_sim_A2` | A-2, sólo rezago propio | `escenario_65` | 2 | `(1, …, 8)` | **rezago propio** |
 | `66_sim_A3` | A-3, sólo rezago propio | `escenario_66` | 3 | `(1, …, 8)` | **rezago propio** |
-| `101_sim_A1` | A-1, rezago propio de orden `N_LAGS` | `escenario_101` | 1 | `(1, 2, 3, 4)` | **rezago propio, 1-3** |
-| `102_sim_A2` | A-2, rezago propio de orden `N_LAGS` | `escenario_102` | 2 | `(1, 2, 3, 4)` | **rezago propio, 1-3** |
-| `103_sim_A3` | A-3, rezago propio de orden `N_LAGS` | `escenario_103` | 3 | `(1, 2, 3, 4)` | **rezago propio, 1-3** |
+| `101_sim_A1` | A-1, rezago propio de orden `N_LAGS` | `escenario_101` | 1 | `(1, 2, 3, 4)` | **rezago propio, 1-4** |
+| `102_sim_A2` | A-2, rezago propio de orden `N_LAGS` | `escenario_102` | 2 | `(1, 2, 3, 4)` | **rezago propio, 1-4** |
+| `103_sim_A3` | A-3, rezago propio de orden `N_LAGS` | `escenario_103` | 3 | `(1, 2, 3, 4)` | **rezago propio, 1-4** |
 
 **Sección B del anexo — procesos funcionales** (`ane_00_02`):
 
@@ -488,15 +488,19 @@ escenarios en una comparación entre ajustes.
 | `71_sim_B1` | B-1: FAR(1) lineal, núcleo **exponencial** | `escenario_71` | 1 | `(2, 3, 4)` |
 | `72_sim_B2` | B-2: TV-FAR, operador que deriva de 0.30 a 0.80 | `escenario_72` | 2 | `(2, 3, 4)` |
 | `73_sim_B3` | B-3: cambio estructural recurrente | `escenario_73` | 3 | `(2, 3, 4, 5)` |
+| `104_sim_B1` | B-1, mezcla de mecanismos, rezago propio de orden `N_LAGS` | `escenario_104` | 1 | `(2, 3, 4)` |
+| `105_sim_B2` | B-2, mezcla de mecanismos, rezago propio de orden `N_LAGS` | `escenario_105` | 2 | `(2, 3, 4)` |
+| `106_sim_B3` | B-3, mezcla de mecanismos, rezago propio de orden `N_LAGS` | `escenario_106` | 3 | `(2, 3, 4, 5)` |
 
 `61_sim_A1` es la plantilla (§4).
 
 **Las corridas 101-103 son las 64-66 con el rezago propio generalizado.** Mismo
 generador y misma calibración del gating; lo que cambia es que `N_LAGS` es una
-perilla de `[CONFIG]` que admite **1, 2 o 3**, de modo que la componente `k` se
+perilla de `[CONFIG]` que admite **1, 2, 3 o 4**, de modo que la componente `k` se
 predice con `xi_{k,t-1}, …, xi_{k,t-N_LAGS}` y con nada más. `HP_BY_TYPE` tiene
-un peldaño de `apij`/`bpij` por rezago (`own_lag1`/`2`/`3`, con `E[pi]` bajando
-de 0.90 a 0.25) y `_clasificar` lee el rezago del nombre `fpc_<idx>_lag<l>` en
+un peldaño de `apij`/`bpij` por rezago (`own_lag1`/`2`/`3`/`4`, con `E[pi]`
+bajando de 0.90 a 0.125, a la mitad cada rezago desde el 2) y `_clasificar` lee
+el rezago del nombre `fpc_<idx>_lag<l>` en
 vez de devolver `own_lag1` fijo. Arrancan en `N_LAGS = 1`, que reproduce las
 64-66. Las tres evalúan contra `curva_suavizada` (§6.5) y entrenan sólo en
 `M_ENTRENO = 4`. Conviven con las 61-66: no las reemplazan.
@@ -522,6 +526,39 @@ citar qué orden ganó en cada `M`.
 de la `63`/`66`.** Ese burn largo se justificaba por `p = 20` (rezagos
 cruzados); con rezago propio (`p = N_LAGS <= 3`) no aplica, así que `103` sigue
 la config común de la tabla de abajo en vez de heredar la de su plantilla.
+
+**Las corridas 104-106 son la sección B rehecha con rezago propio + `N_LAGS` +
+los dos fixes de gating de la 101-103.** El anexo (`docs/01 Anexo.tex`)
+redefinió B-1/B-2/B-3 como una MEZCLA de $K=3$ mecanismos funcionales — no el
+FAR exponencial / TV-FAR / cambio estructural que usan 71-73, que quedaron
+como historia en `pipelines/deprecated/sim_escenario_B{1,2,3}_*` (los
+notebooks 71-73 no se tocaron y ya no son re-ejecutables contra el paquete
+actual). Generadores nuevos en `pipelines/sim_escenario_B1/B2/B3.py`,
+documentados con la calibración numérica completa (medias `mu_k`
+deliberadamente cercanas entre sí para no dejar toda la varianza en el sorteo
+de mecanismo, coeficientes altos, oráculo `R^2 ≈ 0.50 / 0.13 / 0.08` para
+B-1/B-2/B-3) en el docstring de cada módulo. No hay un intermedio B análogo a
+las 64-66 de A: 104-106 se construyeron directamente con rezago propio, sin
+pasar por una versión de rezagos cruzados.
+
+Mismo patrón que 101-103: `N_LAGS` en `{1,2,3,4}` vía `[CONFIG]` en `_01`,
+misma calibración de gating por dispersión (`mupsij`/`taupsij` desde
+`sd_gate_objetivo`) y la misma constante de Chung & Dunson (`apij=1`,
+`bpij=5`) para el escape de `w_j=0`, mismo `MCMC_CONFIG = {"nsim": 3000,
+"burn": 1000, "N": 30, "M": 50}` y `N_CHAINS = 2`, mismo
+`objetivo_evaluacion = "curva_suavizada"`, y arrancan en `N_LAGS = 4` (no en
+1: no hay una 104-106 histórica en `N_LAGS=1` que reproducir, a diferencia de
+101-103 con 64-66). Entrenan una sola vez en `M_ENTRENO = max(M_FPCA_LIST)`
+(4 para 104/105, 5 para 106) por la misma razón que 64-66/101-103: con rezago
+propio el score `xi_k` no depende de `M`. `psbp_train.m` y `config_paths.m`
+de 104-106 se copiaron de **101**, no de 71-73: 101 ya tiene el fix de
+log-verosimilitud en el paso de muestreo de `Gamma` ("[FIX 2]", evita que
+`pm` subyazca a cero y `Gamma` se sortee ignorando los datos cuando la
+ocupación de un átomo crece), y 71-73 predatan ese fix.
+
+`_04`/`_05` de 104-106 heredan el fix del pivot de `resumen_barrido` (filtra
+`objetivo == "curva_suavizada"` antes de pivotear) y usan `FARp(p=N_LAGS)` en
+el `_05`, igual que 101-103.
 
 **Las corridas 64-66 entrenan una sola vez.** Con covariable de rezago propio el
 score `xi_k` no depende de `M` —`fpca.transform` devuelve siempre la misma

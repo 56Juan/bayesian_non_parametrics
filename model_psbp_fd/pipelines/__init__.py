@@ -107,26 +107,30 @@ from .sim_escenario_A3 import (
     simular_ar_garch,
 )
 
-# --- Algoritmos B-1, B-2 y B-3: procesos funcionales (anexo, seccion B) ---
+# --- Algoritmos B-1, B-2 y B-3: mezcla de mecanismos funcionales (anexo, seccion B) ---
 from .sim_escenario_B1 import (
     ConfigEscenarioB1,
+    calcular_rasgos,
+    funciones_rasgo,
     generar_escenario_B1,
-    generar_far_funcional,
     media_seno,
+    medias_mezcla,
     resumen_escenario_B1,
-    simular_far_centrado,
+    simular_mezcla_curvas,
+    transformar_identidad,
 )
 from .sim_escenario_B2 import (
+    B_MECANISMOS_B2,
     ConfigEscenarioB2,
     generar_escenario_B2,
-    pesos_deriva_operador,
     resumen_escenario_B2,
+    transformar_rasgos_B2,
 )
 from .sim_escenario_B3 import (
+    A_ASIGNACION_B3,
     ConfigEscenarioB3,
-    forma_desplazamiento,
     generar_escenario_B3,
-    indicador_episodio,
+    probabilidades_softmax,
     resumen_escenario_B3,
 )
 
@@ -226,22 +230,26 @@ __all__ = [
     "resumen_escenario_A3",
     "sd_condicional_bloque",
     "simular_ar_garch",
-    # ── Algoritmos B-1, B-2 y B-3: procesos funcionales (anexo, seccion B) ──
+    # ── Algoritmos B-1, B-2 y B-3: mezcla de mecanismos funcionales (anexo, seccion B) ──
     "ConfigEscenarioB1",
     "generar_escenario_B1",
     "resumen_escenario_B1",
-    "generar_far_funcional",
-    "simular_far_centrado",
     "media_seno",
+    "medias_mezcla",
+    "funciones_rasgo",
+    "calcular_rasgos",
+    "transformar_identidad",
+    "simular_mezcla_curvas",
     "ConfigEscenarioB2",
     "generar_escenario_B2",
     "resumen_escenario_B2",
-    "pesos_deriva_operador",
+    "transformar_rasgos_B2",
+    "B_MECANISMOS_B2",
     "ConfigEscenarioB3",
     "generar_escenario_B3",
     "resumen_escenario_B3",
-    "indicador_episodio",
-    "forma_desplazamiento",
+    "probabilidades_softmax",
+    "A_ASIGNACION_B3",
     # ── Algoritmos C-1, C-2 y C-3: coeficientes de la representacion ──
     "ConfigEscenarioC",
     "config_C1",

@@ -139,40 +139,86 @@ $\sigma_a^2$    & varianza incondicional de la innovación             & $1.0$ \
 
 \section{Métodos basados en Procesos Funcionales}
 \label{ane_00_02_metodos_procesos_funcionales}
-Este segundo enfoque especifica la dinámica directamente sobre la curva completa, mediante un operador definido sobre el dominio $\mathcal{T}=[0,1]$. Los algoritmos son los siguientes:
+
+Este segundo enfoque genera directamente las curvas funcionales y permite que la relación entre observaciones consecutivas dependa de distintos mecanismos de generación. A diferencia de los métodos basados en series de tiempo clásicas, la dinámica se especifica sobre la curva completa, de modo que cada período puede ser generado mediante un mecanismo funcional diferente. En particular, los escenarios consideran una estructura de mezcla en la que una variable latente determina el mecanismo que genera la curva siguiente.\\
+
+Sea $Z_t \in \{1,\ldots,K\}$ el mecanismo asociado al período $t$. Condicionalmente a $Z_t=k$, la curva se genera mediante:
+
+\begin{equation}
+\label{eq:ane_algB_general}
+X_t(\tau)
+=
+f_k\!\left(R_{t-1,1},\ldots,R_{t-1,p}\right)(\tau)
++
+\varepsilon_t(\tau),
+\end{equation}
+
+donde $f_k$ representa el mecanismo funcional correspondiente al estado $k$, $R_{t-1,j}$ denota el $j$-ésimo rasgo obtenido de la curva anterior y $\varepsilon_t(\tau)$ corresponde al término de error funcional.\\
+
+Los escenarios se organizan de forma progresiva según la complejidad de esta estructura:
+
 \begin{itemize}
-    \item El Algoritmo~B-1 genera una dinámica lineal gaussiana homogénea mediante un proceso autorregresivo funcional con un núcleo de dependencia poco suave.
-    \item El Algoritmo~B-2 introduce un operador de dependencia que varía a lo largo de la serie mediante un proceso autorregresivo funcional de coeficientes variables en el tiempo (TV-FAR).
-    \item El Algoritmo~B-3 introduce un cambio estructural recurrente, en el que a intervalos regulares el proceso exhibe un comportamiento marcadamente distinto al habitual.
+    \item El Algoritmo~B-1 considera varios mecanismos funcionales con relaciones lineales, de modo que la heterogeneidad se encuentra en los parámetros de generación de cada mecanismo.
+
+    \item El Algoritmo~B-2 incorpora mecanismos con relaciones no lineales, permitiendo que distintos mecanismos representen transformaciones lineales y no lineales de los rasgos funcionales de la curva anterior.
+
+    \item El Algoritmo~B-3 combina mecanismos no lineales con una asignación dependiente de múltiples características de la curva anterior, de modo que la información disponible en $X_{t-1}$ determina probabilísticamente qué mecanismo genera $X_t$.
 \end{itemize}
 
-\subsection{Algoritmo B-1: Proceso autorregresivo funcional lineal}
+\subsection{Algoritmo B-1: Mezcla de mecanismos funcionales lineales}
 \label{ane_00_02_01_alg_b1}
-Este algoritmo genera curvas desde un proceso autorregresivo funcional de orden uno (Sección~\ref{02_02_02_modelos_funcionales_clasicos}),
-\begin{equation}\label{eq:ane_algB1_far}
-    X_t(\tau) = \mu(\tau) + \int_{0}^{1} \psi(\tau, s)\,
-    \bigl(X_{t-1}(s) - \mu(s)\bigr)\, ds + \varepsilon_t(\tau),
+
+Este algoritmo genera curvas mediante una mezcla de mecanismos funcionales lineales. El objetivo es introducir heterogeneidad en la relación entre curvas consecutivas sin incorporar todavía efectos no lineales. Para ello, se consideran $K$ mecanismos de generación, cada uno caracterizado por una función media y un conjunto de coeficientes funcionales.\\
+
+Sea $Z_t \in \{1,\ldots,K\}$ la variable latente que identifica el mecanismo utilizado en el período $t$. Condicionalmente a $Z_t=k$, la curva se genera como
+
+\begin{equation}
+\label{eq:ane_algB1}
+X_t(\tau)
+=
+\mu_k(\tau)
++
+\sum_{j=1}^{p}
+\beta_{kj}(\tau)R_{t-1,j}
++
+\varepsilon_t(\tau),
 \end{equation}
-con función media $\mu(\tau)$ y núcleo autorregresivo exponencial
-\begin{equation}\label{eq:ane_algB1_kernel}
-    \psi(\tau, s) = c \cdot \exp\!\left\{
-    -\frac{|\tau - s|}{\gamma}\right\},
+
+donde $\mu_k(\tau)$ representa la función media asociada al mecanismo $k$, $\beta_{kj}(\tau)$ es el efecto funcional del $j$-ésimo rasgo bajo dicho mecanismo y $R_{t-1,j}$ corresponde a una característica de la curva anterior. En este escenario se consideran $p=3$ rasgos funcionales, de manera que cada curva futura depende simultáneamente de tres características de $X_{t-1}$.\\
+
+Los rasgos se definen mediante funcionales lineales de la curva anterior,
+
+\begin{equation}
+\label{eq:ane_algB1_rasgos}
+R_{t-1,j}
+=
+\int_0^1 X_{t-1}(s)w_j(s)\,ds,
+\qquad j=1,2,3,
 \end{equation}
-donde $\gamma > 0$ controla el alcance de la dependencia entre puntos del dominio, de modo que valores pequeños concentran la influencia de $X_{t-1}$ en un entorno estrecho de cada $\tau$ y valores grandes la distribuyen sobre todo el dominio. A diferencia del núcleo gaussiano, el núcleo exponencial no es diferenciable en $\tau = s$, por lo que el operador suaviza menos y transmite a la curva siguiente más detalle fino de la anterior. La constante $c$ se calibra de modo que la norma de Hilbert--Schmidt del operador, $\|\Psi\|_{\mathcal{HS}} = \bigl(\int_0^1\!\int_0^1 \psi^2(\tau,s)\, d\tau\, ds\bigr)^{1/2}$, alcance un valor prefijado menor que uno, condición que garantiza la existencia de una solución estacionaria y determina la persistencia temporal del proceso \cite{02_02_bosq2000linear}. Las innovaciones $\{\varepsilon_t\}$ son trayectorias independientes de un proceso gaussiano de media cero con núcleo de covarianza exponencial cuadrático,
-\begin{equation}\label{eq:ane_algB1_innovacion}
-    \mathrm{Cov}\bigl(\varepsilon_t(\tau),\, \varepsilon_t(s)\bigr)
-    = \sigma_\varepsilon^2 \exp\!\left\{
-    -\frac{(\tau - s)^2}{2\ell^2}\right\},
+
+donde $w_j(s)$ son funciones de ponderación prefijadas. De esta forma, cada rasgo resume información de una región o característica particular de la curva anterior.\\
+
+La variable $Z_t$ se genera independientemente de las curvas, con probabilidades
+
+\begin{equation}
+\label{eq:ane_algB1_mixture}
+P(Z_t=k)=\pi_k,
+\qquad
+\sum_{k=1}^{K}\pi_k=1.
 \end{equation}
-donde $\sigma_\varepsilon^2$ escala la magnitud de la innovación y $\ell > 0$ es su longitud de correlación, que determina la suavidad de las trayectorias generadas: valores pequeños de $\ell$ producen innovaciones más rugosas y valores grandes producen innovaciones más suaves.\\
+
+Por tanto, la heterogeneidad presente en las curvas proviene de la existencia de distintos mecanismos de generación, mientras que la asignación de cada período a un mecanismo no depende todavía de la curva anterior.\\
 
 La generación procede de la siguiente forma:
+
 \begin{enumerate}
-    \item Se discretizan el núcleo $\psi(\tau,s)$ y el núcleo de covarianza de la innovación sobre la grilla $\{\tau_l\}_{l=1}^{L}$, obteniendo las matrices $\mathbf{\Psi} \in \mathbb{R}^{L \times L}$ y $\mathbf{K}_\varepsilon \in \mathbb{R}^{L \times L}$. La constante $c$ se despeja de modo que la norma de Hilbert--Schmidt aproximada del operador alcance el valor objetivo.
+    \item Se fijan los $K$ mecanismos, sus funciones medias $\mu_k(\tau)$ y sus coeficientes funcionales $\beta_{kj}(\tau)$.
 
-    \item Se inicializa $\mathbf{X}_0 = \boldsymbol{\mu} + \mathbf{e}_0$, con $\mathbf{e}_0 \sim \mathcal{N}_L(\mathbf{0}, \mathbf{K}_\varepsilon)$, y se itera la versión discretizada de \eqref{eq:ane_algB1_far} durante $T$ períodos, generando en cada paso la innovación como $\boldsymbol{\varepsilon}_t \sim \mathcal{N}_L(\mathbf{0}, \mathbf{K}_\varepsilon)$ mediante la factorización de Cholesky de $\mathbf{K}_\varepsilon$.
+    \item Se calculan los tres rasgos $R_{t-1,1}$, $R_{t-1,2}$ y $R_{t-1,3}$ a partir de la curva anterior.
 
-    \item Se aplica el esquema de observación común a las $T$ curvas, obteniendo la matriz de datos que se entrega a los métodos.
+    \item Se genera $Z_t$ de acuerdo con las probabilidades $\{\pi_k\}_{k=1}^{K}$.
+
+    \item Se genera $X_t(\tau)$ mediante \eqref{eq:ane_algB1}, utilizando los parámetros correspondientes al mecanismo seleccionado.
 \end{enumerate}
 
 \begin{table}[H]
@@ -183,76 +229,164 @@ La generación procede de la siguiente forma:
 \hline
 Símbolo & Descripción & Valor \\
 \hline
-$\mu(\tau)$                 & función media                             & $\sin(2\pi\tau)$ \\
-$\gamma$                    & alcance del núcleo autorregresivo         & $0.3$ \\
-$\|\Psi\|_{\mathcal{HS}}$   & norma objetivo del operador               & $0.7$ \\
-$\sigma_\varepsilon$        & escala de la innovación funcional         & $1.0$ \\
-$\ell$                      & longitud de correlación de la innovación  & $0.5$ \\
+$K$ & número de mecanismos funcionales & $3$ \\
+$p$ & número de rasgos funcionales & $3$ \\
+$\pi_k$ & probabilidad del mecanismo $k$ & $1/3$ \\
+$w_j(\tau)$ & funciones de ponderación & prefijadas \\
+$\beta_{kj}(\tau)$ & coeficientes funcionales & prefijados \\
 \hline
 \end{tabular}
 \end{table}
 
-\subsection{Algoritmo B-2: Proceso autorregresivo funcional de coeficientes variables (TV-FAR)}
+
+\subsection{Algoritmo B-2: Mezcla de mecanismos funcionales no lineales}
 \label{ane_00_02_02_alg_b2}
-Este algoritmo genera curvas con la dinámica del Algoritmo~B-1, permitiendo que el operador de dependencia cambie a lo largo de la serie, con el fin de  evaluar el desempeño cuando la persistencia y el alcance de la dependencia no son constantes. La curva se define como
-\begin{equation}\label{eq:ane_algB2_tvfar}
-    X_t(\tau) = \mu(\tau) + \int_{0}^{1} \psi_t(\tau, s)\,
-    \bigl(X_{t-1}(s) - \mu(s)\bigr)\, ds + \varepsilon_t(\tau),
+
+Este algoritmo extiende el escenario anterior incorporando mecanismos cuya relación entre los rasgos de la curva anterior y la curva futura puede ser no lineal. El objetivo es evaluar el comportamiento de los métodos cuando la heterogeneidad no se limita a diferencias en los parámetros de una relación lineal, sino que los distintos mecanismos presentan formas funcionales de dependencia diferentes.
+
+La curva se genera mediante
+
+\begin{equation}
+\label{eq:ane_algB2}
+X_t(\tau)
+=
+\mu_{Z_t}(\tau)
++
+f_{Z_t}\!\left(
+R_{t-1,1},R_{t-1,2},R_{t-1,3}
+\right)(\tau)
++
+\varepsilon_t(\tau),
 \end{equation}
-donde el núcleo autorregresivo interpola entre dos operadores de la forma \eqref{eq:ane_algB1_kernel},
-\begin{equation}\label{eq:ane_algB2_kernel}
-    \psi_t(\tau, s) = (1 - w_t)\, \psi^{(0)}(\tau, s) + w_t\, \psi^{(1)}(\tau, s),
-    \qquad
-    w_t = \frac{t}{T},
+
+donde $f_k$ representa el mecanismo funcional asociado al estado $k$. Para introducir diferentes grados de no linealidad, se consideran mecanismos con estructuras distintas. Por ejemplo, un mecanismo puede presentar una relación lineal,
+
+\begin{equation}
+f_1(R_1,R_2,R_3)(\tau)
+=
+\beta_{11}(\tau)R_1
++
+\beta_{12}(\tau)R_2
++
+\beta_{13}(\tau)R_3,
 \end{equation}
-con $\psi^{(0)}$ y $\psi^{(1)}$ calibrados por separado a sus respectivas normas objetivo y alcances. Como ambas normas son menores que uno, también lo es la de $\psi_t$ para todo $t$. La media y la innovación son las del Algoritmo~B-1, y la generación sigue sus pasos, evaluando $\psi_t$ en cada período.
+
+mientras que otros pueden incorporar términos cuadráticos o de interacción,
+
+\begin{equation}
+f_2(R_1,R_2,R_3)(\tau)
+=
+\beta_{21}(\tau)R_1^2
++
+\beta_{22}(\tau)R_2
++
+\beta_{23}(\tau)R_2R_3,
+\end{equation}
+
+y
+
+\begin{equation}
+f_3(R_1,R_2,R_3)(\tau)
+=
+\beta_{31}(\tau)R_1R_2
++
+\beta_{32}(\tau)R_2^2
++
+\beta_{33}(\tau)R_3^2.
+\end{equation}
+
+En este escenario, la asignación $Z_t$ mantiene probabilidades fijas, por lo que la complejidad adicional proviene exclusivamente de la forma de los mecanismos de generación.
+
+La generación procede de forma análoga al Algoritmo~B-1, reemplazando la relación lineal por el mecanismo $f_{Z_t}$ correspondiente.
 
 \begin{table}[H]
 \centering
-\caption{Parámetros del Algoritmo~B-2. La media y la innovación coinciden con las del Cuadro~\ref{tab:ane_algB1}.}
+\caption{Parámetros del Algoritmo~B-2.}
 \label{tab:ane_algB2}
 \begin{tabular}{llc}
 \hline
 Símbolo & Descripción & Valor \\
 \hline
-$\gamma^{(0)},\gamma^{(1)}$                 & alcance del núcleo inicial y final        & $0.3$, $0.3$ \\
-$\|\Psi^{(0)}\|_{\mathcal{HS}}$             & norma objetivo, operador inicial          & $0.30$ \\
-$\|\Psi^{(1)}\|_{\mathcal{HS}}$             & norma objetivo, operador final            & $0.80$ \\
+$K$ & número de mecanismos funcionales & $3$ \\
+$p$ & número de rasgos funcionales & $3$ \\
+$\pi_k$ & probabilidad del mecanismo $k$ & $1/3$ \\
+$f_1$ & mecanismo lineal & definido en el algoritmo \\
+$f_2$ & mecanismo cuadrático & definido en el algoritmo \\
+$f_3$ & mecanismo con interacciones & definido en el algoritmo \\
 \hline
 \end{tabular}
 \end{table}
 
-\subsection{Algoritmo B-3: Proceso con cambio estructural recurrente}
+
+\subsection{Algoritmo B-3: Mezcla funcional con asignación dependiente de múltiples rasgos}
 \label{ane_00_02_03_alg_b3}
-Este algoritmo genera curvas que siguen la dinámica del Algoritmo~B-1, pero que a intervalos regulares atraviesan episodios de comportamiento marcadamente distinto, con el fin de evaluar cómo responden los métodos a cambios estructurales recurrentes. Sea
-\begin{equation}\label{eq:ane_algB3_episodios}
-    \mathcal{E} = \bigl\{\, t : ((t-1) \bmod P) < D \,\bigr\}
+
+Este algoritmo incorpora el nivel de complejidad más alto de los escenarios basados en procesos funcionales. Además de permitir mecanismos de generación no lineales, la selección del mecanismo deja de ser independiente de la curva anterior. En consecuencia, las características de $X_{t-1}$ determinan probabilísticamente qué mecanismo será utilizado para generar $X_t$.\\
+
+Sea nuevamente $Z_t \in \{1,\ldots,K\}$ la variable latente. Sus probabilidades condicionales se definen mediante
+
+\begin{equation}
+\label{eq:ane_algB3_probs}
+P(Z_t=k\mid X_{t-1})
+=
+\frac{
+\exp\!\left\{
+q_k(R_{t-1,1},R_{t-1,2},R_{t-1,3})
+\right\}
+}{
+\displaystyle
+\sum_{h=1}^{K}
+\exp\!\left\{
+q_h(R_{t-1,1},R_{t-1,2},R_{t-1,3})
+\right\}
+},
 \end{equation}
-el conjunto de períodos en episodio, donde $P$ es el número de períodos entre inicios consecutivos de episodios y $D < P$ es su duración. Durante un episodio la curva sufre un desplazamiento localizado y su variabilidad aumenta:
-\begin{equation}\label{eq:ane_algB3_curva}
-    X_t(\tau) = \mu(\tau) + \mathbf{1}(t \in \mathcal{E})\, A\, g(\tau) + Y_t(\tau),
+
+donde $q_k(\cdot)$ determina cómo los distintos rasgos funcionales influyen en la probabilidad de seleccionar el mecanismo $k$.\\
+
+Una vez seleccionado el mecanismo, la curva se genera mediante
+
+\begin{equation}
+\label{eq:ane_algB3}
+X_t(\tau)
+=
+\mu_{Z_t}(\tau)
++
+f_{Z_t}\!\left(
+R_{t-1,1},R_{t-1,2},R_{t-1,3}
+\right)(\tau)
++
+\varepsilon_t(\tau).
 \end{equation}
-donde $A\,g(\tau)$ es el desplazamiento característico del episodio, con amplitud $A$ y forma $g$, y $\{Y_t\}$ es el proceso autorregresivo funcional centrado del Algoritmo~B-1,
-\begin{equation}\label{eq:ane_algB3_Y}
-    Y_t(\tau) = \int_{0}^{1} \psi(\tau, s)\, Y_{t-1}(s)\, ds + \kappa_t\, \varepsilon_t(\tau),
-    \qquad
-    \kappa_t = \kappa^{\mathbf{1}(t \in \mathcal{E})},
-\end{equation}
-con $\kappa \geq 1$ el factor que amplifica la escala de la innovación durante los episodios. El inicio y el fin de cada episodio no dependen de la dinámica del proceso, por lo que resultan impredecibles para un modelo que solo observa la curva anterior. La generación sigue los pasos del Algoritmo~B-1, agregando en cada período el término de episodio y la escala $\kappa_t$.
+
+De este modo, la dependencia temporal presenta dos niveles. Primero, la curva anterior determina probabilísticamente el mecanismo que será utilizado. Segundo, el mecanismo seleccionado determina la forma en que los rasgos de la curva anterior se transforman en la nueva curva. Por tanto, la distribución condicional de $X_t$ es una mezcla cuyos pesos dependen de múltiples características funcionales de $X_{t-1}$.\\
+
+La generación procede de la siguiente forma:
+
+\begin{enumerate}
+    \item Se fijan los mecanismos $f_1,\ldots,f_K$ y sus correspondientes funciones medias.
+
+    \item Se calculan los rasgos funcionales $R_{t-1,1},R_{t-1,2},R_{t-1,3}$.
+
+    \item Se calculan las probabilidades condicionales de los mecanismos mediante \eqref{eq:ane_algB3_probs}.
+
+    \item Se genera $Z_t$ a partir de dichas probabilidades.
+
+    \item Se genera $X_t(\tau)$ mediante \eqref{eq:ane_algB3}, utilizando el mecanismo seleccionado.
+\end{enumerate}
 
 \begin{table}[H]
 \centering
-\caption{Parámetros del Algoritmo~B-3. La dinámica de $Y_t$ coincide con la del Cuadro~\ref{tab:ane_algB1}.}
+\caption{Parámetros del Algoritmo~B-3.}
 \label{tab:ane_algB3}
 \begin{tabular}{llc}
 \hline
 Símbolo & Descripción & Valor \\
 \hline
-$P$         & períodos entre inicios de episodios       & $20$ \\
-$D$         & duración de cada episodio                 & $5$ \\
-$A$         & amplitud del desplazamiento               & $3.0$ \\
-$g(\tau)$   & forma del desplazamiento                  & $\exp\{-(\tau-0.5)^2/(2\cdot 0.1^2)\}$ \\
-$\kappa$    & factor de escala de la innovación         & $1.5$ \\
+$K$ & número de mecanismos funcionales & $3$ \\
+$p$ & número de rasgos funcionales & $3$ \\
+$q_k$ & función de asignación del mecanismo $k$ & prefijada \\
+$f_k$ & mecanismo funcional no lineal & prefijado \\
 \hline
 \end{tabular}
 \end{table}

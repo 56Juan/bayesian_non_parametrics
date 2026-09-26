@@ -44,7 +44,7 @@ BASENAME     = "escenario_101";
 % usa solo su rezago propio, asi que sus cadenas sirven a todos los M menores
 % (los notebooks 101_03, 101_04 y 101_05 leen las trazas de este M).
 % DEBE ser el M_ENTRENO de 101_01 y estar procesado antes de correr esto.
-M_FPCA_LIST  = [4];
+M_FPCA_LIST  = [8];
 
 % Con true, un M sin artefactos de 101_01 se SALTA con aviso en vez de abortar
 % todo el barrido. Con false, la falta de artefactos es un error.
