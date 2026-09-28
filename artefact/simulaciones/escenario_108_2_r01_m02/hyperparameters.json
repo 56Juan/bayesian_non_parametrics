@@ -1,0 +1,140 @@
+{
+  "global": {
+    "atau": 2.0,
+    "btau": 0.5,
+    "ag": 2.0,
+    "bg": 0.5,
+    "mumu": 0.0,
+    "taumu": 1.0,
+    "pwj": 0.5
+  },
+  "by_type": {
+    "comun": {
+      "apij": 1.0,
+      "bpij": 5.0
+    }
+  },
+  "escalera": {
+    "0": {
+      "sd_gate_objetivo": 0.8,
+      "cv_psi": 1.0,
+      "atau": 2.5,
+      "razon_Etau_lambda": 1.3
+    },
+    "1": {
+      "sd_gate_objetivo": 0.8,
+      "cv_psi": 1.0,
+      "atau": 2.0,
+      "razon_Etau_lambda": 1.0
+    }
+  },
+  "escala_probit": [
+    4.43100054797427,
+    4.43100054797427
+  ],
+  "mcmc_config": {
+    "nsim": 3000,
+    "burn": 1000,
+    "N": 30,
+    "M": 50
+  },
+  "n_iter": 2,
+  "seed_scheme": "seed_base + chain*9973 + k*31",
+  "escenario_id": 2,
+  "replica_id": 1,
+  "m_fpca": 2,
+  "covariables": "todos_los_rezagos",
+  "seed_base": 41232,
+  "scores_scale": "raw_fpca_scores",
+  "partition": {
+    "T": 1000,
+    "T0": 700,
+    "prop_train": 0.7,
+    "n_train_eff": 698,
+    "n_test_eff": 300,
+    "train_files": [
+      "dataset_fpc_1_train.csv",
+      "dataset_fpc_2_train.csv"
+    ],
+    "test_files": [
+      "dataset_fpc_1_test.csv",
+      "dataset_fpc_2_test.csv"
+    ]
+  },
+  "hyperparams_list": [
+    {
+      "component_k": 0,
+      "fpc_idx": 1,
+      "hyperparams": {
+        "atau": 2.5,
+        "btau": 1.1068550720506614,
+        "ag": 2.0,
+        "bg": 0.5,
+        "mumu": 0.0,
+        "taumu": 1.0,
+        "pwj": 0.5,
+        "apij": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "bpij": [
+          5.0,
+          5.0,
+          5.0,
+          5.0
+        ],
+        "mupsij": [
+          0.6105261285590794,
+          0.8419372928481357,
+          0.6128217922346583,
+          0.8316835735404774
+        ],
+        "taupsij": [
+          2.6828197192046943,
+          1.4107189712665194,
+          2.6627573906159236,
+          1.445718545844056
+        ]
+      }
+    },
+    {
+      "component_k": 1,
+      "fpc_idx": 2,
+      "hyperparams": {
+        "atau": 2.0,
+        "btau": 0.5715044063579561,
+        "ag": 2.0,
+        "bg": 0.5,
+        "mumu": 0.0,
+        "taumu": 1.0,
+        "pwj": 0.5,
+        "apij": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "bpij": [
+          5.0,
+          5.0,
+          5.0,
+          5.0
+        ],
+        "mupsij": [
+          0.6105261285590794,
+          0.8419372928481357,
+          0.6128217922346583,
+          0.8316835735404774
+        ],
+        "taupsij": [
+          2.6828197192046943,
+          1.4107189712665194,
+          2.6627573906159236,
+          1.445718545844056
+        ]
+      }
+    }
+  ]
+}

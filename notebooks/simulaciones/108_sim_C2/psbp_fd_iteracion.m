@@ -44,7 +44,7 @@ BASENAME     = "escenario_108";
 % [ENTRENAMIENTO] Se entrenan TODOS los M: con todos los rezagos de todas las
 % componentes el diseno de cada componente depende de M (p = M*2), asi que
 % no se reutilizan trazas entre M. DEBE ser el M_FPCA_LIST de 108_01.
-M_FPCA_LIST  = [3 4 5 6];
+M_FPCA_LIST  = [1 2 3 4 5 6];
 
 % Con true, un M sin artefactos de 108_01 se SALTA con aviso en vez de abortar
 % todo el barrido. Con false, la falta de artefactos es un error.
