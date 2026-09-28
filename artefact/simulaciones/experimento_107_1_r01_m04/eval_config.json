@@ -6,13 +6,12 @@
   "horizons": [
     1
   ],
-  "n_lags": 5,
-  "m_coef": 10,
-  "componentes_cov": [
-    1,
-    2
-  ],
-  "objetivo_evaluacion": "curva",
+  "n_lags": 2,
+  "m_fpca": 4,
+  "scores_scale": "raw_fpca_scores",
+  "objetivo_evaluacion": "curva_suavizada",
+  "objetivo_secundario": "representacion_fpca",
+  "modo_residuo": "ninguno",
   "nivel_credibilidad": 0.95,
   "ventana_movil": {
     "w": [
@@ -36,5 +35,9 @@
     "winkler",
     "winkler_max_medio",
     "winkler_max_glob"
-  ]
+  ],
+  "fuente": "escenario_107_1_r01_m04",
+  "modelo": "mezcla_gp_funcional",
+  "respuesta": "coeficientes_bspline_blanqueados",
+  "m_cov": 4
 }
