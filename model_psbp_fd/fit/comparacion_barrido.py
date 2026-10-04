@@ -163,11 +163,11 @@ def ajustar_far(EST: Dict, DIS: Dict, ORIG: Dict, kn_max: int = 12, criterio: st
 
 
 def _cols_propias(e: Dict, k: int, r: int):
-    """Columnas de Z con los rezagos 1..r de la componente k."""
-    nombres = e["cov_por_componente"][k][:r]
-    for l, nombre in enumerate(nombres, start=1):
-        assert nombre.endswith(f"_lag{l}"), (
-            f"cov_por_componente[{k}] no esta en orden de rezago: {nombre!r} en lag {l}.")
+    """Columnas de Z con las covariables de la componente k hasta el rezago r: sus
+    propios rezagos 1..r (diseno de rezago propio) o los rezagos 1..r de todas las
+    componentes (diseno cruzado), segun lo que declare `cov_por_componente`."""
+    nombres = [n for n in e["cov_por_componente"][k] if int(n.rsplit("_lag", 1)[1]) <= r]
+    assert nombres, f"[k={k}] ninguna covariable con rezago <= {r}."
     return [e["cov_names"].index(nombre) for nombre in nombres]
 
 

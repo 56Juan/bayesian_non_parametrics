@@ -198,6 +198,7 @@ from .sim_comun import (
     grilla_regular,
     semillas_replicas,
 )
+from ..utils.quadrature import pesos_trapezoidales
 from .sim_escenario_B1 import media_seno
 from .sim_escenario_C import base_fourier, gram_base
 
@@ -459,6 +460,9 @@ def generar_mezcla_scores(cfg: ConfigEscenarioC1, mec: MecanismoScores,
     Phi = base_fourier(tau, int(cfg.J))                    # (L, J)
     lam = espectro_nominal(cfg.J, cfg.lambda_1, cfg.rho)
     s = np.sqrt(lam)
+    # Coeficientes de mu en la base (exactos: mu cae en su espacio). Con ellos la
+    # representacion en la base es theta = mu_theta + xi (sin estimar nada).
+    mu_theta = np.linalg.solve(gram_base(Phi, tau), Phi.T @ (pesos_trapezoidales(tau) * mu))
 
     hijas, registro = semillas_replicas(cfg.seed, cfg.R)
     R_, T, G, J = int(cfg.R), int(cfg.T), int(cfg.L), int(cfg.J)
@@ -490,6 +494,8 @@ def generar_mezcla_scores(cfg: ConfigEscenarioC1, mec: MecanismoScores,
         "mecanismo": Z_all,
         "pi": P_all,
         "scores": scores,
+        "mu_theta": mu_theta,
+        "theta": mu_theta[None, None, :] + scores,
         "media_condicional": mc,
         "media_condicional_curva": mc_curva,
         "varianza_entre_mecanismos": ventre,

@@ -322,37 +322,36 @@ La variabilidad del proceso queda así contenida en la propia mezcla, tanto en l
 \subsection{Esquema de inferencia}
 \label{03_04_01_esquema_inferencia}
 
-La especificación anterior se enunció sobre los scores tal como los entrega la descomposición, mientras que la implementación opera sobre su versión estandarizada. La razón es que la grilla de referencia $\{\Gamma_{jl}^*\}$ de la Sección~\ref{03_03_02_esquema_inferencia_bayesiana} está definida sobre un rango fijo y el prior sobre los coeficientes de decaimiento $\rho_{hj}$ se calibra en esa misma escala, de modo que ambos presuponen predictores en escala comparable, condición que los scores no satisfacen, ya que $\mathrm{Var}(\xi_{tm}) = \lambda_m$ decrece con el orden de la componente. Cada serie se estandariza mediante $\tilde{\xi}_{tm} = (\xi_{tm} - c_m)/d_m$, con los momentos $(c_m, d_m)$ calculados sobre el bloque de entrenamiento y aplicados sin recalcular al bloque de prueba, de modo que la evaluación fuera de muestra no incorpore información del período evaluado, siguiendo la recomendación de \citet{03_02_chung2009nonparametric}.\\
+La implementación opera directamente sobre los scores tal como los entrega la descomposición, sin transformarlos. La grilla de referencia $\{\Gamma_{jl}^*\}$ de la Sección~\ref{03_03_02_esquema_inferencia_bayesiana} se construye por predictor, sobre el rango que cada uno toma en el bloque de entrenamiento ampliado en los extremos, de modo que no presupone una escala común. El prior sobre los coeficientes de decaimiento $\rho_{hj}$ y el prior sobre la precisión de los átomos sí dependen de la escala, ya que $\mathrm{Var}(\xi_{tm}) = \lambda_m$ decrece con el orden de la componente. Esa dependencia no se elimina reescalando los datos, sino expresando los hiperparámetros de escala relativos a la dispersión de cada serie, si $s_m$ es la desviación estándar de $\xi_{tm}$ en el bloque de entrenamiento y $s_j$ la del predictor $j$, el hiperparámetro de escala del prior de los átomos se fija proporcional a $s_m^{2}$ y el de los coeficientes de decaimiento proporcional a $s_j^{2}$, con las constantes de proporcionalidad de \citet{03_02_chung2009nonparametric}. Así el prior conserva el significado que esa calibración le asigna sobre variables de escala unitaria, sin modificar los datos. Las desviaciones $s_m$ y $s_j$ se calculan únicamente con el bloque de entrenamiento, de modo que la evaluación fuera de muestra no incorpora información del período evaluado.\\
 
-Al ser la estandarización una transformación afín e invertible, la forma funcional de \eqref{eq:psbpm_fd_componente} y \eqref{eq:eta_psbpm_fd} se preserva, y ambas escrituras designan por tanto la misma especificación con parámetros reexpresados. En lo sucesivo se entiende que el modelo se ajusta sobre $\tilde{\xi}_{tm}$ y sobre el predictor $\mathbf{z}_t = (\tilde{\boldsymbol{\xi}}_{t-1}^\top, \dots, \tilde{\boldsymbol{\xi}}_{t-q}^\top)^\top$, común a las $M$ mezclas, según ilustra la Figura~\ref{fig:esquema_inferencia_psbpm_fd}. La invariancia atañe únicamente a la forma del modelo y no al prior, que no es invariante a la escala y es precisamente lo que fija la estandarización como requisito y no como conveniencia. La escala original se recupera al reconstruir.\\
+Por lo tanto el modelo se ajusta sobre $\xi_{tm}$ y sobre el predictor $\mathbf{z}_t = (\boldsymbol{\xi}_{t-1}^\top, \dots, \boldsymbol{\xi}_{t-q}^\top)^\top$, común a las $M$ mezclas, según ilustra la Figura~\ref{fig:esquema_inferencia_psbpm_fd}. La curva se reconstruye directamente a partir de los scores.\\
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{IMG/03_04/esquema_inferencia_psbpm_fd.png}
     \caption[Esquema de inferencia del PSBPM-FD]{Esquema de inferencia del
-    PSBPM-FD. Cada mezcla toma como respuesta el score estandarizado
-    $\tilde{\xi}_{tm}$ de su componente y como predictor el vector común
-    $\mathbf{z}_t$, de modo que el rezago de cualquier componente puede influir
-    sobre la ley de cualquier otra. Su salida son $S$ extracciones de la
-    predictiva a posteriori.}
+    PSBPM-FD. Cada mezcla toma como respuesta el score $\xi_{tm}$ de su
+    componente y como predictor el vector común $\mathbf{z}_t$, de modo que el
+    rezago de cualquier componente puede influir sobre la ley de cualquier otra.
+    Su salida son $S$ extracciones de la predictiva a posteriori.}
     \label{fig:esquema_inferencia_psbpm_fd}
 \end{figure}
 
-Sobre estos datos se aplica sin modificación el muestreador de Gibbs descrito en la Sección~\ref{03_03_02_esquema_inferencia_bayesiana}, sustituyendo $y_i$ por $\tilde{\xi}_{tm}$ y $x_i$ por $\mathbf{z}_t$, sobre los $T_0 - q$ pares disponibles en un bloque de entrenamiento de longitud $T_0$. La factorización \eqref{eq:factorizacion} descompone la verosimilitud en el producto de las $M$ verosimilitudes individuales, de manera que los muestreadores son mutuamente independientes.\\
+Sobre estos datos se aplica sin modificación el muestreador de Gibbs descrito en la Sección~\ref{03_03_02_esquema_inferencia_bayesiana}, sustituyendo $y_i$ por $\xi_{tm}$ y $x_i$ por $\mathbf{z}_t$, sobre los $T_0 - q$ pares disponibles en un bloque de entrenamiento de longitud $T_0$. La factorización \eqref{eq:factorizacion} descompone la verosimilitud en el producto de las $M$ verosimilitudes individuales, de manera que los muestreadores son mutuamente independientes.\\
 
 Cada uno entrega una colección de extracciones $\boldsymbol{\vartheta}_m^{(s)}$, con $s = 1, \dots, S$, provenientes de la distribución a posteriori $p(\boldsymbol{\vartheta}_m \mid \mathcal{D})$ tras descartar el período de calentamiento, donde $\boldsymbol{\vartheta}_m$ agrupa los parámetros de pesos y átomos de la $m$-ésima mezcla y $\mathcal{D}$ denota el bloque de entrenamiento. Las extracciones de varias cadenas se agrupan por concatenación. Estas colecciones constituyen la única representación disponible del posterior y son, en consecuencia, el insumo del que se derivan todas las cantidades desconocidas del análisis, que quedan así definidas como funcionales de las extracciones y no como estimaciones puntuales.\\
 
-La primera de dichas cantidades es la distribución predictiva del score estandarizado, obtenida marginalizando la incertidumbre sobre los parámetros,
+La primera de dichas cantidades es la distribución predictiva del score, obtenida marginalizando la incertidumbre sobre los parámetros,
 \begin{equation}\label{eq:predictiva_posteriori_score}
-    f\bigl(\tilde{\xi}_{tm} \mid \mathbf{z}_t, \mathcal{D}\bigr)
-    = \int f\bigl(\tilde{\xi}_{tm} \mid \mathbf{z}_t, \boldsymbol{\vartheta}_m\bigr)\,
+    f\bigl(\xi_{tm} \mid \mathbf{z}_t, \mathcal{D}\bigr)
+    = \int f\bigl(\xi_{tm} \mid \mathbf{z}_t, \boldsymbol{\vartheta}_m\bigr)\,
       p\bigl(\boldsymbol{\vartheta}_m \mid \mathcal{D}\bigr)\, d\boldsymbol{\vartheta}_m
     \;\approx\; \frac{1}{S} \sum_{s=1}^{S}
-      f\bigl(\tilde{\xi}_{tm} \mid \mathbf{z}_t, \boldsymbol{\vartheta}_m^{(s)}\bigr),
+      f\bigl(\xi_{tm} \mid \mathbf{z}_t, \boldsymbol{\vartheta}_m^{(s)}\bigr),
 \end{equation}
-donde el integrando es la mezcla \eqref{eq:psbpm_fd_componente} en la escala estandarizada, evaluada en cada extracción. La predictiva es una mezcla de mezclas y no la evaluación de \eqref{eq:psbpm_fd_componente} en una estimación puntual de $\boldsymbol{\vartheta}_m$, distinción que resulta determinante para la incertidumbre reportada.\\
+donde el integrando es la mezcla \eqref{eq:psbpm_fd_componente} evaluada en cada extracción. La predictiva es una mezcla de mezclas y no la evaluación de \eqref{eq:psbpm_fd_componente} en una estimación puntual de $\boldsymbol{\vartheta}_m$, distinción que resulta determinante para la incertidumbre reportada.\\
 
-La aproximación~\eqref{eq:predictiva_posteriori_score} admite dos usos. Evaluada sobre una grilla del soporte entrega la densidad predictiva en forma cerrada, mientras que su versión muestral se obtiene simulando en cada iteración el índice de componente desde la ley de pesos y a continuación la respuesta desde el átomo seleccionado, procedimiento cuya marginal es precisamente~\eqref{eq:predictiva_posteriori_score} y que basta ejecutar una vez por iteración. Ambas quedan expresadas en la escala estandarizada en que operó el muestreador.
+La aproximación~\eqref{eq:predictiva_posteriori_score} entrega la densidad predictiva en forma cerrada sobre una grilla, ademas su versión muestral se obtiene simulando en cada iteración el índice de componente desde la ley de pesos y a continuación la respuesta desde el átomo seleccionado, procedimiento cuya marginal es precisamente~\eqref{eq:predictiva_posteriori_score} y que basta ejecutar una vez por iteración.
 
 \section{Reconstrucción Funcional}
 \label{03_05_00_reconstruccion_funcional}

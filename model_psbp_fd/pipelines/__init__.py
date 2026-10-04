@@ -170,6 +170,18 @@ from .sim_escenario_C3 import (
     generar_escenario_C3,
     resumen_escenario_C3,
 )
+# Escenarios sobre scores 201 (GARCH) y 202 (TAR de tres regimenes).
+from .sim_escenario_GARCH import (
+    ConfigEscenarioGARCH,
+    generar_escenario_GARCH,
+    resumen_escenario_GARCH,
+)
+from .sim_escenario_TAR3 import (
+    ConfigEscenarioTAR3,
+    generar_escenario_TAR3,
+    resumen_escenario_TAR3,
+)
+
 # Escenario TAR (corrida 114): umbral suave sobre el rezago propio de cada score.
 from .sim_escenario_TAR import (
     ConfigEscenarioTAR,
@@ -301,6 +313,12 @@ __all__ = [
     "ConfigEscenarioC3",
     "generar_escenario_C3",
     "resumen_escenario_C3",
+    "ConfigEscenarioGARCH",
+    "generar_escenario_GARCH",
+    "resumen_escenario_GARCH",
+    "ConfigEscenarioTAR3",
+    "generar_escenario_TAR3",
+    "resumen_escenario_TAR3",
     "ConfigEscenarioTAR",
     "generar_escenario_TAR",
     "resumen_escenario_TAR",
