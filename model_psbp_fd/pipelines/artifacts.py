@@ -29,6 +29,7 @@ import pandas as pd
 
 __all__ = [
     "ArtefactosFPCA",
+    "ArtefactosODPC",
     "guardar_curvas",
     "cargar_curvas",
     "cargar_curvas_true",
@@ -65,6 +66,11 @@ ARCHIVOS = {
     "fpca_scores_std":   "fpca_scores_std.csv",
     "fpca_evals":        "fpca_evals.csv",
     "fpca_meta":         "fpca_meta.json",
+    # ODPC (solo corridas 110-112): filtros, base estatica y rezagos de la
+    # reconstruccion
+    "odpc_filtros":      "odpc_filtros.csv",
+    "odpc_B_estatica":   "odpc_B_estatica.csv",
+    "odpc_B_rezagos":    "odpc_B_rezagos.csv",
     "estandarizador":    "scores_standardizer",
     "manifest":          "datasets_manifest.json",
     "hiperparametros":   "hyperparameters.json",
@@ -73,7 +79,8 @@ ARCHIVOS = {
 
 # Matrices que deben conservar dos dimensiones aunque tengan una sola columna.
 _MATRICES_2D = {"theta", "basis_phi", "fpca_eigenfun", "fpca_gram_W",
-                "fpca_coef_B", "fpca_scores", "fpca_scores_std"}
+                "fpca_coef_B", "fpca_scores", "fpca_scores_std",
+                "odpc_filtros", "odpc_B_estatica", "odpc_B_rezagos"}
 
 
 # ==========================================================================
@@ -336,6 +343,85 @@ class ArtefactosFPCA:
                 "todo_ok": bool(max(err_orto, err_rutas) < tol)}
 
 
+@dataclass
+class ArtefactosODPC(ArtefactosFPCA):
+    """
+    Artefactos de `ODPC_Funcional`. `Psi_grid` / `B` / `reconstruct` son la
+    parte CONTEMPORANEA de la reconstruccion (la que depende del score que se
+    predice), de modo que PropagadorFuncional y las lineas base funcionan igual
+    que con la FPCA estatica. La parte de los rezagos f_{t-1..t-k2}, conocida en
+    el origen, sale de `desplazamiento` y se SUMA a la curva.
+
+    - `transform` filtra la serie CONTINUA: la fila t usa las curvas t-k1..t.
+    - `B` no es ortonormal en W; se verifica la base estatica de partida.
+
+    filtros    : (k1+1, K_din, M)  filtros[j] pesa la curva t-j.
+    B_estatica : (K, K_din)        base FPCA estatica ortonormal de partida.
+    B_rezagos  : (k2, K, M)        coeficientes de base de f_{t-h}, h = 1..k2.
+    """
+
+    filtros: np.ndarray = None
+    B_estatica: np.ndarray = None
+    B_rezagos: np.ndarray = None
+
+    def scores_estaticos(self, THETA: np.ndarray) -> np.ndarray:
+        TH = np.atleast_2d(np.asarray(THETA, dtype=float))
+        if TH.shape[1] != self.K:
+            raise ValueError(f"THETA tiene {TH.shape[1]} columnas y K={self.K}.")
+        return (TH - self.mu_theta[None, :]) @ (self.W @ self.B_estatica)
+
+    def transform(self, THETA: np.ndarray) -> np.ndarray:
+        """Serie CONTINUA de coeficientes (T, K) -> componentes (T, M)."""
+        from ..functions_models.functions_odpc import filtrar_causal
+        return filtrar_causal(self.scores_estaticos(THETA), self.filtros)
+
+    def transform_prediccion(self, THETA: np.ndarray, THETA_pred: np.ndarray,
+                             desde: int) -> np.ndarray:
+        """
+        Componentes con la curva t sustituida por su prediccion a un paso,
+        t = desde..T-1, y rezagos reales: f_t + a_0^T (s_pred_t - s_t).
+        """
+        Y = self.transform(THETA)[desde:]
+        S_real = self.scores_estaticos(THETA)[desde:]
+        S_pred = self.scores_estaticos(THETA_pred)
+        if S_pred.shape != S_real.shape:
+            raise ValueError(f"THETA_pred {S_pred.shape} no alinea con "
+                             f"THETA[{desde}:] {S_real.shape}.")
+        return Y + (S_pred - S_real) @ self.filtros[0]
+
+    def desplazamiento(self, SCORES: Optional[np.ndarray] = None,
+                       desde: int = 0) -> np.ndarray:
+        """
+        (T-desde, G) aporte de f_{t-1..t-k2} a la curva de t. Por defecto con
+        la serie persistida: son scores REALES, conocidos en el origen.
+        """
+        from ..functions_models.functions_odpc import rezagar
+        F = self.SCORES if SCORES is None else np.atleast_2d(SCORES)
+        D = np.zeros((F.shape[0], self.Phi.shape[0]))
+        for h in range(1, self.B_rezagos.shape[0] + 1):
+            D += rezagar(F, h) @ (self.Phi @ self.B_rezagos[h - 1]).T
+        return D[desde:]
+
+    def reconstruct_serie(self, SCORES: Optional[np.ndarray] = None) -> np.ndarray:
+        """Serie CONTINUA de componentes -> curvas (T, G), todos los rezagos."""
+        F = self.SCORES if SCORES is None else np.atleast_2d(SCORES)
+        return self.reconstruct(F) + self.desplazamiento(F)
+
+    def verificar(self, tol: float = 1e-10) -> dict:
+        Kd = self.B_estatica.shape[1]
+        err_orto = float(np.abs(
+            self.B_estatica.T @ self.W @ self.B_estatica - np.eye(Kd)).max())
+        S = np.eye(self.M)
+        err_rutas = float(np.abs(
+            self.reconstruct(S) - self.scores_a_theta(S) @ self.Phi.T).max())
+        err_forma = float(self.filtros.shape[1:] != (Kd, self.M)
+                          or self.B_rezagos.shape[1:] != (self.K, self.M))
+        return {"err_ortonormalidad_estatica": err_orto,
+                "err_rutas_reconstruccion": err_rutas,
+                "err_forma": err_forma,
+                "todo_ok": bool(max(err_orto, err_rutas, err_forma) < tol)}
+
+
 def guardar_fpca(paths: dict, fpca, SCORES: np.ndarray,
                  SCORES_STD: Optional[np.ndarray] = None,
                  meta_extra: Optional[dict] = None) -> dict:
@@ -357,6 +443,15 @@ def guardar_fpca(paths: dict, fpca, SCORES: np.ndarray,
         "fpca_scores": np.atleast_2d(SCORES),
         "fpca_evals": fpca.evals,
     }
+    odpc = hasattr(fpca, "betas_full")
+    if odpc:
+        F = fpca.filtros                                      # (k1+1, Kd, M)
+        tablas["odpc_filtros"] = F.reshape(-1, F.shape[2])
+        tablas["odpc_B_estatica"] = fpca.B_full[:, :F.shape[1]]
+        # (k2*K, M): bloques B_h apilados, h = 1..k2
+        if int(fpca.k2) > 0:
+            tablas["odpc_B_rezagos"] = np.vstack(
+                [fpca.B_rezago(h) for h in range(1, int(fpca.k2) + 1)])
     if SCORES_STD is not None:
         tablas["fpca_scores_std"] = np.atleast_2d(SCORES_STD)
     else:
@@ -385,6 +480,24 @@ def guardar_fpca(paths: dict, fpca, SCORES: np.ndarray,
                    if getattr(fpca, "cond_W", None) is not None else None),
         "lambdas": [float(x) for x in fpca.lambdas],
     }
+    if odpc:
+        # var_explained: varianza de train que recupera la reconstruccion con
+        # todos los rezagos (la que usa la evaluacion).
+        meta.update({
+            "tipo": "odpc",
+            "K": int(fpca.B_full.shape[0]),     # evals tiene M_max, no K
+            "var_explained": float(fpca.var_reconstruida()),
+            "var_estatica": float(fpca.var_cum_estatica[fpca.M - 1]),
+            "k1": int(fpca.k1), "k2": int(fpca.k2),
+            "K_din": int(fpca.filtros_full.shape[1]),
+            "iteraciones_als": [int(x) for x in fpca.iteraciones[:fpca.M]],
+        })
+    else:
+        meta["tipo"] = "estatica"
+        for clave in ("odpc_filtros", "odpc_B_estatica", "odpc_B_rezagos"):
+            obsoleto = d / ARCHIVOS[clave]
+            if obsoleto.exists():
+                obsoleto.unlink()
     if meta_extra:
         meta.update(meta_extra)
     _escribir_json(meta, d / ARCHIVOS["fpca_meta"])
@@ -410,7 +523,19 @@ def cargar_fpca(paths: dict) -> ArtefactosFPCA:
     evals_p = d / ARCHIVOS["fpca_evals"]
     meta_p = d / ARCHIVOS["fpca_meta"]
     scores_std_p = d / ARCHIVOS["fpca_scores_std"]
-    return ArtefactosFPCA(
+    meta = _leer_json(meta_p) if meta_p.exists() else {}
+    extra, clase = {}, ArtefactosFPCA
+    if meta.get("tipo") == "odpc":
+        F = leer("odpc_filtros")
+        k1, k2, Kd = int(meta["k1"]), int(meta["k2"]), int(meta["K_din"])
+        B_est = leer("odpc_B_estatica")
+        M_, K_ = F.shape[1], B_est.shape[0]
+        extra = {"filtros": F.reshape(k1 + 1, Kd, M_),
+                 "B_estatica": B_est,
+                 "B_rezagos": (leer("odpc_B_rezagos").reshape(k2, K_, M_)
+                               if k2 > 0 else np.zeros((0, K_, M_)))}
+        clase = ArtefactosODPC
+    return clase(**extra,
         Psi_grid=leer("fpca_eigenfun"),
         mu_grid=np.ravel(leer("fpca_mean")),
         W=leer("fpca_gram_W"),
@@ -421,7 +546,7 @@ def cargar_fpca(paths: dict) -> ArtefactosFPCA:
         SCORES_STD=(_leer_matriz(scores_std_p, True)
                     if scores_std_p.exists() else None),
         evals=np.ravel(np.loadtxt(evals_p, delimiter=",")) if evals_p.exists() else None,
-        meta=_leer_json(meta_p) if meta_p.exists() else {},
+        meta=meta,
     )
 
 

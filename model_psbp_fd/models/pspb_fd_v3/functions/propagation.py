@@ -117,7 +117,8 @@ def agrupar_muestras_cadenas(lista: Sequence[np.ndarray]) -> np.ndarray:
     return np.concatenate(arrs, axis=0)
 
 
-def curva_media_desde_scores(scores_std: np.ndarray, fpca, estandarizador
+def curva_media_desde_scores(scores_std: np.ndarray, fpca, estandarizador,
+                             desplazamiento: Optional[np.ndarray] = None
                              ) -> np.ndarray:
     """
     Mapa DETERMINISTA scores estandarizados -> curva, sin muestreo.
@@ -125,6 +126,8 @@ def curva_media_desde_scores(scores_std: np.ndarray, fpca, estandarizador
     scores_std : (n, M) en la escala en que se entreno el estandarizador.
     fpca : objeto con `.reconstruct(SCORES)` -> (n, G).
     estandarizador : objeto con `.inverse_transform(scores_std)` -> SCORES.
+    desplazamiento : (n, G), opcional. Parte de la curva conocida en el origen
+        que no depende del score predicho (rezagos de la reconstruccion ODPC).
 
     Es el caso `modo_residuo="ninguno"` de `PropagadorFuncional`, pero para UNA
     sola curva por fila --la media condicional-- y no para extracciones de una
@@ -135,7 +138,8 @@ def curva_media_desde_scores(scores_std: np.ndarray, fpca, estandarizador
     escala de curva que el PSBPM-FD.
     """
     S = estandarizador.inverse_transform(np.atleast_2d(scores_std))
-    return fpca.reconstruct(S)
+    X = fpca.reconstruct(S)
+    return X if desplazamiento is None else X + desplazamiento
 
 
 def bandas_puntuales(muestras: np.ndarray, nivel: float = 0.95):
@@ -209,12 +213,18 @@ class PropagadorFuncional:
 
     # ------------------------------------------------------------------
     def curvas_desde_scores(self, SCORES_STD: np.ndarray,
-                            seed: Optional[int] = None) -> np.ndarray:
+                            seed: Optional[int] = None,
+                            desplazamiento: Optional[np.ndarray] = None
+                            ) -> np.ndarray:
         """
         Convierte muestras de scores en muestras de curvas.
 
         SCORES_STD : (S, n, M) extracciones de la predictiva de los scores, en
                      la escala en que se entrenaron las cadenas.
+        desplazamiento : (n, G), opcional. Parte de la curva de cada origen
+                     que no depende del score predicho (rezagos de la
+                     reconstruccion ODPC); se suma igual a todas las
+                     extracciones.
         Retorna    : (S, n, G) extracciones de la predictiva funcional.
         """
         Z = np.asarray(SCORES_STD, dtype=float)
@@ -230,6 +240,11 @@ class PropagadorFuncional:
             plano = self.estandarizador.inverse_transform(plano)
 
         curvas = (self.mu[None, :] + plano @ self.Psi.T).reshape(S, n, self.G)
+        if desplazamiento is not None:
+            D = np.atleast_2d(np.asarray(desplazamiento, dtype=float))
+            if D.shape != (n, self.G):
+                raise ValueError(f"desplazamiento {D.shape}; se esperaba {(n, self.G)}.")
+            curvas = curvas + D[None]
 
         if self.modo_residuo == "ninguno":
             return curvas

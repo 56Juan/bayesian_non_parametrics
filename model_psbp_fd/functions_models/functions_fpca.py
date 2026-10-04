@@ -187,6 +187,51 @@ class FPCA_L2:
         self.is_fitted_ = True
         return self
 
+    @classmethod
+    def desde_scores_conocidos(cls, Phi: np.ndarray, tau: np.ndarray,
+                               mu_theta: np.ndarray, evals: np.ndarray,
+                               n_ajuste: int) -> "FPCA_L2":
+        """
+        FPCA "de oraculo": la base `Phi` es la de los scores (ortonormal en
+        L^2) y NO se estima nada. Las autofunciones son las propias columnas de
+        `Phi` (B = W^{-1/2}, que con W = I es la identidad), de modo que
+        `transform(theta) = (theta - mu_theta) W B` devuelve los scores
+        generadores.
+
+        `mu_theta` es la media funcional conocida en coeficientes; `evals` la
+        varianza de cada score, en el orden de la base (no creciente), estimada con el bloque de entrenamiento y registrada en
+        `n_ajuste`. Las identidades que `verificar(THETA_train)` exige de un
+        ajuste (media nula y varianza igual al autovalor) NO aplican aqui:
+        sirven las estructurales, `verificar()` sin `THETA_train`.
+        """
+        Phi = np.asarray(Phi, dtype=float)
+        tau = np.asarray(tau, dtype=float)
+        mu_theta = np.asarray(mu_theta, dtype=float).ravel()
+        evals = np.asarray(evals, dtype=float).ravel()
+        K = Phi.shape[1]
+        if mu_theta.size != K or evals.size != K:
+            raise ValueError(
+                f"mu_theta ({mu_theta.size}) y evals ({evals.size}) deben "
+                f"tener K={K} entradas.")
+        if np.any(np.diff(evals) > 0):
+            raise ValueError(
+                "evals debe ser no creciente en el orden de la base: las "
+                "componentes se retienen por indice.")
+        obj = cls()
+        obj.Phi, obj.tau = Phi, tau
+        obj.W = gram(Phi, tau)
+        evW, VW = np.linalg.eigh(obj.W)
+        obj.cond_W = float(evW.max() / evW.min()) if evW.min() > 0 else np.inf
+        obj.B_full = VW @ np.diag(1.0 / np.sqrt(evW)) @ VW.T
+        obj.mu_theta = mu_theta
+        obj.evals = np.clip(evals, 0.0, None)
+        total = obj.evals.sum()
+        obj.var_ratio = obj.evals / total if total > 0 else np.zeros_like(obj.evals)
+        obj.var_cum = np.cumsum(obj.var_ratio)
+        obj.n_ajuste = int(n_ajuste)
+        obj.is_fitted_ = True
+        return obj
+
     # ------------------------------------------------------------------
     # SELECCION DEL NUMERO DE COMPONENTES
     # ------------------------------------------------------------------

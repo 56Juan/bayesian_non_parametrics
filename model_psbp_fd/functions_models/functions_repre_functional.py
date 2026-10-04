@@ -332,6 +332,36 @@ class FunctionalRepresentation:
         obj._frozen_THETA = THETA
         return obj
 
+    # ─────────────────────────────────────────────────────────────────────
+    # Constructor alternativo: desde_base (base CONOCIDA, sin ajuste)
+    # ─────────────────────────────────────────────────────────────────────
+    @classmethod
+    def desde_base(cls, Phi: np.ndarray, grid: np.ndarray) -> "FunctionalRepresentation":
+        """
+        Representacion con una base conocida de antemano (la del generador).
+
+        No hay seleccion de base ni ajuste: `Phi` (G, K) es la base, evaluada
+        en `grid`, y `transform` / `reconstruct` operan igual que tras un `fit`
+        (proyeccion L^2 con la cuadratura trapezoidal del proyecto,
+        `center=False`). Si la base es ortonormal, la Gram es la identidad y
+        los coeficientes de una curva de la forma sum_j xi_j phi_j son los xi_j.
+        """
+        Phi = np.asarray(Phi, dtype=float)
+        grid = np.asarray(grid, dtype=float)
+        if Phi.ndim != 2 or Phi.shape[0] != grid.size:
+            raise ValueError(
+                f"Phi debe ser (G={grid.size}, K); recibido {Phi.shape}.")
+        obj = cls(method="fourier", n_basis=int(Phi.shape[1]), center=False)
+        obj.grid_ = grid
+        obj.domain_ = (float(grid.min()), float(grid.max()))
+        obj.mean_ = np.zeros(grid.size)
+        obj.w_quad_ = pesos_trapezoidales(grid)
+        obj.phi_ = Phi.T.copy()
+        obj.K_ = obj.phi_.shape[0]
+        obj._compute_gram()
+        obj.is_fitted_ = True
+        return obj
+
     # ═════════════════════════════════════════════════════════════════════
     # Implementacion interna
     # ═════════════════════════════════════════════════════════════════════

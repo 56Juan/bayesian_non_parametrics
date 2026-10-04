@@ -9,6 +9,8 @@ plot_fpca_scree               : Scree plot (log) + varianza acumulada.
 plot_fpca_correlacion_lag0    : Heatmap de correlación contemporánea R₀ entre scores.
 plot_rezagos_heatmap          : Heatmap de correlación (Pearson o Spearman) entre
                                 respuesta en t y scores rezagados.
+plot_series_componentes       : Una serie temporal por componente (coeficientes o
+                                scores), en rejilla compacta.
 
 Contexto
 --------
@@ -235,6 +237,62 @@ def plot_rezagos_heatmap(
     fig.colorbar(im, ax=ax, shrink=0.85, label=f"correlación (sat. ±{vclip})")
 
     plt.tight_layout()
+    if save_path:
+        fig.savefig(save_path, dpi=dpi, bbox_inches="tight")
+    return fig
+
+
+def plot_series_componentes(
+    Y: np.ndarray,
+    T0: Optional[int] = None,
+    simbolo: str = r"\xi",
+    titulo: Optional[str] = None,
+    ncols: int = 2,
+    altura_panel: float = 1.5,
+    ancho: float = 14.0,
+    color: str = "C0",
+    save_path: Optional[str] = None,
+    dpi: int = 110,
+) -> plt.Figure:
+    r"""
+    Una serie temporal por columna de `Y` (coeficientes o scores), en una
+    rejilla de `ncols` columnas para que la figura no se alargue.
+
+    Parámetros
+    ----------
+    Y            : (T, K) una columna por componente
+    T0           : corte train/test; si se da, se marca y el título de cada panel
+                   trae sd y autocorrelación a rezago 1 del bloque de entrenamiento
+    simbolo      : símbolo de la etiqueta (LaTeX), p. ej. r"\theta" o r"\xi"
+    ncols        : columnas de la rejilla
+    altura_panel : alto de cada panel, en pulgadas
+    """
+    Y = np.atleast_2d(np.asarray(Y, dtype=float))
+    T, K = Y.shape
+    nrows = int(np.ceil(K / ncols))
+    fig, axes = plt.subplots(nrows, ncols, sharex=True, squeeze=False,
+                             figsize=(ancho, altura_panel * nrows + 0.8))
+    for j in range(nrows * ncols):
+        ax = axes[j // ncols, j % ncols]
+        if j >= K:
+            ax.set_visible(False)
+            continue
+        y = Y[:, j]
+        ax.plot(np.arange(T), y, lw=0.8, color=color)
+        ref = y[:T0] if T0 else y
+        ax.axhline(ref.mean(), color="0.6", lw=0.6)
+        if T0:
+            ax.axvline(T0, color="crimson", ls="--", lw=1.0)
+        ax.set_ylabel(rf"${simbolo}_{{{j + 1}}}$")
+        c = ref - ref.mean()
+        ar1 = float((c[1:] * c[:-1]).sum() / max((c[:-1] ** 2).sum(), 1e-300))
+        ax.set_title(f"sd {ref.std():.3f}" + (f" · ar1 {ar1:+.2f}" if T0 else ""),
+                     fontsize=8, loc="left")
+    for ax in axes[-1]:
+        ax.set_xlabel("t")
+    if titulo:
+        fig.suptitle(titulo, fontsize=11)
+    fig.tight_layout()
     if save_path:
         fig.savefig(save_path, dpi=dpi, bbox_inches="tight")
     return fig

@@ -38,6 +38,29 @@ from .viz_fpca import (
     plot_fpca_scree,
     plot_fpca_correlacion_lag0,
     plot_rezagos_heatmap,
+    plot_series_componentes,
+)
+
+from .viz_convergencia import (
+    plot_ocupacion_mezcla,
+    plot_gating,
+    plot_diagnostico_vs_M,
+    plot_ocupacion_vs_M,
+    plot_pip_vs_M,
+    plot_variantes,
+)
+
+from .viz_comparacion import (
+    ESTILOS_MODELOS,
+    plot_ganador_modelo,
+    plot_metricas_vs_M,
+    plot_bandas_contraste,
+)
+
+from .viz_evaluacion_barrido import (
+    plot_ganador_ventana,
+    plot_scores_banda,
+    plot_scores_dispersion,
 )
 
 from .viz_evaluacion import (
@@ -76,6 +99,24 @@ __all__ = [
     "plot_fpca_scree",
     "plot_fpca_correlacion_lag0",
     "plot_rezagos_heatmap",
+    "plot_series_componentes",
+    # viz_comparacion
+    "ESTILOS_MODELOS",
+    "plot_ganador_modelo",
+    "plot_metricas_vs_M",
+    "plot_bandas_contraste",
+    # viz_evaluacion_barrido
+    "plot_ganador_ventana",
+    "plot_scores_banda",
+    "plot_scores_dispersion",
+    # viz_evaluacion
+    # viz_convergencia
+    "plot_ocupacion_mezcla",
+    "plot_gating",
+    "plot_diagnostico_vs_M",
+    "plot_ocupacion_vs_M",
+    "plot_pip_vs_M",
+    "plot_variantes",
     # viz_evaluacion
     "plot_ventana_movil",
     "plot_bandas_serie",

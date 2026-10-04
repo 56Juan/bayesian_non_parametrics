@@ -82,6 +82,7 @@ def evaluar_baseline(
     fpca=None,
     X_obs: Optional[np.ndarray] = None,
     tau: Optional[np.ndarray] = None,
+    desplazamiento: Optional[np.ndarray] = None,
 ) -> dict:
     """
     Evalua una prediccion del bloque de prueba en los dos niveles.
@@ -92,6 +93,8 @@ def evaluar_baseline(
     fpca          : objeto con `reconstruct`, para pasar de scores a curvas.
     X_obs         : (T, G) curvas observadas; se recorta al bloque de prueba.
     tau           : grilla, requerida para las metricas funcionales.
+    desplazamiento: (n_test, G), opcional. Parte de la curva conocida en el
+                    origen (rezagos de la reconstruccion ODPC); se suma.
 
     Si no se entregan `estandarizador`, `fpca`, `X_obs` y `tau`, se reportan
     unicamente las metricas de coeficientes.
@@ -117,6 +120,8 @@ def evaluar_baseline(
     if completos:
         S_pred = estandarizador.inverse_transform(Y_pred)
         X_pred = fpca.reconstruct(S_pred)
+        if desplazamiento is not None:
+            X_pred = X_pred + desplazamiento
         X_test = np.atleast_2d(np.asarray(X_obs, dtype=float))[T0:, :]
         fila["MISE"] = mise(X_test, X_pred, tau)
         fila["RMSE_funcional"] = rmse_funcional(X_test, X_pred, tau)
@@ -124,7 +129,8 @@ def evaluar_baseline(
 
 
 def tabla_baselines(SCORES_STD: np.ndarray, T0: int, estandarizador=None,
-                    fpca=None, X_obs=None, tau=None, h: int = 1):
+                    fpca=None, X_obs=None, tau=None, h: int = 1,
+                    desplazamiento=None):
     """
     Tabla comparativa de las lineas base sobre el bloque de prueba.
 
@@ -136,9 +142,11 @@ def tabla_baselines(SCORES_STD: np.ndarray, T0: int, estandarizador=None,
     filas = [
         evaluar_baseline("media_incondicional",
                          prediccion_media_incondicional(SCORES_STD, T0),
-                         SCORES_STD, T0, estandarizador, fpca, X_obs, tau),
+                         SCORES_STD, T0, estandarizador, fpca, X_obs, tau,
+                         desplazamiento),
         evaluar_baseline(f"persistencia_lag{h}",
                          prediccion_persistencia(SCORES_STD, T0, h),
-                         SCORES_STD, T0, estandarizador, fpca, X_obs, tau),
+                         SCORES_STD, T0, estandarizador, fpca, X_obs, tau,
+                         desplazamiento),
     ]
     return pd.DataFrame(filas).set_index("modelo")

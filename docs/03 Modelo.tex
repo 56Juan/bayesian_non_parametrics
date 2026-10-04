@@ -28,12 +28,11 @@ Finalmente, dentro de la familia stick-breaking dependiente, \citet{03_01_rodrig
  
 \subsection{Discusión y brecha de investigación}
 \label{03_02_01_discusion_brecha}
-La revisión anterior muestra que un modelo para el problema de esta tesis necesita  que la ley de mezcla dependa del estado rezagado del proceso, y que las observaciones sean funcionales. \\
+La revisión anterior muestra que un modelo para el problema de esta tesis necesita que la ley de mezcla dependa del estado rezagado del proceso y que las observaciones sean funcionales.\\
 
-La mezcla probit stick-breaking permite conectar ambas propiedades, pues sus pesos pueden depender de covariables vectoriales con inferencia sencilla; sin embargo, tampoco ha sido aplicada a datos funcionales ni a covariables construidas con los rezagos del proceso, \cite{03_01_rodriguez2011probit,03_01_grazian2025spatiotemporal}. En consecuencia, no existe en la literatura una mezcla stick-breaking cuyos pesos dependan del estado funcional rezagado de la serie.\\
- 
-Por tanto, la brecha de investigación que este trabajo busca cubrir consiste en desarrollar un modelo bayesiano no paramétrico que opere directamente sobre los pesos de la formulación del stick-breaking. En concreto, la curva $X_t(\tau)$ se proyecta sobre la base de componentes principales funcionales y el vector de scores resultante, $\boldsymbol{\xi}_t\in\mathbb{R}^M$, se modela mediante una mezcla probit stick-breaking cuyos pesos dependen del estado rezagado. \\
+La mezcla probit stick-breaking permite construir un modelo cuyos pesos dependen de covariables construidas con los rezagos del proceso, mientras que la parte funcional se puede ajustar con $M$ modelos univariados para los scores obtenidos de un análisis de componentes principales funcionales.\\
 
+Por tanto, la brecha de investigación que este trabajo busca cubrir consiste en desarrollar un modelo bayesiano no paramétrico que combine modelos univariados para los scores con pesos de stick-breaking dependientes del estado funcional rezagado, y que permita predecir los scores para, a partir de ellos, reconstruir la curva $X_t(\tau)$.
 
  
 \section{Probit Stick-Breaking Process Mixture}
@@ -262,7 +261,6 @@ con $Z_{il} = 0$ para $l = 1, \dots, S_i - 1$ y $Z_{il} = 1$ para $l = S_i$. Dad
  
 \end{enumerate}
  
-Los autores recomiendan estandarizar $y$ y $x$ antes del análisis y proponen los siguientes valores por defecto para los hiperparámetros: $\mu_{\rho_j} = 0$, $\nu_{\rho_j} = 100$, grilla $\{\Gamma_{jl}^*\}_{l=1}^{50}$ de 50 puntos igualmente espaciados en $(-3.5,\, 3.5)$, $a_g = b_g = a_\nu = b_\nu = 0.5$, $a_{\kappa_j} = b_{\kappa_j} = 0.5$, $\mu_\mu = 0$, $\nu_\mu = 1$, y nivel de truncamiento $N = 20$.
  
 \subsection{Propiedades}
 \label{03_03_03_propiedades}
@@ -497,10 +495,10 @@ El segundo eje contrasta el desempeño del PSBPM-FD frente a los siguientes mode
 
 \begin{itemize}
     \item Modelo autorregresivo funcional (FAR): El modelo se ajusta sobre los  coeficientes de la representación de las curvas.
-    \item Random Forest y XGBoost: Ajustados sobre los scores, aumentando el número de scores utilizados de manera análoga al primer eje, de modo que la comparación con el PSBPM-FD se realice bajo la misma dimensión de  representación.
+    \item Random Forest: Ajustado sobre los scores, aumentando el número de scores utilizados de manera análoga al primer eje, de modo que la comparación con el PSBPM-FD se realice bajo la misma dimensión de  representación.
 \end{itemize}
 
-Para este fin, se realizan simulaciones bajo distintos escenarios, en las que el desempeño se evalúa de dos maneras. Por un lado, la calidad de las predicciones sobre las curvas se mide, para el PSBPM-FD, el FAR, Random Forest y XGBoost, mediante las métricas de error presentadas en la Sección~\ref{02_02_03_02_metricas_error}. Por otro lado, dado que solo el FAR y el PSBPM-FD permiten construir intervalos, la evaluación de la incertidumbre se restringe a estos dos modelos y se realiza exclusivamente a través de las medidas de evaluación descritas en la Sección~\ref{02_02_03_04_calibracion}.
+Para este fin, se realizan simulaciones bajo distintos escenarios, en las que el desempeño se evalúa de dos maneras. Por un lado, la calidad de las predicciones sobre las curvas se mide, para el PSBPM-FD, el FAR y Random Forest, mediante las métricas de error presentadas en la Sección~\ref{02_02_03_02_metricas_error}. Por otro lado, dado que solo el FAR y el PSBPM-FD permiten construir intervalos, la evaluación de la incertidumbre se restringe a estos dos modelos y se realiza exclusivamente a través de las medidas de evaluación descritas en la Sección~\ref{02_02_03_04_calibracion}.
 
 \subsection{Escenarios}
 \label{03_06_01_escenarios}

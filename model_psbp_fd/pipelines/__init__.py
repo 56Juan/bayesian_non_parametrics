@@ -170,6 +170,12 @@ from .sim_escenario_C3 import (
     generar_escenario_C3,
     resumen_escenario_C3,
 )
+# Escenario TAR (corrida 114): umbral suave sobre el rezago propio de cada score.
+from .sim_escenario_TAR import (
+    ConfigEscenarioTAR,
+    generar_escenario_TAR,
+    resumen_escenario_TAR,
+)
 
 # ══════════════════════════════════════════════════════════════════════════
 # 2. CONTRATO DE ARTEFACTOS
@@ -178,6 +184,7 @@ from .sim_escenario_C3 import (
 from .artifacts import (
     ARCHIVOS,
     ArtefactosFPCA,
+    ArtefactosODPC,
     nombre_dataset,
     guardar_curvas,
     cargar_curvas,
@@ -294,6 +301,9 @@ __all__ = [
     "ConfigEscenarioC3",
     "generar_escenario_C3",
     "resumen_escenario_C3",
+    "ConfigEscenarioTAR",
+    "generar_escenario_TAR",
+    "resumen_escenario_TAR",
     "MecanismoScores",
     "simular_mezcla_scores",
     "generar_mezcla_scores",
@@ -301,6 +311,7 @@ __all__ = [
     # ── Contrato de artefactos ──
     "ARCHIVOS",
     "ArtefactosFPCA",
+    "ArtefactosODPC",
     "nombre_dataset",
     "guardar_curvas",
     "cargar_curvas",
