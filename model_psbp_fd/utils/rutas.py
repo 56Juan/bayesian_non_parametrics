@@ -36,7 +36,7 @@ from __future__ import annotations
 
 import shutil
 from pathlib import Path
-from typing import Callable, Dict, Iterable, Optional, Sequence
+from typing import Callable, Dict, Iterable, Optional, Sequence, Union
 
 from .raiz import get_project_root
 
@@ -67,7 +67,7 @@ _DOMINIOS = ("simulaciones", "reales")
 
 def experiment_id(
     basename: str,
-    escenario_id: int,
+    escenario_id: Union[int, str],
     replica_id: Optional[int] = None,
     M: Optional[int] = None,
 ) -> str:
@@ -78,8 +78,10 @@ def experiment_id(
     ----------
     basename : str
         Prefijo del experimento (p. ej. ``"escenario"``).
-    escenario_id : int
-        Algoritmo `k` del anexo.
+    escenario_id : int | str
+        Algoritmo `k` del anexo. Un `str` se usa tal cual: los datos reales lo
+        entregan ya formateado (``"v01"``, la ventana) y con `replica_id=None`
+        dan ``real_<serie>_v01_m04``.
     replica_id : int, opcional
         Replica Monte Carlo. Si es None se omite el sufijo `_rNN`, que es la
         convencion heredada de las corridas 03-10.
@@ -93,8 +95,11 @@ def experiment_id(
     'escenario_1_r01_m02'
     >>> experiment_id("escenario", 3)
     'escenario_3'
+    >>> experiment_id("real_btcusdt", "v01", None, 4)
+    'real_btcusdt_v01_m04'
     """
-    eid = f"{basename}_{int(escenario_id)}"
+    esc = escenario_id if isinstance(escenario_id, str) else int(escenario_id)
+    eid = f"{basename}_{esc}"
     if replica_id is not None:
         eid += f"_r{int(replica_id):02d}"
     if M is not None:

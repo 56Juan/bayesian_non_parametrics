@@ -138,6 +138,42 @@ from .sim_escenario_B3_cambio_estructural import (
     resumen_escenario_B3 as resumen_escenario_B3_cambio_estructural,
 )
 
+# --- Corridas retiradas del anexo viejo (A-1, A-2, A-3, C-2, C-3), movidas aqui ---
+from .sim_escenario_A1 import (
+    ConfigEscenarioA1,
+    autocorrelacion_arfima,
+    varianza_innovacion_arfima,
+    simular_davies_harte,
+    generar_escenario_A1,
+    resumen_escenario_A1,
+)
+from .sim_escenario_A2 import (
+    ConfigEscenarioA2,
+    autocovarianza_cambio_regimen,
+    filtrar_regimen,
+    generar_escenario_A2,
+    media_condicional_regimen,
+    resumen_escenario_A2,
+    simular_cambio_regimen,
+)
+from .sim_escenario_A3 import (
+    ConfigEscenarioA3,
+    generar_escenario_A3,
+    resumen_escenario_A3,
+    sd_condicional_bloque,
+    simular_ar_garch,
+)
+from .sim_escenario_C2 import (
+    ConfigEscenarioC2,
+    generar_escenario_C2,
+    resumen_escenario_C2,
+)
+from .sim_escenario_C3 import (
+    ConfigEscenarioC3,
+    generar_escenario_C3,
+    resumen_escenario_C3,
+)
+
 __all__ = [
     "ConfigEscenario2", "generar_escenario_2", "resumen_escenario_2",
     "simular_trayectoria_fgarch", "construir_operadores_garch",
@@ -173,4 +209,28 @@ __all__ = [
     "ConfigEscenarioB2TvFar", "generar_escenario_B2_tvfar", "resumen_escenario_B2_tvfar",
     "ConfigEscenarioB3CambioEstructural", "generar_escenario_B3_cambio_estructural",
     "resumen_escenario_B3_cambio_estructural",
+    "ConfigEscenarioA1",
+    "autocorrelacion_arfima",
+    "varianza_innovacion_arfima",
+    "simular_davies_harte",
+    "generar_escenario_A1",
+    "resumen_escenario_A1",
+    "ConfigEscenarioA2",
+    "autocovarianza_cambio_regimen",
+    "filtrar_regimen",
+    "generar_escenario_A2",
+    "media_condicional_regimen",
+    "resumen_escenario_A2",
+    "simular_cambio_regimen",
+    "ConfigEscenarioA3",
+    "generar_escenario_A3",
+    "resumen_escenario_A3",
+    "sd_condicional_bloque",
+    "simular_ar_garch",
+    "ConfigEscenarioC2",
+    "generar_escenario_C2",
+    "resumen_escenario_C2",
+    "ConfigEscenarioC3",
+    "generar_escenario_C3",
+    "resumen_escenario_C3",
 ]

@@ -63,9 +63,10 @@ def _leer_traza_completa(ruta):
     return traces, burn, feat
 
 
-def cargar_artefactos(basename: str, escenario_id: int, replica_id: int,
+def cargar_artefactos(basename: str, escenario_id, replica_id,
                       M_list: Sequence[int], project_root: Path,
-                      verbose: bool = True, con_test: bool = False):
+                      verbose: bool = True, con_test: bool = False,
+                      dominio: str = "simulaciones"):
     """
     Carga, por cada M del barrido, los artefactos que dejo `_01` y cruza el
     contrato (`verificar_contrato`: manifest, hiperparametros y FPCA).
@@ -77,9 +78,12 @@ def cargar_artefactos(basename: str, escenario_id: int, replica_id: int,
     declara M y el manifest lo determina: si discrepan, el directorio esta mal
     nombrado y se falla (la comparacion entre M mezclaria el efecto de M con el
     de otra cosa).
+
+    `dominio="reales"` lee de `data/reales/...`; con datos reales `escenario_id` es la
+    ventana ya formateada (``"v01"``) y `replica_id` es None (ver `experiment_id`).
     """
     paths = rutas_por_M(basename, escenario_id, replica_id, M_list,
-                        dominio="simulaciones", project_root=project_root)
+                        dominio=dominio, project_root=project_root)
     EST, saltados = {}, []
     for M, P in paths.items():
         eid = experiment_id(basename, escenario_id, replica_id, M)

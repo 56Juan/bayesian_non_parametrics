@@ -68,6 +68,7 @@ def cargar_representaciones(EST: Dict, verbose: bool = True) -> Dict:
     si no, las diferencias entre M mezclarian el efecto de M con el de otra cosa.
     Retorna `DIS` con T, T0, N_LAGS, NIVEL, MODO_RESIDUO, OBJETIVO, VENTANAS_W,
     W_REF, grilla, X_true, X_obs y X_suav (la curva suavizada, el objetivo).
+    `X_true` es None con datos reales: no hay curva sin ruido que persistir.
     """
     for M, e in EST.items():
         P = e["paths"]
@@ -82,13 +83,13 @@ def cargar_representaciones(EST: Dict, verbose: bool = True) -> Dict:
             "La propagacion funcional necesita el vector completo de scores en "
             f"orden; [M={M}] COMPONENT_IDX={e['component_idx']} y M={fpca.M}.")
         e.update({"fpca": fpca, "std": cargar_estandarizador(P, DataStandardizer),
-                  "X_obs": X_obs, "X_true": cargar_curvas_true(P),
+                  "X_obs": X_obs, "X_true": cargar_curvas_true(P, estricto=False),
                   "X_suav": fr.reconstruct(THETA), "fr": fr, "grilla": grilla,
                   "Psi_grid": fpca.Psi_grid, "mu_grid": fpca.mu_grid,
                   "SCORES": fpca.SCORES})
         if verbose:
             print(f"M={M}  FPCA M={fpca.M} K={fpca.K}  var. explicada="
-                  f"{float(fpca.meta['var_explained']):.4%}  ·  curvas {e['X_true'].shape}")
+                  f"{float(fpca.meta['var_explained']):.4%}  ·  curvas {X_obs.shape}")
 
     comun = {M: (e["T"], e["T0"], e["n_lags"], e["nivel"], e["modo_residuo"], e["objetivo"],
                  tuple(e["ventanas_w"]), e["n_iter"], e["mcmc_cfg"]["nsim"],
@@ -98,9 +99,11 @@ def cargar_representaciones(EST: Dict, verbose: bool = True) -> Dict:
         f"configuracion MCMC identicos. Difieren: {comun}")
     M0 = next(iter(EST))
     for M, e in EST.items():
-        assert np.allclose(e["X_true"], EST[M0]["X_true"]) and np.allclose(e["grilla"], EST[M0]["grilla"]), (
-            f"[M={M}] las curvas verdaderas difieren de las de M={M0}: los puntos no "
-            "salen de la misma simulacion.")
+        # Con datos reales no hay X_true: las observadas son las que tienen que coincidir.
+        _ref = "X_true" if EST[M0]["X_true"] is not None else "X_obs"
+        assert np.allclose(e[_ref], EST[M0][_ref]) and np.allclose(e["grilla"], EST[M0]["grilla"]), (
+            f"[M={M}] las curvas ({_ref}) difieren de las de M={M0}: los puntos no "
+            "salen de la misma realizacion.")
     e0 = EST[M0]
     DIS = {"T": e0["T"], "T0": e0["T0"], "N_LAGS": e0["n_lags"], "NIVEL": e0["nivel"],
            "MODO_RESIDUO": e0["modo_residuo"], "OBJETIVO": e0["objetivo"],

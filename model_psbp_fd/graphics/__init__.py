@@ -39,6 +39,7 @@ from .viz_fpca import (
     plot_fpca_correlacion_lag0,
     plot_rezagos_heatmap,
     plot_series_componentes,
+    plot_diagnostico_rezagos,
 )
 
 from .viz_convergencia import (
@@ -100,6 +101,7 @@ __all__ = [
     "plot_fpca_correlacion_lag0",
     "plot_rezagos_heatmap",
     "plot_series_componentes",
+    "plot_diagnostico_rezagos",
     # viz_comparacion
     "ESTILOS_MODELOS",
     "plot_ganador_modelo",

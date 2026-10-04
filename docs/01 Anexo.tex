@@ -125,28 +125,30 @@ $\sigma_a^{2}$  & varianza incondicional de la innovación             & $1.0$ \
 
 \subsection{Algoritmo C-2: Cambio de régimen por umbral en los scores}
 \label{ane_00_02_02_alg_c2}
-Este algoritmo induce una media condicional no lineal y una varianza que depende del estado mediante un cambio de régimen por umbral sobre el propio rezago del score. Cada score activo $j\le J_a$ evoluciona en una coordenada cruda $u_{tj}$ con $K=3$ regímenes ordenados, asignados mediante umbrales $c_{1j}<c_{2j}$ sobre $u_{t-1,j}$. Condicionalmente al régimen $R_{tj}=k$,
+Este algoritmo induce una media condicional no lineal y una varianza que depende del estado mediante un cambio de régimen por umbral sobre el propio rezago del score. Cada score activo $j\le J_a$ evoluciona en una coordenada cruda $u_{tj}$ con dos regímenes, $A$ y $B$, asignados mediante un umbral $c_j$ sobre $u_{t-1,j}$. Condicionalmente al régimen $R_{tj}=k\in\{A,B\}$,
 \begin{equation}\label{eq:ane_algC2}
     u_{tj}=\mu_{kj}+\phi_{kj}\,u_{t-1,j}+s_{kj}\,e_{tj},
     \qquad
     e_{tj}\overset{\mathrm{iid}}{\sim}\mathcal{N}(0,1),
 \end{equation}
-de modo que los regímenes difieren en nivel $\mu_{kj}$, persistencia $\phi_{kj}$ y escala $s_{kj}$.\\
+de modo que los regímenes difieren en nivel $\mu_{kj}$, persistencia $\phi_{kj}$ y escala $s_{kj}$: el régimen $A$ es persistente y de escala pequeña, y el $B$ revierte y es más volátil.\
 
-La asignación es un probit ordenado sobre el rezago propio. Con $\Phi$ la función de distribución normal estándar, $P_r=\Phi\bigl((u_{t-1,j}-c_{rj})/h_j\bigr)$ para $r=1,2$ y $h_j>0$ el ancho de la transición,
+La asignación es un probit sobre el rezago propio. Con $\Phi$ la función de distribución normal estándar y $h_j>0$ el ancho de la transición,
 \begin{equation}\label{eq:ane_algC2_probs}
-    P(R_{tj}=1\mid u_{t-1,j})=1-P_1,~~~~
-    P(R_{tj}=2\mid u_{t-1,j})=P_{1}-P_{2},~~~~
-    P(R_{tj}=3\mid u_{t-1,j})=P_2,
+    P(R_{tj}=B\mid u_{t-1,j})=\Phi\!\left(\frac{u_{t-1,j}-c_j}{h_j}\right),
+    \qquad
+    P(R_{tj}=A\mid u_{t-1,j})=1-P(R_{tj}=B\mid u_{t-1,j}).
 \end{equation}
-bien definidas porque $P_1\ge P_2$. Con $h_j\to0$ la asignación se vuelve determinista y el escenario es un SETAR clásico, mientras que un $h_j$ positivo hace la transición suave.\\
+Con $h_j\to0$ la asignación se vuelve determinista y el escenario es un SETAR clásico, mientras que un $h_j$ positivo hace la transición suave.\
 
 La media condicional es exacta,
 \begin{equation}\label{eq:ane_algC2_oraculo}
     \mathbb{E}\bigl[u_{tj}\mid u_{t-1,j}\bigr]
-    =\sum_{k=1}^{3} P(R_{tj}=k\mid u_{t-1,j})\,\bigl(\mu_{kj}+\phi_{kj}\,u_{t-1,j}\bigr),
+    =\bigl(1-p_{tj}\bigr)\bigl(\mu_{Aj}+\phi_{Aj}\,u_{t-1,j}\bigr)+p_{tj}\bigl(\mu_{Bj}+\phi_{Bj}\,u_{t-1,j}\bigr),
+    \qquad
+    p_{tj}=P(R_{tj}=B\mid u_{t-1,j}),
 \end{equation}
-y se conserva como referencia de lo alcanzable. La dinámica usa un único rezago.\\
+y se conserva como referencia de lo alcanzable. La dinámica usa un único rezago.\
 
 El score se obtiene estandarizando $u_{tj}$ con sus momentos poblacionales $(m_j,d_j)$, estimados una sola vez mediante una simulación larga, y escalando por \eqref{eq:ane_escala},
 \begin{equation}
@@ -155,15 +157,15 @@ z_{tj}=\frac{u_{tj}-m_j}{d_j},
 \qquad
 \xi_{tj}=\sqrt{\lambda_j}\,z_{tj}.
 \end{equation}
-La estandarización pertenece al generador, que fija la escala del escenario, y no se aplica a los datos que recibe un método.\\
+La estandarización pertenece al generador, que fija la escala del escenario, y no se aplica a los datos que recibe un método.\
 
-Los parámetros se eligen de modo que cada régimen tenga una ocupación no despreciable, los regímenes persistan varios períodos y la media condicional \eqref{eq:ane_algC2_oraculo} se aparte de cualquier relación lineal.\\
+Los parámetros se eligen de modo que cada régimen tenga una ocupación no despreciable, los regímenes persistan varios períodos y la media condicional \eqref{eq:ane_algC2_oraculo} se aparte de cualquier relación lineal.\
 
 La generación procede en los pasos que siguen.
 \begin{enumerate}
-    \item Se fijan, para cada score activo, los umbrales $(c_{rj})$, el ancho $h_j$ y los parámetros $(\mu_{kj},\phi_{kj},s_{kj})$ de los tres regímenes.
+    \item Se fijan, para cada score activo, el umbral $c_j$, el ancho $h_j$ y los parámetros $(\mu_{kj},\phi_{kj},s_{kj})$ de los dos regímenes.
 
-    \item Para cada período se calculan las probabilidades \eqref{eq:ane_algC2_probs} a partir de $u_{t-1,j}$ y se sortea $R_{tj}$. La secuencia de regímenes no se entrega a los métodos.
+    \item Para cada período se calcula la probabilidad \eqref{eq:ane_algC2_probs} a partir de $u_{t-1,j}$ y se sortea $R_{tj}$. La secuencia de regímenes no se entrega a los métodos.
 
     \item Se genera $u_{tj}$ mediante \eqref{eq:ane_algC2}, con el régimen sorteado.
 
@@ -178,15 +180,29 @@ La generación procede en los pasos que siguen.
 \label{tab:ane_algC2}
 \begin{tabular}{llc}
 \hline
-Símbolo & Descripción & Valor \\
+Símbolo & Descripción & Valor \
 \hline
-$K$                       & número de regímenes                                    & $3$ \\
-$c_{1j}<c_{2j}$           & umbrales sobre el rezago propio                        & por calibrar \\
-$h_j$                     & ancho de la transición probit                          & por calibrar \\
-$\mu_{kj}$                & nivel del régimen $k$                                  & por calibrar \\
-$\phi_{kj}$               & coeficiente autorregresivo del régimen $k$             & por calibrar \\
-$s_{kj}$                  & escala de la innovación del régimen $k$                & por calibrar \\
-$(m_j,d_j)$               & media y desviación poblacionales de $u_{tj}$           & simulación larga \\
+$K$                       & número de regímenes                                    & $2$ \
+$c_j$                     & umbral sobre el rezago propio                          & $0$ \
+$h_j$                     & ancho de la transición probit                          & Cuadro~\ref{tab:ane_algC2_scores} \
+$\mu_{kj},\ \phi_{kj},\ s_{kj}$ & nivel, coeficiente autorregresivo y escala del régimen $k$ & Cuadro~\ref{tab:ane_algC2_scores} \
+$(m_j,d_j)$               & media y desviación poblacionales de $u_{tj}$           & simulación larga \
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Parámetros del Algoritmo~C-2 por score activo.}
+\label{tab:ane_algC2_scores}
+\begin{tabular}{lcccccccc}
+\hline
+$j$ & $h_j$ & $\mu_{Aj}$ & $\phi_{Aj}$ & $s_{Aj}$ & $\mu_{Bj}$ & $\phi_{Bj}$ & $s_{Bj}$ & $c_j$ \
+\hline
+$1$ & $0.10$ & $0$ & $0.8$ & $0.25$ & $2.5$ & $-0.9$ & $1.0$ & $0$ \
+$2$ & $0.10$ & $0$ & $0.6$ & $0.25$ & $2.0$ & $-0.9$ & $1.0$ & $0$ \
+$3$ & $0.25$ & $0$ & $0.8$ & $0.40$ & $2.0$ & $-0.9$ & $1.0$ & $0$ \
+$4$ & $0.25$ & $0$ & $0.6$ & $0.40$ & $2.5$ & $-0.9$ & $1.0$ & $0$ \
 \hline
 \end{tabular}
 \end{table}

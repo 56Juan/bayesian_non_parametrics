@@ -11,6 +11,8 @@ plot_rezagos_heatmap          : Heatmap de correlación (Pearson o Spearman) ent
                                 respuesta en t y scores rezagados.
 plot_series_componentes       : Una serie temporal por componente (coeficientes o
                                 scores), en rejilla compacta.
+plot_diagnostico_rezagos      : Los dos heatmaps (Pearson y Spearman) de respuesta vs
+                                rezagos que arma `fit.preparacion_barrido`.
 
 Contexto
 --------
@@ -296,3 +298,21 @@ def plot_series_componentes(
     if save_path:
         fig.savefig(save_path, dpi=dpi, bbox_inches="tight")
     return fig
+
+
+def plot_diagnostico_rezagos(diag: dict, M: int, save_dir=None, vclip: float = 0.6):
+    """
+    Heatmaps de Pearson y de Spearman entre la respuesta en t y los scores rezagados, a
+    partir de `diagnostico_rezagos` (solo train). Guarda `09a_rezagos_pearson.png` y
+    `09b_rezagos_spearman.png` en `save_dir` si se da. Retorna las dos figuras.
+    """
+    from pathlib import Path
+    figs = []
+    for matriz, nombre, arch in ((diag["corr_pearson"], "Pearson", "09a"),
+                                 (diag["corr_spearman"], "Spearman", "09b")):
+        figs.append(plot_rezagos_heatmap(
+            matriz, diag["col_labels"], diag["row_labels"],
+            title=f"{nombre} — respuesta($t$) vs rezagos 1..{diag['n_lags_max']}  (M={M})",
+            n_lags_max=diag["n_lags_max"], K_total=diag["K_total"], band=diag["band"], vclip=vclip,
+            save_path=(str(Path(save_dir) / f"{arch}_rezagos_{nombre.lower()}.png") if save_dir else None)))
+    return figs

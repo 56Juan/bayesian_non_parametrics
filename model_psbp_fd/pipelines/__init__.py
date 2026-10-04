@@ -28,13 +28,13 @@ El paquete agrupa tres responsabilidades:
    Comprueba la consistencia entre manifest, hiperparametros y artefactos FPCA
    antes de que el analisis comience.
 
-Generadores oficiales: `sim_escenario_1` (base del B-1), `sim_series_clasicas`
-y los Algoritmos A-1, A-2 y A-3 (series clasicas), B-1, B-2 y B-3 (procesos
-funcionales) y C-1, C-2 y C-3 (`sim_escenario_C1/C2/C3`, mezcla de mecanismos
-en el espacio de scores) del anexo. `sim_escenario_C` implementa un diseno
-anterior de la seccion C que no coincide con el anexo vigente. Los generadores de corridas retiradas (Escenarios 2-6,
-B, C-F, TS, J, K, L y CE) viven en `pipelines/deprecated/`: siguen importables
-desde ahi, no desde este paquete, y no forman parte del estudio oficial.
+Generadores vivos: `sim_comun`, `sim_scores_comun` (motor de los escenarios sobre
+scores), `sim_escenario_TAR` (corrida 200), `sim_escenario_GARCH` (201) y
+`sim_escenario_C1` (202, mezcla de mecanismos en el espacio de scores), mas
+`sim_escenario_1/B1/B2/B3/C` y `sim_series_clasicas`, de los que dependen. Los
+generadores de corridas retiradas (Escenarios 2-6, A-1, A-2, A-3, B, C-2, C-3, C-F,
+TS, J, K, L y CE) viven en `pipelines/deprecated/`: siguen importables desde ahi,
+no desde este paquete, y no forman parte del estudio oficial.
 """
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -69,15 +69,6 @@ from .sim_escenario_1 import (
     simular_trayectoria_far1,
 )
 
-# --- Escenario A-1: ARFIMA(0,d,0) de memoria larga, segmentado en curvas ---
-from .sim_escenario_A1 import (
-    ConfigEscenarioA1,
-    autocorrelacion_arfima,
-    varianza_innovacion_arfima,
-    simular_davies_harte,
-    generar_escenario_A1,
-    resumen_escenario_A1,
-)
 
 # --- Series de tiempo clasicas: mecanismo comun a A-1, A-2 y A-3 ---
 from .sim_series_clasicas import (
@@ -89,25 +80,7 @@ from .sim_series_clasicas import (
     r2_empirico_media_condicional,
 )
 
-# --- Escenario A-2: AR con cambio de regimen markoviano ---
-from .sim_escenario_A2 import (
-    ConfigEscenarioA2,
-    autocovarianza_cambio_regimen,
-    filtrar_regimen,
-    generar_escenario_A2,
-    media_condicional_regimen,
-    resumen_escenario_A2,
-    simular_cambio_regimen,
-)
 
-# --- Escenario A-3: AR-GARCH(1,1) ---
-from .sim_escenario_A3 import (
-    ConfigEscenarioA3,
-    generar_escenario_A3,
-    resumen_escenario_A3,
-    sd_condicional_bloque,
-    simular_ar_garch,
-)
 
 # --- Algoritmos B-1, B-2 y B-3: mezcla de mecanismos funcionales (anexo, seccion B) ---
 from .sim_escenario_B1 import (
@@ -160,26 +133,11 @@ from .sim_escenario_C1 import (
     resumen_mezcla_scores,
     simular_mezcla_scores,
 )
-from .sim_escenario_C2 import (
-    ConfigEscenarioC2,
-    generar_escenario_C2,
-    resumen_escenario_C2,
-)
-from .sim_escenario_C3 import (
-    ConfigEscenarioC3,
-    generar_escenario_C3,
-    resumen_escenario_C3,
-)
-# Escenarios sobre scores 201 (GARCH) y 202 (TAR de tres regimenes).
+# Escenario sobre scores 201 (GARCH); el TAR es la corrida 200 y la multimodalidad la 202.
 from .sim_escenario_GARCH import (
     ConfigEscenarioGARCH,
     generar_escenario_GARCH,
     resumen_escenario_GARCH,
-)
-from .sim_escenario_TAR3 import (
-    ConfigEscenarioTAR3,
-    generar_escenario_TAR3,
-    resumen_escenario_TAR3,
 )
 
 # Escenario TAR (corrida 114): umbral suave sobre el rezago propio de cada score.
@@ -244,13 +202,9 @@ __all__ = [
     "generar_escenario_1",
     "resumen_escenario_1",
     "simular_trayectoria_far1",
-    # ── Escenario A-1: ARFIMA(0,d,0) de memoria larga (anexo, Algoritmo A-1) ──
-    "ConfigEscenarioA1",
-    "autocorrelacion_arfima",
-    "varianza_innovacion_arfima",
-    "simular_davies_harte",
-    "generar_escenario_A1",
-    "resumen_escenario_A1",
+
+
+
     # ── Series de tiempo clasicas: mecanismo comun a A-1, A-2 y A-3 ──
     "acf_empirica_serie",
     "bloques_de_serie",
@@ -258,20 +212,11 @@ __all__ = [
     "generar_serie_segmentada",
     "oraculo_lineal_un_rezago",
     "r2_empirico_media_condicional",
-    # ── Escenario A-2: AR con cambio de regimen markoviano (anexo, Algoritmo A-2) ──
-    "ConfigEscenarioA2",
-    "autocovarianza_cambio_regimen",
-    "filtrar_regimen",
-    "generar_escenario_A2",
-    "media_condicional_regimen",
-    "resumen_escenario_A2",
-    "simular_cambio_regimen",
-    # ── Escenario A-3: AR-GARCH(1,1) (anexo, Algoritmo A-3) ──
-    "ConfigEscenarioA3",
-    "generar_escenario_A3",
-    "resumen_escenario_A3",
-    "sd_condicional_bloque",
-    "simular_ar_garch",
+
+
+
+
+
     # ── Algoritmos B-1, B-2 y B-3: mezcla de mecanismos funcionales (anexo, seccion B) ──
     "ConfigEscenarioB1",
     "generar_escenario_B1",
@@ -307,18 +252,12 @@ __all__ = [
     "ConfigEscenarioC1",
     "generar_escenario_C1",
     "resumen_escenario_C1",
-    "ConfigEscenarioC2",
-    "generar_escenario_C2",
-    "resumen_escenario_C2",
-    "ConfigEscenarioC3",
-    "generar_escenario_C3",
-    "resumen_escenario_C3",
+
+
+
     "ConfigEscenarioGARCH",
     "generar_escenario_GARCH",
     "resumen_escenario_GARCH",
-    "ConfigEscenarioTAR3",
-    "generar_escenario_TAR3",
-    "resumen_escenario_TAR3",
     "ConfigEscenarioTAR",
     "generar_escenario_TAR",
     "resumen_escenario_TAR",
