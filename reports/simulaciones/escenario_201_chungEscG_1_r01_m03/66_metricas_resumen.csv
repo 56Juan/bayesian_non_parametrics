@@ -1,0 +1,41 @@
+objetivo,metrica,bloque,columna,minimo,maximo,promedio
+curva_suavizada,1. MAE  (L^1),train,mae_f,0.5235931270194208,1.0683828161361197,0.7116525690310288
+curva_suavizada,1. MAE  (L^1),test,mae_f,0.5871809650114239,0.8807529324586458,0.7238728376072172
+curva_suavizada,2. RMSE (L^2),train,rmse_f,0.6718556860568755,1.3290029546448123,0.8967974676730561
+curva_suavizada,2. RMSE (L^2),test,rmse_f,0.7241477587029644,1.1342443059873497,0.9030662158396946
+curva_suavizada,3. E_max promedio por curva,train,linf_medio,1.304945947646984,2.2012404806770878,1.6217987634375501
+curva_suavizada,3. E_max promedio por curva,test,linf_medio,1.3591690908291543,1.9167220090044592,1.6088258555805377
+curva_suavizada,4. E_max peor de la ventana,train,linf_max,1.982329514416549,4.449395669457035,2.899372512863717
+curva_suavizada,4. E_max peor de la ventana,test,linf_max,2.156598284038976,3.795648579844009,2.9141971405183633
+curva_suavizada,5. MPIW,train,mpiw,2.964652981073659,3.738945783136605,3.1022234846746906
+curva_suavizada,5. MPIW,test,mpiw,2.969542005665256,3.2803472297258462,3.091867689181273
+curva_suavizada,6. PICP puntual,train,picp,0.776,0.9684444444444444,0.91367916041979
+curva_suavizada,6. PICP puntual,test,picp,0.848,0.9737777777777777,0.9100647806478065
+curva_suavizada,7. PICPB curva completa,train,picp_simultaneo,0.16666666666666666,0.7666666666666667,0.4799100449775113
+curva_suavizada,7. PICPB curva completa,test,picp_simultaneo,0.26666666666666666,0.7,0.46691266912669127
+curva_suavizada,8. Winkler,train,winkler,3.3017220460104815,8.869042038048661,4.5357811329836455
+curva_suavizada,8. Winkler,test,winkler,3.254929540931033,6.6462987423485975,4.488284829336283
+curva_suavizada,9. Winkler max promedio,train,winkler_max_medio,6.9410338138896295,28.62781182163654,13.84071981771236
+curva_suavizada,9. Winkler max promedio,test,winkler_max_medio,6.453960807650362,22.57187089676724,13.742654431678385
+curva_suavizada,10. Winkler max peor ventana,train,winkler_max_glob,20.092685114595884,105.11366048752765,56.19556786162324
+curva_suavizada,10. Winkler max peor ventana,test,winkler_max_glob,26.32493117807703,88.9142203671876,55.59154941436425
+representacion_fpca,1. MAE  (L^1),train,mae_f,0.4321308019829941,0.9995016252561035,0.6098842849272534
+representacion_fpca,1. MAE  (L^1),test,mae_f,0.4848020998000953,0.8298845445351827,0.6424403282864051
+representacion_fpca,2. RMSE (L^2),train,rmse_f,0.5450416446880308,1.2429123162901252,0.7716202965339997
+representacion_fpca,2. RMSE (L^2),test,rmse_f,0.6039618331778306,1.0642775159252087,0.8039351349452212
+representacion_fpca,3. E_max promedio por curva,train,linf_medio,0.8367606722566718,1.8747623405922265,1.1807177864676162
+representacion_fpca,3. E_max promedio por curva,test,linf_medio,0.9153078320152481,1.613540192423175,1.2191710297269256
+representacion_fpca,4. E_max peor de la ventana,train,linf_max,1.536908195399529,4.0181468882078875,2.4391037434652825
+representacion_fpca,4. E_max peor de la ventana,test,linf_max,1.823877938532431,3.4570351884619672,2.480796079520035
+representacion_fpca,5. MPIW,train,mpiw,2.964652981073659,3.738945783136605,3.1022234846746906
+representacion_fpca,5. MPIW,test,mpiw,2.969542005665256,3.2803472297258462,3.091867689181273
+representacion_fpca,6. PICP puntual,train,picp,0.856,1.0,0.9542042312177244
+representacion_fpca,6. PICP puntual,test,picp,0.8608888888888889,0.992,0.9418614186141864
+representacion_fpca,7. PICPB curva completa,train,picp_simultaneo,0.5,1.0,0.8041479260369817
+representacion_fpca,7. PICPB curva completa,test,picp_simultaneo,0.5,0.9333333333333333,0.7451414514145142
+representacion_fpca,8. Winkler,train,winkler,2.9981991057515165,6.426574939828106,3.733873800025208
+representacion_fpca,8. Winkler,test,winkler,3.0263810659559036,5.660480815338523,3.829968988967493
+representacion_fpca,9. Winkler max promedio,train,winkler_max_medio,3.447917435813921,16.06881095698149,6.614049298431043
+representacion_fpca,9. Winkler max promedio,test,winkler_max_medio,3.780128130409109,12.783403350465266,7.205022550467954
+representacion_fpca,10. Winkler max peor ventana,train,winkler_max_glob,3.825648254152252,76.4487957068815,33.5637621244201
+representacion_fpca,10. Winkler max peor ventana,test,winkler_max_glob,11.270322887654222,60.33801552306423,35.84309353865778

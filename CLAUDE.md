@@ -220,10 +220,9 @@ GBT**. Hay una sola referencia lineal.
 - **PSBPM-FD**: su predicción puntual (media analítica) y su banda se **leen** de
   `banda_funcional_psbp.npz`, que persiste `_04`; no se recalcula desde las trazas.
 
-El Bloque B se restringe a FAR y PSBPM-FD —los únicos con mecanismo de intervalo
-propio— con tres filas por `M`: la banda nativa de cada uno y una banda gaussiana
-del PSBPM-FD con el mecanismo del FAR, para separar "gana por el modelo" de "gana
-por la forma de la predictiva".
+El Bloque B se restringe a FAR y PSBPM-FD —los únicos con mecanismo de intervalo propio— con dos filas por `M`: la banda gaussiana del FAR y la banda nativa del PSBPM-FD (cuantiles
+de su predictiva). `IC_PSBP_TAMBIEN_GAUSSIANA = False`: no se corre el control con banda gaussiana
+sobre la media del PSBPM-FD.
 
 ---
 
@@ -446,8 +445,8 @@ eso se entrega a la estimación**.
   oráculo−AR(2) 0.41/0.51/0.42/0.44 (0.386 agregada en L²). Parámetros en
   `PARAMETROS_TAR`, momentos poblacionales en `MOMENTOS_TAR`.
 - **201 — GARCH.** Cada score activo es AR(1) con innovaciones GARCH(1,1)
-  (`φ=0.5`, `α₁=0.08`, `β₁=0.90`, `σ_a²=1`): media **lineal**, varianza persistente
-  (memoria de 50 curvas). La innovación reciente `a_{t-1} = u_{t-1} − φ u_{t-2}`
+  (`φ=0.5`, `α₁=0.25`, `β₁=0.60`, `σ_a²=1`): media **lineal**, varianza persistente
+  (memoria de ~7 curvas, acf1 de los cuadrados ≈ 0.36). La innovación reciente `a_{t-1} = u_{t-1} − φ u_{t-2}`
   es función de los dos rezagos propios; con `N_LAGS ≥ 2` el término `α₁a²` es
   aprendible, `β₁` no. Se espera ventaja en el Bloque B.
 - **202 — Multimodalidad.** Mezcla de 3 mecanismos lineales con asignación softmax

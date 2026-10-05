@@ -7,9 +7,11 @@ anexo). Cada score activo j = 1..4 sigue un AR(1) con innovaciones GARCH(1,1):
     u_tj = phi u_{t-1,j} + a_tj,   a_tj = sqrt(h_tj) e_tj,   e_tj ~ N(0, 1),
     h_tj = alpha_0 + alpha_1 a_{t-1,j}^2 + beta_1 h_{t-1,j},   alpha_0 = sigma_a^2 (1 - alpha_1 - beta_1),
 
-con los valores del anexo (phi = 0.5, alpha_1 = 0.08, beta_1 = 0.90, sigma_a^2 = 1). La media
+con los valores del anexo (phi = 0.5, alpha_1 = 0.25, beta_1 = 0.60, sigma_a^2 = 1). La media
 condicional es LINEAL (phi u_{t-1}) y la no linealidad esta solo en la varianza, cuya memoria
-es de 1/(1 - alpha_1 - beta_1) = 50 periodos, que aqui son curvas.
+es de 1/(1 - alpha_1 - beta_1) = 6.7 periodos, que aqui son curvas. La combinacion alpha_1
+alto / beta_1 moderado da una senal de volatilidad fuerte y aprendible desde los rezagos (acf1 de
+los cuadrados ~ 0.36, mediana 0.28 con T = 1000, curtosis teorica 5.5).
 
 Que ve un modelo con covariables de rezago propio: h_t depende de la historia infinita de
 innovaciones a traves de beta_1, que no es observable; pero la innovacion reciente es
@@ -32,7 +34,7 @@ from .sim_escenario_TAR import ConfigEscenarioTAR
 __all__ = ["PARAMETROS_GARCH", "ConfigEscenarioGARCH", "generar_escenario_GARCH",
            "resumen_escenario_GARCH"]
 
-PARAMETROS_GARCH = {"phi": 0.5, "alpha1": 0.08, "beta1": 0.90, "sigma_a2": 1.0}
+PARAMETROS_GARCH = {"phi": 0.5, "alpha1": 0.25, "beta1": 0.60, "sigma_a2": 1.0}
 
 
 class ConfigEscenarioGARCH(ConfigEscenarioTAR):
