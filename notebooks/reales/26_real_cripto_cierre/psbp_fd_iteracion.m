@@ -38,7 +38,7 @@ clear; clc; close all;
 N_WORKERS    = 8;            % workers del pool
 BASENAME     = "real";
 SERIE_ID     = "btcusdt_cierre";   % serie modelada; DEBE coincidir con 26_01
-VENTANA_ID   = 1;            % 1 precio_cierre, 2 log_precio; DEBE coincidir con 26_01
+VENTANA_ID   = 2;            % 1 = 2020-2026 (70/30), 2 = entrena 2021-2023 y prueba 2024; DEBE coincidir con 26_01
 
 % [ENTRENAMIENTO] Solo se entrena M = max(M_FPCA_LIST) de 26_01: cada componente
 % usa solo su rezago propio, asi que sus cadenas sirven a todos los M menores
