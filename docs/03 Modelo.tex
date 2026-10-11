@@ -614,23 +614,22 @@ El estudio de simulación tiene como objetivo determinar en qué escenarios la p
 \subsection{Métodos de evaluación}
 \label{03_07_01_metodos_evaluacion}
 
-Las curvas de cada escenario se dividen en orden cronológico en un bloque de entrenamiento y uno de prueba. Todo lo que se estima a partir de los datos, la descomposición de la representación, los hiperparámetros relativos a la dispersión de cada score, las cadenas del muestreador y los modelos de referencia, se ajusta solo con el bloque de entrenamiento, y las predicciones a un paso sobre el bloque de prueba se construyen con los rezagos observados, sin reestimar. Las métricas se calculan sobre el esquema de ventana móvil de la Sección~\ref{02_02_03_01_esquema_evaluacion} con los anchos del Cuadro~\ref{tab:dis_particion}; en este capítulo se reporta exclusivamente el ancho de referencia $w_{\mathrm{ref}}$ y los otros dos se presentan en el Anexo~\ref{aneB_00_00_resultados_simulacion}. Las ventanas que cruzan el corte entre entrenamiento y prueba se excluyen de todo agregado. El objetivo contra el que se mide cada predicción es la curva ajustada por la representación funcional de la Sección~\ref{03_05_00_reconstruccion_funcional}, que en los escenarios simulados coincide con la curva generada porque la representación es exacta.
+Las curvas de cada escenario se generan con la configuración general del esquema común del Anexo~\ref{ane_00_01_esquema_comun} (Cuadro~\ref{tab:ane_comun}) y se dividen en orden cronológico en un bloque de entrenamiento y uno de prueba según el Cuadro~\ref{tab:dis_particion}, que reúne lo propio de la evaluación. Todo lo que se estima a partir de los datos, la descomposición de la representación, los hiperparámetros relativos a la dispersión de cada score, las cadenas del muestreador y los modelos de referencia, se ajusta solo con el bloque de entrenamiento, y las predicciones a un paso sobre el bloque de prueba se construyen con los rezagos observados, sin reestimar. Las métricas se calculan sobre el esquema de ventana móvil de la Sección~\ref{02_02_03_01_esquema_evaluacion} con los anchos del mismo cuadro; en este capítulo se reporta exclusivamente el ancho de referencia $w_{\mathrm{ref}}$ y los otros dos se presentan en el Anexo~\ref{aneB_00_00_resultados_simulacion}. Las ventanas que cruzan el corte entre entrenamiento y prueba se excluyen de todo agregado. El objetivo contra el que se mide cada predicción es la curva ajustada por la representación funcional de la Sección~\ref{03_05_00_reconstruccion_funcional}, que en los escenarios simulados coincide con la curva generada porque la representación es exacta.
 
 \begin{table}[H]
 \centering\small
-\caption{Partición temporal, ventana móvil y referencias de las tablas.}
+\caption{Configuración general de la evaluación: partición temporal, ventana móvil y referencias de las tablas.}
 \label{tab:dis_particion}
 \begin{tabular}{p{0.14\textwidth} p{0.56\textwidth} p{0.18\textwidth}}
 \hline
 Símbolo & Descripción & Valor \\
 \hline
-$T$                & curvas por escenario                            & $1000$ \\
-$T_0$              & corte entrenamiento / prueba ($70\%$ de $T$)  & $700$ \\
+$T_0$              & corte entrenamiento / prueba ($70\%$ de las $T = 1000$ curvas del Cuadro~\ref{tab:ane_comun}) & $700$ \\
 $h$                & horizonte de predicción                         & $1$ \\
 $w$                & anchos de la ventana móvil                      & $\{20, 30, 40\}$ \\
 $w_{\mathrm{ref}}$ & ancho reportado en el capítulo                  & $40$ \\
 paso               & desplazamiento entre ventanas                   & $1$ \\
-$M_{\mathrm{ref}}$ & dimensión del estado en las tablas (primera $M$ con al menos $95\%$ de la varianza acumulada) & $5$ \\
+$M_{\mathrm{ref}}$ & dimensión del estado en las tablas, la mayor del barrido de cada escenario (Cuadro~\ref{tab:dis_escenarios}) & $10$ ($6$ en C-3) \\
 $1-\zeta$          & nivel de los intervalos de credibilidad         & $0.95$ \\
 \hline
 \end{tabular}
