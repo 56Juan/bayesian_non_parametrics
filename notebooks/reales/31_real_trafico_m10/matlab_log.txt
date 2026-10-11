@@ -1,0 +1,202 @@
+ออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+  BARRIDO EN M : [10]
+  N_WORKERS    : 8
+ออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+
+PROJECT_ROOT : C:\Users\56jua\Desktop\git_tesis\bayesian_non_parametrics-1
+Experiment ID : real_trafico_m10_v01_m10
+Seed (base)   : 4123
+
+  raw          C:\Users\56jua\Desktop\git_tesis\bayesian_non_parametrics-1\data\reales\raw\real_trafico_m10_v01_m10
+  functional   C:\Users\56jua\Desktop\git_tesis\bayesian_non_parametrics-1\data\reales\processed\functional\real_trafico_m10_v01_m10
+  predict      C:\Users\56jua\Desktop\git_tesis\bayesian_non_parametrics-1\data\reales\processed\predict\real_trafico_m10_v01_m10
+  out_report   C:\Users\56jua\Desktop\git_tesis\bayesian_non_parametrics-1\reports\reales\real_trafico_m10_v01_m10
+  out_artefact  C:\Users\56jua\Desktop\git_tesis\bayesian_non_parametrics-1\artefact\reales\real_trafico_m10_v01_m10
+  out          C:\Users\56jua\Desktop\git_tesis\bayesian_non_parametrics-1\reports\reales\real_trafico_m10_v01_m10
+
+ฤฤ M=10  (real_trafico_m10_v01_m10) ฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤ
+   N_ITER=1   SEED_BASE=41232  (desde JSON)
+   MCMC: nsim=2500 burn=500 N=30 M=50
+   n_components=10  n_lags=1
+     fpc_1  T_eff=830  p=10
+     fpc_2  T_eff=830  p=10
+     fpc_3  T_eff=830  p=10
+     fpc_4  T_eff=830  p=10
+     fpc_5  T_eff=830  p=10
+     fpc_6  T_eff=830  p=10
+     fpc_7  T_eff=830  p=10
+     fpc_8  T_eff=830  p=10
+     fpc_9  T_eff=830  p=10
+     fpc_10  T_eff=830  p=10
+   -> 10 jobs (1 cadenas  10 componentes)
+
+ 10 jobs construidos en total
+
+Starting parallel pool (parpool) using the 'Processes' profile ...
+Connected to parallel pool with 8 workers.
+ Pool iniciado con 8 workers
+
+Iniciando parfor (10 jobs, 8 workers)...
+
+[job   6/10]  M=10  fpc_6  iter01  seed=51391
+[job   8/10]  M=10  fpc_8  iter01  seed=51453
+[job   1/10]  M=10  fpc_1  iter01  seed=51236
+[job   2/10]  M=10  fpc_2  iter01  seed=51267
+[job   5/10]  M=10  fpc_5  iter01  seed=51360
+[job   7/10]  M=10  fpc_7  iter01  seed=51422
+[job   4/10]  M=10  fpc_4  iter01  seed=51329
+[job   3/10]  M=10  fpc_3  iter01  seed=51298
+  [seed=51453] iter  200/2500  N_act=24  (burn-in, eta 32min)
+  [seed=51422] iter  200/2500  N_act=12  (burn-in, eta 33min)
+  [seed=51391] iter  200/2500  N_act=16  (burn-in, eta 34min)
+  [seed=51329] iter  200/2500  N_act=30  (burn-in, eta 34min)
+  [seed=51267] iter  200/2500  N_act=22  (burn-in, eta 35min)
+  [seed=51360] iter  200/2500  N_act=12  (burn-in, eta 35min)
+  [seed=51298] iter  200/2500  N_act=26  (burn-in, eta 36min)
+  [seed=51236] iter  200/2500  N_act=8   (burn-in, eta 37min)
+  [seed=51453] iter  400/2500  N_act=15  (burn-in, eta 30min)
+  [seed=51422] iter  400/2500  N_act=14  (burn-in, eta 30min)
+  [seed=51391] iter  400/2500  N_act=14  (burn-in, eta 31min)
+  [seed=51267] iter  400/2500  N_act=22  (burn-in, eta 31min)
+  [seed=51329] iter  400/2500  N_act=28  (burn-in, eta 32min)
+  [seed=51360] iter  400/2500  N_act=11  (burn-in, eta 32min)
+  [seed=51298] iter  400/2500  N_act=24  (burn-in, eta 33min)
+  [seed=51236] iter  400/2500  N_act=7   (burn-in, eta 33min)
+  [seed=51422] iter  600/2500  N_act=14  (muestreo, eta 25min)
+  [seed=51453] iter  600/2500  N_act=21  (muestreo, eta 25min)
+  [seed=51391] iter  600/2500  N_act=30  (muestreo, eta 26min)
+  [seed=51267] iter  600/2500  N_act=30  (muestreo, eta 26min)
+  [seed=51329] iter  600/2500  N_act=30  (muestreo, eta 26min)
+  [seed=51360] iter  600/2500  N_act=15  (muestreo, eta 26min)
+  [seed=51298] iter  600/2500  N_act=30  (muestreo, eta 27min)
+  [seed=51236] iter  600/2500  N_act=7   (muestreo, eta 28min)
+  [seed=51422] iter  800/2500  N_act=17  (muestreo, eta 21min)
+  [seed=51453] iter  800/2500  N_act=30  (muestreo, eta 21min)
+  [seed=51391] iter  800/2500  N_act=26  (muestreo, eta 22min)
+  [seed=51267] iter  800/2500  N_act=30  (muestreo, eta 22min)
+  [seed=51329] iter  800/2500  N_act=15  (muestreo, eta 23min)
+  [seed=51360] iter  800/2500  N_act=27  (muestreo, eta 23min)
+  [seed=51298] iter  800/2500  N_act=18  (muestreo, eta 23min)
+  [seed=51236] iter  800/2500  N_act=11  (muestreo, eta 24min)
+  [seed=51422] iter 1000/2500  N_act=17  (muestreo, eta 18min)
+  [seed=51453] iter 1000/2500  N_act=30  (muestreo, eta 18min)
+  [seed=51391] iter 1000/2500  N_act=18  (muestreo, eta 19min)
+  [seed=51267] iter 1000/2500  N_act=30  (muestreo, eta 20min)
+  [seed=51329] iter 1000/2500  N_act=13  (muestreo, eta 20min)
+  [seed=51298] iter 1000/2500  N_act=23  (muestreo, eta 20min)
+  [seed=51360] iter 1000/2500  N_act=27  (muestreo, eta 20min)
+  [seed=51236] iter 1000/2500  N_act=9   (muestreo, eta 22min)
+  [seed=51422] iter 1200/2500  N_act=21  (muestreo, eta 16min)
+  [seed=51453] iter 1200/2500  N_act=29  (muestreo, eta 16min)
+  [seed=51391] iter 1200/2500  N_act=16  (muestreo, eta 17min)
+  [seed=51267] iter 1200/2500  N_act=14  (muestreo, eta 17min)
+  [seed=51329] iter 1200/2500  N_act=18  (muestreo, eta 17min)
+  [seed=51298] iter 1200/2500  N_act=21  (muestreo, eta 18min)
+  [seed=51360] iter 1200/2500  N_act=23  (muestreo, eta 18min)
+  [seed=51236] iter 1200/2500  N_act=8   (muestreo, eta 19min)
+  [seed=51422] iter 1400/2500  N_act=30  (muestreo, eta 14min)
+  [seed=51453] iter 1400/2500  N_act=20  (muestreo, eta 14min)
+  [seed=51391] iter 1400/2500  N_act=19  (muestreo, eta 15min)
+  [seed=51267] iter 1400/2500  N_act=29  (muestreo, eta 15min)
+  [seed=51329] iter 1400/2500  N_act=21  (muestreo, eta 15min)
+  [seed=51298] iter 1400/2500  N_act=17  (muestreo, eta 15min)
+  [seed=51360] iter 1400/2500  N_act=15  (muestreo, eta 16min)
+  [seed=51422] iter 1600/2500  N_act=30  (muestreo, eta 12min)
+  [seed=51236] iter 1400/2500  N_act=7   (muestreo, eta 17min)
+  [seed=51453] iter 1600/2500  N_act=28  (muestreo, eta 12min)
+  [seed=51391] iter 1600/2500  N_act=15  (muestreo, eta 12min)
+  [seed=51267] iter 1600/2500  N_act=14  (muestreo, eta 13min)
+  [seed=51298] iter 1600/2500  N_act=14  (muestreo, eta 13min)
+  [seed=51329] iter 1600/2500  N_act=21  (muestreo, eta 13min)
+  [seed=51360] iter 1600/2500  N_act=12  (muestreo, eta 13min)
+  [seed=51422] iter 1800/2500  N_act=30  (muestreo, eta 9min)
+  [seed=51453] iter 1800/2500  N_act=30  (muestreo, eta 9min)
+  [seed=51236] iter 1600/2500  N_act=9   (muestreo, eta 14min)
+  [seed=51391] iter 1800/2500  N_act=14  (muestreo, eta 10min)
+  [seed=51267] iter 1800/2500  N_act=22  (muestreo, eta 10min)
+  [seed=51298] iter 1800/2500  N_act=13  (muestreo, eta 10min)
+  [seed=51329] iter 1800/2500  N_act=13  (muestreo, eta 10min)
+  [seed=51360] iter 1800/2500  N_act=15  (muestreo, eta 10min)
+  [seed=51422] iter 2000/2500  N_act=22  (muestreo, eta 7min)
+  [seed=51453] iter 2000/2500  N_act=30  (muestreo, eta 7min)
+  [seed=51236] iter 1800/2500  N_act=8   (muestreo, eta 11min)
+  [seed=51391] iter 2000/2500  N_act=24  (muestreo, eta 7min)
+  [seed=51267] iter 2000/2500  N_act=14  (muestreo, eta 7min)
+  [seed=51298] iter 2000/2500  N_act=13  (muestreo, eta 7min)
+  [seed=51329] iter 2000/2500  N_act=9   (muestreo, eta 7min)
+  [seed=51422] iter 2200/2500  N_act=18  (muestreo, eta 4min)
+  [seed=51360] iter 2000/2500  N_act=19  (muestreo, eta 8min)
+  [seed=51453] iter 2200/2500  N_act=30  (muestreo, eta 4min)
+  [seed=51391] iter 2200/2500  N_act=21  (muestreo, eta 4min)
+  [seed=51236] iter 2000/2500  N_act=9   (muestreo, eta 8min)
+  [seed=51267] iter 2200/2500  N_act=10  (muestreo, eta 4min)
+  [seed=51298] iter 2200/2500  N_act=12  (muestreo, eta 4min)
+  [seed=51329] iter 2200/2500  N_act=30  (muestreo, eta 4min)
+  [seed=51422] iter 2400/2500  N_act=19  (muestreo, eta 1min)
+  [seed=51453] iter 2400/2500  N_act=30  (muestreo, eta 1min)
+  [seed=51360] iter 2200/2500  N_act=16  (muestreo, eta 5min)
+  [seed=51391] iter 2400/2500  N_act=25  (muestreo, eta 1min)
+   Guardado: C:\Users\56jua\Desktop\git_tesis\bayesian_non_parametrics-1\artefact\reales\real_trafico_m10_v01_m10\chain_fpc_7_iter01.mat
+   Guardado: C:\Users\56jua\Desktop\git_tesis\bayesian_non_parametrics-1\artefact\reales\real_trafico_m10_v01_m10\chain_fpc_8_iter01.mat
+  [seed=51236] iter 2200/2500  N_act=7   (muestreo, eta 5min)
+  [seed=51267] iter 2400/2500  N_act=18  (muestreo, eta 1min)
+  [seed=51298] iter 2400/2500  N_act=8   (muestreo, eta 1min)
+   Guardado: C:\Users\56jua\Desktop\git_tesis\bayesian_non_parametrics-1\artefact\reales\real_trafico_m10_v01_m10\chain_fpc_6_iter01.mat
+  [seed=51329] iter 2400/2500  N_act=29  (muestreo, eta 2min)
+  [seed=51360] iter 2400/2500  N_act=12  (muestreo, eta 2min)
+   Guardado: C:\Users\56jua\Desktop\git_tesis\bayesian_non_parametrics-1\artefact\reales\real_trafico_m10_v01_m10\chain_fpc_2_iter01.mat
+[job  10/10]  M=10  fpc_10  iter01  seed=51515
+   Guardado: C:\Users\56jua\Desktop\git_tesis\bayesian_non_parametrics-1\artefact\reales\real_trafico_m10_v01_m10\chain_fpc_3_iter01.mat
+   Guardado: C:\Users\56jua\Desktop\git_tesis\bayesian_non_parametrics-1\artefact\reales\real_trafico_m10_v01_m10\chain_fpc_4_iter01.mat
+   Guardado: C:\Users\56jua\Desktop\git_tesis\bayesian_non_parametrics-1\artefact\reales\real_trafico_m10_v01_m10\chain_fpc_5_iter01.mat
+  [seed=51236] iter 2400/2500  N_act=18  (muestreo, eta 2min)
+   Guardado: C:\Users\56jua\Desktop\git_tesis\bayesian_non_parametrics-1\artefact\reales\real_trafico_m10_v01_m10\chain_fpc_1_iter01.mat
+[job   9/10]  M=10  fpc_9  iter01  seed=51484
+  [seed=51515] iter  200/2500  N_act=18  (burn-in, eta 29min)
+  [seed=51484] iter  200/2500  N_act=18  (burn-in, eta 14min)
+  [seed=51515] iter  400/2500  N_act=9   (burn-in, eta 19min)
+  [seed=51484] iter  400/2500  N_act=30  (burn-in, eta 12min)
+  [seed=51515] iter  600/2500  N_act=16  (muestreo, eta 15min)
+  [seed=51484] iter  600/2500  N_act=29  (muestreo, eta 12min)
+  [seed=51515] iter  800/2500  N_act=18  (muestreo, eta 13min)
+  [seed=51484] iter  800/2500  N_act=17  (muestreo, eta 13min)
+  [seed=51515] iter 1000/2500  N_act=8   (muestreo, eta 13min)
+  [seed=51484] iter 1000/2500  N_act=13  (muestreo, eta 13min)
+  [seed=51515] iter 1200/2500  N_act=13  (muestreo, eta 12min)
+  [seed=51484] iter 1200/2500  N_act=30  (muestreo, eta 12min)
+  [seed=51515] iter 1400/2500  N_act=14  (muestreo, eta 11min)
+  [seed=51515] iter 1600/2500  N_act=28  (muestreo, eta 9min)
+  [seed=51484] iter 1400/2500  N_act=19  (muestreo, eta 10min)
+  [seed=51515] iter 1800/2500  N_act=18  (muestreo, eta 7min)
+  [seed=51484] iter 1600/2500  N_act=18  (muestreo, eta 8min)
+  [seed=51515] iter 2000/2500  N_act=10  (muestreo, eta 5min)
+  [seed=51484] iter 1800/2500  N_act=30  (muestreo, eta 7min)
+  [seed=51515] iter 2200/2500  N_act=14  (muestreo, eta 3min)
+  [seed=51484] iter 2000/2500  N_act=21  (muestreo, eta 5min)
+  [seed=51515] iter 2400/2500  N_act=17  (muestreo, eta 1min)
+  [seed=51484] iter 2200/2500  N_act=20  (muestreo, eta 3min)
+   Guardado: C:\Users\56jua\Desktop\git_tesis\bayesian_non_parametrics-1\artefact\reales\real_trafico_m10_v01_m10\chain_fpc_10_iter01.mat
+  [seed=51484] iter 2400/2500  N_act=20  (muestreo, eta 1min)
+   Guardado: C:\Users\56jua\Desktop\git_tesis\bayesian_non_parametrics-1\artefact\reales\real_trafico_m10_v01_m10\chain_fpc_9_iter01.mat
+
+ออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+ Entrenamiento completo del barrido
+   M evaluados: [10]
+   Jobs: 10   Tiempo total: 63.0 min
+   Por job: 6.30 min de pared   |   50.36 min de CPU
+
+   Archivos por punto del barrido:
+PROJECT_ROOT : C:\Users\56jua\Desktop\git_tesis\bayesian_non_parametrics-1
+Experiment ID : real_trafico_m10_v01_m10
+Seed (base)   : 4123
+
+  raw          C:\Users\56jua\Desktop\git_tesis\bayesian_non_parametrics-1\data\reales\raw\real_trafico_m10_v01_m10
+  functional   C:\Users\56jua\Desktop\git_tesis\bayesian_non_parametrics-1\data\reales\processed\functional\real_trafico_m10_v01_m10
+  predict      C:\Users\56jua\Desktop\git_tesis\bayesian_non_parametrics-1\data\reales\processed\predict\real_trafico_m10_v01_m10
+  out_report   C:\Users\56jua\Desktop\git_tesis\bayesian_non_parametrics-1\reports\reales\real_trafico_m10_v01_m10
+  out_artefact  C:\Users\56jua\Desktop\git_tesis\bayesian_non_parametrics-1\artefact\reales\real_trafico_m10_v01_m10
+  out          C:\Users\56jua\Desktop\git_tesis\bayesian_non_parametrics-1\reports\reales\real_trafico_m10_v01_m10
+
+     M=10 -> C:\Users\56jua\Desktop\git_tesis\bayesian_non_parametrics-1\artefact\reales\real_trafico_m10_v01_m10
+
+   Continuar con 31_03_convergencia (leen las trazas de este M para todo el barrido).

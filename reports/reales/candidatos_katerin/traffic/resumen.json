@@ -1,0 +1,26 @@
+{
+  "dataset": "traffic",
+  "variable": "volumen (miles veh/h)",
+  "T": 1187,
+  "T0": 830,
+  "desde": "2015-07-01",
+  "hasta": "2018-09-29",
+  "horas_ausentes": 1984,
+  "dias_interpolados": 12,
+  "K": 10,
+  "M95": 3,
+  "far": {
+    "FAR(1)": {
+      "kn": 10,
+      "radio_espectral": 0.5488403763705235
+    },
+    "FAR(2)": {
+      "kn": 10,
+      "radio_espectral": 0.7383493900229021
+    },
+    "FAR(7)": {
+      "kn": 7,
+      "radio_espectral": 0.9896836675265704
+    }
+  }
+}

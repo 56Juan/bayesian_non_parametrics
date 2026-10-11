@@ -1,0 +1,25 @@
+metrica,columna,bloque,modelo,n_ventanas,pct_ventanas_ganadas,criterio
+1. MAE  (L^1),mae_f,train,PSBPM-FD conjunto,671,0.0,menor es mejor
+1. MAE  (L^1),mae_f,train,FAR,671,0.0,menor es mejor
+1. MAE  (L^1),mae_f,train,PSBPM-FD univariado,671,1.0,menor es mejor
+1. MAE  (L^1),mae_f,test,PSBPM-FD conjunto,267,0.0,menor es mejor
+1. MAE  (L^1),mae_f,test,FAR,267,0.0,menor es mejor
+1. MAE  (L^1),mae_f,test,PSBPM-FD univariado,267,1.0,menor es mejor
+2. RMSE (L^2),rmse_f,train,PSBPM-FD conjunto,671,0.0,menor es mejor
+2. RMSE (L^2),rmse_f,train,FAR,671,0.0,menor es mejor
+2. RMSE (L^2),rmse_f,train,PSBPM-FD univariado,671,1.0,menor es mejor
+2. RMSE (L^2),rmse_f,test,PSBPM-FD conjunto,267,0.0,menor es mejor
+2. RMSE (L^2),rmse_f,test,FAR,267,0.0,menor es mejor
+2. RMSE (L^2),rmse_f,test,PSBPM-FD univariado,267,1.0,menor es mejor
+3. E_max promedio por curva,linf_medio,train,PSBPM-FD conjunto,671,0.0,menor es mejor
+3. E_max promedio por curva,linf_medio,train,FAR,671,0.0,menor es mejor
+3. E_max promedio por curva,linf_medio,train,PSBPM-FD univariado,671,1.0,menor es mejor
+3. E_max promedio por curva,linf_medio,test,PSBPM-FD conjunto,267,0.0,menor es mejor
+3. E_max promedio por curva,linf_medio,test,FAR,267,0.0,menor es mejor
+3. E_max promedio por curva,linf_medio,test,PSBPM-FD univariado,267,1.0,menor es mejor
+4. E_max peor de la ventana,linf_max,train,PSBPM-FD conjunto,671,0.07153502235469449,menor es mejor
+4. E_max peor de la ventana,linf_max,train,FAR,671,0.07302533532041729,menor es mejor
+4. E_max peor de la ventana,linf_max,train,PSBPM-FD univariado,671,0.8554396423248882,menor es mejor
+4. E_max peor de la ventana,linf_max,test,PSBPM-FD conjunto,267,0.0599250936329588,menor es mejor
+4. E_max peor de la ventana,linf_max,test,FAR,267,0.0,menor es mejor
+4. E_max peor de la ventana,linf_max,test,PSBPM-FD univariado,267,0.9400749063670412,menor es mejor

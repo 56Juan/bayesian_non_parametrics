@@ -1,0 +1,61 @@
+{
+  "modelo": "psbp_mv",
+  "submodelo": "uni_6",
+  "respuesta": [
+    "coef_6"
+  ],
+  "global": {
+    "ag": 0.5,
+    "bg": 0.5,
+    "mumu": 0.0,
+    "taumu": 1.0,
+    "pwj": 0.5,
+    "nu0": 3,
+    "S0_diag": [
+      0.012278395609419044
+    ],
+    "S0_regla": "0.5 * var_train en la diagonal, nu0 = q + 2"
+  },
+  "por_predictor": {
+    "nombres": [
+      "coef_6_lag1",
+      "coef_6_lag2"
+    ],
+    "apij": [
+      0.5,
+      0.5
+    ],
+    "bpij": [
+      0.5,
+      5.0
+    ],
+    "mupsij": [
+      0.0,
+      0.0
+    ],
+    "taupsij": [
+      0.24647565869161378,
+      0.24630834816236225
+    ],
+    "taupsij_z": 10.0
+  },
+  "mcmc_config": {
+    "nsim": 6000,
+    "burn": 1500,
+    "N": 30,
+    "M": 50
+  },
+  "n_iter": 3,
+  "seed_base": 43232,
+  "seed_scheme": "seed_base + chain*9973",
+  "q": 1,
+  "p": 2,
+  "partition": {
+    "T": 1000,
+    "T0": 700,
+    "prop_train": 0.7,
+    "n_train_eff": 698,
+    "n_test_eff": 300
+  },
+  "experiment_id": "mvb_escenario_200_chungEscG_1_r01_K10"
+}

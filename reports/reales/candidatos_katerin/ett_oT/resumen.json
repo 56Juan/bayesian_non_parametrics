@@ -1,0 +1,26 @@
+{
+  "dataset": "ett_oT",
+  "variable": "OT (grados C)",
+  "T": 725,
+  "T0": 507,
+  "desde": "2016-07-01",
+  "hasta": "2018-06-25",
+  "horas_ausentes": 0,
+  "dias_interpolados": 0,
+  "K": 10,
+  "M95": 1,
+  "far": {
+    "FAR(1)": {
+      "kn": 10,
+      "radio_espectral": 0.9460824593088049
+    },
+    "FAR(2)": {
+      "kn": 10,
+      "radio_espectral": 0.9644992288686083
+    },
+    "FAR(7)": {
+      "kn": 3,
+      "radio_espectral": 0.9896975718019256
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "T": 4299,
+  "T0": 3009,
+  "n_lags": 2,
+  "K": 12,
+  "nivel_credibilidad": 0.95,
+  "objetivo_evaluacion": "curva_suavizada",
+  "modo_residuo": "ninguno",
+  "ventana_movil": {
+    "w": [
+      20,
+      30,
+      40
+    ],
+    "paso": 1,
+    "solapadas": true
+  },
+  "metricas_A": [
+    "mae_f",
+    "rmse_f",
+    "linf_medio",
+    "linf_max"
+  ],
+  "metricas_B": [
+    "mpiw",
+    "picp",
+    "picp_simultaneo",
+    "winkler",
+    "winkler_max_medio",
+    "winkler_max_glob"
+  ]
+}

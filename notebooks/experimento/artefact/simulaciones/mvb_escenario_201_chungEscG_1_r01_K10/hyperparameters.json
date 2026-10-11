@@ -1,0 +1,31 @@
+{
+  "modelo": "psbp_bloque",
+  "submodelos": [
+    "bloque",
+    "uni_5",
+    "uni_6",
+    "uni_7",
+    "uni_8",
+    "uni_9",
+    "uni_10"
+  ],
+  "mcmc_config": {
+    "nsim": 6000,
+    "burn": 1500,
+    "N": 30,
+    "M": 50
+  },
+  "n_iter": 3,
+  "seed_base": 41232,
+  "q": 10,
+  "p": 20,
+  "n_lags": 2,
+  "partition": {
+    "T": 1000,
+    "T0": 700,
+    "prop_train": 0.7,
+    "n_train_eff": 698,
+    "n_test_eff": 300
+  },
+  "experiment_id": "mvb_escenario_201_chungEscG_1_r01_K10"
+}

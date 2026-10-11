@@ -1,0 +1,26 @@
+{
+  "dataset": "household",
+  "variable": "potencia activa (kW)",
+  "T": 1440,
+  "T0": 1007,
+  "desde": "2006-12-17",
+  "hasta": "2010-11-25",
+  "horas_ausentes": 431,
+  "dias_interpolados": 19,
+  "K": 10,
+  "M95": 7,
+  "far": {
+    "FAR(1)": {
+      "kn": 9,
+      "radio_espectral": 0.7133804441832391
+    },
+    "FAR(2)": {
+      "kn": 9,
+      "radio_espectral": 0.840618008811193
+    },
+    "FAR(7)": {
+      "kn": 3,
+      "radio_espectral": 0.9623678078265449
+    }
+  }
+}

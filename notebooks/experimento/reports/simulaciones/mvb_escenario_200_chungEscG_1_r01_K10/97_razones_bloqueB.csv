@@ -1,0 +1,49 @@
+metrica,bloque,banda,razon_vs_mejor,razon_vs_FAR
+5. MPIW,train,FAR (IC gaussiano),1.0584498113862715,1.0
+5. MPIW,train,PSBPM-FD bloque (predictiva nativa),1.1134094417172833,1.0521405433514157
+5. MPIW,train,PSBPM-FD conjunto K (predictiva nativa),1.083432665749445,1.0237767831351767
+5. MPIW,train,PSBPM-FD univariado (predictiva nativa),1.0002014094082519,0.9454785507602543
+5. MPIW,test,FAR (IC gaussiano),1.07361728960267,1.0
+5. MPIW,test,PSBPM-FD bloque (predictiva nativa),1.129742171362117,1.0522680514145744
+5. MPIW,test,PSBPM-FD conjunto K (predictiva nativa),1.0894291437385077,1.0149454973006946
+5. MPIW,test,PSBPM-FD univariado (predictiva nativa),1.0,0.9319088874671678
+6. PICP puntual,train,FAR (IC gaussiano),10.180796042462058,1.0
+6. PICP puntual,train,PSBPM-FD bloque (predictiva nativa),10.84206383865983,6.264275437774249
+6. PICP puntual,train,PSBPM-FD conjunto K (predictiva nativa),5.8124221632856505,4.085116831370497
+6. PICP puntual,train,PSBPM-FD univariado (predictiva nativa),8.910355267291713,5.454375721093041
+6. PICP puntual,test,FAR (IC gaussiano),11.471726791619611,1.0
+6. PICP puntual,test,PSBPM-FD bloque (predictiva nativa),6.854254245316677,3.506643928584349
+6. PICP puntual,test,PSBPM-FD conjunto K (predictiva nativa),3.399359079559994,2.0124544819499213
+6. PICP puntual,test,PSBPM-FD univariado (predictiva nativa),6.098295882843925,3.2416096835611468
+7. PICPB curva completa,train,FAR (IC gaussiano),1.5948151537941748,1.0
+7. PICPB curva completa,train,PSBPM-FD bloque (predictiva nativa),1.1136836415875604,0.7838525393787759
+7. PICPB curva completa,train,PSBPM-FD conjunto K (predictiva nativa),1.4378561590578223,1.0004794316496055
+7. PICPB curva completa,train,PSBPM-FD univariado (predictiva nativa),1.4315452958456105,0.9766289485340878
+7. PICPB curva completa,test,FAR (IC gaussiano),1.953626090440367,1.0
+7. PICPB curva completa,test,PSBPM-FD bloque (predictiva nativa),1.8277176692246093,0.9338688035749808
+7. PICPB curva completa,test,PSBPM-FD conjunto K (predictiva nativa),1.3164046584090416,0.8622403686966643
+7. PICPB curva completa,test,PSBPM-FD univariado (predictiva nativa),1.9057393891846184,1.021498604456917
+8. Winkler,train,FAR (IC gaussiano),1.2329794306356696,1.0
+8. Winkler,train,PSBPM-FD bloque (predictiva nativa),1.0976387757571837,0.8947165242738236
+8. Winkler,train,PSBPM-FD conjunto K (predictiva nativa),1.1416219479183451,0.9299183034741033
+8. Winkler,train,PSBPM-FD univariado (predictiva nativa),1.0,0.8155625579297547
+8. Winkler,test,FAR (IC gaussiano),1.2691411292094916,1.0
+8. Winkler,test,PSBPM-FD bloque (predictiva nativa),1.1470272475005105,0.9128536142495702
+8. Winkler,test,PSBPM-FD conjunto K (predictiva nativa),1.1465627904523277,0.9109698885298059
+8. Winkler,test,PSBPM-FD univariado (predictiva nativa),1.0,0.7967127506483818
+9. Winkler max promedio,train,FAR (IC gaussiano),1.5037768807919656,1.0
+9. Winkler max promedio,train,PSBPM-FD bloque (predictiva nativa),1.0559448391022528,0.718530036198098
+9. Winkler max promedio,train,PSBPM-FD conjunto K (predictiva nativa),1.2926846115432318,0.8721322852387221
+9. Winkler max promedio,train,PSBPM-FD univariado (predictiva nativa),1.0189503071544828,0.6959736964947778
+9. Winkler max promedio,test,FAR (IC gaussiano),1.5484064000971562,1.0
+9. Winkler max promedio,test,PSBPM-FD bloque (predictiva nativa),1.1616430135298264,0.7883555600386454
+9. Winkler max promedio,test,PSBPM-FD conjunto K (predictiva nativa),1.2781690410872553,0.8437629564062344
+9. Winkler max promedio,test,PSBPM-FD univariado (predictiva nativa),1.0116755237190764,0.6854859654430139
+10. Winkler max peor,train,FAR (IC gaussiano),2.0351475833883805,1.0
+10. Winkler max peor,train,PSBPM-FD bloque (predictiva nativa),1.2192838217759217,0.6240418766420569
+10. Winkler max peor,train,PSBPM-FD conjunto K (predictiva nativa),1.6321936847122909,0.8225360579163852
+10. Winkler max peor,train,PSBPM-FD univariado (predictiva nativa),1.1020776436109454,0.5879548822938654
+10. Winkler max peor,test,FAR (IC gaussiano),1.6683526060371703,1.0
+10. Winkler max peor,test,PSBPM-FD bloque (predictiva nativa),1.2782136657701477,0.8301517370166615
+10. Winkler max peor,test,PSBPM-FD conjunto K (predictiva nativa),1.4633513411608938,0.9155992387395597
+10. Winkler max peor,test,PSBPM-FD univariado (predictiva nativa),1.0180038298213512,0.6574272964080551

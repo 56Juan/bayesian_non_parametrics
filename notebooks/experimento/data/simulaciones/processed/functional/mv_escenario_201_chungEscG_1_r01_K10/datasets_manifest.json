@@ -1,0 +1,59 @@
+{
+  "modelo": "psbp_mv",
+  "K": 10,
+  "n_lags": 2,
+  "cov_names": [
+    "coef_1_lag1",
+    "coef_2_lag1",
+    "coef_3_lag1",
+    "coef_4_lag1",
+    "coef_5_lag1",
+    "coef_6_lag1",
+    "coef_7_lag1",
+    "coef_8_lag1",
+    "coef_9_lag1",
+    "coef_10_lag1",
+    "coef_1_lag2",
+    "coef_2_lag2",
+    "coef_3_lag2",
+    "coef_4_lag2",
+    "coef_5_lag2",
+    "coef_6_lag2",
+    "coef_7_lag2",
+    "coef_8_lag2",
+    "coef_9_lag2",
+    "coef_10_lag2"
+  ],
+  "respuesta": [
+    "coef_1",
+    "coef_2",
+    "coef_3",
+    "coef_4",
+    "coef_5",
+    "coef_6",
+    "coef_7",
+    "coef_8",
+    "coef_9",
+    "coef_10"
+  ],
+  "T": 1000,
+  "T0": 700,
+  "blanqueo": "theta_w = theta L, W = L L^T (safe_chol)",
+  "base": {
+    "method": "fourier",
+    "n_basis": 10,
+    "order": 4,
+    "domain": null,
+    "projection": "l2",
+    "quadrature": "trapezoidal",
+    "center": false,
+    "K_": 10,
+    "is_fitted": true,
+    "is_frozen": false
+  },
+  "meta": {
+    "origen": "C:\\Users\\56jua\\Desktop\\git_tesis\\bayesian_non_parametrics-1\\data\\simulaciones\\raw\\escenario_201_chungEscG_1_r01_m05",
+    "escenario": "201",
+    "base": "fourier_generador_ortonormal"
+  }
+}

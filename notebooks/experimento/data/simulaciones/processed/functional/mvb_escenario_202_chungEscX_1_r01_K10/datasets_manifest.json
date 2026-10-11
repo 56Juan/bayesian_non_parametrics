@@ -1,0 +1,203 @@
+{
+  "modelo": "psbp_bloque",
+  "K": 10,
+  "n_lags": 2,
+  "cov_names": [
+    "coef_1_lag1",
+    "coef_2_lag1",
+    "coef_3_lag1",
+    "coef_4_lag1",
+    "coef_5_lag1",
+    "coef_6_lag1",
+    "coef_7_lag1",
+    "coef_8_lag1",
+    "coef_9_lag1",
+    "coef_10_lag1",
+    "coef_1_lag2",
+    "coef_2_lag2",
+    "coef_3_lag2",
+    "coef_4_lag2",
+    "coef_5_lag2",
+    "coef_6_lag2",
+    "coef_7_lag2",
+    "coef_8_lag2",
+    "coef_9_lag2",
+    "coef_10_lag2"
+  ],
+  "respuesta": [
+    "coef_1",
+    "coef_2",
+    "coef_3",
+    "coef_4",
+    "coef_5",
+    "coef_6",
+    "coef_7",
+    "coef_8",
+    "coef_9",
+    "coef_10"
+  ],
+  "T": 1000,
+  "T0": 700,
+  "bloque": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "submodelos": [
+    {
+      "nombre": "bloque",
+      "coords": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "respuesta": [
+        "coef_1",
+        "coef_2",
+        "coef_3",
+        "coef_4"
+      ],
+      "predictores": [
+        "coef_1_lag1",
+        "coef_2_lag1",
+        "coef_3_lag1",
+        "coef_4_lag1",
+        "coef_5_lag1",
+        "coef_6_lag1",
+        "coef_7_lag1",
+        "coef_8_lag1",
+        "coef_9_lag1",
+        "coef_10_lag1",
+        "coef_1_lag2",
+        "coef_2_lag2",
+        "coef_3_lag2",
+        "coef_4_lag2",
+        "coef_5_lag2",
+        "coef_6_lag2",
+        "coef_7_lag2",
+        "coef_8_lag2",
+        "coef_9_lag2",
+        "coef_10_lag2"
+      ],
+      "hyperparameters": "C:\\Users\\56jua\\Desktop\\git_tesis\\bayesian_non_parametrics-1\\notebooks\\experimento\\artefact\\simulaciones\\mvb_escenario_202_chungEscX_1_r01_K10\\hyperparameters_bloque.json",
+      "dataset_train": "C:\\Users\\56jua\\Desktop\\git_tesis\\bayesian_non_parametrics-1\\notebooks\\experimento\\data\\simulaciones\\processed\\functional\\mvb_escenario_202_chungEscX_1_r01_K10\\dataset_bloque_train.csv",
+      "out_prefix": "chain_bloque"
+    },
+    {
+      "nombre": "uni_5",
+      "coords": [
+        4
+      ],
+      "respuesta": [
+        "coef_5"
+      ],
+      "predictores": [
+        "coef_5_lag1",
+        "coef_5_lag2"
+      ],
+      "hyperparameters": "C:\\Users\\56jua\\Desktop\\git_tesis\\bayesian_non_parametrics-1\\notebooks\\experimento\\artefact\\simulaciones\\mvb_escenario_202_chungEscX_1_r01_K10\\hyperparameters_uni_5.json",
+      "dataset_train": "C:\\Users\\56jua\\Desktop\\git_tesis\\bayesian_non_parametrics-1\\notebooks\\experimento\\data\\simulaciones\\processed\\functional\\mvb_escenario_202_chungEscX_1_r01_K10\\dataset_uni_5_train.csv",
+      "out_prefix": "chain_uni_5"
+    },
+    {
+      "nombre": "uni_6",
+      "coords": [
+        5
+      ],
+      "respuesta": [
+        "coef_6"
+      ],
+      "predictores": [
+        "coef_6_lag1",
+        "coef_6_lag2"
+      ],
+      "hyperparameters": "C:\\Users\\56jua\\Desktop\\git_tesis\\bayesian_non_parametrics-1\\notebooks\\experimento\\artefact\\simulaciones\\mvb_escenario_202_chungEscX_1_r01_K10\\hyperparameters_uni_6.json",
+      "dataset_train": "C:\\Users\\56jua\\Desktop\\git_tesis\\bayesian_non_parametrics-1\\notebooks\\experimento\\data\\simulaciones\\processed\\functional\\mvb_escenario_202_chungEscX_1_r01_K10\\dataset_uni_6_train.csv",
+      "out_prefix": "chain_uni_6"
+    },
+    {
+      "nombre": "uni_7",
+      "coords": [
+        6
+      ],
+      "respuesta": [
+        "coef_7"
+      ],
+      "predictores": [
+        "coef_7_lag1",
+        "coef_7_lag2"
+      ],
+      "hyperparameters": "C:\\Users\\56jua\\Desktop\\git_tesis\\bayesian_non_parametrics-1\\notebooks\\experimento\\artefact\\simulaciones\\mvb_escenario_202_chungEscX_1_r01_K10\\hyperparameters_uni_7.json",
+      "dataset_train": "C:\\Users\\56jua\\Desktop\\git_tesis\\bayesian_non_parametrics-1\\notebooks\\experimento\\data\\simulaciones\\processed\\functional\\mvb_escenario_202_chungEscX_1_r01_K10\\dataset_uni_7_train.csv",
+      "out_prefix": "chain_uni_7"
+    },
+    {
+      "nombre": "uni_8",
+      "coords": [
+        7
+      ],
+      "respuesta": [
+        "coef_8"
+      ],
+      "predictores": [
+        "coef_8_lag1",
+        "coef_8_lag2"
+      ],
+      "hyperparameters": "C:\\Users\\56jua\\Desktop\\git_tesis\\bayesian_non_parametrics-1\\notebooks\\experimento\\artefact\\simulaciones\\mvb_escenario_202_chungEscX_1_r01_K10\\hyperparameters_uni_8.json",
+      "dataset_train": "C:\\Users\\56jua\\Desktop\\git_tesis\\bayesian_non_parametrics-1\\notebooks\\experimento\\data\\simulaciones\\processed\\functional\\mvb_escenario_202_chungEscX_1_r01_K10\\dataset_uni_8_train.csv",
+      "out_prefix": "chain_uni_8"
+    },
+    {
+      "nombre": "uni_9",
+      "coords": [
+        8
+      ],
+      "respuesta": [
+        "coef_9"
+      ],
+      "predictores": [
+        "coef_9_lag1",
+        "coef_9_lag2"
+      ],
+      "hyperparameters": "C:\\Users\\56jua\\Desktop\\git_tesis\\bayesian_non_parametrics-1\\notebooks\\experimento\\artefact\\simulaciones\\mvb_escenario_202_chungEscX_1_r01_K10\\hyperparameters_uni_9.json",
+      "dataset_train": "C:\\Users\\56jua\\Desktop\\git_tesis\\bayesian_non_parametrics-1\\notebooks\\experimento\\data\\simulaciones\\processed\\functional\\mvb_escenario_202_chungEscX_1_r01_K10\\dataset_uni_9_train.csv",
+      "out_prefix": "chain_uni_9"
+    },
+    {
+      "nombre": "uni_10",
+      "coords": [
+        9
+      ],
+      "respuesta": [
+        "coef_10"
+      ],
+      "predictores": [
+        "coef_10_lag1",
+        "coef_10_lag2"
+      ],
+      "hyperparameters": "C:\\Users\\56jua\\Desktop\\git_tesis\\bayesian_non_parametrics-1\\notebooks\\experimento\\artefact\\simulaciones\\mvb_escenario_202_chungEscX_1_r01_K10\\hyperparameters_uni_10.json",
+      "dataset_train": "C:\\Users\\56jua\\Desktop\\git_tesis\\bayesian_non_parametrics-1\\notebooks\\experimento\\data\\simulaciones\\processed\\functional\\mvb_escenario_202_chungEscX_1_r01_K10\\dataset_uni_10_train.csv",
+      "out_prefix": "chain_uni_10"
+    }
+  ],
+  "blanqueo": "theta_w = theta L, W = L L^T (safe_chol)",
+  "base": {
+    "method": "fourier",
+    "n_basis": 10,
+    "order": 4,
+    "domain": null,
+    "projection": "l2",
+    "quadrature": "trapezoidal",
+    "center": false,
+    "K_": 10,
+    "is_fitted": true,
+    "is_frozen": false
+  },
+  "meta": {
+    "origen": "C:\\Users\\56jua\\Desktop\\git_tesis\\bayesian_non_parametrics-1\\data\\simulaciones\\raw\\escenario_202_chungEscX_1_r01_m05",
+    "escenario": "202",
+    "base": "fourier_generador_ortonormal"
+  }
+}

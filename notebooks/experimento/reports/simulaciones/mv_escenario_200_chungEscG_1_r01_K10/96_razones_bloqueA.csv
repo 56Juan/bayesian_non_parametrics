@@ -1,0 +1,25 @@
+metrica,bloque,modelo,razon_vs_mejor,razon_vs_FAR
+1. MAE  (L^1),train,PSBPM-FD conjunto,1.2072709589465536,0.9533764896817765
+1. MAE  (L^1),train,FAR,1.2676437431807568,1.0
+1. MAE  (L^1),train,PSBPM-FD univariado,1.0,0.7911685293682201
+1. MAE  (L^1),test,PSBPM-FD conjunto,1.1770422605619535,0.9280497729006403
+1. MAE  (L^1),test,FAR,1.2707112794650575,1.0
+1. MAE  (L^1),test,PSBPM-FD univariado,1.0,0.7893650732399307
+2. RMSE (L^2),train,PSBPM-FD conjunto,1.190765895684138,0.946566145066002
+2. RMSE (L^2),train,FAR,1.2589342961191776,1.0
+2. RMSE (L^2),train,PSBPM-FD univariado,1.0,0.7961126402920866
+2. RMSE (L^2),test,PSBPM-FD conjunto,1.1719557263630997,0.9268764334609231
+2. RMSE (L^2),test,FAR,1.2667014030010904,1.0
+2. RMSE (L^2),test,PSBPM-FD univariado,1.0,0.7916482554615276
+3. E_max promedio por curva,train,PSBPM-FD conjunto,1.1932655588172845,0.9855850407375891
+3. E_max promedio por curva,train,FAR,1.2116395065435528,1.0
+3. E_max promedio por curva,train,PSBPM-FD univariado,1.0,0.82684083285972
+3. E_max promedio por curva,test,PSBPM-FD conjunto,1.175189799051142,0.963701537001959
+3. E_max promedio por curva,test,FAR,1.2208653240909928,1.0
+3. E_max promedio por curva,test,PSBPM-FD univariado,1.0,0.8209594427555323
+4. E_max peor de la ventana,train,PSBPM-FD conjunto,1.1695633516395068,0.9519227544149509
+4. E_max peor de la ventana,train,FAR,1.231200933296484,1.0
+4. E_max peor de la ventana,train,PSBPM-FD univariado,1.0101951207947732,0.8312192409257969
+4. E_max peor de la ventana,test,PSBPM-FD conjunto,1.1364847128350277,0.9574234331841609
+4. E_max peor de la ventana,test,FAR,1.1892492236991243,1.0
+4. E_max peor de la ventana,test,PSBPM-FD univariado,1.0015780521495605,0.8456809603415287

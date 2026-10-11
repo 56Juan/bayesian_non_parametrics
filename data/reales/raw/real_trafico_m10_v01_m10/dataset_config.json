@@ -1,0 +1,59 @@
+{
+  "fuente": "C:\\Users\\56jua\\Desktop\\git_tesis\\bayesian_non_parametrics-1\\data\\reales\\raw\\katerin_traffic\\Metro_Interstate_Traffic_Volume.csv.gz",
+  "origen": "UCI Machine Learning Repository #492, Metro Interstate Traffic Volume (MnDOT ATR 301)",
+  "estacion": "MnDOT ATR 301, I-94 WB",
+  "registros": "una fila por hora",
+  "curva": "volumen",
+  "variable": "volumen (miles veh/h)",
+  "serie_id": "trafico_m10",
+  "ventana_id": 1,
+  "fecha_inicio_pedida": "2015-07-01",
+  "fecha_fin_pedida": "2018-09-30",
+  "fecha_inicio": "2015-07-01",
+  "fecha_fin": "2018-09-30",
+  "T": 1188,
+  "G": 24,
+  "prop_train": 0.7,
+  "barras_dia": 24,
+  "huecos": {
+    "horas_ausentes": 1984,
+    "frac_horas_ausentes": 0.069585,
+    "dias_completos": 884,
+    "dias_con_huecos": 301,
+    "dias_sin_dato": 3,
+    "dias_interpolados": "sin dato o > max_ausentes_ajuste horas ausentes: coeficientes interpolados linealmente en el tiempo",
+    "dias_sin_dato_lista": [
+      "2015-10-24",
+      "2015-10-25",
+      "2015-10-26"
+    ],
+    "representacion": "B-spline ajustada solo a las horas observadas (P-spline debil en dias con huecos)",
+    "max_ausentes_ajuste": 12,
+    "penalizacion_huecos": "P-spline hacia la forma del perfil medio de train, lam = 10",
+    "X_curves": "horas ausentes = curva suavizada"
+  },
+  "dias_descartados": [],
+  "diagnostico": {
+    "T": 1188,
+    "G": 24,
+    "curva": "volumen",
+    "acf1_nivel_diario": 0.437379,
+    "acf1_variacion_cuad": 0.553417,
+    "sd_entre_dias": 0.548466,
+    "sd_intra_dia_media": 1.896181,
+    "razon_intra_entre": 3.457244,
+    "asimetria_nivel": -1.021848,
+    "exceso_curtosis_nivel": 0.799592,
+    "nivel_finde_menos_resto": -0.909876,
+    "volumen_max": 7.28,
+    "horas_ausentes": 1984,
+    "dias_sin_dato": 3
+  },
+  "experiment_id": "real_trafico_m10_v01_m10",
+  "m_fpca": 10,
+  "m_fpca_list": [
+    10
+  ],
+  "seed": 41232,
+  "procesado": "2026-10-09 23:32:00"
+}

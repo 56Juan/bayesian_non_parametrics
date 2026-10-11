@@ -1,0 +1,26 @@
+{
+  "dataset": "beijing_pm25",
+  "variable": "log(1 + PM2.5) promedio 12 estaciones",
+  "T": 1461,
+  "T0": 1022,
+  "desde": "2013-03-01",
+  "hasta": "2017-02-28",
+  "horas_ausentes": 81,
+  "dias_interpolados": 0,
+  "K": 10,
+  "M95": 3,
+  "far": {
+    "FAR(1)": {
+      "kn": 10,
+      "radio_espectral": 0.3300233114083408
+    },
+    "FAR(2)": {
+      "kn": 10,
+      "radio_espectral": 0.45081728772713736
+    },
+    "FAR(7)": {
+      "kn": 9,
+      "radio_espectral": 0.8862334489216526
+    }
+  }
+}

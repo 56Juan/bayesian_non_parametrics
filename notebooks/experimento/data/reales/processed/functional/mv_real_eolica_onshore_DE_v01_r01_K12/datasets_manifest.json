@@ -1,0 +1,71 @@
+{
+  "modelo": "psbp_mv",
+  "K": 12,
+  "n_lags": 2,
+  "cov_names": [
+    "coef_1_lag1",
+    "coef_2_lag1",
+    "coef_3_lag1",
+    "coef_4_lag1",
+    "coef_5_lag1",
+    "coef_6_lag1",
+    "coef_7_lag1",
+    "coef_8_lag1",
+    "coef_9_lag1",
+    "coef_10_lag1",
+    "coef_11_lag1",
+    "coef_12_lag1",
+    "coef_1_lag2",
+    "coef_2_lag2",
+    "coef_3_lag2",
+    "coef_4_lag2",
+    "coef_5_lag2",
+    "coef_6_lag2",
+    "coef_7_lag2",
+    "coef_8_lag2",
+    "coef_9_lag2",
+    "coef_10_lag2",
+    "coef_11_lag2",
+    "coef_12_lag2"
+  ],
+  "respuesta": [
+    "coef_1",
+    "coef_2",
+    "coef_3",
+    "coef_4",
+    "coef_5",
+    "coef_6",
+    "coef_7",
+    "coef_8",
+    "coef_9",
+    "coef_10",
+    "coef_11",
+    "coef_12"
+  ],
+  "T": 4299,
+  "T0": 3009,
+  "blanqueo": "theta_w = theta L, W = L L^T (safe_chol)",
+  "base": {
+    "method": "bspline",
+    "n_basis": 12,
+    "order": 3,
+    "domain": null,
+    "projection": "l2",
+    "quadrature": "trapezoidal",
+    "center": false,
+    "K_": 12,
+    "is_fitted": true,
+    "is_frozen": false
+  },
+  "meta": {
+    "fuente": "SMARD CC BY 4.0",
+    "variable": "factor de planta eolica onshore",
+    "n_basis": 12,
+    "order": 3,
+    "nb_max": 12,
+    "fechas": [
+      "2015-01-01 00:00:00+00:00",
+      "2026-10-08 00:00:00+00:00"
+    ]
+  }
+}
