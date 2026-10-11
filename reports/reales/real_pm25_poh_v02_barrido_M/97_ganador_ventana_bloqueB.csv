@@ -1,0 +1,145 @@
+M,metrica,columna,bloque,banda,n_ventanas,pct_ventanas_ganadas,criterio
+1,5. MPIW,mpiw,train,FAR (IC del modelo AR),2892,0.1376210235131397,menor es mejor
+1,5. MPIW,mpiw,train,PSBPM-FD (predictiva bayesiana),2892,0.8623789764868603,menor es mejor
+1,5. MPIW,mpiw,test,FAR (IC del modelo AR),1067,0.08247422680412371,menor es mejor
+1,5. MPIW,mpiw,test,PSBPM-FD (predictiva bayesiana),1067,0.9175257731958762,menor es mejor
+1,6. PICP puntual,picp,train,FAR (IC del modelo AR),2892,0.7060857538035962,|valor - nominal|
+1,6. PICP puntual,picp,train,PSBPM-FD (predictiva bayesiana),2892,0.2939142461964039,|valor - nominal|
+1,6. PICP puntual,picp,test,FAR (IC del modelo AR),1067,0.7863167760074976,|valor - nominal|
+1,6. PICP puntual,picp,test,PSBPM-FD (predictiva bayesiana),1067,0.21368322399250234,|valor - nominal|
+1,7. PICPB curva completa,picp_simultaneo,train,FAR (IC del modelo AR),2892,0.9844398340248963,|valor - nominal|
+1,7. PICPB curva completa,picp_simultaneo,train,PSBPM-FD (predictiva bayesiana),2892,0.015560165975103735,|valor - nominal|
+1,7. PICPB curva completa,picp_simultaneo,test,FAR (IC del modelo AR),1067,0.9737582005623243,|valor - nominal|
+1,7. PICPB curva completa,picp_simultaneo,test,PSBPM-FD (predictiva bayesiana),1067,0.026241799437675725,|valor - nominal|
+1,8. Winkler,winkler,train,FAR (IC del modelo AR),2892,0.8630705394190872,menor es mejor
+1,8. Winkler,winkler,train,PSBPM-FD (predictiva bayesiana),2892,0.13692946058091288,menor es mejor
+1,8. Winkler,winkler,test,FAR (IC del modelo AR),1067,0.8781630740393627,menor es mejor
+1,8. Winkler,winkler,test,PSBPM-FD (predictiva bayesiana),1067,0.1218369259606373,menor es mejor
+1,9. Winkler max promedio,winkler_max_medio,train,FAR (IC del modelo AR),2892,0.9640387275242047,menor es mejor
+1,9. Winkler max promedio,winkler_max_medio,train,PSBPM-FD (predictiva bayesiana),2892,0.035961272475795295,menor es mejor
+1,9. Winkler max promedio,winkler_max_medio,test,FAR (IC del modelo AR),1067,0.9756326148078726,menor es mejor
+1,9. Winkler max promedio,winkler_max_medio,test,PSBPM-FD (predictiva bayesiana),1067,0.02436738519212746,menor es mejor
+1,10. Winkler max peor ventana,winkler_max_glob,train,FAR (IC del modelo AR),2892,0.7956431535269709,menor es mejor
+1,10. Winkler max peor ventana,winkler_max_glob,train,PSBPM-FD (predictiva bayesiana),2892,0.20435684647302904,menor es mejor
+1,10. Winkler max peor ventana,winkler_max_glob,test,FAR (IC del modelo AR),1067,0.7703842549203374,menor es mejor
+1,10. Winkler max peor ventana,winkler_max_glob,test,PSBPM-FD (predictiva bayesiana),1067,0.2296157450796626,menor es mejor
+2,5. MPIW,mpiw,train,FAR (IC del modelo AR),2892,0.3364453665283541,menor es mejor
+2,5. MPIW,mpiw,train,PSBPM-FD (predictiva bayesiana),2892,0.6635546334716459,menor es mejor
+2,5. MPIW,mpiw,test,FAR (IC del modelo AR),1067,0.2755388940955951,menor es mejor
+2,5. MPIW,mpiw,test,PSBPM-FD (predictiva bayesiana),1067,0.7244611059044048,menor es mejor
+2,6. PICP puntual,picp,train,FAR (IC del modelo AR),2892,0.6186030428769018,|valor - nominal|
+2,6. PICP puntual,picp,train,PSBPM-FD (predictiva bayesiana),2892,0.3813969571230982,|valor - nominal|
+2,6. PICP puntual,picp,test,FAR (IC del modelo AR),1067,0.7047797563261481,|valor - nominal|
+2,6. PICP puntual,picp,test,PSBPM-FD (predictiva bayesiana),1067,0.2952202436738519,|valor - nominal|
+2,7. PICPB curva completa,picp_simultaneo,train,FAR (IC del modelo AR),2892,0.965076071922545,|valor - nominal|
+2,7. PICPB curva completa,picp_simultaneo,train,PSBPM-FD (predictiva bayesiana),2892,0.03492392807745505,|valor - nominal|
+2,7. PICPB curva completa,picp_simultaneo,test,FAR (IC del modelo AR),1067,0.9053420805998126,|valor - nominal|
+2,7. PICPB curva completa,picp_simultaneo,test,PSBPM-FD (predictiva bayesiana),1067,0.09465791940018745,|valor - nominal|
+2,8. Winkler,winkler,train,FAR (IC del modelo AR),2892,0.7392807745504841,menor es mejor
+2,8. Winkler,winkler,train,PSBPM-FD (predictiva bayesiana),2892,0.2607192254495159,menor es mejor
+2,8. Winkler,winkler,test,FAR (IC del modelo AR),1067,0.6654170571696345,menor es mejor
+2,8. Winkler,winkler,test,PSBPM-FD (predictiva bayesiana),1067,0.3345829428303655,menor es mejor
+2,9. Winkler max promedio,winkler_max_medio,train,FAR (IC del modelo AR),2892,0.9453665283540802,menor es mejor
+2,9. Winkler max promedio,winkler_max_medio,train,PSBPM-FD (predictiva bayesiana),2892,0.05463347164591978,menor es mejor
+2,9. Winkler max promedio,winkler_max_medio,test,FAR (IC del modelo AR),1067,0.9259606373008434,menor es mejor
+2,9. Winkler max promedio,winkler_max_medio,test,PSBPM-FD (predictiva bayesiana),1067,0.07403936269915651,menor es mejor
+2,10. Winkler max peor ventana,winkler_max_glob,train,FAR (IC del modelo AR),2892,0.6995159059474412,menor es mejor
+2,10. Winkler max peor ventana,winkler_max_glob,train,PSBPM-FD (predictiva bayesiana),2892,0.30048409405255877,menor es mejor
+2,10. Winkler max peor ventana,winkler_max_glob,test,FAR (IC del modelo AR),1067,0.6551077788191191,menor es mejor
+2,10. Winkler max peor ventana,winkler_max_glob,test,PSBPM-FD (predictiva bayesiana),1067,0.344892221180881,menor es mejor
+3,5. MPIW,mpiw,train,FAR (IC del modelo AR),2892,0.3706777316735823,menor es mejor
+3,5. MPIW,mpiw,train,PSBPM-FD (predictiva bayesiana),2892,0.6293222683264177,menor es mejor
+3,5. MPIW,mpiw,test,FAR (IC del modelo AR),1067,0.3064667291471415,menor es mejor
+3,5. MPIW,mpiw,test,PSBPM-FD (predictiva bayesiana),1067,0.6935332708528584,menor es mejor
+3,6. PICP puntual,picp,train,FAR (IC del modelo AR),2892,0.4557399723374827,|valor - nominal|
+3,6. PICP puntual,picp,train,PSBPM-FD (predictiva bayesiana),2892,0.5442600276625172,|valor - nominal|
+3,6. PICP puntual,picp,test,FAR (IC del modelo AR),1067,0.5791940018744143,|valor - nominal|
+3,6. PICP puntual,picp,test,PSBPM-FD (predictiva bayesiana),1067,0.4208059981255858,|valor - nominal|
+3,7. PICPB curva completa,picp_simultaneo,train,FAR (IC del modelo AR),2892,0.8800138312586445,|valor - nominal|
+3,7. PICPB curva completa,picp_simultaneo,train,PSBPM-FD (predictiva bayesiana),2892,0.11998616874135547,|valor - nominal|
+3,7. PICPB curva completa,picp_simultaneo,test,FAR (IC del modelo AR),1067,0.8322399250234301,|valor - nominal|
+3,7. PICPB curva completa,picp_simultaneo,test,PSBPM-FD (predictiva bayesiana),1067,0.16776007497656983,|valor - nominal|
+3,8. Winkler,winkler,train,FAR (IC del modelo AR),2892,0.5487551867219918,menor es mejor
+3,8. Winkler,winkler,train,PSBPM-FD (predictiva bayesiana),2892,0.4512448132780083,menor es mejor
+3,8. Winkler,winkler,test,FAR (IC del modelo AR),1067,0.6110590440487348,menor es mejor
+3,8. Winkler,winkler,test,PSBPM-FD (predictiva bayesiana),1067,0.3889409559512652,menor es mejor
+3,9. Winkler max promedio,winkler_max_medio,train,FAR (IC del modelo AR),2892,0.7627939142461964,menor es mejor
+3,9. Winkler max promedio,winkler_max_medio,train,PSBPM-FD (predictiva bayesiana),2892,0.23720608575380359,menor es mejor
+3,9. Winkler max promedio,winkler_max_medio,test,FAR (IC del modelo AR),1067,0.8059981255857545,menor es mejor
+3,9. Winkler max promedio,winkler_max_medio,test,PSBPM-FD (predictiva bayesiana),1067,0.19400187441424555,menor es mejor
+3,10. Winkler max peor ventana,winkler_max_glob,train,FAR (IC del modelo AR),2892,0.6061549100968188,menor es mejor
+3,10. Winkler max peor ventana,winkler_max_glob,train,PSBPM-FD (predictiva bayesiana),2892,0.3938450899031812,menor es mejor
+3,10. Winkler max peor ventana,winkler_max_glob,test,FAR (IC del modelo AR),1067,0.6354264292408622,menor es mejor
+3,10. Winkler max peor ventana,winkler_max_glob,test,PSBPM-FD (predictiva bayesiana),1067,0.36457357075913777,menor es mejor
+4,5. MPIW,mpiw,train,FAR (IC del modelo AR),2892,0.4062932226832642,menor es mejor
+4,5. MPIW,mpiw,train,PSBPM-FD (predictiva bayesiana),2892,0.5937067773167358,menor es mejor
+4,5. MPIW,mpiw,test,FAR (IC del modelo AR),1067,0.34395501405810686,menor es mejor
+4,5. MPIW,mpiw,test,PSBPM-FD (predictiva bayesiana),1067,0.6560449859418932,menor es mejor
+4,6. PICP puntual,picp,train,FAR (IC del modelo AR),2892,0.34681881051175656,|valor - nominal|
+4,6. PICP puntual,picp,train,PSBPM-FD (predictiva bayesiana),2892,0.6531811894882434,|valor - nominal|
+4,6. PICP puntual,picp,test,FAR (IC del modelo AR),1067,0.3964386129334583,|valor - nominal|
+4,6. PICP puntual,picp,test,PSBPM-FD (predictiva bayesiana),1067,0.6035613870665417,|valor - nominal|
+4,7. PICPB curva completa,picp_simultaneo,train,FAR (IC del modelo AR),2892,0.7980636237897649,|valor - nominal|
+4,7. PICPB curva completa,picp_simultaneo,train,PSBPM-FD (predictiva bayesiana),2892,0.20193637621023514,|valor - nominal|
+4,7. PICPB curva completa,picp_simultaneo,test,FAR (IC del modelo AR),1067,0.7628865979381443,|valor - nominal|
+4,7. PICPB curva completa,picp_simultaneo,test,PSBPM-FD (predictiva bayesiana),1067,0.23711340206185566,|valor - nominal|
+4,8. Winkler,winkler,train,FAR (IC del modelo AR),2892,0.4927385892116183,menor es mejor
+4,8. Winkler,winkler,train,PSBPM-FD (predictiva bayesiana),2892,0.5072614107883817,menor es mejor
+4,8. Winkler,winkler,test,FAR (IC del modelo AR),1067,0.5238987816307404,menor es mejor
+4,8. Winkler,winkler,test,PSBPM-FD (predictiva bayesiana),1067,0.4761012183692596,menor es mejor
+4,9. Winkler max promedio,winkler_max_medio,train,FAR (IC del modelo AR),2892,0.642807745504841,menor es mejor
+4,9. Winkler max promedio,winkler_max_medio,train,PSBPM-FD (predictiva bayesiana),2892,0.35719225449515907,menor es mejor
+4,9. Winkler max promedio,winkler_max_medio,test,FAR (IC del modelo AR),1067,0.6879100281162137,menor es mejor
+4,9. Winkler max promedio,winkler_max_medio,test,PSBPM-FD (predictiva bayesiana),1067,0.31208997188378634,menor es mejor
+4,10. Winkler max peor ventana,winkler_max_glob,train,FAR (IC del modelo AR),2892,0.549792531120332,menor es mejor
+4,10. Winkler max peor ventana,winkler_max_glob,train,PSBPM-FD (predictiva bayesiana),2892,0.45020746887966806,menor es mejor
+4,10. Winkler max peor ventana,winkler_max_glob,test,FAR (IC del modelo AR),1067,0.6073102155576382,menor es mejor
+4,10. Winkler max peor ventana,winkler_max_glob,test,PSBPM-FD (predictiva bayesiana),1067,0.39268978444236174,menor es mejor
+5,5. MPIW,mpiw,train,FAR (IC del modelo AR),2892,0.4263485477178423,menor es mejor
+5,5. MPIW,mpiw,train,PSBPM-FD (predictiva bayesiana),2892,0.5736514522821576,menor es mejor
+5,5. MPIW,mpiw,test,FAR (IC del modelo AR),1067,0.3917525773195876,menor es mejor
+5,5. MPIW,mpiw,test,PSBPM-FD (predictiva bayesiana),1067,0.6082474226804123,menor es mejor
+5,6. PICP puntual,picp,train,FAR (IC del modelo AR),2892,0.3039419087136929,|valor - nominal|
+5,6. PICP puntual,picp,train,PSBPM-FD (predictiva bayesiana),2892,0.696058091286307,|valor - nominal|
+5,6. PICP puntual,picp,test,FAR (IC del modelo AR),1067,0.3701968134957826,|valor - nominal|
+5,6. PICP puntual,picp,test,PSBPM-FD (predictiva bayesiana),1067,0.6298031865042174,|valor - nominal|
+5,7. PICPB curva completa,picp_simultaneo,train,FAR (IC del modelo AR),2892,0.729253112033195,|valor - nominal|
+5,7. PICPB curva completa,picp_simultaneo,train,PSBPM-FD (predictiva bayesiana),2892,0.27074688796680496,|valor - nominal|
+5,7. PICPB curva completa,picp_simultaneo,test,FAR (IC del modelo AR),1067,0.6991565135895033,|valor - nominal|
+5,7. PICPB curva completa,picp_simultaneo,test,PSBPM-FD (predictiva bayesiana),1067,0.30084348641049674,|valor - nominal|
+5,8. Winkler,winkler,train,FAR (IC del modelo AR),2892,0.4612724757952974,menor es mejor
+5,8. Winkler,winkler,train,PSBPM-FD (predictiva bayesiana),2892,0.5387275242047026,menor es mejor
+5,8. Winkler,winkler,test,FAR (IC del modelo AR),1067,0.4939081537019681,menor es mejor
+5,8. Winkler,winkler,test,PSBPM-FD (predictiva bayesiana),1067,0.5060918462980318,menor es mejor
+5,9. Winkler max promedio,winkler_max_medio,train,FAR (IC del modelo AR),2892,0.5190179806362379,menor es mejor
+5,9. Winkler max promedio,winkler_max_medio,train,PSBPM-FD (predictiva bayesiana),2892,0.4809820193637621,menor es mejor
+5,9. Winkler max promedio,winkler_max_medio,test,FAR (IC del modelo AR),1067,0.5932521087160263,menor es mejor
+5,9. Winkler max promedio,winkler_max_medio,test,PSBPM-FD (predictiva bayesiana),1067,0.40674789128397376,menor es mejor
+5,10. Winkler max peor ventana,winkler_max_glob,train,FAR (IC del modelo AR),2892,0.5778008298755186,menor es mejor
+5,10. Winkler max peor ventana,winkler_max_glob,train,PSBPM-FD (predictiva bayesiana),2892,0.4221991701244813,menor es mejor
+5,10. Winkler max peor ventana,winkler_max_glob,test,FAR (IC del modelo AR),1067,0.598875351452671,menor es mejor
+5,10. Winkler max peor ventana,winkler_max_glob,test,PSBPM-FD (predictiva bayesiana),1067,0.40112464854732893,menor es mejor
+6,5. MPIW,mpiw,train,FAR (IC del modelo AR),2892,0.43533886583679116,menor es mejor
+6,5. MPIW,mpiw,train,PSBPM-FD (predictiva bayesiana),2892,0.5646611341632088,menor es mejor
+6,5. MPIW,mpiw,test,FAR (IC del modelo AR),1067,0.41799437675726336,menor es mejor
+6,5. MPIW,mpiw,test,PSBPM-FD (predictiva bayesiana),1067,0.5820056232427366,menor es mejor
+6,6. PICP puntual,picp,train,FAR (IC del modelo AR),2892,0.29771784232365145,|valor - nominal|
+6,6. PICP puntual,picp,train,PSBPM-FD (predictiva bayesiana),2892,0.7022821576763485,|valor - nominal|
+6,6. PICP puntual,picp,test,FAR (IC del modelo AR),1067,0.3795688847235239,|valor - nominal|
+6,6. PICP puntual,picp,test,PSBPM-FD (predictiva bayesiana),1067,0.6204311152764761,|valor - nominal|
+6,7. PICPB curva completa,picp_simultaneo,train,FAR (IC del modelo AR),2892,0.6635546334716459,|valor - nominal|
+6,7. PICPB curva completa,picp_simultaneo,train,PSBPM-FD (predictiva bayesiana),2892,0.3364453665283541,|valor - nominal|
+6,7. PICPB curva completa,picp_simultaneo,test,FAR (IC del modelo AR),1067,0.6682286785379569,|valor - nominal|
+6,7. PICPB curva completa,picp_simultaneo,test,PSBPM-FD (predictiva bayesiana),1067,0.33177132146204313,|valor - nominal|
+6,8. Winkler,winkler,train,FAR (IC del modelo AR),2892,0.42081604426002767,menor es mejor
+6,8. Winkler,winkler,train,PSBPM-FD (predictiva bayesiana),2892,0.5791839557399724,menor es mejor
+6,8. Winkler,winkler,test,FAR (IC del modelo AR),1067,0.45829428303655106,menor es mejor
+6,8. Winkler,winkler,test,PSBPM-FD (predictiva bayesiana),1067,0.5417057169634489,menor es mejor
+6,9. Winkler max promedio,winkler_max_medio,train,FAR (IC del modelo AR),2892,0.47199170124481327,menor es mejor
+6,9. Winkler max promedio,winkler_max_medio,train,PSBPM-FD (predictiva bayesiana),2892,0.5280082987551867,menor es mejor
+6,9. Winkler max promedio,winkler_max_medio,test,FAR (IC del modelo AR),1067,0.5089034676663543,menor es mejor
+6,9. Winkler max promedio,winkler_max_medio,test,PSBPM-FD (predictiva bayesiana),1067,0.49109653233364575,menor es mejor
+6,10. Winkler max peor ventana,winkler_max_glob,train,FAR (IC del modelo AR),2892,0.5297372060857538,menor es mejor
+6,10. Winkler max peor ventana,winkler_max_glob,train,PSBPM-FD (predictiva bayesiana),2892,0.4702627939142462,menor es mejor
+6,10. Winkler max peor ventana,winkler_max_glob,test,FAR (IC del modelo AR),1067,0.5866916588566073,menor es mejor
+6,10. Winkler max peor ventana,winkler_max_glob,test,PSBPM-FD (predictiva bayesiana),1067,0.4133083411433927,menor es mejor
