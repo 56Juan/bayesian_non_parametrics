@@ -108,6 +108,7 @@ __all__ = [
     "momentos_poblacionales",
     "generar_escenario_TAR",
     "resumen_escenario_TAR",
+    "predictiva_oraculo_TAR",
 ]
 
 J_SCORES_TAR = 10
@@ -212,6 +213,43 @@ def _simular(T: int, burn_in: int, rng: np.random.Generator) -> dict:
     c = int(burn_in)
     return {"z": z[c:], "regimen": reg[c:], "p": P[c:], "oraculo": ora[c:],
             "var_entre": ve[c:]}
+
+
+def predictiva_oraculo_TAR(esc: dict, t_idx, S: int, seed: int = 0, replica: int = 0):
+    """
+    Extracciones de la ley condicional VERDADERA de xi_t dado el pasado, en las
+    curvas `t_idx` (base 0, t >= 1), para validar contra el generador lo que el
+    modelo predice. `esc` es la salida de `cargar_escenario` (claves `interno_*`).
+
+    Activos: mezcla de los dos regimenes con P(B) = Phi((u_{t-1} - c) / h) y,
+    dado el regimen, u_t ~ N(mu_R + phi_R u_{t-1}, s_R^2); pasivos: AR(1) de
+    coeficiente AR_PASIVO_TAR. Retorna `(Z, R)`: Z (S, n, J) en la escala de xi y
+    R (S, n, A) booleano, True en el regimen B. Verifica que P(B) reproduzca la
+    `p_regimen_B` guardada por el generador.
+    """
+    par, mom = np.asarray(esc["interno_parametros"]), np.asarray(esc["interno_momentos"])
+    s = np.asarray(esc["interno_escala_scores"])
+    xi = np.asarray(esc["interno_scores"])[replica]
+    t_idx = np.asarray(t_idx, dtype=int)
+    assert t_idx.min() >= 1, "t_idx debe ser >= 1: el oraculo condiciona en t - 1."
+    A, J = par.shape[0], xi.shape[1]
+    muA, phA, sA, muB, phB, sB, c, h = par.T
+    m, d = mom[:, 0], mom[:, 1]
+    u_prev = m + d * xi[t_idx - 1, :A] / s[:A]                       # (n, A)
+    p = norm.cdf((u_prev - c) / h)
+    p_gen = np.asarray(esc["interno_p_regimen_B"])[replica, t_idx, :A]
+    assert np.allclose(p, p_gen, atol=1e-8), "P(B) no reproduce la del generador."
+    rng = np.random.default_rng(seed)
+    R = rng.random((S, len(t_idx), A)) < p[None]
+    e = rng.standard_normal((S, len(t_idx), A))
+    u = np.where(R, muB + phB * u_prev + sB * e, muA + phA * u_prev + sA * e)
+    Z = np.empty((S, len(t_idx), J))
+    Z[:, :, :A] = s[:A] * (u - m) / d
+    z_prev = xi[t_idx - 1, A:] / s[A:]
+    sig_p = np.sqrt(1.0 - AR_PASIVO_TAR ** 2)
+    Z[:, :, A:] = s[A:] * (AR_PASIVO_TAR * z_prev[None]
+                           + sig_p * rng.standard_normal((S, len(t_idx), J - A)))
+    return Z, R
 
 
 def _soporte(J: int, L: int) -> np.ndarray:

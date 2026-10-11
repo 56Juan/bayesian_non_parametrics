@@ -328,6 +328,27 @@ class PSBPPredictor:
         return muestras
 
     # ------------------------------------------------------------------
+    def media_atomo_modal(self, X: np.ndarray) -> np.ndarray:
+        """
+        Media condicional del atomo de mayor peso en cada iteracion,
+        mu_{h*}(x) con h* = argmax_h pi_h(x) (docs 03_05_04_03). Retorna
+        (T, n). El argmax se decide DENTRO de cada iteracion: las etiquetas de
+        los atomos no se corresponden entre iteraciones ni entre cadenas, de
+        modo que lo unico agregable es este valor, no el indice h.
+        """
+        X = self._validar_X(X)
+        Xn = X[:, 1:]
+        n, T = X.shape[0], self.n_post_
+        salida = np.empty((T, n))
+        idx = np.arange(n)
+        for t in range(T):
+            phx = pesos_probit(Xn, self._alphah[t], self._psijh[t],
+                               self._Gammajh[t])                    # (n, N)
+            mu = medias_componente(X, self._beta0h[t], self._betajh[t])
+            salida[t] = mu[idx, np.argmax(phx, axis=1)]
+        return salida
+
+    # ------------------------------------------------------------------
     def intervalo(self, X: np.ndarray, nivel: float = 0.95,
                   metodo: str = "muestral",
                   extracciones_por_iteracion: int = 1,

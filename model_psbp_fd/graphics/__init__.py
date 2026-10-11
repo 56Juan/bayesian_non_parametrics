@@ -53,6 +53,7 @@ from .viz_convergencia import (
 
 from .viz_comparacion import (
     ESTILOS_MODELOS,
+    ESTILOS_MODELOS_PREDICTORES,
     plot_ganador_modelo,
     plot_metricas_vs_M,
     plot_bandas_contraste,
@@ -62,6 +63,19 @@ from .viz_evaluacion_barrido import (
     plot_ganador_ventana,
     plot_scores_banda,
     plot_scores_dispersion,
+)
+
+from .viz_comportamientos import (
+    ESTILOS_PREDICTORES,
+    plot_predictores_vs_M,
+    plot_histogramas_draws,
+    plot_curvas_predictores,
+    plot_comportamientos,
+    plot_K_barrido,
+    plot_K_serie,
+    plot_catalogo,
+    plot_validacion_regimen,
+    plot_validacion_observado,
 )
 
 from .viz_evaluacion import (
@@ -104,9 +118,21 @@ __all__ = [
     "plot_diagnostico_rezagos",
     # viz_comparacion
     "ESTILOS_MODELOS",
+    "ESTILOS_MODELOS_PREDICTORES",
     "plot_ganador_modelo",
     "plot_metricas_vs_M",
     "plot_bandas_contraste",
+    # viz_comportamientos
+    "ESTILOS_PREDICTORES",
+    "plot_predictores_vs_M",
+    "plot_histogramas_draws",
+    "plot_curvas_predictores",
+    "plot_comportamientos",
+    "plot_K_barrido",
+    "plot_K_serie",
+    "plot_catalogo",
+    "plot_validacion_regimen",
+    "plot_validacion_observado",
     # viz_evaluacion_barrido
     "plot_ganador_ventana",
     "plot_scores_banda",

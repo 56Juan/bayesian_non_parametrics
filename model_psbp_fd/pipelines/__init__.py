@@ -145,6 +145,7 @@ from .sim_escenario_TAR import (
     ConfigEscenarioTAR,
     generar_escenario_TAR,
     resumen_escenario_TAR,
+    predictiva_oraculo_TAR,
 )
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -171,6 +172,8 @@ from .artifacts import (
     cargar_hiperparametros,
     guardar_config_evaluacion,
     cargar_config_evaluacion,
+    guardar_draws_scores,
+    cargar_draws_scores,
     verificar_contrato,
 )
 
@@ -261,6 +264,7 @@ __all__ = [
     "ConfigEscenarioTAR",
     "generar_escenario_TAR",
     "resumen_escenario_TAR",
+    "predictiva_oraculo_TAR",
     "MecanismoScores",
     "simular_mezcla_scores",
     "generar_mezcla_scores",
@@ -285,5 +289,7 @@ __all__ = [
     "cargar_hiperparametros",
     "guardar_config_evaluacion",
     "cargar_config_evaluacion",
+    "guardar_draws_scores",
+    "cargar_draws_scores",
     "verificar_contrato",
 ]

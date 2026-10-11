@@ -452,7 +452,7 @@ def tabla_barrido(EST: Dict, M_OK: Sequence[int], path_barrido: Path) -> pd.Data
     """
     filas = []
     for M in M_OK:
-        e, res, ocu, con = EST[M], EST[M]["res_conv"], EST[M]["ocup_df"], EST[M]["contraste"]
+        e, res, ocu, con = EST[M], EST[M]["res_conv"], EST[M]["ocup_df"], EST[M].get("contraste")
         fila = {"M": M, "experiment_id": e["eid"],
                 "p_covariables": len(e["cov_por_componente"][0]),
                 "n_variables_diag": int(res["n_variables"]),

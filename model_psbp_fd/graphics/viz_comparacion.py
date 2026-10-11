@@ -20,13 +20,21 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-__all__ = ["ESTILOS_MODELOS", "plot_ganador_modelo", "plot_metricas_vs_M", "plot_bandas_contraste"]
+from .viz_comportamientos import ESTILOS_PREDICTORES
+
+__all__ = ["ESTILOS_MODELOS", "ESTILOS_MODELOS_PREDICTORES", "plot_ganador_modelo",
+           "plot_metricas_vs_M", "plot_bandas_contraste"]
 
 # El FAR va grueso y punteado porque se TAPA con el PSBPM-FD cuando sus curvas casi coinciden.
 ESTILOS_MODELOS = {
     "FAR":      dict(color="#1f6f8b", lw=3.0, ls="--"),
     "RF":       dict(color="#e08e0b", lw=1.4, ls="-"),
     "PSBPM-FD": dict(color="#c0392b", lw=1.6, ls="-", zorder=5),
+}
+# Una fila del PSBPM-FD por predictor puntual (`cargar_psbp(..., predictores=...)`).
+ESTILOS_MODELOS_PREDICTORES = {
+    "FAR": ESTILOS_MODELOS["FAR"], "RF": ESTILOS_MODELOS["RF"],
+    **{f"PSBPM-FD ({p})": dict(est, zorder=5) for p, est in ESTILOS_PREDICTORES.items()},
 }
 _AZUL, _ROJO = "#2c7fb8", "#c0392b"
 

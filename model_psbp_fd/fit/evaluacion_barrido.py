@@ -14,6 +14,13 @@ propio de la evaluacion. `EST[M]` es el estado de cada punto; el diseno comun
 desempaqueta una vez.
 
 Las diez metricas son las del marco teorico `02_02_03` y no se agregan otras.
+
+Predictores puntuales (docs 03_05_04): con `predictores=("esperanza",)`, el valor
+por defecto, todo es como antes (la tabla de ventana no lleva columna `predictor`).
+Con mas de uno, `_predecir_punto` calcula cada uno (`resumenes_predictiva`) y la
+ventana movil se recorre por predictor, en formato largo con la columna
+`predictor`; las funciones que leen esa tabla filtran por `predictor`, que por
+defecto es la esperanza. La banda, y por tanto el Bloque B, es la misma para todos.
 """
 
 from __future__ import annotations
@@ -27,15 +34,20 @@ from ..functions_models import DataStandardizer
 from ..models.pspb_fd_v3 import PropagadorFuncional, curva_media_desde_scores
 from ..pipelines import (
     cargar_curvas, cargar_curvas_true, cargar_representacion,
-    cargar_fpca, cargar_estandarizador,
+    cargar_fpca, cargar_estandarizador, guardar_draws_scores,
 )
-from .metrics_puntual import mise
+from ..pipelines.artifacts import ARCHIVOS
+from .metrics_puntual import mise, pesos_normalizados
 from .metrics_distribucional import (
     intervalo_muestral, winkler as winkler_scores,
     indicador_cobertura, indicador_cobertura_simultanea,
 )
 from .pooling import agrupar_momentos
 from .rolling import ventana_movil_scores, ventana_movil_funcional
+from .resumenes_predictiva import (
+    PREDICTORES, mediana_puntual, medoide_l1, mediana_mbd, atomo_modal,
+    distancia_a_muestra_mas_cercana,
+)
 
 __all__ = [
     "METRICAS_A", "METRICAS_B",
@@ -43,6 +55,7 @@ __all__ = [
     "tablas_ventana", "apilar_tablas", "verificar_relaciones_metricas",
     "ganancias_por_ventana", "tabla_ganadores_test", "saltos_T0", "peores_ventanas",
     "resumen_metricas", "resumen_barrido", "monitoreo_scores", "intervalos_scores",
+    "tabla_predictores", "curvas_draws", "diagnostico_multimodalidad",
 ]
 
 # Las 10 metricas del marco teorico 02_02_03, en su orden. Declaradas en la
@@ -132,7 +145,10 @@ def serie_origenes(DIS: Dict) -> Dict:
 # ==========================================================================
 
 def _predecir_punto(e: Dict, M: int, DIS: Dict, ORIG: Dict, cache: Dict, S_POR_ITER: int,
-                    S_FUNC: int, BLOQUE_ORIG: int, SEED_PRED: int) -> None:
+                    S_FUNC: int, BLOQUE_ORIG: int, SEED_PRED: int,
+                    predictores: Sequence[str] = ("esperanza",), pesos_tau=None) -> None:
+    assert "esperanza" in predictores and set(predictores) <= set(PREDICTORES), (
+        f"predictores={predictores}: subconjunto de {PREDICTORES} que incluya la esperanza.")
     n_comp, n_iter, n_post, ci = e["n_components"], e["n_iter"], e["n_post"], e["component_idx"]
     n_orig, grilla, NIVEL = ORIG["n_orig"], DIS["grilla"], DIS["NIVEL"]
     dfs_full = {k: pd.concat([e["dfs_train"][k], e["dfs_test"][k]], ignore_index=True)
@@ -171,14 +187,26 @@ def _predecir_punto(e: Dict, M: int, DIS: Dict, ORIG: Dict, cache: Dict, S_POR_I
                                modo_residuo=DIS["MODO_RESIDUO"])
     SC_thin = SC_draws[::paso_thin]
     li_f, ls_f = np.empty((n_orig, len(grilla))), np.empty((n_orig, len(grilla)))
+    # Predictores sobre las mismas extracciones funcionales que la banda.
+    muestrales = {"mediana": lambda X: mediana_puntual(X),
+                  "medoide": lambda X: medoide_l1(X, grilla, pesos_tau),
+                  "mbd": lambda X: mediana_mbd(X)}
+    X_PRED = {p: np.empty((n_orig, len(grilla))) for p in predictores if p in muestrales}
     for i0 in range(0, n_orig, BLOQUE_ORIG):
         sl = slice(i0, i0 + BLOQUE_ORIG)
         Xd = prop.curvas_desde_scores(SC_thin[:, sl], seed=SEED_PRED)
         li_f[sl] = np.quantile(Xd, (1 - NIVEL) / 2, axis=0)
         ls_f[sl] = np.quantile(Xd, 1 - (1 - NIVEL) / 2, axis=0)
+        for p in X_PRED:
+            X_PRED[p][sl] = muestrales[p](Xd)
     # Prediccion puntual = media ANALITICA (lineal en los scores): con atau <= 1 la
     # predictiva tiene varianza infinita y la media muestral la arrastran unos draws.
     X_pred = curva_media_desde_scores(Y_hat, e["fpca"], e["std"])
+    X_PRED["esperanza"] = X_pred
+    if "modal" in predictores:
+        e["Y_mod"] = atomo_modal(e["models_chains"], dfs_full)
+        X_PRED["modal"] = curva_media_desde_scores(e["Y_mod"], e["fpca"], e["std"])
+    e["X_PRED"] = {p: X_PRED[p] for p in predictores}
     X_proj = e["fpca"].reconstruct(e["SCORES"])[DIS["N_LAGS"]:]       # piso de la representacion
     e.update({"dfs_full": dfs_full, "Y_obs": Y_obs, "Y_hat": Y_hat, "Y_sd": Y_sd,
               "SC_draws": SC_draws, "li_s": li_s, "ls_s": ls_s, "X_pred": X_pred,
@@ -193,12 +221,14 @@ def _predecir_punto(e: Dict, M: int, DIS: Dict, ORIG: Dict, cache: Dict, S_POR_I
 
 def predecir_barrido(EST: Dict, M_OK: Sequence[int], DIS: Dict, ORIG: Dict,
                      S_POR_ITER: int = 1, S_FUNC: int = 1000, BLOQUE_ORIG: int = 200,
-                     SEED_PRED: int = 20260823, max_gb: float = 2.0) -> None:
+                     SEED_PRED: int = 20260823, max_gb: float = 2.0,
+                     predictores: Sequence[str] = ("esperanza",), pesos_tau=None) -> None:
     """
     Prediccion a h=1 de cada M: momentos y extracciones por score (`Y_hat`, `Y_sd`,
     `SC_draws`, banda `li_s`/`ls_s`), curva predicha y su banda por cuantiles
     (`X_pred`, `li_f`, `ls_f`). Modifica `EST`. Solo se conserva en cache el M en
-    curso (cada punto tiene sus propias trazas).
+    curso (cada punto tiene sus propias trazas). `e["X_PRED"]` lleva la curva de
+    cada uno de `predictores` (la esperanza es `X_pred`); con "modal", `e["Y_mod"]`.
     """
     n_orig = ORIG["n_orig"]
     print(f"origenes evaluados: {n_orig}  (train {ORIG['es_train'].sum()} · "
@@ -212,23 +242,34 @@ def predecir_barrido(EST: Dict, M_OK: Sequence[int], DIS: Dict, ORIG: Dict,
     for M in M_OK:
         for clave in [c for c in cache if c[0] != M]:
             del cache[clave]
-        _predecir_punto(EST[M], M, DIS, ORIG, cache, S_POR_ITER, S_FUNC, BLOQUE_ORIG, SEED_PRED)
+        _predecir_punto(EST[M], M, DIS, ORIG, cache, S_POR_ITER, S_FUNC, BLOQUE_ORIG, SEED_PRED,
+                        predictores, pesos_tau)
 
 
-def guardar_bandas(EST: Dict, M_OK: Sequence[int], DIS: Dict, ORIG: Dict) -> None:
+def guardar_bandas(EST: Dict, M_OK: Sequence[int], DIS: Dict, ORIG: Dict,
+                   guardar_draws: bool = False) -> None:
     """Banda y prediccion puntual en `predict/` (objeto de datos, no de lectura):
-    el `_05` las necesita para el Winkler del PSBPM-FD sin re-muestrear."""
+    el `_05` las necesita para el Winkler del PSBPM-FD sin re-muestrear. `X_pred` es
+    la esperanza; los demas predictores de `e["X_PRED"]` van como `X_pred_<nombre>`.
+    Con `guardar_draws`, tambien las extracciones de scores (`draws_scores_psbp.npy`)."""
     for M in M_OK:
         e = EST[M]
-        destino = e["paths"]["predict"] / "banda_funcional_psbp.npz"
+        destino = e["paths"]["predict"] / ARCHIVOS["banda_psbp"]
+        extra = {f"X_pred_{p}": X.astype(np.float32)
+                 for p, X in e.get("X_PRED", {}).items() if p != "esperanza"}
         np.savez_compressed(
             destino, li=e["li_f"].astype(np.float32), ls=e["ls_f"].astype(np.float32),
             X_pred=e["X_pred"].astype(np.float32), t_orig=ORIG["t_orig"],
             nivel=np.array([DIS["NIVEL"]]), n_lags=np.array([DIS["N_LAGS"]]),
             T0=np.array([DIS["T0"]]), modo_residuo=np.array([DIS["MODO_RESIDUO"]]),
-            objetivo=np.array([DIS["OBJETIVO"]]))
+            objetivo=np.array([DIS["OBJETIVO"]]), **extra)
         print(f"[M={M}] banda funcional -> {destino.name}  "
-              f"({destino.stat().st_size / 1e6:.1f} MB, {e['li_f'].shape})")
+              f"({destino.stat().st_size / 1e6:.1f} MB, {e['li_f'].shape})"
+              + (f"  + predictores {sorted(extra)}" if extra else ""))
+        if guardar_draws:
+            p = guardar_draws_scores(e["paths"], e["SC_draws"])
+            print(f"        extracciones de scores -> {p.name} ({p.stat().st_size / 1e6:.0f} MB, "
+                  f"{e['SC_draws'].shape})")
     print("Banda por CUANTILES de la predictiva muestral: no supone forma alguna.")
 
 
@@ -236,18 +277,51 @@ def guardar_bandas(EST: Dict, M_OK: Sequence[int], DIS: Dict, ORIG: Dict) -> Non
 # 3. BLOQUES A Y B SOBRE LA VENTANA MOVIL
 # ==========================================================================
 
-def tablas_ventana(e: Dict, DIS: Dict, ORIG: Dict, pesos_tau=None) -> None:
+def _por_predictor(t: pd.DataFrame, predictor: str = "esperanza") -> pd.DataFrame:
+    """Las filas de un predictor de una tabla de ventana; la tabla tal cual si no
+    lleva la columna `predictor` (un solo predictor, la esperanza)."""
+    if "predictor" not in t.columns:
+        return t
+    sub = t[t["predictor"] == predictor].reset_index(drop=True)
+    assert len(sub), f"la tabla no tiene filas del predictor {predictor!r}"
+    sub.attrs = dict(t.attrs)
+    return sub
+
+
+def _por_cada_predictor(t: pd.DataFrame):
+    """Las sub-tablas de cada predictor (la tabla entera si no hay columna)."""
+    if "predictor" not in t.columns:
+        return [t]
+    return [_por_predictor(t, p) for p in t["predictor"].unique()]
+
+
+def tablas_ventana(e: Dict, DIS: Dict, ORIG: Dict, pesos_tau=None,
+                   predictores: Sequence[str] = ("esperanza",)) -> None:
     """
     Tabla de ventana movil por ancho, contra los DOS objetivos de docs 03_05_00:
     la curva suavizada (`e["tablas_fun"]`) y X_t^(M) (`e["tablas_rep"]`). Es la
     unica vez que se calculan las metricas; todo lo demas se deriva de ellas.
+    Con mas de un predictor la ventana se recorre por cada uno (`e["X_PRED"]`) y
+    la tabla lleva la columna `predictor`; la banda es la misma para todos.
     """
+    largo = tuple(predictores) != ("esperanza",)
+
+    def _una(objetivo, X, w, verboso):
+        return ventana_movil_funcional(
+            objetivo, X, DIS["grilla"], ORIG["T0_orig"], w=w,
+            li=e["li_f"], ls=e["ls_f"], t_offset=DIS["N_LAGS"], pesos_tau=pesos_tau,
+            nivel=DIS["NIVEL"], bloque_A=True, verbose=(verboso and w == DIS["W_REF"]))
+
     def _tablas(objetivo, verboso):
-        return {w: ventana_movil_funcional(
-                    objetivo, e["X_pred"], DIS["grilla"], ORIG["T0_orig"], w=w,
-                    li=e["li_f"], ls=e["ls_f"], t_offset=DIS["N_LAGS"], pesos_tau=pesos_tau,
-                    nivel=DIS["NIVEL"], bloque_A=True, verbose=(verboso and w == DIS["W_REF"]))
-                for w in DIS["VENTANAS_W"]}
+        if not largo:
+            return {w: _una(objetivo, e["X_pred"], w, verboso) for w in DIS["VENTANAS_W"]}
+        out = {}
+        for w in DIS["VENTANAS_W"]:
+            partes = [_una(objetivo, e["X_PRED"][p], w, verboso and j == 0).assign(predictor=p)
+                      for j, p in enumerate(predictores)]
+            out[w] = pd.concat(partes, ignore_index=True)
+            out[w].attrs["w"] = int(w)
+        return out
     e["tablas_fun"] = _tablas(ORIG["X_obj_ev"], True)
     e["tablas_rep"] = _tablas(e["X_proj"], False)
     e["tablas_fun"][DIS["W_REF"]].to_csv(
@@ -255,14 +329,14 @@ def tablas_ventana(e: Dict, DIS: Dict, ORIG: Dict, pesos_tau=None) -> None:
 
 
 def apilar_tablas(EST: Dict, M_OK: Sequence[int], VENTANAS_W: Sequence[int],
-                  columnas: Sequence[str]) -> Dict[int, pd.DataFrame]:
+                  columnas: Sequence[str], predictor: str = "esperanza") -> Dict[int, pd.DataFrame]:
     """`{w: tabla}` con los M apilados en formato largo (columna `punto`), para
-    superponer los M en una sola figura por ancho."""
+    superponer los M en una sola figura por ancho. Las filas de `predictor`."""
     out = {}
     for w in VENTANAS_W:
         partes = []
         for M in M_OK:
-            t = EST[M]["tablas_fun"][w].copy()
+            t = _por_predictor(EST[M]["tablas_fun"][w], predictor).copy()
             faltan = [c for c in columnas if c not in t.columns]
             assert not faltan, f"[M={M}, w={w}] faltan columnas: {faltan}"
             t.insert(0, "punto", f"M={M}")
@@ -280,8 +354,7 @@ def verificar_relaciones_metricas(EST: Dict, M_OK: Sequence[int], VENTANAS_W: Se
     <= winkler_max_glob.
     """
     for M in M_OK:
-        for w in VENTANAS_W:
-            t = EST[M]["tablas_fun"][w]
+        for w, t in ((w, t) for w in VENTANAS_W for t in _por_cada_predictor(EST[M]["tablas_fun"][w])):
             tol = 1e-9
             assert (t["mae_f"] <= t["l2_medio"] + tol).all(), f"[M={M}, w={w}] mae_f > l2_medio"
             assert (t["l2_medio"] <= t["linf_medio"] + tol).all(), f"[M={M}, w={w}] l2_medio > linf_medio"
@@ -296,20 +369,21 @@ def verificar_relaciones_metricas(EST: Dict, M_OK: Sequence[int], VENTANAS_W: Se
 
 
 def ganancias_por_ventana(EST: Dict, M_OK: Sequence[int], VENTANAS_W: Sequence[int],
-                          metricas, NIVEL: float) -> pd.DataFrame:
+                          metricas, NIVEL: float, predictor: str = "esperanza") -> pd.DataFrame:
     """
     % de ventanas ganadas por cada M, por metrica, bloque y ancho. En picp el
     objetivo es el NOMINAL, no el minimo. Exige que las ventanas de todos los M
-    coincidan posicion a posicion.
+    coincidan posicion a posicion. Sobre las filas de `predictor`.
     """
     filas = []
     for w in VENTANAS_W:
-        ref = EST[M_OK[0]]["tablas_fun"][w]
+        tab = {M: _por_predictor(EST[M]["tablas_fun"][w], predictor) for M in M_OK}
+        ref = tab[M_OK[0]]
         for M in M_OK[1:]:
-            assert list(EST[M]["tablas_fun"][w]["t_centro"]) == list(ref["t_centro"]), (
+            assert list(tab[M]["t_centro"]) == list(ref["t_centro"]), (
                 f"[M={M}, w={w}] las ventanas no estan alineadas con M={M_OK[0]}.")
         for etiqueta, col in metricas:
-            piv = pd.DataFrame({M: EST[M]["tablas_fun"][w][col].to_numpy() for M in M_OK})
+            piv = pd.DataFrame({M: tab[M][col].to_numpy() for M in M_OK})
             es_picp = col.startswith("picp")
             obj = (piv - NIVEL).abs() if es_picp else piv
             g = pd.DataFrame({"bloque": ref["bloque"], "cruza_T0": ref["cruza_T0"],
@@ -332,12 +406,13 @@ def tabla_ganadores_test(gana: pd.DataFrame) -> pd.DataFrame:
             .pivot_table(index=["metrica", "w"], columns="M", values="pct_ventanas_ganadas"))
 
 
-def saltos_T0(EST: Dict, M_OK: Sequence[int], VENTANAS_W: Sequence[int]) -> pd.DataFrame:
+def saltos_T0(EST: Dict, M_OK: Sequence[int], VENTANAS_W: Sequence[int],
+              predictor: str = "esperanza") -> pd.DataFrame:
     """Salto del MISE en T0 (test / train), sin las ventanas que cruzan T0."""
     filas = []
     for M in M_OK:
         for w in VENTANAS_W:
-            t = EST[M]["tablas_fun"][w]
+            t = _por_predictor(EST[M]["tablas_fun"][w], predictor)
             t = t[~t["cruza_T0"]]
             a = t.loc[t.bloque == "train", "mise"].mean()
             b = t.loc[t.bloque == "test", "mise"].mean()
@@ -346,9 +421,9 @@ def saltos_T0(EST: Dict, M_OK: Sequence[int], VENTANAS_W: Sequence[int]) -> pd.D
     return pd.DataFrame(filas)
 
 
-def peores_ventanas(e: Dict, w: int, metrica: str, n: int) -> pd.DataFrame:
+def peores_ventanas(e: Dict, w: int, metrica: str, n: int, predictor: str = "esperanza") -> pd.DataFrame:
     """Las `n` ventanas de test (sin cruzar T0) con peor valor de `metrica`."""
-    t = e["tablas_fun"][w]
+    t = _por_predictor(e["tablas_fun"][w], predictor)
     cand = t[(t["bloque"] == "test") & (~t["cruza_T0"])]
     assert metrica in cand.columns, f"{metrica!r} no esta en la tabla de ventana."
     return cand.nlargest(n, metrica)
@@ -367,19 +442,23 @@ def resumen_metricas(e: Dict, M: int, DIS: Dict, ORIG: Dict) -> pd.DataFrame:
     """
     W_REF, NIVEL = DIS["W_REF"], DIS["NIVEL"]
     filas = []
+    largo = "predictor" in e["tablas_fun"][W_REF].columns
     for objetivo, clave in (("curva_suavizada", "tablas_fun"), ("representacion_fpca", "tablas_rep")):
-        tab = e[clave][W_REF]
-        lim = tab[~tab["cruza_T0"]]
-        for etiqueta, col in METRICAS_A + METRICAS_B:
-            for bloque in ("train", "test"):
-                v = lim.loc[lim.bloque == bloque, col]
-                filas.append({"objetivo": objetivo, "metrica": etiqueta, "columna": col,
-                              "bloque": bloque, "minimo": float(v.min()),
-                              "maximo": float(v.max()), "promedio": float(v.mean())})
-        t_ = lim[lim.bloque == "test"]
+        for tab in _por_cada_predictor(e[clave][W_REF]):
+            lim = tab[~tab["cruza_T0"]]
+            pred = {"predictor": tab["predictor"].iloc[0]} if largo else {}
+            for etiqueta, col in METRICAS_A + METRICAS_B:
+                for bloque in ("train", "test"):
+                    v = lim.loc[lim.bloque == bloque, col]
+                    filas.append({"objetivo": objetivo, **pred, "metrica": etiqueta, "columna": col,
+                                  "bloque": bloque, "minimo": float(v.min()),
+                                  "maximo": float(v.max()), "promedio": float(v.mean())})
+        t_ = _por_predictor(e[clave][W_REF])
+        t_ = t_[(~t_["cruza_T0"]) & (t_.bloque == "test")]
         print(f"[M={M}] {objetivo:<20} PICP puntual test = {t_['picp'].mean():.4f} "
               f"(nominal {NIVEL:.2f})  ·  PICP simultaneo test = {t_['picp_simultaneo'].mean():.4f}")
-    resumen = pd.DataFrame(filas).set_index(["objetivo", "metrica", "bloque"])
+    resumen = pd.DataFrame(filas).set_index(
+        ["objetivo"] + (["predictor"] if largo else []) + ["metrica", "bloque"])
     resumen.to_csv(e["paths"]["out_report"] / "66_metricas_resumen.csv")
     e["resumen_df"] = resumen
 
@@ -460,3 +539,80 @@ def intervalos_scores(EST: Dict, M_OK: Sequence[int], DIS: Dict, ORIG: Dict,
     else:
         print(f"OK ninguna componente se aleja mas de {umbral_ace} del nominal en test.")
     return df
+
+
+# ==========================================================================
+# 6. PREDICTORES PUNTUALES Y MULTIMODALIDAD (docs 03_05_04)
+# ==========================================================================
+
+def tabla_predictores(resumen_bar: pd.DataFrame, path_barrido=None,
+                      objetivo: str = "curva_suavizada", bloque: str = "test") -> pd.DataFrame:
+    """
+    Bloque A por predictor y M: el promedio sobre las ventanas (W_REF, sin cruzar
+    T0) de `resumen_barrido`, filas (columna, predictor) y columnas M. Persiste
+    `101_bloqueA_por_predictor.csv` con los dos objetivos y los dos bloques. El
+    funcional consistente con cada metrica: MAE y E_max con las medianas, RMSE con
+    la esperanza; la tabla trae todos los cruces.
+    """
+    assert "predictor" in resumen_bar.columns, "el resumen no trae la columna `predictor`."
+    cols = [c for _, c in METRICAS_A]
+    sub = resumen_bar[resumen_bar["columna"].isin(cols)]
+    if path_barrido is not None:
+        sub.to_csv(path_barrido / "101_bloqueA_por_predictor.csv", index=False)
+    v = sub[(sub["objetivo"] == objetivo) & (sub["bloque"] == bloque)]
+    piv = v.pivot_table(index=["columna", "predictor"], columns="M", values="promedio")
+    orden = [(c, p) for c in cols for p in PREDICTORES if (c, p) in piv.index]
+    return piv.loc[orden]
+
+
+def curvas_draws(e: Dict, DIS: Dict, idx) -> np.ndarray:
+    """Extracciones funcionales (S_funcional, len(idx), G) de los origenes `idx`:
+    las mismas (adelgazadas) con que `_predecir_punto` arma la banda."""
+    prop = PropagadorFuncional(e["Psi_grid"], e["mu_grid"], estandarizador=e["std"],
+                               modo_residuo=DIS["MODO_RESIDUO"])
+    return prop.curvas_desde_scores(e["SC_draws"][::e["paso_thin"]][:, idx], seed=0)
+
+
+def diagnostico_multimodalidad(e: Dict, DIS: Dict, ORIG: Dict, umbral: float = 0.25,
+                               n_ref: int = 100, seed: int = 0, pesos_tau=None,
+                               bloque_orig: int = 100):
+    """
+    Diagnostico de docs 03_05_04 (la diferencia esperanza - mediana es un
+    diagnostico de multimodalidad o asimetria), en dos tablas:
+
+    por score  (`60_multimodalidad_por_score.csv`): por componente y bloque, la
+               fraccion de origenes con |esperanza - mediana| > `umbral` x sd, con
+               la esperanza ANALITICA (`Y_hat`) y sd = (q84 - q16) / 2 de las
+               extracciones: la sd predictiva no existe con atau <= 1.
+    por origen (`61_distancia_mediana_muestra.csv`, test): distancia L^1 de la
+               mediana puntual a la extraccion mas cercana contra la de una
+               extraccion a su vecina (`distancia_a_muestra_mas_cercana`), y la
+               distancia L^1 entre la esperanza y la mediana.
+    """
+    SC, es_train = e["SC_draws"], ORIG["es_train"]
+    q16, q50, q84 = np.quantile(SC, [0.16, 0.5, 0.84], axis=0)
+    sep = np.abs(e["Y_hat"] - q50) / np.maximum((q84 - q16) / 2.0, 1e-12)      # (n, M)
+    filas = []
+    for k in range(e["n_components"]):
+        for bloque, m in (("train", es_train), ("test", ~es_train)):
+            filas.append({"componente": f"FPC {e['component_idx'][k] + 1}", "bloque": bloque,
+                          f"frac_sep_gt_{umbral}": float((sep[m, k] > umbral).mean()),
+                          "sep_mediana": float(np.median(sep[m, k])),
+                          "sep_p90": float(np.quantile(sep[m, k], 0.9))})
+    por_score = pd.DataFrame(filas)
+    por_score.to_csv(e["paths"]["out_report"] / "60_multimodalidad_por_score.csv", index=False)
+
+    idx = np.flatnonzero(~es_train)
+    X_med, wn = e["X_PRED"]["mediana"], pesos_normalizados(DIS["grilla"], pesos_tau)
+    partes = []
+    for i0 in range(0, len(idx), bloque_orig):
+        ii = idx[i0:i0 + bloque_orig]
+        d = distancia_a_muestra_mas_cercana(curvas_draws(e, DIS, ii), X_med[ii], DIS["grilla"],
+                                            pesos_tau, n_ref, seed)
+        partes.append(pd.DataFrame({"t": ORIG["t_orig"][ii], **d}))
+    por_origen = pd.concat(partes, ignore_index=True)
+    por_origen["l1_esperanza_mediana"] = np.abs(e["X_pred"][idx] - X_med[idx]) @ wn
+    por_origen["sep_max_score"] = sep[idx].max(axis=1)
+    por_origen.to_csv(e["paths"]["out_report"] / "61_distancia_mediana_muestra.csv", index=False)
+    e["sep_scores"] = sep
+    return por_score, por_origen

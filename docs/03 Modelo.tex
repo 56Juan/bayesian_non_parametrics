@@ -353,29 +353,31 @@ donde el integrando es la mezcla \eqref{eq:psbpm_fd_componente} evaluada en cada
 
 La aproximación~\eqref{eq:predictiva_posteriori_score} entrega la densidad predictiva en forma cerrada sobre una grilla, ademas su versión muestral se obtiene simulando en cada iteración el índice de componente desde la ley de pesos y a continuación la respuesta desde el átomo seleccionado, procedimiento cuya marginal es precisamente~\eqref{eq:predictiva_posteriori_score} y que basta ejecutar una vez por iteración.
 
+
 \section{Reconstrucción Funcional}
 \label{03_05_00_reconstruccion_funcional}
 
-El objeto de interés del estudio no es el score sino la curva, de modo que la predictiva de $\boldsymbol{\xi}_t$ dado $\mathbf{z}_t$, obtenida en $\mathbb{R}^{M}$, debe transportarse al espacio funcional. La descomposición que dio origen a los scores provee ese transporte, ya que la expansión \eqref{eq:expansion_kl_truncada} es un mapa lineal que asigna a cada vector de $\mathbb{R}^{M}$ una curva del subespacio generado por las autofunciones retenidas, y basta recorrerla en sentido inverso al empleado para construir la representación. Revirtiendo la estandarización mediante $\xi_{tm} = d_m\,\tilde{\xi}_{tm} + c_m$ y proyectando sobre dichas autofunciones, la curva queda escrita como
+El objeto de interés del estudio no es el score sino la curva, de modo que la predictiva de $\boldsymbol{\xi}_t$ dado $\mathbf{z}_t$, obtenida en $\mathbb{R}^{M}$, debe transportarse al espacio funcional. La descomposición que dio origen a los scores provee esa transformacion, ya que la expansión \eqref{eq:expansion_kl_truncada} es un mapa lineal que asigna a cada vector de $\mathbb{R}^{M}$ una curva del subespacio generado por las autofunciones retenidas, y basta recorrerla en sentido inverso al empleado para construir la representación. Proyectando el vector de scores sobre dichas autofunciones, la curva queda escrita como
 \begin{equation}\label{eq:reconstruccion_fpca}
     X_t^{(M)}(\tau_g) = \mu(\tau_g)
-    + \sum_{m=1}^{M} \bigl(d_m\,\tilde{\xi}_{tm} + c_m\bigr)\,\psi_m(\tau_g),
+    + \sum_{m=1}^{M} \xi_{tm}\,\psi_m(\tau_g),
     \qquad g = 1, \dots, G,
 \end{equation}
-donde $\mu(\tau_g)$ y $\psi_m(\tau_g)$ denotan la función media y las autofunciones evaluadas en la grilla del dominio, y $(c_m, d_m)$ los momentos de estandarización de la $m$-ésima componente.\\
+donde $\mu(\tau_g)$ y $\psi_m(\tau_g)$ denotan la función media y las autofunciones evaluadas en la grilla del dominio.\\
 
-La expresión \eqref{eq:reconstruccion_fpca} es una identidad entre el vector de scores y la curva que representa, y adquiere carácter predictivo al evaluarla en el vector aleatorio cuya ley es la predictiva del modelo. Sustituyendo en ella $\tilde{\boldsymbol{\xi}}_t \mid \mathbf{z}_t, \mathcal{D}$ se induce la distribución predictiva de $X_t^{(M)}$ dado el estado rezagado, que es el objeto de interés del pronóstico. Como $\mu(\tau_g)$, $\{\psi_m\}$ y $(c_m, d_m)$ se tratan como conocidas, el mapa es determinista y afín, propiedad de la que se sigue que los momentos condicionales de la curva se obtengan en forma cerrada a partir de los momentos condicionales de los scores y que cada extracción predictiva de los scores, transportada por el mapa, sea una extracción exacta de la predictiva funcional condicional.\\
+La expresión \eqref{eq:reconstruccion_fpca} es una identidad entre el vector de scores y la curva que representa, y adquiere carácter predictivo al evaluarla en el vector aleatorio cuya ley es la predictiva del modelo. Sustituyendo en ella $\boldsymbol{\xi}_t \mid \mathbf{z}_t, \mathcal{D}$ se induce la distribución predictiva de $X_t^{(M)}$ dado el estado rezagado, que es el objeto de interés del pronóstico. Como $\mu(\tau_g)$ y $\{\psi_m\}$ se tratan como conocidas, el mapa es determinista y afín, propiedad de la que se sigue que los momentos condicionales de la curva se obtengan en forma cerrada a partir de los momentos condicionales de los scores y que cada extracción predictiva de los scores, transportada por el mapa, sea una extracción exacta de la predictiva funcional condicional.\\
 
-Ese mismo objeto es el que se toma como objetivo de evaluación, de modo que predicción y objetivo viven en el subespacio generado por las $M$ autofunciones retenidas y toda discrepancia entre ellos proviene de la dinámica sobre los scores. No interviene por tanto ningún término adicional de incertidumbre, en correspondencia con la ausencia de error aditivo externo en la especificación de la Sección~\ref{03_04_00_modelo_propuesto_psbpm_fd}. Las expresiones de esta sección se desarrollan bajo ese objetivo; el contraste contra la curva suavizada, que incorpora además las direcciones descartadas por el truncamiento, se define en la Sección~\ref{03_06_04_objetivos_evaluacion}.
+
+La predictiva funcional por tanto es una mezcla que hereda de \eqref{eq:predictiva_posteriori_score} tantos modos como regímenes distingan los pesos de mezcla $\pi_h(\mathbf{z}_t)$.
 
 \subsection{Esperanza predictiva}
 \label{03_05_01_esperanza}
 
-Aplicando el operador esperanza condicional a \eqref{eq:reconstruccion_fpca}, y observando que $\mu(\tau_g)$ y los términos $c_m\psi_m(\tau_g)$ son constantes que salen del operador, su linealidad entrega
+Aplicando el operador esperanza condicional a \eqref{eq:reconstruccion_fpca}, y observando que $\mu(\tau_g)$ y $\psi_m(\tau_g)$ son constantes que salen del operador, su linealidad entrega
 \begin{equation}\label{eq:esperanza_curva}
     \mathbb{E}\bigl[X_t^{(M)}(\tau_g) \mid \mathbf{z}_t, \mathcal{D}\bigr]
     = \mu(\tau_g)
-    + \sum_{m=1}^{M} \Bigl(d_m\,\mathbb{E}\bigl[\tilde{\xi}_{tm} \mid \mathbf{z}_t, \mathcal{D}\bigr] + c_m\Bigr)\psi_m(\tau_g).
+    + \sum_{m=1}^{M} \mathbb{E}\bigl[\xi_{tm} \mid \mathbf{z}_t, \mathcal{D}\bigr]\,\psi_m(\tau_g).
 \end{equation}
 La esperanza predictiva de la curva queda determinada por las $M$ esperanzas predictivas de los scores, sin aproximación adicional.\\
 
@@ -389,53 +391,54 @@ La esperanza de cada score se obtiene de \eqref{eq:predictiva_posteriori_score}.
 \end{equation}
 y la esperanza predictiva es el promedio de dichas medias sobre las $S$ extracciones,
 \begin{equation}\label{eq:esperanza_score_estimada}
-    \widehat{\mathbb{E}}\bigl[\tilde{\xi}_{tm} \mid \mathbf{z}_t, \mathcal{D}\bigr]
+    \widehat{\mathbb{E}}\bigl[\xi_{tm} \mid \mathbf{z}_t, \mathcal{D}\bigr]
     = \frac{1}{S}\sum_{s=1}^{S} m_{ms}.
 \end{equation}
-El orden de las operaciones no es intercambiable, ya que $m_{ms}$ es un funcional de la mezcla completa e invariante a permutaciones de las etiquetas $h$, mientras que los parámetros individuales de cada átomo no lo son, de modo que promediarlos entre iteraciones y evaluar después la mezcla en el promedio carecería de sentido.
+El orden de las operaciones no es intercambiable, ya que $m_{ms}$ es un funcional de la mezcla completa e invariante a permutaciones de las etiquetas $h$, mientras que los parámetros individuales de cada átomo no lo son.\\
+
 
 \subsection{Varianza predictiva}
 \label{03_05_02_varianza}
 
-Conviene partir de la desviación respecto de la media, donde las constantes se cancelan. Escribiendo $a_m(\tau_g) = d_m\,\psi_m(\tau_g)$,
+Conviene partir de la desviación respecto de la media, donde la función media se cancela,
 \begin{equation}\label{eq:desviacion_curva}
     X_t^{(M)}(\tau_g) - \mathbb{E}\bigl[X_t^{(M)}(\tau_g)\bigr]
-    = \sum_{m=1}^{M} a_m(\tau_g)\Bigl(\tilde{\xi}_{tm} - \mathbb{E}\bigl[\tilde{\xi}_{tm}\bigr]\Bigr).
+    = \sum_{m=1}^{M} \psi_m(\tau_g)\Bigl(\xi_{tm} - \mathbb{E}\bigl[\xi_{tm}\bigr]\Bigr).
 \end{equation}
 Elevando al cuadrado se obtiene una suma doble sobre pares de componentes, y al tomar esperanza los términos diagonales entregan varianzas y los restantes covarianzas, cada par de índices distintos contado dos veces,
 \begin{equation}\label{eq:varianza_curva_exacta}
     \mathrm{Var}\bigl[X_t^{(M)}(\tau_g) \mid \mathbf{z}_t, \mathcal{D}\bigr]
-    = \sum_{m=1}^{M} a_m(\tau_g)^2\,\mathrm{Var}\bigl[\tilde{\xi}_{tm}\bigr]
-    + 2\!\!\sum_{m < m'}\!\! a_m(\tau_g)\,a_{m'}(\tau_g)\,
-      \mathrm{Cov}\bigl[\tilde{\xi}_{tm}, \tilde{\xi}_{tm'}\bigr],
+    = \sum_{m=1}^{M} \psi_m(\tau_g)^2\,\mathrm{Var}\bigl[\xi_{tm}\bigr]
+    + 2\!\!\sum_{m < m'}\!\! \psi_m(\tau_g)\,\psi_{m'}(\tau_g)\,
+      \mathrm{Cov}\bigl[\xi_{tm}, \xi_{tm'}\bigr],
 \end{equation}
 donde todos los momentos se entienden condicionales a $\mathbf{z}_t$ y $\mathcal{D}$. Aplicando ahora la ley de covarianza total sobre la distribución a posteriori de los parámetros,
 \begin{equation}\label{eq:covarianza_total_scores}
-    \mathrm{Cov}\bigl[\tilde{\xi}_{tm}, \tilde{\xi}_{tm'}\bigr]
+    \mathrm{Cov}\bigl[\xi_{tm}, \xi_{tm'}\bigr]
     = \mathbb{E}_{\boldsymbol{\vartheta}}\!\Bigl[
-      \mathrm{Cov}\bigl(\tilde{\xi}_{tm}, \tilde{\xi}_{tm'} \mid \boldsymbol{\vartheta}\bigr)\Bigr]
+      \mathrm{Cov}\bigl(\xi_{tm}, \xi_{tm'} \mid \boldsymbol{\vartheta}\bigr)\Bigr]
     + \mathrm{Cov}_{\boldsymbol{\vartheta}}\!\Bigl[
-      \mathbb{E}\bigl(\tilde{\xi}_{tm} \mid \boldsymbol{\vartheta}_m\bigr),\,
-      \mathbb{E}\bigl(\tilde{\xi}_{tm'} \mid \boldsymbol{\vartheta}_{m'}\bigr)\Bigr],
+      \mathbb{E}\bigl(\xi_{tm} \mid \boldsymbol{\vartheta}_m\bigr),\,
+      \mathbb{E}\bigl(\xi_{tm'} \mid \boldsymbol{\vartheta}_{m'}\bigr)\Bigr],
 \end{equation}
 el término cruzado se anula por dos razones de naturaleza distinta. El primer sumando es nulo por el supuesto de factorización \eqref{eq:factorizacion} y el segundo lo es porque la distribución a posteriori factoriza entre componentes, consecuencia de que la verosimilitud se descomponga en el producto de las verosimilitudes individuales y las distribuciones a priori sean independientes entre mezclas. Sólo el primer sumando constituye un supuesto sustantivo; el segundo se deriva de la especificación y justifica formalmente ejecutar los muestreadores por separado.\\
 
 La varianza predictiva de la curva resulta entonces aditiva sobre las componentes,
 \begin{equation}\label{eq:varianza_curva}
     \mathrm{Var}\bigl[X_t^{(M)}(\tau_g) \mid \mathbf{z}_t, \mathcal{D}\bigr]
-    = \sum_{m=1}^{M} a_m(\tau_g)^{2}\,
-      \mathrm{Var}\bigl[\tilde{\xi}_{tm} \mid \mathbf{z}_t, \mathcal{D}\bigr].
+    = \sum_{m=1}^{M} \psi_m(\tau_g)^{2}\,
+      \mathrm{Var}\bigl[\xi_{tm} \mid \mathbf{z}_t, \mathcal{D}\bigr].
 \end{equation}
-El factor $\psi_m(\tau_g)^2$ contenido en $a_m(\tau_g)^2$ implica que la incertidumbre no se distribuya de manera uniforme sobre el dominio, sino que se concentre en las regiones donde la autofunción correspondiente presenta mayor amplitud, lo que permite atribuir la amplitud del intervalo en cada zona de la curva a componentes específicas.\\
+El factor $\psi_m(\tau_g)^2$ implica que la incertidumbre no se distribuya de manera uniforme sobre el dominio, sino que se concentre en las regiones donde la autofunción correspondiente presenta mayor amplitud, lo que permite atribuir la amplitud del intervalo en cada zona de la curva a componentes específicas.\\
 
 Resta la varianza predictiva de cada score, que a su vez se descompone por la ley de varianza total en
 \begin{equation}\label{eq:varianza_total_score}
-    \mathrm{Var}\bigl[\tilde{\xi}_{tm} \mid \mathbf{z}_t, \mathcal{D}\bigr]
+    \mathrm{Var}\bigl[\xi_{tm} \mid \mathbf{z}_t, \mathcal{D}\bigr]
     = \underbrace{\mathbb{E}_{\boldsymbol{\vartheta}_m}\!\bigl[
-        \mathrm{Var}\bigl(\tilde{\xi}_{tm} \mid \mathbf{z}_t, \boldsymbol{\vartheta}_m\bigr)\bigr]}
+        \mathrm{Var}\bigl(\xi_{tm} \mid \mathbf{z}_t, \boldsymbol{\vartheta}_m\bigr)\bigr]}
         _{\text{dispersión de la mezcla}}
     + \underbrace{\mathrm{Var}_{\boldsymbol{\vartheta}_m}\!\bigl[
-        \mathbb{E}\bigl(\tilde{\xi}_{tm} \mid \mathbf{z}_t, \boldsymbol{\vartheta}_m\bigr)\bigr]}
+        \mathbb{E}\bigl(\xi_{tm} \mid \mathbf{z}_t, \boldsymbol{\vartheta}_m\bigr)\bigr]}
         _{\text{incertidumbre sobre el centro}},
 \end{equation}
 donde el primer término recoge la variabilidad irreducible del proceso y el segundo la incertidumbre a posteriori sobre los parámetros, que se reduce al aumentar la información disponible. Ambos son cantidades agregadas y no componentes separadamente identificables de la mezcla, razón por la cual la descomposición se obtiene por la ley de varianza total y no atribuyendo dispersión a los átomos por un lado y a los pesos por otro. Emplear una estimación puntual de $\boldsymbol{\vartheta}_m$ anula el segundo término por construcción y produce intervalos sistemáticamente demasiado angostos.\\
@@ -448,47 +451,162 @@ Para la estimación se evalúa en cada iteración la varianza de la mezcla en fo
 \end{equation}
 y se agregan ambos términos de \eqref{eq:varianza_total_score} sobre las $S$ extracciones,
 \begin{equation}\label{eq:varianza_score_estimada}
-    \widehat{\mathrm{Var}}\bigl[\tilde{\xi}_{tm} \mid \mathbf{z}_t, \mathcal{D}\bigr]
+    \widehat{\mathrm{Var}}\bigl[\xi_{tm} \mid \mathbf{z}_t, \mathcal{D}\bigr]
     = \frac{1}{S}\sum_{s=1}^{S} v_{ms}
     + \frac{1}{S-1}\sum_{s=1}^{S}\bigl(m_{ms} - \bar{m}_m\bigr)^{2},
 \end{equation}
-donde el primer sumando es un promedio de varianzas y el segundo la varianza de las medias, en correspondencia con los dos términos de la descomposición. La varianza funcional se obtiene finalmente sustituyendo \eqref{eq:varianza_score_estimada} en \eqref{eq:varianza_curva}, operación que sólo recombina $M$ escalares por punto de la grilla.
+donde el primer sumando es un promedio de varianzas y el segundo la varianza de las medias, en correspondencia con los dos términos de la descomposición. La varianza funcional se obtiene finalmente sustituyendo \eqref{eq:varianza_score_estimada} en \eqref{eq:varianza_curva}, operación que sólo recombina $M$ escalares por punto de la grilla.\\
 
-\subsection{Intervalos de credibilidad predictivos}
-\label{03_05_03_intervalos_predictivos}
+La varianza así definida existe sólo si el segundo momento de cada átomo es finito a posteriori, lo que exige que el hiperparámetro de forma de la distribución a priori de las precisiones supere la unidad. 
 
-Los momentos anteriores no determinan la predictiva, ya que una mezcla no queda caracterizada por sus dos primeros momentos, de modo que la construcción de intervalos requiere la vía muestral. El objeto que se cubre es una curva futura y no la curva media condicional, por lo que los intervalos se construyen sobre extracciones de la predictiva. Para cada iteración $s$ se extrae de la predictiva de cada score, primero el índice de componente y a continuación la respuesta desde el átomo seleccionado,
+\subsection{Extracciones de la predictiva funcional}
+\label{03_05_03_extracciones}
+
+Los momentos no determinan la predictiva, ya que una mezcla no queda caracterizada por sus dos primeros momentos. Todo resumen que vaya más allá de ellos, sean cuantiles, medianas, regiones de máxima densidad o modos, se construye sobre extracciones de la predictiva, y esta subsección fija cómo se obtienen. El objeto que se simula es una curva futura y no la curva media condicional.\\
+
+Para cada extracción $s$ de los parámetros y cada componente $m$ se obtiene una extracción del score en dos pasos: primero el índice del átomo, con los pesos evaluados en $\mathbf{z}_t$, y a continuación la respuesta desde el átomo seleccionado,
 \begin{equation}\label{eq:extraccion_score}
     h_m^{(s)} \sim \text{Categórica}\Bigl(\pi_{1m}^{(s)}, \dots, \pi_{Nm}^{(s)}\Bigr),
     \qquad
-    \tilde{\xi}_{tm}^{(s)} \sim \mathcal{N}\Bigl(\mu_{h_m^{(s)}m}^{(s)},\,
-    \bigl(\nu_{h_m^{(s)}m}^{*(s)}\bigr)^{-1}\Bigr),
+    \xi_{tm}^{(s)} \sim \mathcal{N}\Bigl(\mu_{h_m^{(s)}m}^{(s)},\,
+    \bigl(\nu_{h_m^{(s)}m}^{*(s)}\bigr)^{-1}\Bigr).
 \end{equation}
-extracciones que se apilan entre componentes bajo la factorización \eqref{eq:factorizacion} y se transportan a la curva mediante \eqref{eq:reconstruccion_fpca},
+Las $M$ extracciones de una misma iteración $s$ se apilan en un vector, lo que es legítimo bajo la factorización \eqref{eq:factorizacion}, y se transportan a la curva mediante \eqref{eq:reconstruccion_fpca},
 \begin{equation}\label{eq:extraccion_curva}
     \widehat{X}_{t}^{(s)}(\tau_g) = \mu(\tau_g)
-    + \sum_{m=1}^{M} \bigl(d_m\,\tilde{\xi}_{tm}^{(s)} + c_m\bigr)\,\psi_m(\tau_g),
+    + \sum_{m=1}^{M} \xi_{tm}^{(s)}\,\psi_m(\tau_g),
     \qquad s = 1, \dots, S.
 \end{equation}
-Al ser \eqref{eq:reconstruccion_fpca} un mapa determinista, las curvas así construidas son extracciones exactas de la predictiva funcional.\\
+Al ser \eqref{eq:reconstruccion_fpca} un mapa determinista, las curvas así construidas son extracciones exactas de la predictiva funcional; la muestra $\{\widehat{X}_t^{(s)}\}_{s=1}^{S}$ es la representación empírica de esa ley y el insumo de todo lo que sigue.\\
 
-Los intervalos se construyen a partir de los cuantiles empíricos de las extracciones y no como intervalos simétricos en torno a la media, que impondrían por construcción la simetría y unimodalidad que el modelo existe para no suponer. Denotando por $\widehat{F}_{t,g}$ la función de distribución empírica de la muestra funcional en el punto $\tau_g$,
+Al muestrear de este modo, cada extracción elige primero un átomo y luego extrae de él, de manera que la muestra mezcla las extracciones de todos los átomos con peso en $\mathbf{z}_t$ sin registrar de cuál proviene cada una. Si dos o más átomos reciben peso apreciable y sus medias condicionales están separadas, la muestra resulta multimodal y por tanto las extracciones se agrupan en torno a la media de cada átomo. Esa multimodalidad es una propiedad de la mezcla en $\mathbf{z}_t$, no del muestreo, y existiría aunque los parámetros fuesen conocidos. Como la elección del átomo ocurre dentro de cada iteración, el etiquetado de los átomos entre iteraciones o cadenas no afecta a la muestra. En la curva, cada score multimodal separa las extracciones en grupos desplazados a lo largo de su autofunción; con varios scores multimodales los grupos se combinan, aunque pocas combinaciones reciben masa. 
+
+\subsection{Predictores puntuales de la curva}
+\label{03_05_04_predictores_puntuales}
+
+La esperanza de la Sección~\ref{03_05_01_esperanza} es un predictor puntual de la curva, y es el adecuado cuando la predictiva es unimodal, esto es, cuando el estado rezagado $\mathbf{z}_t$ contiene la información que separa los regímenes de la mezcla y los pesos $\pi_{hm}(\mathbf{z}_t)$ concentran la masa en un solo átomo. Cuando la predictiva resulta multimodal (o asimetrica), la muestra de la Sección~\ref{03_05_03_extracciones} indica que $\mathbf{z}_t$ no basta para distinguir los regímenes, de modo que falta en el conjunto de predictores una covariable que los indexe, y la esperanza pasa a ser un promedio de comportamientos posibles que no coincide con ninguno de ellos. En ese caso la esperanza deja de ser un predictor informativo y conviene disponer de alternativas.
+
+\subsubsection{Mediana puntual}
+\label{03_05_04_01_mediana_puntual}
+
+Denotando por $\widehat{F}_{t,g}$ la función de distribución empírica de la muestra en el punto $\tau_g$,
 \begin{equation}\label{eq:fdist_empirica}
     \widehat{F}_{t,g}(u) = \frac{1}{S}\sum_{s=1}^{S}
     \mathbf{1}\bigl\{\widehat{X}_{t}^{(s)}(\tau_g) \leq u\bigr\},
 \end{equation}
-el intervalo de credibilidad de nivel $1-\alpha$ queda definido por los cuantiles equi-colas
+la mediana puntual es la curva $\tau_g \mapsto \widehat{F}_{t,g}^{-1}(1/2)$. Como el error absoluto funcional es una integral de errores absolutos en cada punto, la mediana puntual lo minimiza punto a punto y es el predictor consistente con esa métrica. Su limitación es que no es necesariamente una curva que el modelo genere, ya que en cada punto del dominio toma la mediana de las extracciones, y si en una parte del dominio domina un grupo de extracciones y en otra parte domina otro, el resultado junta tramos de curvas distintas. El control empírico es la distancia $L^1$ entre la mediana puntual y la extracción más cercana, que debe ser comparable a la distancia típica entre extracciones.
+
+\subsubsection{Mediana de Fréchet}
+\label{03_05_04_02_mediana_frechet}
+
+La mediana escalar admite la caracterización como el punto que minimiza la distancia esperada, y esa caracterización se extiende a espacios de Banach \citep{03_05_kemperman1987median,03_05_gervini2008robust}. Su versión muestral con la métrica $L^1$ es la extracción que minimiza la suma de distancias a las demás,
+\begin{equation}\label{eq:medoide_l1}
+    \widehat{X}_t^{\,\mathrm{med}} = \widehat{X}_t^{(s^\star)},
+    \qquad
+    s^\star = \operatorname*{arg\,min}_{s} \sum_{r=1}^{S} \int \bigl|\widehat{X}_t^{(s)}(\tau) - \widehat{X}_t^{(r)}(\tau)\bigr|\,d\tau,
+\end{equation}
+con la integral evaluada por la cuadratura común del estudio. A diferencia de la mediana puntual es una curva que el modelo efectivamente genera, de modo que conserva la forma de un comportamiento y no un promedio entre ellos.
+
+\subsubsection{Átomo más probable}
+\label{03_05_04_03_atomo_modal}
+
+Los tres predictores anteriores eligen entre modos de forma indirecta, a través de la geometría de la muestra, mientras que el cuarto lo hace de forma explícita y sin pasar por ella. En cada iteración $s$ y componente $m$ se toma el átomo de mayor peso en $\mathbf{z}_t$ y su media condicional,
+\begin{equation}\label{eq:atomo_modal}
+    h_m^{\star(s)} = \operatorname*{arg\,max}_{h}\, \pi_{hm}^{(s)},
+    \qquad
+    \xi_{tm}^{\,\mathrm{mod}} = \operatorname{mediana}_{s}\,\mu_{h_m^{\star(s)} m}^{(s)},
+\end{equation}
+y la curva modal se obtiene transportando el vector $\boldsymbol{\xi}_t^{\,\mathrm{mod}}$ por \eqref{eq:reconstruccion_fpca}. Se trata del predictor óptimo bajo pérdida cero-uno sobre la asignación de régimen de cada componente, y su cálculo es exacto, ya que la ley conjunta de los $M$ scores es una mezcla sobre configuraciones $(h_1, \dots, h_M)$ con pesos $\prod_m \pi_{h_m m}^{(s)}$, de modo que, al maximizarse un producto de factores independientes factor a factor, la configuración más probable es la que toma el átomo más probable de cada componente. La agregación sobre $s$ se realiza mediante la mediana y no mediante el promedio, con el fin de evitar que las iteraciones en que los pesos $\pi_{hm}^{(s)}$ se reparten casi por igual entre dos átomos desplacen el predictor hacia la región entre ambos. Este predictor responde a cómo sería la curva si se realizara el régimen más probable y acompaña de modo natural a la probabilidad de ese régimen.\\
+
+Los cinco predictores coinciden cuando la predictiva es unimodal y simétrica, y se separan en la medida en que no lo es, de modo que la diferencia entre la esperanza y cualquiera de las medianas constituye un diagnóstico de multimodalidad o asimetría de la predictiva y se reporta como tal.
+
+\subsection{Intervalos de credibilidad predictivos}
+\label{03_05_03_intervalos_predictivos}
+
+Los intervalos se construyen a partir de los cuantiles empíricos de las extracciones y no como intervalos simétricos en torno a la esperanza, que impondrían por construcción la simetría y unimodalidad que el modelo existe para no suponer. Tres construcciones responden a tres preguntas distintas.\\
+
+
+\subsubsection{Intervalo puntual equi-colas.} Con la distribución empírica \eqref{eq:fdist_empirica}, el intervalo de credibilidad de nivel $1-\alpha$ en cada punto del dominio es
 \begin{equation}\label{eq:intervalo_puntual}
     \Bigl[\,\widehat{F}_{t,g}^{-1}(\alpha/2),\;
     \widehat{F}_{t,g}^{-1}(1-\alpha/2)\,\Bigr],
     \qquad g = 1, \dots, G.
 \end{equation}
-El intervalo así construido es puntual y no simultáneo, esto es, satisface el nivel nominal en cada punto del dominio por separado, mientras que la probabilidad de que la curva completa quede contenida en toda su extensión es estrictamente menor.
+Es el intervalo central de la predictiva marginal en $\tau_g$ y el que minimiza en esperanza el puntaje de Winkler de nivel $1-\alpha$, que es por tanto la regla de puntuación consistente con él \citep{03_05_gneiting2007strictly}. El intervalo así construido es puntual y no simultáneo.
+
+\subsubsection{Banda simultánea} Cuando el objeto de interés es la curva completa, la banda debe calibrarse para que contenga la curva entera con probabilidad $1-\alpha$. Con un centro $\widehat{c}_t(\tau_g)$ y una escala $\widehat{s}_t(\tau_g)$ obtenidos de la muestra, se define la desviación máxima normalizada de cada extracción,
+\begin{equation}\label{eq:supnorma}
+    D^{(s)} = \max_{g}\;\frac{\bigl|\widehat{X}_t^{(s)}(\tau_g) - \widehat{c}_t(\tau_g)\bigr|}{\widehat{s}_t(\tau_g)},
+\end{equation}
+y la banda $\widehat{c}_t(\tau_g) \pm q_{1-\alpha}(D)\,\widehat{s}_t(\tau_g)$, con $q_{1-\alpha}(D)$ el cuantil empírico de $\{D^{(s)}\}$, contiene por construcción a una fracción $1-\alpha$ de las extracciones en toda su extensión. Es la banda de tipo supremo de \citet{03_05_degras2011bands} evaluada sobre la predictiva.  Este intervalo contiene una limitación cuando la predictiva es multimodal, porque al ser regiones conexas, cubren también el valle entre los cumbres.
+
+\subsubsection{Región de máxima densidad}
+\label{03_05_05_03_hdr}
+
+La región de máxima densidad de nivel $1-\alpha$ \citep{03_05_hyndman1996hdr} es el conjunto de menor medida que acumula probabilidad $1-\alpha$,
+\begin{equation}\label{eq:hdr}
+    R_{1-\alpha} = \bigl\{u : f(u) \geq f_{\alpha}\bigr\},
+    \qquad
+    \Pr\bigl(U \in R_{1-\alpha}\bigr) = 1-\alpha,
+\end{equation}
+con $f$ la densidad predictiva. Con una predictiva unimodal coincide con el intervalo equi-colas, mientras que con dos modos es la unión de dos intervalos, uno por modo, cuya longitud total es menor que la del intervalo central al mismo nivel porque excluye el valle. Es la contraparte, para intervalos, de la observación de la Sección~\ref{03_05_04_predictores_puntuales} sobre la esperanza.\\
+
+En el caso funcional la región se construye punto a punto sobre el dominio, del mismo modo que el intervalo \eqref{eq:intervalo_puntual}. En cada $\tau_g$ se estima la densidad de la muestra $\{\widehat{X}_t^{(s)}(\tau_g)\}_{s=1}^{S}$ y se toma el conjunto \eqref{eq:hdr}, que en los puntos donde la predictiva es unimodal se reduce al intervalo equi-colas y en los puntos donde es multimodal se descompone en tantos tramos como modos.\\
+
+El puntaje de Winkler se extiende a una región de este tipo sumando las longitudes de sus tramos y penalizando por la distancia de la observación al tramo más cercano, de modo que puede compararse con el intervalo equi-colas; sin embargo, el funcional que ese puntaje elicita es el intervalo central, y las métricas de la Sección~\ref{03_06_00_diseno_estudio_simulacion} lo definen sobre un intervalo por punto del dominio.
+
+\section{Comportamientos predictivos}
+\label{03_06_00_comportamientos}
+
+Cada vez que se predice la curva de un origen $t$, la Sección~\ref{03_05_03_extracciones} produce $S$ extracciones del vector de scores $\boldsymbol{\xi}_t^{(s)}$ a partir del estado rezagado $\mathbf{z}_t$, las mismas con las que se construyen la banda y los predictores puntuales. El análisis de esta sección se aplica a esa muestra, origen por origen, y forma parte de la predicción de cada curva y no de un análisis posterior sobre el conjunto de los datos. Su objeto es que la predictiva conjunta del vector de scores es, en cada iteración, una mezcla sobre configuraciones de átomos $(h_1, \dots, h_M)$ con pesos $\prod_m \pi_{h_m m}^{(s)}$, y sus modos son los comportamientos que el modelo considera posibles para la curva siguiente. Describir la predictiva de cada origen por esos comportamientos, con la probabilidad de cada uno, su curva típica y su dispersión condicional, es la lectura natural de un modelo de mezcla y una que los modelos de referencia, de ley unimodal, no pueden ofrecer.\\
+
+Los comportamientos no pueden leerse de los parámetros, ya que los átomos de componentes distintas no se corresponden entre sí, un mismo régimen puede repartirse en varios átomos equivalentes y el peso de una configuración completa, al ser un producto de $M$ pesos, no se interpreta como la probabilidad de un comportamiento. Lo único que vincula a las $M$ mezclas es $\mathbf{z}_t$, de modo que los comportamientos se identifican sobre las extracciones, que son extracciones de la predictiva conjunta en ese $\mathbf{z}_t$. 
+\subsection{Agrupamiento de las extracciones}
+\label{03_06_01_agrupamiento}
+
+Como las autofunciones son ortonormales en $L^2$, la distancia euclídea entre dos vectores de scores coincide con la distancia $L^2$ entre las curvas que representan, de modo que basta agrupar las extracciones en $\mathbb{R}^{M}$ con los scores. Para cada origen $t$ se agrupan las $S$ extracciones $\{\boldsymbol{\xi}_t^{(s)}\}$ mediante $k$-medias, esto es, se busca la partición en $K$ grupos $C_1, \dots, C_K$ que minimiza la suma de cuadrados dentro de los grupos,
+\begin{equation}\label{eq:kmedias}
+    \min_{C_1, \dots, C_K}\ \sum_{c=1}^{K}\ \sum_{s \in C_c} \bigl\lVert \boldsymbol{\xi}_t^{(s)} - \mathbf{c}_{t,c} \bigr\rVert^{2},
+    \qquad
+    \mathbf{c}_{t,c} = \frac{1}{\lvert C_c \rvert}\sum_{s \in C_c} \boldsymbol{\xi}_t^{(s)},
+\end{equation}
+resuelta alternando la asignación de cada extracción al centroide más cercano con el recálculo de los centroides como medias de sus grupos, desde varios inicios aleatorios.\\
+
+La fracción de varianza explicada por la partición, $R^2_K = 1 - W_K / W_1$ con $W_K$ el mínimo de \eqref{eq:kmedias}, crece con $K$ aunque no exista estructura, de manera que el número de comportamientos no puede fijarse por un umbral sobre ella y se decide con las tres reglas de la Sección~\ref{03_06_02_numero}. Cuando la distribución a priori de las precisiones admite átomos de varianza no acotada, las extracciones se recortan a los cuantiles extremos de cada score antes del agrupamiento.
+
+\subsection{Número de comportamientos}
+\label{03_06_02_numero}
+
+La primera regla decide si existe más de un comportamiento. Con $K = 2$, las extracciones se proyectan sobre el eje que une los dos centroides, $u = (\mathbf{c}_{t,2} - \mathbf{c}_{t,1}) / \lVert \mathbf{c}_{t,2} - \mathbf{c}_{t,1} \rVert$, y sobre la proyección se estima por núcleo la densidad $\widehat{f}$. Se declara que hay dos modos si la densidad entre los centroides desciende por debajo de la mitad del menor de los dos picos,
+\begin{equation}\label{eq:valle}
+    \frac{\min_{a \le v \le b} \widehat{f}(v)}{\min\bigl\{\widehat{f}(a), \widehat{f}(b)\bigr\}} < \tfrac{1}{2},
+    \qquad a = \mathbf{c}_{t,1}^\top u,\ \ b = \mathbf{c}_{t,2}^\top u,
+\end{equation}
+y en caso contrario se declara un único comportamiento. Esta regla es una versión operativa del contraste de unimodalidad de \citet{03_05_hartigan1985dip}, y es la que distingue una predictiva con dos modos de una unimodal alargada o asimétrica, que $k$-medias también parte en dos pero sin que la densidad presente un valle.\\
+
+La segunda regla acota el número de comportamientos. A partir de $K = 2$ se acepta la partición en $K + 1$ grupos sólo si el grupo adicional explica al menos tanto como explica en promedio cada uno de los existentes,
+\begin{equation}\label{eq:crecimiento}
+    R^2_{K+1} \;\geq\; R^2_K + \frac{R^2_K}{K},
+\end{equation}
+condición equivalente a que la varianza explicada por comportamiento no disminuya, y el barrido se detiene en el primer $K$ que la incumple.\\
+
+La tercera regla exige que cada comportamiento reúna una masa de al menos $\alpha$, el nivel de la banda de credibilidad, de manera que un comportamiento sea un grupo de extracciones que la banda al nivel $1-\alpha$ tendría que cubrir; un grupo de masa menor es una cola y no un comportamiento, y la partición que lo produce se descarta. Las tres reglas dependen de dos constantes, el cociente de valle y $\alpha$.
+
+\subsection{Descripción de cada comportamiento}
+\label{03_06_03_descripcion}
+
+El resultado por origen es un conjunto de $K_t$ comportamientos. Cada uno tiene probabilidad $p_{t,c} = \lvert C_c \rvert / S$, igual a la fracción de extracciones del grupo, curva típica $\widehat{X}_{t,c}$ igual al centroide $\mathbf{c}_{t,c}$ transportado por \eqref{eq:reconstruccion_fpca}, que por linealidad del mapa es la esperanza predictiva condicional a ese comportamiento, e intervalo condicional dado por los cuantiles equi-colas \eqref{eq:intervalo_puntual} calculados sólo sobre las extracciones del grupo. La esperanza predictiva de la Sección~\ref{03_05_01_esperanza} se recupera como la mezcla de las curvas típicas ponderada por sus probabilidades,
+\begin{equation}\label{eq:esperanza_por_comportamientos}
+    \widehat{\mathbb{E}}\bigl[X_t^{(M)}(\tau_g) \mid \mathbf{z}_t, \mathcal{D}\bigr]
+    = \sum_{c=1}^{K_t} p_{t,c}\,\widehat{X}_{t,c}(\tau_g),
+\end{equation}
+identidad que muestra por qué, con más de un comportamiento, la esperanza se sitúa entre ellos. El contraste entre dos comportamientos es la diferencia de sus curvas típicas, $\Delta_{t,ab}(\tau_g) = \widehat{X}_{t,a}(\tau_g) - \widehat{X}_{t,b}(\tau_g)$, que localiza en qué parte del dominio difieren y en cuánto.
+
 
 \section{Diseño del Estudio de Simulación}
 \label{03_06_00_diseno_estudio_simulacion}
 
-El presente estudio de simulación evalúa el desempeño predictivo del PSBPM-FD en dos ejes complementarios. El primero examina el comportamiento interno del modelo, comparando su rendimiento a medida que se incorpora un número creciente de scores de la representación funcional, con el fin de analizar cómo la dimensión de la representación incide en la calidad de las predicciones.\\
+El presente estudio de simulación evalúa el desempeño predictivo del PSBPM-FD en tres ejes. El primero examina el comportamiento interno del modelo, comparando su rendimiento a medida que se incorpora un número creciente de scores de la representación funcional, con el fin de analizar cómo la dimensión de la representación incide en la calidad de las predicciones.\\
 
 El segundo eje contrasta el desempeño del PSBPM-FD frente a los siguientes modelos de referencia:
 
@@ -504,9 +622,21 @@ Para este fin, se realizan simulaciones bajo distintos escenarios, en las que el
 
 
 
-\
+\subsection{}
 \section{Resultados}
 \label{03_07_00_resultados}
+
+\subsection{Metricas puntuales}
+
+Analizis de las metricas puntuales con diferentes estimadores
+
+\subsection{Evaluacion de intervalo de credibilidad}
+
+\subsubsection{Comportamiento Posteriori}
+aqui va todo lo que tiene que ver con clustering 
+aun no se bien que reportar con lso eescenarios en esta parte 
+\subsubsection{Comparacion}
+
 
 % [PENDIENTE] Organización propuesta:
 %   1. Verificación de los generadores (diagnósticos del Anexo).

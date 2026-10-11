@@ -45,6 +45,8 @@ __all__ = [
     "cargar_hiperparametros",
     "guardar_config_evaluacion",
     "cargar_config_evaluacion",
+    "guardar_draws_scores",
+    "cargar_draws_scores",
     "verificar_contrato",
 ]
 
@@ -75,6 +77,11 @@ ARCHIVOS = {
     "manifest":          "datasets_manifest.json",
     "hiperparametros":   "hyperparameters.json",
     "eval_config":       "eval_config.json",
+    # predict/: prediccion del PSBPM-FD que persiste el _04
+    "banda_psbp":        "banda_funcional_psbp.npz",
+    # .npy y no .npz: son cientos de MB por M y *.npy esta en .gitignore
+    "draws_scores":      "draws_scores_psbp.npy",
+    "comportamientos":   "comportamientos_psbp.npz",
 }
 
 # Matrices que deben conservar dos dimensiones aunque tengan una sola columna.
@@ -680,6 +687,25 @@ def cargar_config_evaluacion(paths: dict) -> dict:
 
 
 # ==========================================================================
+# EXTRACCIONES DE LA PREDICTIVA (predict/)
+# ==========================================================================
+
+def guardar_draws_scores(paths: dict, SC_draws: np.ndarray) -> Path:
+    """Extracciones de scores del PSBPM-FD, (S, n, M) en float32."""
+    p = Path(paths["predict"]) / ARCHIVOS["draws_scores"]
+    np.save(p, np.asarray(SC_draws, dtype=np.float32))
+    return p
+
+
+def cargar_draws_scores(paths: dict, mmap: bool = False) -> Optional[np.ndarray]:
+    """(S, n, M) o None si no se persistieron."""
+    p = Path(paths["predict"]) / ARCHIVOS["draws_scores"]
+    if not p.exists():
+        return None
+    return np.load(p, mmap_mode="r" if mmap else None)
+
+
+# ==========================================================================
 # VERIFICACION CRUZADA DEL CONTRATO
 # ==========================================================================
 
@@ -749,8 +775,12 @@ def verificar_contrato(paths: dict, estricto: bool = True) -> dict:
                 f"el estandarizador se ajusto con {n_aj} filas y T0={T0_man}: "
                 "los momentos de estandarizacion vieron el bloque de prueba")
 
-    p_prev = len(manifest.get("cov_names", []))
+    # Las exogenas (no scores) se declaran en el manifest y no cuentan como rezagos.
+    exo_man = list(manifest.get("exogenas", {}))
+    p_prev = len([c for c in manifest.get("cov_names", []) if c not in exo_man])
     p_esp = n_man * int(manifest.get("n_lags", 0))
+    if any(not c.startswith("fpc_") for c in manifest.get("cov_names", []) if c not in exo_man):
+        problemas.append("cov_names trae covariables que no son scores y no estan en 'exogenas'")
     if p_prev != p_esp:
         problemas.append(f"cov_names tiene {p_prev} entradas, se esperaban {p_esp}")
 

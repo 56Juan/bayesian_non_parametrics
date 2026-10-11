@@ -10,7 +10,7 @@
 %     (M) x (cadena) x (componente FPCA)
 %
 % de modo que un solo parfor cubre todo el barrido. Cada M es un EXPERIMENT_ID
-% distinto -real_sa1_precio_v02_m01 ... _m06- con sus propios datos, contrato y
+% distinto -real_sa1_precio_v02_m01 ... _m10- con sus propios datos, contrato y
 % trazas, asi que los jobs de distintos M no comparten nada mas que el pool: no
 % hay riesgo de que uno pise los artefactos del otro.
 %
@@ -40,11 +40,11 @@ BASENAME     = "real";
 SERIE_ID     = "sa1_precio";   % serie modelada; DEBE coincidir con 27_01
 VENTANA_ID   = 2;            % 1 = 2022-2025 (70/30), 2 = entrena 2022-2024 y prueba 2025; DEBE coincidir con 27_01
 
-% [ENTRENAMIENTO] Solo se entrena M = max(M_FPCA_LIST) de 27_01: cada componente
-% usa solo su rezago propio, asi que sus cadenas sirven a todos los M menores
-% (los notebooks 27_03, 27_04 y 27_05 leen las trazas de este M).
-% DEBE ser el M_ENTRENO de 27_01 y estar procesado antes de correr esto.
-M_FPCA_LIST  = [6];
+% [ENTRENAMIENTO] Covariables cruzadas (un rezago, p = M): el diseno cambia con M,
+% asi que se entrena CADA M (cada punto lee sus propias trazas; hyperparameters.json
+%["trazas_en"] apunta a si mismo). DEBE coincidir con M_FPCA_LIST de 27_01 y estar
+% procesado antes de correr esto.
+M_FPCA_LIST  = [1 2 3 4 5 6 7 8 9 10];
 
 % Con true, un M sin artefactos de 27_01 se SALTA con aviso en vez de abortar
 % todo el barrido. Con false, la falta de artefactos es un error.

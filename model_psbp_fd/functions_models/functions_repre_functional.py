@@ -115,6 +115,9 @@ class FunctionalRepresentation:
     domain:     Optional[Tuple[float, float]] = None
     projection: ProjectionMethod = "l2"
     center:     bool             = False
+    # Solo para curvas con puntos ausentes (NaN): ver `_project_con_huecos`.
+    # 10 se calibro con huecos artificiales en PM2.5 horario (corrida 28).
+    penalizacion_huecos: float   = 10.0
 
     # ── Estado interno (post-fit) ────────────────────────────────────────────
     grid_:      Optional[np.ndarray] = field(default=None, repr=False)
@@ -125,6 +128,7 @@ class FunctionalRepresentation:
     gram_:      Optional[np.ndarray] = field(default=None, repr=False)
     w_quad_:    Optional[np.ndarray] = field(default=None, repr=False)
     basis_:     Any                  = field(default=None, repr=False)
+    theta_ref_: Optional[np.ndarray] = field(default=None, repr=False)
     is_fitted_: bool                 = field(default=False, repr=False)
     is_frozen_: bool                 = field(default=False, repr=False)
 
@@ -173,7 +177,7 @@ class FunctionalRepresentation:
 
         self.grid_ = grid
         self.domain_ = self.domain or (float(grid.min()), float(grid.max()))
-        self.mean_ = Y.mean(axis=0)
+        self.mean_ = np.nanmean(Y, axis=0) if np.isnan(Y).any() else Y.mean(axis=0)
         self.w_quad_ = pesos_trapezoidales(grid)
 
         if self.method == "bspline":
@@ -185,6 +189,12 @@ class FunctionalRepresentation:
 
         self.K_ = self.phi_.shape[0]
         self.is_fitted_ = True
+        # Referencia de `_project_con_huecos`: coeficientes medios de las curvas
+        # completas del bloque de ajuste (solo se usa si alguna curva trae NaN).
+        Yc = Y[np.isfinite(Y).all(axis=1)]
+        if len(Yc):
+            Yc = (Yc - self.mean_) if self.center else Yc
+            self.theta_ref_ = self._project_to_base(Yc).mean(axis=0)
         return self
 
     def transform(self, Y: np.ndarray,
@@ -223,6 +233,8 @@ class FunctionalRepresentation:
             )
 
         Y_work = (Y - self.mean_) if self.center else Y
+        if np.isnan(Y_work).any():
+            return self._project_con_huecos(Y_work)
         return self._project_to_base(Y_work)
 
     def fit_transform(self, Y: np.ndarray, grid: np.ndarray) -> np.ndarray:
@@ -482,6 +494,45 @@ class FunctionalRepresentation:
 
         B = (Y * self.w_quad_[None, :]) @ self.phi_.T       # (T, K)
         return np.linalg.solve(self.gram_, B.T).T
+
+    def _project_con_huecos(self, Y: np.ndarray) -> np.ndarray:
+        """
+        Proyeccion de curvas con puntos ausentes (NaN) sin imputarlos.
+
+        Las filas completas siguen el camino de `_project_to_base` (resultado
+        identico). En una fila con huecos se resuelve el mismo problema de
+        minimos cuadrados restringido a los puntos observados, con pesos de
+        cuadratura (o unitarios si projection='discrete'):
+
+            theta = argmin sum_{m obs} w_m (y_m - phi(tau_m)' theta)^2
+                    + lam * ||D2 theta||^2,
+
+        con el termino de penalizacion lam * ||D2 (theta - theta_ref)||^2 en vez del
+        anterior: D2 = segundas diferencias de los coeficientes (P-spline) y
+        theta_ref = coeficientes medios de las curvas completas del fit
+        (`theta_ref_`). Solo entra en filas con huecos (`penalizacion_huecos` por la
+        traza media del sistema): identifica las funciones de base que caen
+        enteras dentro de un hueco, y el hueco sigue la FORMA del perfil medio
+        (D2 anula nivel y pendiente, que los fijan las horas observadas). Filas sin
+        ningun punto observado devuelven NaN: no hay nada que ajustar.
+        """
+        obs = np.isfinite(Y)
+        THETA = np.full((Y.shape[0], self.phi_.shape[0]), np.nan)
+        completas = obs.all(axis=1)
+        if completas.any():
+            THETA[completas] = self._project_to_base(Y[completas])
+        K = self.phi_.shape[0]
+        D2 = np.diff(np.eye(K), n=2, axis=0)
+        P = D2.T @ D2
+        ref = self.theta_ref_ if self.theta_ref_ is not None else np.zeros(K)
+        w = self.w_quad_ if self.projection == "l2" else np.ones(Y.shape[1])
+        for t in np.where(~completas & obs.any(axis=1))[0]:
+            o = obs[t]
+            Phi_o = self.phi_[:, o] * w[o][None, :]          # (K, G_o)
+            A = Phi_o @ self.phi_[:, o].T
+            lam = self.penalizacion_huecos * np.trace(A) / K
+            THETA[t] = np.linalg.solve(A + lam * P, Phi_o @ Y[t, o] + lam * P @ ref)
+        return THETA
 
     # ─────────────────────────────────────────────────────────────────────
     # Graficos (mantenidos en la clase para uso del orquestador)

@@ -211,6 +211,10 @@ class ModeloTraza:
         """Extracciones de la predictiva, (n_post * d, n)."""
         return self.predictor_.muestrear(self._diseno(df), d, seed=seed)
 
+    def atomo_modal(self, df) -> np.ndarray:
+        """Media del atomo de mayor peso por iteracion, (n_post, n)."""
+        return self.predictor_.media_atomo_modal(self._diseno(df))
+
 
 # ==========================================================================
 # ORQUESTADOR

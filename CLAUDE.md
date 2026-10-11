@@ -39,7 +39,20 @@ decisión numérica y suelen traer la respuesta antes que el código.
   representación funcional. El anexo vigente tiene tres escenarios, cada uno
   asociado a un rasgo de la ley condicional del score que un modelo de media
   lineal no representa: **TAR** (cambio de régimen por umbral), **GARCH**
-  (heterocedasticidad condicional) y **multimodalidad**.
+  (heterocedasticidad condicional) y **multimodalidad**. **El conjunto no está
+  cerrado**: pueden agregarse escenarios (cada uno = un algoritmo nuevo en el
+  anexo + una copia de la 200 con otro generador). Cuáles se muestran en el
+  documento es una decisión pendiente del autor (§8).
+- **La predictiva del PSBPM-FD es una mezcla** y se resume de más de una forma.
+  `docs/03 Modelo.tex §03_05` define cinco predictores puntuales (esperanza,
+  mediana puntual, mediana de Fréchet/medoide L¹, mediana por profundidad MBD,
+  átomo más probable), tres intervalos (equi-colas puntual, banda simultánea,
+  región de máxima densidad) y `§03_06` los **comportamientos predictivos**
+  (k-medias sobre los draws de scores con reglas valle/crecimiento/masa). Regla
+  de consistencia (Gneiting 2011): MAE y E_max se reportan con una mediana,
+  RMSE con la esperanza; Winkler/PICP/MPIW con la banda equi-colas. **Hoy el
+  pipeline sólo calcula la esperanza y la banda equi-colas**; el resto se
+  incorpora con las corridas 300–302 (§7).
 - El foco experimental son **escenarios donde el modelo puede ganar**: se trata de
   caracterizar *cuándo y por qué* el PSBPM-FD supera a las alternativas, no de
   probar que gana siempre. Un resultado negativo bien acotado es un resultado,
@@ -217,8 +230,12 @@ GBT**. Hay una sola referencia lineal.
   PSBPM-FD (rezago propio en 200/201; todos los rezagos en 202). Barre el orden
   `1..N_LAGS` y se queda con el que gana más **ventanas de TRAIN** en `mae_f`;
   nunca test.
-- **PSBPM-FD**: su predicción puntual (media analítica) y su banda se **leen** de
+- **PSBPM-FD**: su predicción puntual y su banda se **leen** de
   `banda_funcional_psbp.npz`, que persiste `_04`; no se recalcula desde las trazas.
+  En 200–202 y las reales hasta la 31 el punto es la **esperanza analítica**
+  (`momentos()`). En 300–302 el `.npz` lleva además los draws de scores y los
+  cuatro predictores restantes de `§03_05`, y el Bloque A se reporta por predictor
+  (`notebooks/simulaciones/PROMPT_300_estimadores.md`).
 
 El Bloque B se restringe a FAR y PSBPM-FD —los únicos con mecanismo de intervalo propio— con dos filas por `M`: la banda gaussiana del FAR y la banda nativa del PSBPM-FD (cuantiles
 de su predictiva). `IC_PSBP_TAMBIEN_GAUSSIANA = False`: no se corre el control con banda gaussiana
@@ -240,6 +257,11 @@ sobre la media del PSBPM-FD.
 - `200_sim_TAR/` es la plantilla y se edita con cuidado. Las copias 201/202 **no
   se actualizan solas**: un cambio en la 200 se propaga a mano. Lo histórico (§7)
   no se toca.
+- **Las corridas 300–302 no regeneran ni reentrenan**: toman los artefactos de
+  200–202 por copia en disco bajo IDs nuevos (`escenario_30x`) y sólo ejecutan
+  `_04`/`_05`. Nunca escribir en los directorios de 200–202 desde una 30x.
+- Los cambios al paquete que piden las 30x son **aditivos**: valores por defecto
+  que dejan 200–202 y las reales exactamente como están.
 - Tras cambiar el paquete, el kernel de los notebooks debe **reiniciarse** (los
   módulos ya importados no se recargan).
 
@@ -420,17 +442,27 @@ y los otros seis son AR(1) de coeficiente 0.3.
 
 ## 7. Estado del repositorio
 
-**Se trabaja sobre las corridas 200–202.** Todo lo anterior existe en el repo y no
-se borra, pero es **historia**: no es plantilla, no se edita y no se cita como
-estado actual.
+**Se trabaja sobre las corridas 200–202 (hechas) y sus reevaluaciones 300–302
+(en curso).** Todo lo anterior existe en el repo y no se borra, pero es
+**historia**: no es plantilla, no se edita y no se cita como estado actual.
 
 ### Corridas vivas — `notebooks/simulaciones/`
 
-| Carpeta | Escenario (anexo) | Generador | `BASENAME` | `M_FPCA_LIST` | covariables |
-|---|---|---|---|---|---|
-| `200_sim_TAR` | **TAR de dos regímenes** (C-2) | `sim_escenario_TAR.py` | `escenario_200` | `(1, …, 10)` | rezago propio, `N_LAGS = 4` |
-| `201_sim_GARCH` | **GARCH en los scores** (C-1) | `sim_escenario_GARCH.py` | `escenario_201` | `(1, …, 10)` | rezago propio, `N_LAGS = 4` |
-| `202_sim_MULT` | **Multimodalidad** (C-3) | `sim_escenario_C1.py` | `escenario_202` | `(3, 4, 5, 6)` | **cruzadas**, `N_LAGS = L = 2` |
+| Carpeta | Escenario (anexo) | Generador | `BASENAME` | `M_FPCA_LIST` | covariables | estado |
+|---|---|---|---|---|---|---|
+| `200_sim_TAR` | **TAR de dos regímenes** (C-2) | `sim_escenario_TAR.py` | `escenario_200` | `(1, …, 10)` | rezago propio, `N_LAGS = 4` | entrenada y evaluada, 3 cadenas |
+| `201_sim_GARCH` | **GARCH en los scores** (C-1) | `sim_escenario_GARCH.py` | `escenario_201` | `(1, …, 10)` | rezago propio, `N_LAGS = 4` | entrenada y evaluada, 3 cadenas |
+| `202_sim_MULT` | **Multimodalidad** (C-3) | `sim_escenario_C1.py` | `escenario_202` | `(3, 4, 5, 6)` | **cruzadas**, `N_LAGS = L = 2` | entrenada y evaluada, 3 cadenas |
+| `30x_sim_*_estimadores` | los mismos | ninguno (copia de 20x) | `escenario_30x` | las mismas | las mismas | **pendientes**: `301` tiene la carpeta con `_01`/`.m`/`_03` copiados, sin `_04`/`_05` |
+
+Las 30x reevalúan 200–202 con los predictores, intervalos y comportamientos de
+`docs §03_05–§03_06`. El plan completo, con el contexto que lo justifica, está en
+`notebooks/simulaciones/PROMPT_300_estimadores.md` (300, y al final 301 y 302).
+Hallazgos que motivan las 30x: con predictiva multimodal la esperanza cae entre
+los modos y pierde bajo MAE (tráfico −9 % con la mediana; Mapocho −13 % por
+asimetría; 200 −1 %: sus regímenes difieren en dinámica, no en nivel; 201, 202 y
+las demás reales sin diferencia); las reglas de comportamientos dan K = 2 en el
+tráfico (69 % de los días) y K = 1 en 201, 202 y las reales restantes.
 
 El generador común (`pipelines/sim_scores_comun.py`) arma la salida a partir de un
 simulador de `z`, calcula `mu_theta`, `theta` y el control de calidad
@@ -490,16 +522,24 @@ corridas anteriores y no lo usa ninguna corrida viva.
 
 ### Datos reales — `notebooks/reales/`
 
-`21_real_nivel/` a `25_real_cripto/` siguen **la arquitectura anterior** (base
-B-spline por GCV, FPCA estimada, escalera de hiperparámetros) y **no se han
-actualizado** al esquema de las corridas 200–202. Series: nivel diario del RÍO
-MAPOCHO EN LOS ALMENDROS (21–24, 48 mediciones por día) y BTCUSDT de Binance en
-velas de 5 min (25, 288 barras por día UTC). `24_real_nivel` y `25_real_cripto` son
-las vivas (rezago propio `N_LAGS = 7`, objetivo `curva_suavizada`, `MCMC_CONFIG =
-{5000, 2000, 40, 60}`, `N_CHAINS = 2`); 21–23 llevan el objetivo y el gating
-anteriores y **sus cifras no son comparables** con las del 24. Los datos de cada
-serie, su calidad y su calibración están en los `_01` y en el changelog del
-notebook, no se repiten aquí.
+Dos generaciones. `21_real_nivel/` a `25_real_cripto/` siguen **la arquitectura
+anterior** (base B-spline por GCV, FPCA estimada, escalera de hiperparámetros):
+nivel diario del RÍO MAPOCHO EN LOS ALMENDROS (21–24, 48 mediciones por día) y
+BTCUSDT de Binance en velas de 5 min (25, 288 barras por día UTC). `24` y `25`
+son las vivas de esa generación (rezago propio `N_LAGS = 7`, `MCMC_CONFIG =
+{5000, 2000, 40, 60}`, `N_CHAINS = 2`); 21–23 **no son comparables** con la 24.
+
+`26`–`31` llevan el **pipeline de la 200 portado a reales** (B-spline 10/3 elegida
+por el analista, FPCA en train, scores crudos, `chungEscG`, `atau = 2`,
+covariables **cruzadas con un rezago** salvo que se indique): `26` BTC cierre,
+`27` precio SA1 (AEMO), `28` PM2.5 Parque O'Higgins (SINCA), `29` BTC volatilidad
+realizada (+ exógenas), `30` tráfico I-94 barrido `M = 1..6` y `31` tráfico
+`M = 10` (1 cadena). Los datasets de la tesis de Katerin (`references/`) están en
+`data/reales/raw/katerin_*`; el tráfico (régimen semanal) y el PM2.5 crudo
+(volatilidad) son los candidatos; household no. **Pendiente: `32` = tráfico con
+rezagos `{1, 7}`**, que requiere admitir rezagos no contiguos en
+`preparacion_barrido`, FAR y RF (MATLAB no cambia). Los datos de cada serie, su
+calidad y su calibración están en los `_01`, no se repiten aquí.
 
 ### Historia — no se edita ni se cita como estado actual
 
@@ -525,26 +565,48 @@ notebook, no se repiten aquí.
 
 Señaladas, no resueltas. **Preguntar antes de codificar contra ellas.**
 
-1. **`docs/03 Modelo.tex` referencia `\ref{03_06_04_objetivos_evaluacion}`
-   (línea ~369) y ese label no existe.** Es donde `docs` promete definir el segundo
-   objetivo de evaluación, que §6.5 ya implementa. Las subsecciones de §03_06
-   sobre modelos de referencia, métricas y objetivo están sin escribir.
-2. **`§03_07 Resultados` es un bloque `% [PENDIENTE]`.**
-3. **Estandarización en `docs/03 Modelo.tex`.** El esquema de inferencia ya se
-   redactó sin estandarizar, pero otras secciones del capítulo (reconstrucción,
-   ~líneas 359 y 365) aún mencionan la des-estandarización: hay que alinearlas.
+1. **`docs/03 Modelo.tex`: "Diseño del Estudio de Simulación" tiene dos párrafos
+   y una subsección "Escenarios" vacía; "Resultados" es un esqueleto con
+   `% [PENDIENTE]`.** Falta escribir objetivos de evaluación, modelos de
+   referencia, especificación del PSBPM-FD, qué resumen va con qué métrica y qué
+   se reporta. Esquema propuesto en la sesión del 2026-10-10 (seis subsecciones);
+   no redactar sin pedido.
+2. **Qué escenarios se muestran en el documento.** Hoy son tres (C-1 GARCH, C-2
+   TAR, C-3 multimodal) pero el conjunto puede crecer. Con las reglas de
+   comportamientos, sólo el tráfico produce predictivas multimodales; 200–202 tal
+   como están calibradas no (el TAR separa dinámica, no nivel). Si se quiere un
+   escenario simulado donde los comportamientos aparezcan, hace falta un
+   generador con regímenes que difieran en **nivel** (tipo calendario).
+3. **Dos bloques del capítulo 03 comparten el prefijo de etiqueta `03_06_`**
+   (Comportamientos predictivos y Diseño del estudio). Compila, pero al renumerar
+   hay que revisar las `\ref` de `§03_05` y del prompt de la 300.
 4. **El anexo (`docs/01 Anexo.tex`) y el capítulo 03 no coinciden en el predictor.**
    El capítulo describe un predictor común con los rezagos de **todas** las
-   componentes; 200 y 201 usan **rezago propio** (sólo 202 es cruzado).
-5. **`R = 50` réplicas no está implementado.** `REPLICA_ID` existe y viaja en el
-   `EXPERIMENT_ID`, pero siempre vale 1. Con `R = 1` una diferencia de pocos puntos
-   porcentuales entre modelos es indistinguible del ruido Monte Carlo: **ninguna
-   afirmación comparativa es concluyente hoy**, y así hay que presentarla.
+   componentes; 200 y 201 usan **rezago propio** (sólo 202 es cruzado). Se
+   resuelve escribiéndolo como decisión por escenario en el diseño del estudio.
+5. **Una réplica por escenario, por decisión (2026-10-10).** No habrá réplicas;
+   `REPLICA_ID` se conserva en el `EXPERIMENT_ID` y en las rutas para que el
+   código lo permita, pero siempre vale 1. Consecuencia que el documento declara:
+   las diferencias entre modelos son evidencia descriptiva, y una diferencia de
+   pocos puntos porcentuales no se lee como superioridad. No proponer réplicas.
 6. **`200_sim_TAR` está calibrada para favorecer al gating** (calibración de la
    114 "exagerada"). Las conclusiones sobre el TAR valen para esa calibración, no
    para un TAR genérico.
-7. **Las corridas 201 y 202 no se han entrenado**: el `.m`, los `_03` y `_04` no se
-   probaron con trazas reales. Sólo se verificó el `_01` (contrato) y la carga de
-   artefactos y ajuste de FAR/RF en memoria.
-8. **`pipelines/real_pipeline.py` es un stub `TODO`** de seis líneas. El flujo de
-   datos reales vive en `notebooks/reales/`.
+7. **`atau = 0.5` en 200–202 deja átomos con precisión ≈ 0**: los draws tienen
+   colas no acotadas (curtosis 10⁵–10⁶). La esperanza analítica y los cuantiles no
+   lo sufren; **la media de los draws sí** y nunca se usa como estimador; antes de
+   clusterizar se recortan los draws a los cuantiles 0.5–99.5 %. Las reales usan
+   `atau = 2`. Si se reentrena una simulación, decidir `atau` antes.
+8. **La banda es puntual y PICPB mide cobertura simultánea**: queda bajo el
+   nominal para todos los modelos por construcción (0.72 FAR / 0.75 PSBPM-FD en
+   tráfico). Compara modelos, no mide calibración; la banda simultánea de
+   `§03_05` no está implementada.
+9. **Las etiquetas de los átomos no convergen** (ψ, Γ, α; los β sí) y la mezcla
+   toca `N = 30` en varias componentes de las reales. No afecta a la predictiva
+   (invariante a etiquetas), pero R̂ no se calcula con 1 cadena (30/31).
+10. **`pipelines/real_pipeline.py` es un stub `TODO`** de seis líneas. El flujo de
+    datos reales vive en `notebooks/reales/`.
+
+Resueltas en la sesión del 2026-10-10 (no reabrir): la referencia a
+`03_06_04_objetivos_evaluacion` ya no existe; `§03_05` quedó sin estandarización
+(`ξ` crudo, sin `(c_m, d_m)`); 201 y 202 están entrenadas y evaluadas.

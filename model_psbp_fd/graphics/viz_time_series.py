@@ -100,10 +100,10 @@ def _add_labels(
 ) -> None:
     """Añade anotaciones sobre las curvas destacadas."""
     T = X.shape[0]
-    y_range = y_range or (X.max() - X.min())
+    y_range = y_range or (np.nanmax(X) - np.nanmin(X))
     for t in highlight_idx:
         x_mid = t_offset + t + 0.5
-        y_top = X[t].max()
+        y_top = np.nanmax(X[t])
         label = (
             r"$X_1(\tau)$"        if t == 0
             else r"$X_T(\tau)$"   if t == T - 1
@@ -402,7 +402,7 @@ def plot_fts_comparison(
 
     # Etiquetas sobre curvas destacadas (usando la empírica como referencia
     # de posición y rango)
-    y_range = X.max() - X.min()
+    y_range = np.nanmax(X) - np.nanmin(X)
     _add_labels(ax, X, highlight_idx, color=color_empirical, y_range=y_range)
 
     # Anotación de métricas en la esquina

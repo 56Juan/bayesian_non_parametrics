@@ -13,7 +13,9 @@ que `evaluacion_barrido`:
     RF        un bosque por componente con SUS PROPIOS rezagos; el orden 1..N_LAGS
               se elige por ventanas de TRAIN ganadas en `mae_f`, nunca con test.
     PSBPM-FD  su prediccion y su banda, leidas de `banda_funcional_psbp.npz` que
-              persiste `_04`: no se recalcula nada desde las trazas.
+              persiste `_04`: no se recalcula nada desde las trazas. Con
+              `cargar_psbp(..., predictores=...)` entra una fila por predictor
+              puntual, "PSBPM-FD (<predictor>)"; el Bloque B sigue con la esperanza.
 
 Bloque A (error puntual) aplica a los tres; el Bloque B (intervalos) solo al FAR y
 al PSBPM-FD, los unicos con mecanismo de intervalo propio. `EST[M]["CURVAS"]` guarda
@@ -23,7 +25,7 @@ la curva predicha de cada modelo; el resto se deriva de ahi.
 from __future__ import annotations
 
 import json
-from typing import Dict, Sequence
+from typing import Dict, Optional, Sequence
 
 import numpy as np
 import pandas as pd
@@ -31,6 +33,7 @@ from sklearn.ensemble import RandomForestRegressor
 
 from ..models.pspb_fd_v3 import curva_media_desde_scores
 from ..pipelines import cargar_representacion
+from ..pipelines.artifacts import ARCHIVOS
 from ..utils.linalg import safe_chol
 from .far_operador import FARp, seleccionar_kn
 from .intervalos import residuos_para_banda, banda_predictiva_modelo, sigma_residual
@@ -40,20 +43,26 @@ from .metrics_distribucional import (
 from .metrics_puntual import mise, normas_error_por_origen
 from .rolling import ventana_movil_funcional
 from .evaluacion_barrido import METRICAS_B
+from .comportamientos import cargar_comportamientos, validar_observado, resumen_validacion
 
 __all__ = [
     "G_FAR", "G_PSG", "G_PSB", "PISO",
-    "preparar_diseno", "info_generador", "ajustar_far", "ajustar_rf", "cargar_psbp",
+    "preparar_diseno", "info_generador", "ajustar_far", "exogenas", "ajustar_rf", "cargar_psbp",
     "tablas_modelos", "verificar_cadena_modelos",
     "construir_bandas", "tabla_bloque_B", "ventana_bloque_B",
     "ganadores_por_ventana", "resumen_min_max", "promedio_vs_M",
-    "origenes_extremos", "contraste_origenes",
+    "origenes_extremos", "contraste_origenes", "nombre_psbp", "validar_comportamientos_barrido",
 ]
 
 G_FAR = "FAR (IC del modelo AR)"
 G_PSG = "PSBPM-FD (IC gaussiano, mismo mecanismo)"
 G_PSB = "PSBPM-FD (predictiva bayesiana)"
 PISO = "(truncamiento FPCA)"       # referencia, no es un competidor
+
+
+def nombre_psbp(predictor: str) -> str:
+    """Etiqueta de la fila del PSBPM-FD con un predictor puntual dado."""
+    return f"PSBPM-FD ({predictor})"
 
 
 # ==========================================================================
@@ -102,6 +111,27 @@ def info_generador(e0: Dict, n_lags: int) -> None:
               f"mejor lineal en los mismos rezagos = {float(d['r2_lineal']):.4f}")
 
 
+def exogenas(e: Dict) -> list:
+    """Covariables del diseno que no son scores rezagados (`fpc_<k>_lag<l>`)."""
+    return [c for c in e["cov_names"] if not c.startswith("fpc_")]
+
+
+def _farx(far: FARp, X_w: np.ndarray, T0: int, p: int, Z_exo: np.ndarray) -> np.ndarray:
+    """
+    VAR(p) con exogenas en el subespacio del FAR ya ajustado: s_t = c + sum_l R_l s_(t-l)
+    + B z_t, por MCO sobre los origenes de train. Misma base `kn`, centrado y pesos que
+    `far`, de modo que sin `Z_exo` reproduce su VAR (salvo Yule-Walker vs MCO). Retorna
+    la prediccion a h=1 alineada con `X_w[p:]`, como `predict_serie`.
+    """
+    S = ((X_w - far.media_[None, :]) * far.pesos_[None, :]) @ far.base_      # (T, kn)
+    t = np.arange(p, X_w.shape[0])
+    assert Z_exo.shape[0] == len(t), (Z_exo.shape, len(t))
+    D = np.column_stack([np.ones(len(t))] + [S[t - l] for l in range(1, p + 1)] + [Z_exo])
+    tr = t < T0
+    B = np.linalg.lstsq(D[tr], S[t][tr], rcond=None)[0]
+    return far.media_[None, :] + (D @ B) @ far.base_.T
+
+
 def ajustar_far(EST: Dict, DIS: Dict, ORIG: Dict, kn_max: int = 12, criterio: str = "L2",
                 verbose: bool = True) -> Dict:
     """
@@ -113,9 +143,14 @@ def ajustar_far(EST: Dict, DIS: Dict, ORIG: Dict, kn_max: int = 12, criterio: st
     L^2 dos veces. kn se elige por `far.cv` sobre train. Se EVALUA con los K
     coeficientes completos, sin truncar a M. Llena `e["CURVAS"]["FAR"]` y
     `e["PRED"]["FAR"]` en cada punto; retorna el resumen del ajuste.
+
+    FARX: si `cov_names` trae covariables que no son scores (`fpc_*`), las mismas
+    que ve el PSBPM-FD, entran como regresores del VAR(p) en el subespacio `kn` del
+    FAR (`_farx`). `kn` y la base se eligen sin ellas. Sin exogenas, identico al FAR.
     """
     T0, N_LAGS, n_orig = DIS["T0"], DIS["N_LAGS"], ORIG["n_orig"]
     e0 = EST[next(iter(EST))]
+    exo = exogenas(e0)
     fr, THETA, _ = cargar_representacion(e0["paths"])
     THETA = np.asarray(THETA, dtype=float)
     W = np.asarray(fr.gram_, dtype=float)
@@ -132,6 +167,12 @@ def ajustar_far(EST: Dict, DIS: Dict, ORIG: Dict, kn_max: int = 12, criterio: st
     diag = far.diagnostico_kn()
     pred_w = far.predict_serie(THETA_W)
     assert pred_w.shape[0] == n_orig, (pred_w.shape, n_orig)
+    if exo:
+        Z_exo = e0["Z"][:, [e0["cov_names"].index(c) for c in exo]]
+        for M_, e in EST.items():
+            assert np.allclose(e["Z"][:, [e["cov_names"].index(c) for c in exo]], Z_exo), (
+                f"[M={M_}] las exogenas difieren entre puntos del barrido.")
+        pred_w = _farx(far, THETA_W, T0, N_LAGS, Z_exo)
     THETA_pred = np.linalg.solve(L.T, pred_w.T).T
     X_far = fr.reconstruct(THETA_pred)
     hs = float(np.sqrt(np.sum(np.asarray(diag["norma_hs_por_rezago"]) ** 2)))
@@ -139,7 +180,8 @@ def ajustar_far(EST: Dict, DIS: Dict, ORIG: Dict, kn_max: int = 12, criterio: st
         e["CURVAS"]["FAR"] = X_far
         e["PRED"]["FAR"] = e["std"].transform(e["fpca"].transform(THETA_pred))
         e["INFO"]["FAR"] = (f"coeficientes K={THETA.shape[1]} COMPLETO (no truncado a M), p={N_LAGS}, "
-                            f"kn={kn} (far.cv/{criterio}), ||rho||_HS={hs:.4f}")
+                            f"kn={kn} (far.cv/{criterio}), ||rho||_HS={hs:.4f}"
+                            + (f", FARX con {exo}" if exo else ""))
         e.update({"far_kn": int(kn), "far_p": int(N_LAGS), "far_hs": hs,
                   "far_hs_por_rezago": list(diag["norma_hs_por_rezago"]),
                   "far_cond": float(diag["condicion"])})
@@ -208,20 +250,30 @@ def ajustar_rf(EST: Dict, DIS: Dict, ORIG: Dict, params: Dict, pesos_tau=None) -
         e["INFO"]["RF"] = f"n_estimators={params['n_estimators']}, leaf>={params['min_samples_leaf']}, orden={ganador}"
         e["ml_orden_rf"] = ganador
         assert e["PRED"]["RF"].shape == e["Y_obs"].shape
+        cruzados = any(c.startswith("fpc_") and not c.startswith(f"fpc_{e['component_idx'][k] + 1}_lag")
+                       for k, cov in enumerate(e["cov_por_componente"]) for c in cov)
+        con_exo = any(not c.startswith("fpc_") for cov in e["cov_por_componente"] for c in cov)
         print(f"M={M}: RF orden={ganador}" + (f"   ({info})" if info else "")
-              + f"   ·   {e['n_components']} modelos univariantes (rezagos propios)")
+              + f"   ·   {e['n_components']} modelos univariantes ("
+              + ("rezagos de todas las componentes" if cruzados else "rezagos propios")
+              + (" + exogenas)" if con_exo else ")"))
 
 
-def cargar_psbp(EST: Dict, DIS: Dict, ORIG: Dict) -> tuple:
+def cargar_psbp(EST: Dict, DIS: Dict, ORIG: Dict, predictores: Optional[Sequence[str]] = None) -> tuple:
     """
     Prediccion y banda del PSBPM-FD, leidas de `banda_funcional_psbp.npz` (la
     persiste `_04`: es la misma prediccion puntual, media analitica, y la banda por
     cuantiles). Verifica que compartan particion, nivel y objetivo. Los M sin
     artefacto se quitan de `EST` con aviso. Retorna `M_OK`.
+
+    Con `predictores` (p. ej. `resumenes_predictiva.PREDICTORES`) hay una fila
+    `nombre_psbp(p)` por predictor en `CURVAS`, leida de `X_pred_<p>` (la esperanza
+    es `X_pred`); sin ellos, una sola fila "PSBPM-FD" como siempre. `e["X_PSBP"]`
+    es siempre la esperanza: es la que acompana a la banda en el Bloque B.
     """
     for M in list(EST):
         e = EST[M]
-        npz = e["paths"]["predict"] / "banda_funcional_psbp.npz"
+        npz = e["paths"]["predict"] / ARCHIVOS["banda_psbp"]
         if not npz.exists():
             print(f"! M={M} saltado: falta {npz.name}. Ejecuta 200_04 para este M.")
             del EST[M]
@@ -235,7 +287,15 @@ def cargar_psbp(EST: Dict, DIS: Dict, ORIG: Dict) -> tuple:
         assert int(z["T0"][0]) == DIS["T0"] and int(z["n_lags"][0]) == DIS["N_LAGS"]
         assert str(z["objetivo"][0]) == DIS["OBJETIVO"], (
             f"[M={M}] el _04 evaluo contra {z['objetivo'][0]!r}, aqui {DIS['OBJETIVO']!r}.")
-        e["CURVAS"]["PSBPM-FD"] = z["X_pred"].astype(float)
+        e["X_PSBP"] = z["X_pred"].astype(float)
+        if predictores is None:
+            e["CURVAS"]["PSBPM-FD"] = e["X_PSBP"]
+        else:
+            for p in predictores:
+                clave = "X_pred" if p == "esperanza" else f"X_pred_{p}"
+                assert clave in z.files, (
+                    f"[M={M}] {npz.name} no trae {clave}: ejecuta el _04 con ese predictor.")
+                e["CURVAS"][nombre_psbp(p)] = z[clave].astype(float)
         e["BANDA_PSBP"] = (z["li"].astype(float), z["ls"].astype(float))
     assert EST, "Ningun punto del barrido tiene la banda del PSBPM-FD: ejecuta 200_04."
     M_OK = tuple(sorted(EST))
@@ -304,7 +364,7 @@ def construir_bandas(e: Dict, DIS: Dict, ORIG: Dict, por_tau: bool = True,
     """
     NIVEL, es_train, X_obj = DIS["NIVEL"], ORIG["es_train"], ORIG["X_obj_ev"]
     corr = np.sqrt(1.0 + e["far_kn"] / int(es_train.sum())) if correccion_estimacion else None
-    X_far, X_ps = e["CURVAS"]["FAR"], e["CURVAS"]["PSBPM-FD"]
+    X_far, X_ps = e["CURVAS"]["FAR"], e["X_PSBP"]
     r_far = residuos_para_banda(X_obj, X_far, es_train)
     bandas = {G_FAR: (banda_predictiva_modelo(X_far, r_far, nivel=NIVEL, por_tau=por_tau,
                                               correccion_estimacion=corr), X_far)}
@@ -457,7 +517,7 @@ def origenes_extremos(e: Dict, DIS: Dict, ORIG: Dict, metrica: str, n: int, peso
     (una del Bloque A por origen: mae_f, rmse_f o linf_medio)."""
     clave = {"mae_f": "l1", "rmse_f": "l2", "linf_medio": "linf"}
     assert metrica in clave, f"{metrica!r} no es una del Bloque A: {list(clave)}"
-    serie = normas_error_por_origen(ORIG["X_obj_ev"], e["CURVAS"]["PSBPM-FD"], DIS["grilla"],
+    serie = normas_error_por_origen(ORIG["X_obj_ev"], e["X_PSBP"], DIS["grilla"],
                                     pesos_tau=pesos_tau, verificar=False)[clave[metrica]]
     idx = np.where(~ORIG["es_train"])[0]
     orden = idx[np.argsort(serie[idx])]
@@ -488,4 +548,45 @@ def contraste_origenes(EST: Dict, extremos: Dict, DIS: Dict, ORIG: Dict, metrica
     for M in extremos:
         df[df.M == M].drop(columns="M").to_csv(
             EST[M]["paths"]["out_report"] / f"{prefijo + 9}_ic_contraste_origenes.csv", index=False)
+    return df
+
+
+# ==========================================================================
+# 6. COMPORTAMIENTOS PREDICTIVOS: VALIDACION CONTRA LO OBSERVADO
+# ==========================================================================
+
+def validar_comportamientos_barrido(EST: Dict, DIS: Dict, ORIG: Dict, path_barrido,
+                                    pesos_tau=None) -> pd.DataFrame:
+    """
+    Por M, lee `comportamientos_psbp.npz` (lo persiste `_04` §12) y valida los
+    comportamientos contra lo observado (`comportamientos.validar_observado`), con
+    los dos objetivos de docs 03_05_00. Persiste por M `82_validacion_comportamientos.csv`
+    (por origen) y `83_validacion_resumen.csv`, y en el barrido
+    `105_validacion_comportamientos_por_M.csv`. Los M sin artefacto se saltan.
+    """
+    partes = []
+    for M, e in EST.items():
+        C = cargar_comportamientos(e["paths"])
+        if C is None:
+            print(f"! M={M} sin comportamientos_psbp.npz: ejecuta el _04 §12.")
+            continue
+        assert np.array_equal(C["t_orig"], ORIG["t_orig"]), f"[M={M}] origenes distintos al _04."
+        li_f, ls_f = e["BANDA_PSBP"]
+        por_obj, res_obj = [], []
+        for objetivo, Y in (("curva_suavizada", ORIG["X_obj_ev"]), ("representacion_fpca", e["X_proj"])):
+            v = validar_observado(C, e["Y_obs"], Y, li_f, ls_f, DIS["grilla"], pesos_tau)
+            v.insert(0, "objetivo", objetivo)
+            v.insert(1, "t", ORIG["t_orig"][v["i"].to_numpy()])
+            por_obj.append(v)
+            r = resumen_validacion(v.drop(columns="objetivo"), ORIG["es_train"]).reset_index()
+            res_obj.append(r.assign(objetivo=objetivo, M=M))
+        pd.concat(por_obj, ignore_index=True).to_csv(
+            e["paths"]["out_report"] / "82_validacion_comportamientos.csv", index=False)
+        res = pd.concat(res_obj, ignore_index=True)
+        res.to_csv(e["paths"]["out_report"] / "83_validacion_resumen.csv", index=False)
+        e["validacion_comp"] = res
+        partes.append(res)
+    assert partes, "Ningun M tiene comportamientos persistidos."
+    df = pd.concat(partes, ignore_index=True)
+    df.to_csv(path_barrido / "105_validacion_comportamientos_por_M.csv", index=False)
     return df
