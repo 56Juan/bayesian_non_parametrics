@@ -1,0 +1,145 @@
+M,metrica,columna,bloque,intervalo,n_ventanas,pct_ventanas_ganadas,criterio
+3,5. MPIW,mpiw,train,equicolas,669,0.9940209267563528,menor es mejor
+3,5. MPIW,mpiw,train,simultanea,669,0.0,menor es mejor
+3,5. MPIW,mpiw,train,hdr,669,0.005979073243647235,menor es mejor
+3,5. MPIW,mpiw,test,equicolas,271,1.0,menor es mejor
+3,5. MPIW,mpiw,test,simultanea,271,0.0,menor es mejor
+3,5. MPIW,mpiw,test,hdr,271,0.0,menor es mejor
+3,6. PICP puntual,picp,train,equicolas,669,0.11061285500747384,|valor - nominal|
+3,6. PICP puntual,picp,train,simultanea,669,0.49177877428998507,|valor - nominal|
+3,6. PICP puntual,picp,train,hdr,669,0.3976083707025411,|valor - nominal|
+3,6. PICP puntual,picp,test,equicolas,271,0.033210332103321034,|valor - nominal|
+3,6. PICP puntual,picp,test,simultanea,271,0.5018450184501845,|valor - nominal|
+3,6. PICP puntual,picp,test,hdr,271,0.46494464944649444,|valor - nominal|
+3,7. PICPB curva completa,picp_simultaneo,train,equicolas,669,0.0,|valor - nominal|
+3,7. PICPB curva completa,picp_simultaneo,train,simultanea,669,1.0,|valor - nominal|
+3,7. PICPB curva completa,picp_simultaneo,train,hdr,669,0.0,|valor - nominal|
+3,7. PICPB curva completa,picp_simultaneo,test,equicolas,271,0.0,|valor - nominal|
+3,7. PICPB curva completa,picp_simultaneo,test,simultanea,271,1.0,|valor - nominal|
+3,7. PICPB curva completa,picp_simultaneo,test,hdr,271,0.0,|valor - nominal|
+3,8. Winkler,winkler,train,equicolas,669,0.38266068759342303,menor es mejor
+3,8. Winkler,winkler,train,simultanea,669,0.18834080717488788,menor es mejor
+3,8. Winkler,winkler,train,hdr,669,0.4289985052316891,menor es mejor
+3,8. Winkler,winkler,test,equicolas,271,0.23616236162361623,menor es mejor
+3,8. Winkler,winkler,test,simultanea,271,0.33948339483394835,menor es mejor
+3,8. Winkler,winkler,test,hdr,271,0.42435424354243545,menor es mejor
+3,9. Winkler max promedio,winkler_max_medio,train,equicolas,669,0.0,menor es mejor
+3,9. Winkler max promedio,winkler_max_medio,train,simultanea,669,1.0,menor es mejor
+3,9. Winkler max promedio,winkler_max_medio,train,hdr,669,0.0,menor es mejor
+3,9. Winkler max promedio,winkler_max_medio,test,equicolas,271,0.0,menor es mejor
+3,9. Winkler max promedio,winkler_max_medio,test,simultanea,271,1.0,menor es mejor
+3,9. Winkler max promedio,winkler_max_medio,test,hdr,271,0.0,menor es mejor
+3,10. Winkler max peor ventana,winkler_max_glob,train,equicolas,669,0.0,menor es mejor
+3,10. Winkler max peor ventana,winkler_max_glob,train,simultanea,669,1.0,menor es mejor
+3,10. Winkler max peor ventana,winkler_max_glob,train,hdr,669,0.0,menor es mejor
+3,10. Winkler max peor ventana,winkler_max_glob,test,equicolas,271,0.0,menor es mejor
+3,10. Winkler max peor ventana,winkler_max_glob,test,simultanea,271,1.0,menor es mejor
+3,10. Winkler max peor ventana,winkler_max_glob,test,hdr,271,0.0,menor es mejor
+4,5. MPIW,mpiw,train,equicolas,669,1.0,menor es mejor
+4,5. MPIW,mpiw,train,simultanea,669,0.0,menor es mejor
+4,5. MPIW,mpiw,train,hdr,669,0.0,menor es mejor
+4,5. MPIW,mpiw,test,equicolas,271,1.0,menor es mejor
+4,5. MPIW,mpiw,test,simultanea,271,0.0,menor es mejor
+4,5. MPIW,mpiw,test,hdr,271,0.0,menor es mejor
+4,6. PICP puntual,picp,train,equicolas,669,0.4260089686098655,|valor - nominal|
+4,6. PICP puntual,picp,train,simultanea,669,0.08071748878923767,|valor - nominal|
+4,6. PICP puntual,picp,train,hdr,669,0.49327354260089684,|valor - nominal|
+4,6. PICP puntual,picp,test,equicolas,271,0.45387453874538747,|valor - nominal|
+4,6. PICP puntual,picp,test,simultanea,271,0.15498154981549817,|valor - nominal|
+4,6. PICP puntual,picp,test,hdr,271,0.39114391143911437,|valor - nominal|
+4,7. PICPB curva completa,picp_simultaneo,train,equicolas,669,0.0,|valor - nominal|
+4,7. PICPB curva completa,picp_simultaneo,train,simultanea,669,1.0,|valor - nominal|
+4,7. PICPB curva completa,picp_simultaneo,train,hdr,669,0.0,|valor - nominal|
+4,7. PICPB curva completa,picp_simultaneo,test,equicolas,271,0.0,|valor - nominal|
+4,7. PICPB curva completa,picp_simultaneo,test,simultanea,271,1.0,|valor - nominal|
+4,7. PICPB curva completa,picp_simultaneo,test,hdr,271,0.0,|valor - nominal|
+4,8. Winkler,winkler,train,equicolas,669,0.46038863976083705,menor es mejor
+4,8. Winkler,winkler,train,simultanea,669,0.0014947683109118087,menor es mejor
+4,8. Winkler,winkler,train,hdr,669,0.5381165919282511,menor es mejor
+4,8. Winkler,winkler,test,equicolas,271,0.5387453874538746,menor es mejor
+4,8. Winkler,winkler,test,simultanea,271,0.025830258302583026,menor es mejor
+4,8. Winkler,winkler,test,hdr,271,0.4354243542435424,menor es mejor
+4,9. Winkler max promedio,winkler_max_medio,train,equicolas,669,0.0,menor es mejor
+4,9. Winkler max promedio,winkler_max_medio,train,simultanea,669,1.0,menor es mejor
+4,9. Winkler max promedio,winkler_max_medio,train,hdr,669,0.0,menor es mejor
+4,9. Winkler max promedio,winkler_max_medio,test,equicolas,271,0.0,menor es mejor
+4,9. Winkler max promedio,winkler_max_medio,test,simultanea,271,1.0,menor es mejor
+4,9. Winkler max promedio,winkler_max_medio,test,hdr,271,0.0,menor es mejor
+4,10. Winkler max peor ventana,winkler_max_glob,train,equicolas,669,0.0,menor es mejor
+4,10. Winkler max peor ventana,winkler_max_glob,train,simultanea,669,1.0,menor es mejor
+4,10. Winkler max peor ventana,winkler_max_glob,train,hdr,669,0.0,menor es mejor
+4,10. Winkler max peor ventana,winkler_max_glob,test,equicolas,271,0.0,menor es mejor
+4,10. Winkler max peor ventana,winkler_max_glob,test,simultanea,271,1.0,menor es mejor
+4,10. Winkler max peor ventana,winkler_max_glob,test,hdr,271,0.0,menor es mejor
+5,5. MPIW,mpiw,train,equicolas,669,1.0,menor es mejor
+5,5. MPIW,mpiw,train,simultanea,669,0.0,menor es mejor
+5,5. MPIW,mpiw,train,hdr,669,0.0,menor es mejor
+5,5. MPIW,mpiw,test,equicolas,271,1.0,menor es mejor
+5,5. MPIW,mpiw,test,simultanea,271,0.0,menor es mejor
+5,5. MPIW,mpiw,test,hdr,271,0.0,menor es mejor
+5,6. PICP puntual,picp,train,equicolas,669,0.6278026905829597,|valor - nominal|
+5,6. PICP puntual,picp,train,simultanea,669,0.004484304932735426,|valor - nominal|
+5,6. PICP puntual,picp,train,hdr,669,0.36771300448430494,|valor - nominal|
+5,6. PICP puntual,picp,test,equicolas,271,0.6199261992619927,|valor - nominal|
+5,6. PICP puntual,picp,test,simultanea,271,0.05904059040590406,|valor - nominal|
+5,6. PICP puntual,picp,test,hdr,271,0.3210332103321033,|valor - nominal|
+5,7. PICPB curva completa,picp_simultaneo,train,equicolas,669,0.0,|valor - nominal|
+5,7. PICPB curva completa,picp_simultaneo,train,simultanea,669,1.0,|valor - nominal|
+5,7. PICPB curva completa,picp_simultaneo,train,hdr,669,0.0,|valor - nominal|
+5,7. PICPB curva completa,picp_simultaneo,test,equicolas,271,0.0,|valor - nominal|
+5,7. PICPB curva completa,picp_simultaneo,test,simultanea,271,1.0,|valor - nominal|
+5,7. PICPB curva completa,picp_simultaneo,test,hdr,271,0.0,|valor - nominal|
+5,8. Winkler,winkler,train,equicolas,669,0.5769805680119582,menor es mejor
+5,8. Winkler,winkler,train,simultanea,669,0.0,menor es mejor
+5,8. Winkler,winkler,train,hdr,669,0.42301943198804187,menor es mejor
+5,8. Winkler,winkler,test,equicolas,271,0.5387453874538746,menor es mejor
+5,8. Winkler,winkler,test,simultanea,271,0.0,menor es mejor
+5,8. Winkler,winkler,test,hdr,271,0.4612546125461255,menor es mejor
+5,9. Winkler max promedio,winkler_max_medio,train,equicolas,669,0.0,menor es mejor
+5,9. Winkler max promedio,winkler_max_medio,train,simultanea,669,1.0,menor es mejor
+5,9. Winkler max promedio,winkler_max_medio,train,hdr,669,0.0,menor es mejor
+5,9. Winkler max promedio,winkler_max_medio,test,equicolas,271,0.0,menor es mejor
+5,9. Winkler max promedio,winkler_max_medio,test,simultanea,271,1.0,menor es mejor
+5,9. Winkler max promedio,winkler_max_medio,test,hdr,271,0.0,menor es mejor
+5,10. Winkler max peor ventana,winkler_max_glob,train,equicolas,669,0.0,menor es mejor
+5,10. Winkler max peor ventana,winkler_max_glob,train,simultanea,669,1.0,menor es mejor
+5,10. Winkler max peor ventana,winkler_max_glob,train,hdr,669,0.0,menor es mejor
+5,10. Winkler max peor ventana,winkler_max_glob,test,equicolas,271,0.0,menor es mejor
+5,10. Winkler max peor ventana,winkler_max_glob,test,simultanea,271,1.0,menor es mejor
+5,10. Winkler max peor ventana,winkler_max_glob,test,hdr,271,0.0,menor es mejor
+6,5. MPIW,mpiw,train,equicolas,669,1.0,menor es mejor
+6,5. MPIW,mpiw,train,simultanea,669,0.0,menor es mejor
+6,5. MPIW,mpiw,train,hdr,669,0.0,menor es mejor
+6,5. MPIW,mpiw,test,equicolas,271,1.0,menor es mejor
+6,5. MPIW,mpiw,test,simultanea,271,0.0,menor es mejor
+6,5. MPIW,mpiw,test,hdr,271,0.0,menor es mejor
+6,6. PICP puntual,picp,train,equicolas,669,0.5799701046337817,|valor - nominal|
+6,6. PICP puntual,picp,train,simultanea,669,0.0,|valor - nominal|
+6,6. PICP puntual,picp,train,hdr,669,0.4200298953662182,|valor - nominal|
+6,6. PICP puntual,picp,test,equicolas,271,0.34686346863468637,|valor - nominal|
+6,6. PICP puntual,picp,test,simultanea,271,0.025830258302583026,|valor - nominal|
+6,6. PICP puntual,picp,test,hdr,271,0.6273062730627307,|valor - nominal|
+6,7. PICPB curva completa,picp_simultaneo,train,equicolas,669,0.0,|valor - nominal|
+6,7. PICPB curva completa,picp_simultaneo,train,simultanea,669,1.0,|valor - nominal|
+6,7. PICPB curva completa,picp_simultaneo,train,hdr,669,0.0,|valor - nominal|
+6,7. PICPB curva completa,picp_simultaneo,test,equicolas,271,0.0,|valor - nominal|
+6,7. PICPB curva completa,picp_simultaneo,test,simultanea,271,1.0,|valor - nominal|
+6,7. PICPB curva completa,picp_simultaneo,test,hdr,271,0.0,|valor - nominal|
+6,8. Winkler,winkler,train,equicolas,669,0.5874439461883408,menor es mejor
+6,8. Winkler,winkler,train,simultanea,669,0.0,menor es mejor
+6,8. Winkler,winkler,train,hdr,669,0.4125560538116592,menor es mejor
+6,8. Winkler,winkler,test,equicolas,271,0.5867158671586716,menor es mejor
+6,8. Winkler,winkler,test,simultanea,271,0.0036900369003690036,menor es mejor
+6,8. Winkler,winkler,test,hdr,271,0.4095940959409594,menor es mejor
+6,9. Winkler max promedio,winkler_max_medio,train,equicolas,669,0.0,menor es mejor
+6,9. Winkler max promedio,winkler_max_medio,train,simultanea,669,1.0,menor es mejor
+6,9. Winkler max promedio,winkler_max_medio,train,hdr,669,0.0,menor es mejor
+6,9. Winkler max promedio,winkler_max_medio,test,equicolas,271,0.0,menor es mejor
+6,9. Winkler max promedio,winkler_max_medio,test,simultanea,271,1.0,menor es mejor
+6,9. Winkler max promedio,winkler_max_medio,test,hdr,271,0.0,menor es mejor
+6,10. Winkler max peor ventana,winkler_max_glob,train,equicolas,669,0.0,menor es mejor
+6,10. Winkler max peor ventana,winkler_max_glob,train,simultanea,669,1.0,menor es mejor
+6,10. Winkler max peor ventana,winkler_max_glob,train,hdr,669,0.0,menor es mejor
+6,10. Winkler max peor ventana,winkler_max_glob,test,equicolas,271,0.0,menor es mejor
+6,10. Winkler max peor ventana,winkler_max_glob,test,simultanea,271,1.0,menor es mejor
+6,10. Winkler max peor ventana,winkler_max_glob,test,hdr,271,0.0,menor es mejor

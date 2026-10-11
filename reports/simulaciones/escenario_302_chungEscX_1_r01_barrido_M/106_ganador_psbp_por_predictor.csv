@@ -1,0 +1,129 @@
+M,metrica,columna,bloque,modelo,n_ventanas,pct_ventanas_ganadas,criterio,predictor
+3,1. MAE  (L^1),mae_f,train,PSBPM-FD (esperanza),669,0.0,menor es mejor,esperanza
+3,1. MAE  (L^1),mae_f,test,PSBPM-FD (esperanza),271,0.44280442804428044,menor es mejor,esperanza
+3,2. RMSE (L^2),rmse_f,train,PSBPM-FD (esperanza),669,0.0,menor es mejor,esperanza
+3,2. RMSE (L^2),rmse_f,test,PSBPM-FD (esperanza),271,0.5276752767527675,menor es mejor,esperanza
+3,3. E_max promedio por curva,linf_medio,train,PSBPM-FD (esperanza),669,0.0,menor es mejor,esperanza
+3,3. E_max promedio por curva,linf_medio,test,PSBPM-FD (esperanza),271,0.5940959409594095,menor es mejor,esperanza
+3,4. E_max peor de la ventana,linf_max,train,PSBPM-FD (esperanza),669,0.0,menor es mejor,esperanza
+3,4. E_max peor de la ventana,linf_max,test,PSBPM-FD (esperanza),271,0.2730627306273063,menor es mejor,esperanza
+4,1. MAE  (L^1),mae_f,train,PSBPM-FD (esperanza),669,0.0,menor es mejor,esperanza
+4,1. MAE  (L^1),mae_f,test,PSBPM-FD (esperanza),271,0.6420664206642066,menor es mejor,esperanza
+4,2. RMSE (L^2),rmse_f,train,PSBPM-FD (esperanza),669,0.0,menor es mejor,esperanza
+4,2. RMSE (L^2),rmse_f,test,PSBPM-FD (esperanza),271,0.7047970479704797,menor es mejor,esperanza
+4,3. E_max promedio por curva,linf_medio,train,PSBPM-FD (esperanza),669,0.0,menor es mejor,esperanza
+4,3. E_max promedio por curva,linf_medio,test,PSBPM-FD (esperanza),271,0.8081180811808119,menor es mejor,esperanza
+4,4. E_max peor de la ventana,linf_max,train,PSBPM-FD (esperanza),669,0.0,menor es mejor,esperanza
+4,4. E_max peor de la ventana,linf_max,test,PSBPM-FD (esperanza),271,0.23616236162361623,menor es mejor,esperanza
+5,1. MAE  (L^1),mae_f,train,PSBPM-FD (esperanza),669,0.0,menor es mejor,esperanza
+5,1. MAE  (L^1),mae_f,test,PSBPM-FD (esperanza),271,0.6309963099630996,menor es mejor,esperanza
+5,2. RMSE (L^2),rmse_f,train,PSBPM-FD (esperanza),669,0.0,menor es mejor,esperanza
+5,2. RMSE (L^2),rmse_f,test,PSBPM-FD (esperanza),271,0.6826568265682657,menor es mejor,esperanza
+5,3. E_max promedio por curva,linf_medio,train,PSBPM-FD (esperanza),669,0.0,menor es mejor,esperanza
+5,3. E_max promedio por curva,linf_medio,test,PSBPM-FD (esperanza),271,0.8634686346863468,menor es mejor,esperanza
+5,4. E_max peor de la ventana,linf_max,train,PSBPM-FD (esperanza),669,0.0,menor es mejor,esperanza
+5,4. E_max peor de la ventana,linf_max,test,PSBPM-FD (esperanza),271,0.25092250922509224,menor es mejor,esperanza
+6,1. MAE  (L^1),mae_f,train,PSBPM-FD (esperanza),669,0.0,menor es mejor,esperanza
+6,1. MAE  (L^1),mae_f,test,PSBPM-FD (esperanza),271,0.7084870848708487,menor es mejor,esperanza
+6,2. RMSE (L^2),rmse_f,train,PSBPM-FD (esperanza),669,0.0,menor es mejor,esperanza
+6,2. RMSE (L^2),rmse_f,test,PSBPM-FD (esperanza),271,0.7380073800738007,menor es mejor,esperanza
+6,3. E_max promedio por curva,linf_medio,train,PSBPM-FD (esperanza),669,0.0,menor es mejor,esperanza
+6,3. E_max promedio por curva,linf_medio,test,PSBPM-FD (esperanza),271,0.8081180811808119,menor es mejor,esperanza
+6,4. E_max peor de la ventana,linf_max,train,PSBPM-FD (esperanza),669,0.0,menor es mejor,esperanza
+6,4. E_max peor de la ventana,linf_max,test,PSBPM-FD (esperanza),271,0.2693726937269373,menor es mejor,esperanza
+3,1. MAE  (L^1),mae_f,train,PSBPM-FD (mediana),669,0.0,menor es mejor,mediana
+3,1. MAE  (L^1),mae_f,test,PSBPM-FD (mediana),271,0.3800738007380074,menor es mejor,mediana
+3,2. RMSE (L^2),rmse_f,train,PSBPM-FD (mediana),669,0.0,menor es mejor,mediana
+3,2. RMSE (L^2),rmse_f,test,PSBPM-FD (mediana),271,0.43911439114391143,menor es mejor,mediana
+3,3. E_max promedio por curva,linf_medio,train,PSBPM-FD (mediana),669,0.0,menor es mejor,mediana
+3,3. E_max promedio por curva,linf_medio,test,PSBPM-FD (mediana),271,0.5166051660516605,menor es mejor,mediana
+3,4. E_max peor de la ventana,linf_max,train,PSBPM-FD (mediana),669,0.0,menor es mejor,mediana
+3,4. E_max peor de la ventana,linf_max,test,PSBPM-FD (mediana),271,0.2730627306273063,menor es mejor,mediana
+4,1. MAE  (L^1),mae_f,train,PSBPM-FD (mediana),669,0.0,menor es mejor,mediana
+4,1. MAE  (L^1),mae_f,test,PSBPM-FD (mediana),271,0.5387453874538746,menor es mejor,mediana
+4,2. RMSE (L^2),rmse_f,train,PSBPM-FD (mediana),669,0.0,menor es mejor,mediana
+4,2. RMSE (L^2),rmse_f,test,PSBPM-FD (mediana),271,0.6494464944649446,menor es mejor,mediana
+4,3. E_max promedio por curva,linf_medio,train,PSBPM-FD (mediana),669,0.0,menor es mejor,mediana
+4,3. E_max promedio por curva,linf_medio,test,PSBPM-FD (mediana),271,0.7453874538745388,menor es mejor,mediana
+4,4. E_max peor de la ventana,linf_max,train,PSBPM-FD (mediana),669,0.0,menor es mejor,mediana
+4,4. E_max peor de la ventana,linf_max,test,PSBPM-FD (mediana),271,0.23616236162361623,menor es mejor,mediana
+5,1. MAE  (L^1),mae_f,train,PSBPM-FD (mediana),669,0.0,menor es mejor,mediana
+5,1. MAE  (L^1),mae_f,test,PSBPM-FD (mediana),271,0.5977859778597786,menor es mejor,mediana
+5,2. RMSE (L^2),rmse_f,train,PSBPM-FD (mediana),669,0.0,menor es mejor,mediana
+5,2. RMSE (L^2),rmse_f,test,PSBPM-FD (mediana),271,0.6457564575645757,menor es mejor,mediana
+5,3. E_max promedio por curva,linf_medio,train,PSBPM-FD (mediana),669,0.0,menor es mejor,mediana
+5,3. E_max promedio por curva,linf_medio,test,PSBPM-FD (mediana),271,0.8819188191881919,menor es mejor,mediana
+5,4. E_max peor de la ventana,linf_max,train,PSBPM-FD (mediana),669,0.0,menor es mejor,mediana
+5,4. E_max peor de la ventana,linf_max,test,PSBPM-FD (mediana),271,0.18081180811808117,menor es mejor,mediana
+6,1. MAE  (L^1),mae_f,train,PSBPM-FD (mediana),669,0.0,menor es mejor,mediana
+6,1. MAE  (L^1),mae_f,test,PSBPM-FD (mediana),271,0.6752767527675276,menor es mejor,mediana
+6,2. RMSE (L^2),rmse_f,train,PSBPM-FD (mediana),669,0.0,menor es mejor,mediana
+6,2. RMSE (L^2),rmse_f,test,PSBPM-FD (mediana),271,0.7306273062730627,menor es mejor,mediana
+6,3. E_max promedio por curva,linf_medio,train,PSBPM-FD (mediana),669,0.0,menor es mejor,mediana
+6,3. E_max promedio por curva,linf_medio,test,PSBPM-FD (mediana),271,0.8081180811808119,menor es mejor,mediana
+6,4. E_max peor de la ventana,linf_max,train,PSBPM-FD (mediana),669,0.0,menor es mejor,mediana
+6,4. E_max peor de la ventana,linf_max,test,PSBPM-FD (mediana),271,0.12915129151291513,menor es mejor,mediana
+3,1. MAE  (L^1),mae_f,train,PSBPM-FD (medoide),669,0.0,menor es mejor,medoide
+3,1. MAE  (L^1),mae_f,test,PSBPM-FD (medoide),271,0.33579335793357934,menor es mejor,medoide
+3,2. RMSE (L^2),rmse_f,train,PSBPM-FD (medoide),669,0.0,menor es mejor,medoide
+3,2. RMSE (L^2),rmse_f,test,PSBPM-FD (medoide),271,0.36531365313653136,menor es mejor,medoide
+3,3. E_max promedio por curva,linf_medio,train,PSBPM-FD (medoide),669,0.0,menor es mejor,medoide
+3,3. E_max promedio por curva,linf_medio,test,PSBPM-FD (medoide),271,0.5498154981549815,menor es mejor,medoide
+3,4. E_max peor de la ventana,linf_max,train,PSBPM-FD (medoide),669,0.0,menor es mejor,medoide
+3,4. E_max peor de la ventana,linf_max,test,PSBPM-FD (medoide),271,0.1070110701107011,menor es mejor,medoide
+4,1. MAE  (L^1),mae_f,train,PSBPM-FD (medoide),669,0.0,menor es mejor,medoide
+4,1. MAE  (L^1),mae_f,test,PSBPM-FD (medoide),271,0.3874538745387454,menor es mejor,medoide
+4,2. RMSE (L^2),rmse_f,train,PSBPM-FD (medoide),669,0.0,menor es mejor,medoide
+4,2. RMSE (L^2),rmse_f,test,PSBPM-FD (medoide),271,0.46863468634686345,menor es mejor,medoide
+4,3. E_max promedio por curva,linf_medio,train,PSBPM-FD (medoide),669,0.0,menor es mejor,medoide
+4,3. E_max promedio por curva,linf_medio,test,PSBPM-FD (medoide),271,0.6937269372693727,menor es mejor,medoide
+4,4. E_max peor de la ventana,linf_max,train,PSBPM-FD (medoide),669,0.0,menor es mejor,medoide
+4,4. E_max peor de la ventana,linf_max,test,PSBPM-FD (medoide),271,0.34317343173431736,menor es mejor,medoide
+5,1. MAE  (L^1),mae_f,train,PSBPM-FD (medoide),669,0.0,menor es mejor,medoide
+5,1. MAE  (L^1),mae_f,test,PSBPM-FD (medoide),271,0.42435424354243545,menor es mejor,medoide
+5,2. RMSE (L^2),rmse_f,train,PSBPM-FD (medoide),669,0.0,menor es mejor,medoide
+5,2. RMSE (L^2),rmse_f,test,PSBPM-FD (medoide),271,0.4317343173431734,menor es mejor,medoide
+5,3. E_max promedio por curva,linf_medio,train,PSBPM-FD (medoide),669,0.0,menor es mejor,medoide
+5,3. E_max promedio por curva,linf_medio,test,PSBPM-FD (medoide),271,0.5608856088560885,menor es mejor,medoide
+5,4. E_max peor de la ventana,linf_max,train,PSBPM-FD (medoide),669,0.0,menor es mejor,medoide
+5,4. E_max peor de la ventana,linf_max,test,PSBPM-FD (medoide),271,0.3210332103321033,menor es mejor,medoide
+6,1. MAE  (L^1),mae_f,train,PSBPM-FD (medoide),669,0.0,menor es mejor,medoide
+6,1. MAE  (L^1),mae_f,test,PSBPM-FD (medoide),271,0.2915129151291513,menor es mejor,medoide
+6,2. RMSE (L^2),rmse_f,train,PSBPM-FD (medoide),669,0.0,menor es mejor,medoide
+6,2. RMSE (L^2),rmse_f,test,PSBPM-FD (medoide),271,0.3726937269372694,menor es mejor,medoide
+6,3. E_max promedio por curva,linf_medio,train,PSBPM-FD (medoide),669,0.0,menor es mejor,medoide
+6,3. E_max promedio por curva,linf_medio,test,PSBPM-FD (medoide),271,0.34686346863468637,menor es mejor,medoide
+6,4. E_max peor de la ventana,linf_max,train,PSBPM-FD (medoide),669,0.0,menor es mejor,medoide
+6,4. E_max peor de la ventana,linf_max,test,PSBPM-FD (medoide),271,0.28044280442804426,menor es mejor,medoide
+3,1. MAE  (L^1),mae_f,train,PSBPM-FD (modal),669,0.0,menor es mejor,modal
+3,1. MAE  (L^1),mae_f,test,PSBPM-FD (modal),271,0.34317343173431736,menor es mejor,modal
+3,2. RMSE (L^2),rmse_f,train,PSBPM-FD (modal),669,0.0,menor es mejor,modal
+3,2. RMSE (L^2),rmse_f,test,PSBPM-FD (modal),271,0.3800738007380074,menor es mejor,modal
+3,3. E_max promedio por curva,linf_medio,train,PSBPM-FD (modal),669,0.0,menor es mejor,modal
+3,3. E_max promedio por curva,linf_medio,test,PSBPM-FD (modal),271,0.5313653136531366,menor es mejor,modal
+3,4. E_max peor de la ventana,linf_max,train,PSBPM-FD (modal),669,0.0,menor es mejor,modal
+3,4. E_max peor de la ventana,linf_max,test,PSBPM-FD (modal),271,0.14022140221402213,menor es mejor,modal
+4,1. MAE  (L^1),mae_f,train,PSBPM-FD (modal),669,0.0,menor es mejor,modal
+4,1. MAE  (L^1),mae_f,test,PSBPM-FD (modal),271,0.28044280442804426,menor es mejor,modal
+4,2. RMSE (L^2),rmse_f,train,PSBPM-FD (modal),669,0.0,menor es mejor,modal
+4,2. RMSE (L^2),rmse_f,test,PSBPM-FD (modal),271,0.24723247232472326,menor es mejor,modal
+4,3. E_max promedio por curva,linf_medio,train,PSBPM-FD (modal),669,0.0,menor es mejor,modal
+4,3. E_max promedio por curva,linf_medio,test,PSBPM-FD (modal),271,0.46863468634686345,menor es mejor,modal
+4,4. E_max peor de la ventana,linf_max,train,PSBPM-FD (modal),669,0.0,menor es mejor,modal
+4,4. E_max peor de la ventana,linf_max,test,PSBPM-FD (modal),271,0.17712177121771217,menor es mejor,modal
+5,1. MAE  (L^1),mae_f,train,PSBPM-FD (modal),669,0.0,menor es mejor,modal
+5,1. MAE  (L^1),mae_f,test,PSBPM-FD (modal),271,0.3800738007380074,menor es mejor,modal
+5,2. RMSE (L^2),rmse_f,train,PSBPM-FD (modal),669,0.0,menor es mejor,modal
+5,2. RMSE (L^2),rmse_f,test,PSBPM-FD (modal),271,0.4132841328413284,menor es mejor,modal
+5,3. E_max promedio por curva,linf_medio,train,PSBPM-FD (modal),669,0.0,menor es mejor,modal
+5,3. E_max promedio por curva,linf_medio,test,PSBPM-FD (modal),271,0.6568265682656826,menor es mejor,modal
+5,4. E_max peor de la ventana,linf_max,train,PSBPM-FD (modal),669,0.0,menor es mejor,modal
+5,4. E_max peor de la ventana,linf_max,test,PSBPM-FD (modal),271,0.14760147601476015,menor es mejor,modal
+6,1. MAE  (L^1),mae_f,train,PSBPM-FD (modal),669,0.0,menor es mejor,modal
+6,1. MAE  (L^1),mae_f,test,PSBPM-FD (modal),271,0.33210332103321033,menor es mejor,modal
+6,2. RMSE (L^2),rmse_f,train,PSBPM-FD (modal),669,0.0,menor es mejor,modal
+6,2. RMSE (L^2),rmse_f,test,PSBPM-FD (modal),271,0.35424354243542433,menor es mejor,modal
+6,3. E_max promedio por curva,linf_medio,train,PSBPM-FD (modal),669,0.0,menor es mejor,modal
+6,3. E_max promedio por curva,linf_medio,test,PSBPM-FD (modal),271,0.5793357933579336,menor es mejor,modal
+6,4. E_max peor de la ventana,linf_max,train,PSBPM-FD (modal),669,0.0,menor es mejor,modal
+6,4. E_max peor de la ventana,linf_max,test,PSBPM-FD (modal),271,0.15867158671586715,menor es mejor,modal
