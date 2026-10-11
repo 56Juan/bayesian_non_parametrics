@@ -111,6 +111,7 @@ from .metrics_distribucional import (
     crps_muestral, winkler, indicador_cobertura_simultanea,
 )
 from .metrics_puntual import _2d, normas_error_por_origen, pesos_normalizados
+from .intervalos_predictiva import ancho_tramos, cobertura_tramos, winkler_tramos
 from ..utils.quadrature import pesos_trapezoidales
 from ..utils.progreso import Progreso
 
@@ -365,7 +366,8 @@ def ventana_movil_funcional(X_obs: np.ndarray, X_pred: np.ndarray,
                             q_extremo: float = 0.95,
                             nivel: float = 0.95,
                             bloque_A: bool = True,
-                            verbose: bool = False) -> pd.DataFrame:
+                            verbose: bool = False,
+                            region: Optional[tuple] = None) -> pd.DataFrame:
     """
     Evolucion del error funcional: una sola serie que agrega las M componentes.
 
@@ -392,6 +394,10 @@ def ventana_movil_funcional(X_obs: np.ndarray, X_pred: np.ndarray,
     bloque_A : emite las normas L^p del error y, si hay banda, el Bloque B.
         En False la tabla es exactamente la de antes de esta extension.
     verbose : informa el avance ventana a ventana. No afecta al resultado.
+    region : (L, U) de forma (n, G, K), una union de tramos por punto (la HDR de
+        `intervalos_predictiva`, NaN donde no hay tramo). Si se pasa, el Bloque B se
+        calcula sobre los tramos (`winkler_tramos`, `ancho_tramos`,
+        `cobertura_tramos`) y `li`/`ls` se ignoran; con K = 1 da las mismas cifras.
 
     Metricas por ventana:
         mise   : (1/w) sum_t integral (X_t - Xhat_t)^2 dtau
@@ -471,11 +477,19 @@ def ventana_movil_funcional(X_obs: np.ndarray, X_pred: np.ndarray,
                 a[idx].mean() / max(float(np.sqrt((a[idx] ** 2).mean())), 1e-300)),
         })
 
-    if li is not None and ls is not None:
-        L, U = _2d(li), _2d(ls)
-        dentro = (O >= L) & (O <= U)                       # (n, G)
+    if region is not None or (li is not None and ls is not None):
+        if region is not None:
+            L, U = (np.asarray(a, dtype=float) for a in region)
+            if L.ndim == O.ndim:
+                L, U = L[..., None], U[..., None]
+            dentro = cobertura_tramos(O, L, U)             # (n, G)
+            ancho = ancho_tramos(L, U)                     # (n, G) suma de tramos
+        else:
+            L, U = _2d(li), _2d(ls)
+            dentro = (O >= L) & (O <= U)                   # (n, G)
+            ancho = U - L
         metricas["cobertura_puntual"] = lambda idx: float(dentro[idx].mean())
-        metricas["ancho_medio"] = lambda idx: float((U[idx] - L[idx]).mean())
+        metricas["ancho_medio"] = lambda idx: float(ancho[idx].mean())
         # Cobertura SIMULTANEA: 1 por origen si la curva ENTERA quedo dentro
         # de la banda, 0 si al menos un tau escapo (`indicador_cobertura_
         # simultanea`, un AND sobre tau en vez del promedio de siempre). El
@@ -484,7 +498,8 @@ def ventana_movil_funcional(X_obs: np.ndarray, X_pred: np.ndarray,
         # distinta de `cobertura_puntual` (fraccion de PUNTOS cubiertos) y
         # normalmente menor: basta un tau fuera para que la curva entera
         # cuente como no cubierta.
-        dentro_curva = indicador_cobertura_simultanea(O, L, U)   # (n,)
+        dentro_curva = (dentro.all(axis=1) if region is not None
+                        else indicador_cobertura_simultanea(O, L, U))   # (n,)
         metricas["cobertura_simultanea"] = lambda idx: float(dentro_curva[idx].mean())
         if bloque_A:
             # El Winkler puntual se calcula UNA vez; de el salen las tres
@@ -492,7 +507,8 @@ def ventana_movil_funcional(X_obs: np.ndarray, X_pred: np.ndarray,
             # su supremo por curva. `picp` y `mpiw` duplican a
             # `cobertura_puntual` y `ancho_medio` con el nombre del bloque.
             wn = pesos_normalizados(tau, pesos_tau)
-            W_pt    = winkler(O, L, U, nivel=nivel)        # (n, G)
+            W_pt    = (winkler_tramos(O, L, U, nivel=nivel) if region is not None
+                       else winkler(O, L, U, nivel=nivel))  # (n, G)
             w_t     = W_pt @ wn                            # (n,) integrado
             w_max_t = W_pt.max(axis=1)                     # (n,) peor tau por curva
             metricas["winkler"] = lambda idx, v=w_t: float(v[idx].mean())

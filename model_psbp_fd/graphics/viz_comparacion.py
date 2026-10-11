@@ -7,9 +7,11 @@ las cifras las calcula `fit/comparacion_barrido.py`.
 Funciones publicas
 ------------------
 ESTILOS_MODELOS         : color y trazo de cada modelo.
+ESTILOS_BANDAS          : color de cada banda del Bloque B (FAR y construcciones del PSBPM-FD).
 plot_ganador_modelo     : % de ventanas ganadas por modelo, train y test, para un M.
 plot_metricas_vs_M      : promedio en test de cada metrica contra M, una linea por grupo.
-plot_bandas_contraste   : dos bandas superpuestas sobre la misma curva, origenes extremos.
+plot_bandas_contraste   : dos bandas superpuestas sobre la misma curva, origenes extremos
+                          (una HDR se dibuja por tramos).
 """
 
 from __future__ import annotations
@@ -22,7 +24,7 @@ import matplotlib.pyplot as plt
 
 from .viz_comportamientos import ESTILOS_PREDICTORES
 
-__all__ = ["ESTILOS_MODELOS", "ESTILOS_MODELOS_PREDICTORES", "plot_ganador_modelo",
+__all__ = ["ESTILOS_MODELOS", "ESTILOS_MODELOS_PREDICTORES", "ESTILOS_BANDAS", "plot_ganador_modelo",
            "plot_metricas_vs_M", "plot_bandas_contraste"]
 
 # El FAR va grueso y punteado porque se TAPA con el PSBPM-FD cuando sus curvas casi coinciden.
@@ -36,7 +38,21 @@ ESTILOS_MODELOS_PREDICTORES = {
     "FAR": ESTILOS_MODELOS["FAR"], "RF": ESTILOS_MODELOS["RF"],
     **{f"PSBPM-FD ({p})": dict(est, zorder=5) for p, est in ESTILOS_PREDICTORES.items()},
 }
+# Las claves son G_FAR, G_PSG, G_PSB, G_PSS y G_PSH de `fit.comparacion_barrido`
+# (tests/test_intervalos_predictiva.py verifica que coincidan).
+ESTILOS_BANDAS = {
+    "FAR (IC del modelo AR)": dict(color="#1f6f8b"),
+    "PSBPM-FD (IC gaussiano, mismo mecanismo)": dict(color="#8c8c8c"),
+    "PSBPM-FD (predictiva bayesiana)": dict(color="#c0392b"),
+    "PSBPM-FD (banda simultánea)": dict(color="#e08e0b"),
+    "PSBPM-FD (región de máxima densidad)": dict(color="#2ca25f"),
+}
 _AZUL, _ROJO = "#2c7fb8", "#c0392b"
+
+
+def _tramos3(L, U):
+    L, U = np.asarray(L, float), np.asarray(U, float)
+    return (L, U) if L.ndim == 3 else (L[..., None], U[..., None])
 
 
 def plot_ganador_modelo(gana: pd.DataFrame, M: int, metricas, w: int, save_path=None) -> plt.Figure:
@@ -115,18 +131,22 @@ def plot_bandas_contraste(bandas: Dict, extremos: Dict, X_obj: np.ndarray, grill
     if b1 is None or b2 is None:
         print(f"[M={M}] no estan las dos bandas {nombres}; se omite.")
         return None
-    (li1, ls1), Xp1 = b1
-    (li2, ls2), Xp2 = b2
+    (L1, U1), Xp1 = _tramos3(*b1[0]), b1[1]
+    (L2, U2), Xp2 = _tramos3(*b2[0]), b2[1]
     idx = extremos[grupo]
     fig, axes = plt.subplots(1, len(idx), figsize=(3.1 * len(idx), 3.3), sharey=True, squeeze=False)
+
+    def _cob(i, L, U):
+        y = X_obj[i][:, None]
+        return float(np.mean(((y >= L[i]) & (y <= U[i])).any(axis=-1)))
     for ax, i in zip(axes[0], idx):
-        ax.fill_between(grilla, li1[i], ls1[i], color="#1f6f8b", alpha=0.20, lw=0)
-        ax.fill_between(grilla, li2[i], ls2[i], color="#c0392b", alpha=0.20, lw=0)
+        for L, U, col in ((L1, U1, "#1f6f8b"), (L2, U2, "#c0392b")):
+            for k in range(L.shape[-1]):        # una HDR: un relleno por tramo, con huecos NaN
+                ax.fill_between(grilla, L[i, :, k], U[i, :, k], color=col, alpha=0.20, lw=0)
         ax.plot(grilla, Xp1[i], color="#1f6f8b", lw=1.3, ls="--")
         ax.plot(grilla, Xp2[i], color="#c0392b", lw=1.3)
         ax.plot(grilla, X_obj[i], color="k", lw=1.6)
-        c1 = float(np.mean((X_obj[i] >= li1[i]) & (X_obj[i] <= ls1[i])))
-        c2 = float(np.mean((X_obj[i] >= li2[i]) & (X_obj[i] <= ls2[i])))
+        c1, c2 = _cob(i, L1, U1), _cob(i, L2, U2)
         ax.set_title(f"t={int(t_orig[i])}\ncob {c1:.2f} / {c2:.2f}", fontsize=9)
         ax.tick_params(labelsize=7)
         ax.set_xlabel(r"$\tau$", fontsize=8)

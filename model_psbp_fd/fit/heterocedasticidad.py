@@ -22,7 +22,10 @@ por construccion, por eso no se calcula.
 
 Los anchos son los de las bandas ya calculadas por `evaluacion_barrido.predecir_barrido`:
 `li_s`/`ls_s` por score y `li_f`/`ls_f` por curva (ancho integrado con la cuadratura
-trapezoidal comun). No se vuelve a muestrear nada.
+trapezoidal comun). No se vuelve a muestrear nada. Con `intervalos`, la fila de la curva
+se repite para cada construccion de `e["INTERVALOS"]` (docs 03_05_05: equi-colas,
+simultanea, HDR; en la HDR el ancho en (t, g) es la suma de las longitudes de sus
+tramos) y la tabla gana la columna `intervalo`; las filas por score son de la equi-colas.
 """
 
 from __future__ import annotations
@@ -34,6 +37,7 @@ import pandas as pd
 from scipy.stats import norm, pearsonr, spearmanr
 
 from ..pipelines.sim_scores_comun import AR_PASIVO
+from .intervalos_predictiva import ancho_tramos
 from ..utils.quadrature import pesos_trapezoidales
 
 __all__ = ["varianza_condicional_scores", "banda_contra_varianza_condicional"]
@@ -48,8 +52,9 @@ def varianza_condicional_scores(esc: Dict) -> np.ndarray:
     return v
 
 
-def _fila(M, objeto, bloque, ancho, ancho_or):
-    return {"M": M, "objeto": objeto, "bloque": bloque, "n": int(ancho.size),
+def _fila(M, objeto, bloque, ancho, ancho_or, intervalo=None):
+    return {"M": M, "objeto": objeto, **({"intervalo": intervalo} if intervalo else {}),
+            "bloque": bloque, "n": int(ancho.size),
             "spearman": float(spearmanr(ancho, ancho_or)[0]),
             "pearson": float(pearsonr(ancho, ancho_or)[0]),
             "ancho_psbp": float(ancho.mean()), "ancho_oraculo": float(ancho_or.mean()),
@@ -59,13 +64,18 @@ def _fila(M, objeto, bloque, ancho, ancho_or):
 
 
 def banda_contra_varianza_condicional(EST: Dict, M_OK: Sequence[int], DIS: Dict, ORIG: Dict,
-                                      esc: Dict, cos_min: float = 0.999) -> pd.DataFrame:
+                                      esc: Dict, cos_min: float = 0.999,
+                                      intervalos: Sequence[str] = ("equicolas",)) -> pd.DataFrame:
     """
     Por M y bloque (train/test): ancho de la banda del PSBPM-FD contra el del oraculo,
     para la curva (`objeto = "curva"`) y para cada score activo (`"xi_<j>"`). Guarda en
-    `EST[M]` los anchos por origen (`ancho_banda_psbp`, `ancho_banda_oraculo`) para la
-    figura.
+    `EST[M]` los anchos por origen (`ancho_banda_psbp`, de la equi-colas,
+    `ancho_banda_oraculo` y, con `intervalos`, `ancho_banda_psbp_intervalos` =
+    {nombre: ancho}) para la figura. Con `intervalos=("equicolas",)` la tabla es la de
+    siempre, sin columna `intervalo`.
     """
+    largo_i = tuple(intervalos) != ("equicolas",)
+    assert "equicolas" in intervalos, intervalos
     v = varianza_condicional_scores(esc)
     n_act = esc["interno_var_condicional"].shape[-1]
     Phi, t = esc["interno_Phi"], ORIG["t_orig"]
@@ -82,10 +92,19 @@ def banda_contra_varianza_condicional(EST: Dict, M_OK: Sequence[int], DIS: Dict,
         ancho_f = ((e["ls_f"] - e["li_f"]) * w).sum(1)
         ancho_f_or = (2 * z * np.sqrt(vt @ (Phi[:, ci] ** 2).T) * w).sum(1)
         e["ancho_banda_psbp"], e["ancho_banda_oraculo"] = ancho_f, ancho_f_or
+        anchos = {"equicolas": ancho_f}
+        for nombre in intervalos:
+            if nombre != "equicolas":
+                assert nombre in e.get("INTERVALOS", {}), (
+                    f"[M={M}] falta {nombre!r}: predecir_barrido(..., intervalos=...).")
+                anchos[nombre] = (ancho_tramos(*e["INTERVALOS"][nombre]) * w).sum(1)
+        e["ancho_banda_psbp_intervalos"] = anchos
         for bloque, m in (("train", ORIG["es_train"]), ("test", ~ORIG["es_train"])):
-            filas.append(_fila(M, "curva", bloque, ancho_f[m], ancho_f_or[m]))
+            for nombre in intervalos:
+                filas.append(_fila(M, "curva", bloque, anchos[nombre][m], ancho_f_or[m],
+                                   nombre if largo_i else None))
             for k in np.flatnonzero(ci < n_act):
                 filas.append(_fila(M, f"xi_{ci[k] + 1}", bloque,
                                    (e["ls_s"][:, k] - e["li_s"][:, k])[m],
-                                   2 * z * np.sqrt(vt[m, k])))
+                                   2 * z * np.sqrt(vt[m, k]), "equicolas" if largo_i else None))
     return pd.DataFrame(filas)

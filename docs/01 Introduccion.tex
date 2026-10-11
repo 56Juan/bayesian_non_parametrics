@@ -5,16 +5,16 @@ La presente tesis se organiza en cuatro capítulos. Este primer capítulo descri
 
 El Capítulo~\ref{02_00_00_fundamentos_teoricos_metodologicos} presenta los fundamentos teóricos y metodológicos sobre los que descansa el modelo propuesto. En él se desarrolla la representación de datos funcionales en bases de dimensión finita y el análisis de componentes principales funcional, el marco de las series de tiempo funcionales y sus criterios de evaluación, los fundamentos de la inferencia bayesiana y los métodos de simulación MCMC y por ultimo la construcción de los Procesos de Dirichlet, sus modelos de mezcla y sus extensiones dependientes. \\
 
-El Capítulo~\ref{03_00_00_mezclas_ddp_series_tiempo_funcionales} constituye el aporte metodológico de la tesis y se estructura de forma autocontenida. Incluye su propia motivación y una revisión del estado del arte específica en el área de modelos de series de tiempo funcionales bajo enfoques basados en mezclas de Procesos de Dirichlet Dependientes, a partir de la cual se identifica la brecha de investigación que el trabajo aborda. Sobre esa base se presenta el Probit Stick-Breaking Process, \cite{03_02_chung2009nonparametric}, del cual se deriva el modelo propuesto (PSBPM-FD) junto con su esquema de inferencia bayesiana. Se describe el procedimiento de reconstrucción funcional y se evalúa el desempeño del modelo mediante un estudio de simulación.\\
+El Capítulo~\ref{03_00_00_mezclas_ddp_series_tiempo_funcionales} constituye el aporte metodológico de la tesis. Se presenta el Probit Stick-Breaking Process de \citet{03_02_chung2009nonparametric} y se deriva de él el modelo propuesto, PSBPM-FD, con su esquema de inferencia y la reconstrucción funcional de su predictiva, de la que se obtienen la curva predicha, sus intervalos de credibilidad y los comportamientos que la mezcla distingue. El capítulo cierra con el estudio de simulación y sus resultados.\\
 
-%Finalmente, el Capítulo~\ref{04_00_00_aplicacion} ilustra la metodología propuesta mediante su aplicación a datos reales de series de tiempo funcionales.
+Finalmente, el Capítulo~\ref{04_00_00_aplicacion} aplica la metodología propuesta mediante su aplicación a datos reales de series de tiempo funcionales.
 
 \section{Contexto y motivación aplicada}
 \label{01_01_00_contexto_motivacion_aplicada}
 En diversos ámbitos aplicados, los procesos de interés se registran de forma intradiaria a intervalos regulares de una hora, treinta o quince minutos, e incluso a resoluciones mayores. Bajo una representación discreta tradicional, cada período queda descrito por un vector de dimensión elevada (por ejemplo, $24$, $48$ o $96$ componentes por día), y la predicción del período siguiente se convierte en un problema de series de tiempo multivariadas de alta dimensión. En este escenario, la especificación de modelos clásicos se complejiza de manera considerable el número de parámetros de un modelo vectorial autorregresivo crece cuadráticamente con la dimensión, la estimación se vuelve inestable con muestras de tamaño moderado y la estructura de dependencia entre los distintos instantes del día resulta difícil de imponer de manera parsimoniosa, 
 \cite{02_02_aue2015prediction,02_01_kokoszka2017introduction,02_02_bosq2000linear}.\\
 
-Una alternativa conceptualmente más adecuada consiste en reconocer que estas observaciones densamente muestreadas son, en esencia, discretizaciones de una curva subyacente, y tratarlas en consecuencia como datos funcionales, es decir, en lugar de un vector $\mathbf{X}_t \in \mathbb{R}^{p}$ correspondiente al día $t$, se dispone de una curva $X_t(\tau)$, $\tau \in [0,1]$, que resume la totalidad del registro intradía del período $t$. La Figura~\ref{fig:corte_funcional} ilustra esta idea: el panel superior muestra la serie completa a resolución de media hora durante $88$ días, mientras que el panel inferior segmenta los primeros cinco días en las curvas diarias $X_1(\tau), \ldots, X_5(\tau)$. Este corte funcional no constituye una abstracción, sino una simple reorganización de la información ya registrada: en lugar de una sucesión de valores indexados en el tiempo, se dispone ahora de una sucesión de curvas.
+Una alternativa conceptualmente más adecuada consiste en reconocer que estas observaciones densamente muestreadas son, en esencia, discretizaciones de una curva subyacente, y tratarlas en consecuencia como datos funcionales, es decir, en lugar de un vector $\mathbf{X}_t \in \mathbb{R}^{p}$ correspondiente al día $t$, se dispone de una curva $X_t(\tau)$, $\tau \in [0,1]$, que resume la totalidad del registro intradía del período $t$. La Figura~\ref{fig:corte_funcional} ilustra esta idea: el panel superior muestra la serie completa a resolución de media hora durante $88$ días, mientras que el panel inferior segmenta los primeros cinco días en las curvas diarias $X_1(\tau), \ldots, X_5(\tau)$. Este corte funcional no constituye una abstracción, sino una simple reorganización de la información ya registrada, la cual en lugar de una sucesión de valores indexados en el tiempo, ahora dispone de una sucesión de curvas.
 
 \begin{figure}[H]
     \centering
@@ -32,21 +32,23 @@ El enfoque de series de tiempo funcionales evita esta pérdida, al conservar la 
 \section{Objetivo General}
 \label{01_03_00_objetivo_general}
 
-Desarrollar un modelo bayesiano no paramétrico basado en Mezclas de Procesos de Dirichlet Dependientes para la modelación de la dinámica temporal de series de tiempo funcionales.
+Desarrollar un modelo bayesiano no paramétrico basado en Mezclas de Procesos de Dirichlet Dependientes para series de tiempo funcionales, que describa la distribución condicional completa de la curva dado su pasado y permita predecirla.
 
 \subsection{Objetivos Específicos}
 \label{01_03_01_objetivos_especificos}
 
 \begin{itemize}
-    \item Representar las trayectorias funcionales observadas mediante una representación funcional.
+    \item Representar las trayectorias funcionales observadas en una base de funciones de dimensión finita.
 
-    \item Aplicar FPCA sobre las curvas para obtener vectores de scores de dimensión reducida. 
+    \item Aplicar análisis de componentes principales funcional sobre las curvas representadas para obtener vectores de scores de dimensión reducida.
 
-    \item Formular un modelo dinámico bayesiano no paramétrico para los scores mediante Mezclas de Procesos de Dirichlet Dependientes, incorporando dependencia temporal en la distribución condicional del proceso.
+    \item Formular un modelo bayesiano no paramétrico para los scores mediante Mezclas de Procesos de Dirichlet Dependientes, en el que los pesos de la mezcla dependan del estado rezagado del proceso.
 
-    \item Desarrollar un esquema de inferencia bayesiana basado en métodos MCMC para la estimación de los parámetros y componentes latentes del modelo propuesto.
+    \item Adaptar un esquema de inferencia bayesiana basado en métodos MCMC que entregue extracciones de la distribución a posteriori y, a partir de ellas, la distribución predictiva de los scores y de la curva.
 
-    \item Incorporar mecanismos de cuantificación de incertidumbre sobre las predicciones funcionales, mediante bandas de credibilidad en el espacio funcional.
+    \item Incorporar metodologías de análisis de la forma de la distribución predictiva, mediante agrupamiento de sus extracciones, que identifiquen los comportamientos que la mezcla distingue y la probabilidad de cada uno.
 
-    \item Evaluar el desempeño predictivo y la capacidad adaptativa del modelo mediante estudios de simulación y aplicaciones a datos reales de series de tiempo funcionales.
+    \item Estimar la curva futura y su incertidumbre a partir de la distribución predictiva mediante predictores puntuales e intervalos de credibilidad consistentes con la forma de dicha distribución.
+
+    \item Evaluar el desempeño predictivo del modelo frente a modelos de referencia mediante estudios de simulación y aplicaciones a datos reales de series de tiempo funcionales.
 \end{itemize}

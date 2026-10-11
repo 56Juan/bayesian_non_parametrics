@@ -20,6 +20,13 @@ que `evaluacion_barrido`:
 Bloque A (error puntual) aplica a los tres; el Bloque B (intervalos) solo al FAR y
 al PSBPM-FD, los unicos con mecanismo de intervalo propio. `EST[M]["CURVAS"]` guarda
 la curva predicha de cada modelo; el resto se deriva de ahi.
+
+Intervalos del PSBPM-FD (docs 03_05_05): con `cargar_psbp(..., intervalos=...)` y
+`construir_bandas(..., intervalos_psbp=...)` entran, junto a la equi-colas, la banda
+simultanea (`G_PSS`) y la region de maxima densidad (`G_PSH`), todas con la esperanza
+como curva asociada. `e["BANDAS"][nombre] = ((L, U), X)` con (L, U) de forma
+(n, G, K): las bandas de un tramo pasan por el calculo de siempre (`li`/`ls`) y la HDR
+por las metricas de tramos (`region=`).
 """
 
 from __future__ import annotations
@@ -42,21 +49,30 @@ from .metrics_distribucional import (
 )
 from .metrics_puntual import mise, normas_error_por_origen
 from .rolling import ventana_movil_funcional
-from .evaluacion_barrido import METRICAS_B
+from .evaluacion_barrido import METRICAS_B, _kw_banda
+from .intervalos_predictiva import (
+    ancho_tramos, cobertura_tramos, cobertura_simultanea_tramos, resumen_intervalo_tramos,
+)
 from .comportamientos import cargar_comportamientos, validar_observado, resumen_validacion
 
 __all__ = [
-    "G_FAR", "G_PSG", "G_PSB", "PISO",
+    "G_FAR", "G_PSG", "G_PSB", "G_PSS", "G_PSH", "PISO", "BANDAS_INTERVALO",
     "preparar_diseno", "info_generador", "ajustar_far", "exogenas", "ajustar_rf", "cargar_psbp",
     "tablas_modelos", "verificar_cadena_modelos",
     "construir_bandas", "tabla_bloque_B", "ventana_bloque_B",
     "ganadores_por_ventana", "resumen_min_max", "promedio_vs_M",
     "origenes_extremos", "contraste_origenes", "nombre_psbp", "validar_comportamientos_barrido",
+    "bloqueB_contra_far",
 ]
 
 G_FAR = "FAR (IC del modelo AR)"
 G_PSG = "PSBPM-FD (IC gaussiano, mismo mecanismo)"
 G_PSB = "PSBPM-FD (predictiva bayesiana)"
+G_PSS = "PSBPM-FD (banda simultánea)"
+G_PSH = "PSBPM-FD (región de máxima densidad)"
+#: Fila del Bloque B de cada construccion de intervalo del PSBPM-FD (la equi-colas es G_PSB).
+BANDAS_INTERVALO = {"equicolas": G_PSB, "simultanea": G_PSS, "hdr": G_PSH}
+_ARCHIVO_BANDA = {G_PSS: "PSBPM-FD-simultanea", G_PSH: "PSBPM-FD-hdr"}
 PISO = "(truncamiento FPCA)"       # referencia, no es un competidor
 
 
@@ -213,14 +229,20 @@ def _cols_propias(e: Dict, k: int, r: int):
     return [e["cov_names"].index(nombre) for nombre in nombres]
 
 
-def ajustar_rf(EST: Dict, DIS: Dict, ORIG: Dict, params: Dict, pesos_tau=None) -> None:
+def ajustar_rf(EST: Dict, DIS: Dict, ORIG: Dict, params: Dict, pesos_tau=None,
+               ordenes: Optional[Sequence[int]] = None) -> None:
     """
     Random Forest: un bosque por componente con SUS PROPIOS rezagos 1..r (los mismos
     insumos del PSBPM-FD y el FAR). El orden r en 1..N_LAGS se elige por el % de
     ventanas de TRAIN ganadas en `mae_f`, nunca con test. Llena `e["CURVAS"]["RF"]`.
+
+    `ordenes` restringe el barrido (rezagos NO contiguos, p. ej. `manifest["lags"] =
+    [1, 7]` en la corrida 32: r = 1 usa {1} y r = 7 usa {1, 7}); sin el, 1..N_LAGS
+    como siempre.
     """
     N_LAGS, W_REF, es_train = DIS["N_LAGS"], DIS["W_REF"], ORIG["es_train"]
-    ordenes = list(range(1, N_LAGS + 1))
+    ordenes = list(range(1, N_LAGS + 1)) if ordenes is None else sorted({int(r) for r in ordenes})
+    assert ordenes and all(1 <= r <= N_LAGS for r in ordenes), f"ordenes={ordenes}: enteros en 1..{N_LAGS}"
     for M, e in EST.items():
         def _pred(r):
             P = np.empty_like(e["Y_obs"])
@@ -259,7 +281,8 @@ def ajustar_rf(EST: Dict, DIS: Dict, ORIG: Dict, params: Dict, pesos_tau=None) -
               + (" + exogenas)" if con_exo else ")"))
 
 
-def cargar_psbp(EST: Dict, DIS: Dict, ORIG: Dict, predictores: Optional[Sequence[str]] = None) -> tuple:
+def cargar_psbp(EST: Dict, DIS: Dict, ORIG: Dict, predictores: Optional[Sequence[str]] = None,
+                intervalos: Optional[Sequence[str]] = None) -> tuple:
     """
     Prediccion y banda del PSBPM-FD, leidas de `banda_funcional_psbp.npz` (la
     persiste `_04`: es la misma prediccion puntual, media analitica, y la banda por
@@ -270,6 +293,10 @@ def cargar_psbp(EST: Dict, DIS: Dict, ORIG: Dict, predictores: Optional[Sequence
     `nombre_psbp(p)` por predictor en `CURVAS`, leida de `X_pred_<p>` (la esperanza
     es `X_pred`); sin ellos, una sola fila "PSBPM-FD" como siempre. `e["X_PSBP"]`
     es siempre la esperanza: es la que acompana a la banda en el Bloque B.
+
+    Con `intervalos` (p. ej. `intervalos_predictiva.INTERVALOS`), `e["INTERVALOS_PSBP"]
+    = {nombre: (L, U)}` de forma (n, G, K), leidos del .npz; `e["BANDA_PSBP"]` sigue
+    siendo la equi-colas.
     """
     for M in list(EST):
         e = EST[M]
@@ -278,7 +305,8 @@ def cargar_psbp(EST: Dict, DIS: Dict, ORIG: Dict, predictores: Optional[Sequence
             print(f"! M={M} saltado: falta {npz.name}. Ejecuta 200_04 para este M.")
             del EST[M]
             continue
-        z = np.load(npz, allow_pickle=False)
+        with np.load(npz, allow_pickle=False) as _z:
+            z = {k: _z[k] for k in _z.files}        # se cierra el archivo (Windows lo bloquea)
         assert z["li"].shape == ORIG["X_obj_ev"].shape, (
             f"[M={M}] la banda del _04 es {z['li'].shape} y aqui {ORIG['X_obj_ev'].shape}: "
             "¿distinta particion?")
@@ -293,10 +321,22 @@ def cargar_psbp(EST: Dict, DIS: Dict, ORIG: Dict, predictores: Optional[Sequence
         else:
             for p in predictores:
                 clave = "X_pred" if p == "esperanza" else f"X_pred_{p}"
-                assert clave in z.files, (
+                assert clave in z, (
                     f"[M={M}] {npz.name} no trae {clave}: ejecuta el _04 con ese predictor.")
                 e["CURVAS"][nombre_psbp(p)] = z[clave].astype(float)
         e["BANDA_PSBP"] = (z["li"].astype(float), z["ls"].astype(float))
+        if intervalos is not None:
+            claves = {"equicolas": ("li", "ls"), "simultanea": ("li_simultanea", "ls_simultanea"),
+                      "hdr": ("hdr_L", "hdr_U")}
+            e["INTERVALOS_PSBP"] = {}
+            for nombre in intervalos:
+                assert nombre in claves, f"intervalo desconocido {nombre!r}: {list(claves)}"
+                a, b = claves[nombre]
+                assert a in z and b in z, (
+                    f"[M={M}] {npz.name} no trae {a}/{b}: ejecuta el _04 con intervalos que "
+                    f"incluyan {nombre!r} (predecir_barrido(..., intervalos=...)).")
+                L, U = z[a].astype(float), z[b].astype(float)
+                e["INTERVALOS_PSBP"][nombre] = (L, U) if L.ndim == 3 else (L[..., None], U[..., None])
     assert EST, "Ningun punto del barrido tiene la banda del PSBPM-FD: ejecuta 200_04."
     M_OK = tuple(sorted(EST))
     print(f"OK PSBPM-FD leido del _04 en M = {list(M_OK)}")
@@ -355,24 +395,35 @@ def verificar_cadena_modelos(EST: Dict, W_REF: int, tol: float = 1e-9) -> None:
 # ==========================================================================
 
 def construir_bandas(e: Dict, DIS: Dict, ORIG: Dict, por_tau: bool = True,
-                     correccion_estimacion: bool = True, psbp_gaussiana: bool = True) -> None:
+                     correccion_estimacion: bool = True, psbp_gaussiana: bool = True,
+                     intervalos_psbp: Optional[Sequence[str]] = None) -> None:
     """
-    `e["BANDAS"] = {nombre: ((li, ls), X_pred)}` con tres filas que separan "gana por
-    el modelo" de "gana por el mecanismo de intervalo": la banda gaussiana del FAR
-    (residuos de TRAIN contra el objetivo), la MISMA banda gaussiana sobre la media
-    del PSBPM-FD, y la banda bayesiana nativa del PSBPM-FD (cuantiles, del _04).
+    `e["BANDAS"] = {nombre: ((L, U), X_pred)}`, (L, U) de forma (n, G, K), con tres
+    filas que separan "gana por el modelo" de "gana por el mecanismo de intervalo": la
+    banda gaussiana del FAR (residuos de TRAIN contra el objetivo), la MISMA banda
+    gaussiana sobre la media del PSBPM-FD, y la banda bayesiana nativa del PSBPM-FD
+    (cuantiles, del _04). Con `intervalos_psbp`, una fila mas por cada construccion
+    distinta de la equi-colas (`BANDAS_INTERVALO`, de `e["INTERVALOS_PSBP"]`), con la
+    esperanza como curva asociada: misma predictiva, distinta construccion.
     """
     NIVEL, es_train, X_obj = DIS["NIVEL"], ORIG["es_train"], ORIG["X_obj_ev"]
     corr = np.sqrt(1.0 + e["far_kn"] / int(es_train.sum())) if correccion_estimacion else None
     X_far, X_ps = e["CURVAS"]["FAR"], e["X_PSBP"]
     r_far = residuos_para_banda(X_obj, X_far, es_train)
-    bandas = {G_FAR: (banda_predictiva_modelo(X_far, r_far, nivel=NIVEL, por_tau=por_tau,
-                                              correccion_estimacion=corr), X_far)}
+    def _3d(b):
+        return tuple(np.asarray(a, float)[..., None] for a in b)
+    bandas = {G_FAR: (_3d(banda_predictiva_modelo(X_far, r_far, nivel=NIVEL, por_tau=por_tau,
+                                                  correccion_estimacion=corr)), X_far)}
     if psbp_gaussiana:
         r_ps = residuos_para_banda(X_obj, X_ps, es_train)
-        bandas[G_PSG] = (banda_predictiva_modelo(X_ps, r_ps, nivel=NIVEL, por_tau=por_tau,
-                                                 correccion_estimacion=corr), X_ps)
-    bandas[G_PSB] = (e["BANDA_PSBP"], X_ps)
+        bandas[G_PSG] = (_3d(banda_predictiva_modelo(X_ps, r_ps, nivel=NIVEL, por_tau=por_tau,
+                                                     correccion_estimacion=corr)), X_ps)
+    bandas[G_PSB] = (_3d(e["BANDA_PSBP"]), X_ps)
+    for nombre in (intervalos_psbp or ()):
+        if nombre != "equicolas":
+            assert nombre in e.get("INTERVALOS_PSBP", {}), (
+                f"falta {nombre!r}: cargar_psbp(..., intervalos=...) con ese intervalo.")
+            bandas[BANDAS_INTERVALO[nombre]] = (e["INTERVALOS_PSBP"][nombre], X_ps)
     e["BANDAS"] = bandas
     sd = sigma_residual(r_far, por_tau=por_tau)
     print(f"M={e['n_components']}  kn={e['far_kn']}  correccion={corr if corr else 1.0:.4f}  "
@@ -389,13 +440,19 @@ def tabla_bloque_B(e: Dict, DIS: Dict, ORIG: Dict) -> pd.DataFrame:
     NIVEL, grilla, es_train = DIS["NIVEL"], DIS["grilla"], ORIG["es_train"]
     filas = []
     for objetivo, Y in (("curva_suavizada", ORIG["X_obj_ev"]), ("representacion_fpca", e["X_proj"])):
-        for nombre, ((li, ls), _Xp) in e["BANDAS"].items():
+        for nombre, ((L, U), _Xp) in e["BANDAS"].items():
+            un_tramo = L.shape[-1] == 1
             for etq, mask in (("train", es_train), ("test", ~es_train)):
-                r = resumen_intervalo(Y[mask], li[mask], ls[mask], nivel=NIVEL, tau=grilla)
+                if un_tramo:
+                    li, ls = L[mask, :, 0], U[mask, :, 0]
+                    r = resumen_intervalo(Y[mask], li, ls, nivel=NIVEL, tau=grilla)
+                    psim = indicador_cobertura_simultanea(Y[mask], li, ls)
+                else:
+                    r = resumen_intervalo_tramos(Y[mask], L[mask], U[mask], nivel=NIVEL, tau=grilla)
+                    psim = cobertura_simultanea_tramos(Y[mask], L[mask], U[mask])
                 filas.append({"objetivo": objetivo, "banda": nombre, "bloque": etq,
                               **{k: r[k] for k in ("winkler", "picp", "ee_picp", "ace", "mpiw")},
-                              "picp_simultaneo": float(indicador_cobertura_simultanea(
-                                  Y[mask], li[mask], ls[mask]).mean())})
+                              "picp_simultaneo": float(psim.mean())})
     B = pd.DataFrame(filas).set_index(["bloque", "objetivo", "banda"]).sort_index()
     B.to_csv(e["paths"]["out_report"] / "80_bloqueB_modelos.csv")
     e["B_modelos"] = B
@@ -408,6 +465,11 @@ def tabla_bloque_B(e: Dict, DIS: Dict, ORIG: Dict) -> pd.DataFrame:
         if {G_PSG, G_PSB} <= set(te.index):
             print(f"        {objetivo:<20} mismo MODELO, distinto MECANISMO: "
                   f"bayesiana - gaussiana = {te.loc[G_PSB, 'winkler'] - te.loc[G_PSG, 'winkler']:+.4f}")
+        otras = [g for g in (G_PSS, G_PSH) if g in te.index]
+        if otras and G_PSB in te.index:
+            print(f"        {objetivo:<20} misma PREDICTIVA, distinta CONSTRUCCION: "
+                  + "   ".join(f"{g.split('(')[1].rstrip(')')} - equi-colas = "
+                             f"{te.loc[g, 'winkler'] - te.loc[G_PSB, 'winkler']:+.4f}" for g in otras))
     return B
 
 
@@ -420,10 +482,10 @@ def ventana_bloque_B(e: Dict, DIS: Dict, ORIG: Dict, pesos_tau=None, prefijo: in
     """
     W_REF, NIVEL, N_LAGS = DIS["W_REF"], DIS["NIVEL"], DIS["N_LAGS"]
     partes = []
-    for nombre, ((li, ls), Xp) in e["BANDAS"].items():
+    for nombre, ((L, U), Xp) in e["BANDAS"].items():
         t_ = ventana_movil_funcional(ORIG["X_obj_ev"], Xp, DIS["grilla"], ORIG["T0_orig"], w=W_REF,
-                                     li=li, ls=ls, t_offset=N_LAGS, pesos_tau=pesos_tau,
-                                     nivel=NIVEL, bloque_A=True, verbose=False)
+                                     t_offset=N_LAGS, pesos_tau=pesos_tau,
+                                     nivel=NIVEL, bloque_A=True, verbose=False, **_kw_banda(L, U))
         t_["banda"] = nombre
         partes.append(t_)
     vb = pd.concat(partes, ignore_index=True)
@@ -435,12 +497,19 @@ def ventana_bloque_B(e: Dict, DIS: Dict, ORIG: Dict, pesos_tau=None, prefijo: in
     assert (s["picp_simultaneo"] <= s["picp"] + tol).all(), f"[M={M}] picp_simultaneo > picp"
     assert (s["winkler"] <= s["winkler_max_medio"] + tol).all(), f"[M={M}] winkler > winkler_max_medio"
     assert (s["winkler_max_medio"] <= s["winkler_max_glob"] + tol).all(), f"[M={M}] winkler_max_medio > winkler_max_glob"
-    for nombre, ((li, ls), _Xp) in e["BANDAS"].items():
+    for nombre, ((L, U), _Xp) in e["BANDAS"].items():
+        if L.shape[-1] == 1:
+            dentro = indicador_cobertura(ORIG["X_obj_ev"], L[..., 0], U[..., 0])
+            dentro_curva = indicador_cobertura_simultanea(ORIG["X_obj_ev"], L[..., 0], U[..., 0])
+        else:
+            dentro = cobertura_tramos(ORIG["X_obj_ev"], L, U)
+            dentro_curva = cobertura_simultanea_tramos(ORIG["X_obj_ev"], L, U)
+        archivo = _ARCHIVO_BANDA.get(nombre, nombre.split(" ")[0])
         pd.DataFrame({"t": ORIG["t_orig"], "bloque": np.where(ORIG["es_train"], "train", "test"),
                       "banda": nombre,
-                      "I_t_puntual": indicador_cobertura(ORIG["X_obj_ev"], li, ls).mean(axis=1),
-                      "I_t_simultaneo": indicador_cobertura_simultanea(ORIG["X_obj_ev"], li, ls).astype(float)}
-                     ).to_csv(e["paths"]["out_report"] / f"81b_indicador_cobertura_{nombre.split(' ')[0]}.csv",
+                      "I_t_puntual": dentro.mean(axis=1),
+                      "I_t_simultaneo": dentro_curva.astype(float)}
+                     ).to_csv(e["paths"]["out_report"] / f"81b_indicador_cobertura_{archivo}.csv",
                               index=False)
     return vb
 
@@ -537,11 +606,11 @@ def contraste_origenes(EST: Dict, extremos: Dict, DIS: Dict, ORIG: Dict, metrica
     for M, ext in extremos.items():
         for grupo in ("mejores", "peores"):
             for i in ext[grupo]:
-                for nombre, ((li, ls), _Xp) in EST[M]["BANDAS"].items():
-                    dentro = (X[i] >= li[i]) & (X[i] <= ls[i])
+                for nombre, ((L, U), _Xp) in EST[M]["BANDAS"].items():
+                    dentro = cobertura_tramos(X[i], L[i], U[i])
                     filas.append({"M": M, "grupo": grupo, "t": int(t[i]), "banda": nombre,
                                   f"{metrica}_PSBPM": float(ext["serie"][i]),
-                                  "mpiw": float(np.mean(ls[i] - li[i])),
+                                  "mpiw": float(np.mean(ancho_tramos(L[i], U[i]))),
                                   "picp_puntual": float(dentro.mean()),
                                   "I_t_simultaneo": float(bool(dentro.all()))})
     df = pd.DataFrame(filas)
@@ -589,4 +658,31 @@ def validar_comportamientos_barrido(EST: Dict, DIS: Dict, ORIG: Dict, path_barri
     assert partes, "Ningun M tiene comportamientos persistidos."
     df = pd.concat(partes, ignore_index=True)
     df.to_csv(path_barrido / "105_validacion_comportamientos_por_M.csv", index=False)
+    return df
+
+
+# ==========================================================================
+# 7. CONSTRUCCIONES DEL PSBPM-FD CONTRA EL FAR
+# ==========================================================================
+
+def bloqueB_contra_far(EST: Dict, path_barrido) -> pd.DataFrame:
+    """
+    Por M y banda del PSBPM-FD de `e["BANDAS"]`, contra la del FAR, sobre la ventana de
+    referencia (`e["ventana_B"]`, de `ventana_bloque_B`), en test y sin las ventanas que
+    cruzan T0: Winkler medio de cada una, su diferencia con el FAR y el % de ventanas en
+    que tiene menor Winkler que el FAR, cara a cara (`111_bloqueB_intervalos_vs_FAR.csv`).
+    """
+    filas = []
+    for M, e in EST.items():
+        vb = e["ventana_B"]
+        vb = vb[(~vb["cruza_T0"]) & (vb["bloque"] == "test")]
+        piv = vb.pivot_table(index="t_centro", columns="banda", values="winkler")
+        assert G_FAR in piv.columns, f"[M={M}] la ventana del Bloque B no trae la banda del FAR."
+        for banda in [b for b in piv.columns if b.startswith("PSBPM-FD")]:
+            filas.append({"M": M, "banda": banda, "n_ventanas": int(len(piv)),
+                          "winkler": float(piv[banda].mean()), "winkler_FAR": float(piv[G_FAR].mean()),
+                          "dif_winkler_vs_FAR": float(piv[banda].mean() - piv[G_FAR].mean()),
+                          "pct_ventanas_gana_FAR": float((piv[banda] < piv[G_FAR]).mean())})
+    df = pd.DataFrame(filas)
+    df.to_csv(path_barrido / "111_bloqueB_intervalos_vs_FAR.csv", index=False)
     return df

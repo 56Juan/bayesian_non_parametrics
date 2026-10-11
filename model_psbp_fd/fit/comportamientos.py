@@ -35,6 +35,8 @@ from scipy.stats import gaussian_kde
 from sklearn.cluster import KMeans
 
 from ..models.pspb_fd_v3 import curva_media_desde_scores
+from .intervalos_predictiva import (RECORTE_HDR, ancho_tramos, banda_simultanea, cobertura_tramos,
+                                    cobertura_simultanea_tramos, hdr_puntual)
 from .metrics_distribucional import winkler, indicador_cobertura_simultanea
 from .metrics_puntual import pesos_normalizados
 
@@ -42,7 +44,7 @@ __all__ = [
     "VALLE", "K_MAX", "N_INIT", "SEMILLA", "CUANTILES_RECORTE",
     "debe_recortar", "recortar", "razon_valle", "numero_comportamientos",
     "comportamientos_origenes", "catalogo_global", "validar_observado",
-    "resumen_validacion", "validar_regimen", "resumen_regimen",
+    "resumen_validacion", "validar_regimen", "resumen_regimen", "intervalos_contra_oraculo",
     "guardar_comportamientos", "cargar_comportamientos",
     "comportamientos_barrido", "catalogo_barrido", "regimen_barrido",
 ]
@@ -198,7 +200,8 @@ def catalogo_global(C: Dict, a_curva: Callable, mascara=None, k_max: int = K_MAX
 # ==========================================================================
 
 def validar_observado(C: Dict, Y_obs: np.ndarray, X_obj: np.ndarray, li_f: np.ndarray,
-                      ls_f: np.ndarray, tau: np.ndarray, pesos_tau=None) -> pd.DataFrame:
+                      ls_f: np.ndarray, tau: np.ndarray, pesos_tau=None,
+                      curvas_ref: Optional[Dict[str, np.ndarray]] = None) -> pd.DataFrame:
     """
     Por origen de `C["mascara"]`: el comportamiento en que cae lo observado
     (`c_obs`, centroide mas cercano a los scores observados `Y_obs` (n, M): L^2
@@ -208,8 +211,22 @@ def validar_observado(C: Dict, Y_obs: np.ndarray, X_obj: np.ndarray, li_f: np.nd
     REALIZADO (`_real`, elegida mirando lo observado: cota de lo que daria saber el
     comportamiento), la condicional del MAS PROBABLE (`_mp`, un pronostico) y la
     marginal (`_marg`, la del Bloque B).
+
+    Ademas el error puntual en el origen (MAE y RMSE sobre tau, con los pesos de
+    cuadratura) de la curva tipica del comportamiento realizado (`mae_real`,
+    `rmse_real`: la cota de acertar el comportamiento) y del mas probable (`mae_mp`,
+    `rmse_mp`: el pronostico), y, si se pasa `curvas_ref` ({nombre: (n, G)}, p. ej.
+    la esperanza, el FAR y el RF), el mismo error de cada referencia en los mismos
+    origenes (`mae_<nombre>`, `rmse_<nombre>`), para leer cuanto gana acertar el
+    comportamiento frente a lo que ya dan los predictores puntuales.
     """
     nivel, wn = C["nivel"], pesos_normalizados(tau, pesos_tau)
+    curvas_ref = dict(curvas_ref or {})
+
+    def _err(y, x):
+        d = y - x
+        return float(np.abs(d) @ wn), float(np.sqrt((d ** 2) @ wn))
+
     filas = []
     for i in np.flatnonzero(C["mascara"]):
         K = int(C["K"][i])
@@ -217,6 +234,9 @@ def validar_observado(C: Dict, Y_obs: np.ndarray, X_obj: np.ndarray, li_f: np.nd
         c_obs = int(np.argmin(((cen - Y_obs[i, :cen.shape[1]][None]) ** 2).sum(axis=1)))
         fila = {"i": int(i), "K": K, "c_obs": c_obs, "p_obs": float(p[c_obs]),
                 "p_esperada": float((p ** 2).sum()), "acierto": float(c_obs == 0)}
+        for sufijo, x in (("real", C["curvas"][i, c_obs]), ("mp", C["curvas"][i, 0]),
+                          *((k, X[i]) for k, X in curvas_ref.items())):
+            fila[f"mae_{sufijo}"], fila[f"rmse_{sufijo}"] = _err(X_obj[i], x)
         for sufijo, (lo, hi) in (("real", (C["li_c"][i, c_obs], C["ls_c"][i, c_obs])),
                                  ("mp", (C["li_c"][i, 0], C["ls_c"][i, 0])),
                                  ("marg", (li_f[i], ls_f[i]))):
@@ -304,6 +324,57 @@ def resumen_regimen(df: pd.DataFrame) -> Dict:
             "confusion": conf,
             "medias": df[["tv", "pureza", "acierto_modelo", "acierto_oraculo",
                           "p_regimen_modelo", "p_regimen_oraculo"]].mean()}
+
+
+_COLS_INT_ORACULO = tuple(f"{m}_{q}" for m in ("frac_multitramo", "masa_hdr", "ancho_hdr",
+                                               "masa_sim", "ancho_sim")
+                          for q in ("modelo", "oraculo"))
+
+
+def intervalos_contra_oraculo(INT: Dict, idx: np.ndarray, Z_or: np.ndarray,
+                              a_curva: Callable[[np.ndarray], np.ndarray], nivel: float,
+                              recorte: Optional[Sequence[float]] = None,
+                              bloque: int = 25) -> pd.DataFrame:
+    """
+    La HDR y la banda simultanea del modelo (`INT` = `e["INTERVALOS"]`, (L, U) de
+    forma (n, G, K)) contra las mismas construcciones sobre la ley VERDADERA, en los
+    origenes `idx`. `Z_or` (S', n', M) son las extracciones oraculo de scores, que
+    `a_curva` lleva a X^(M); sobre ellas se aplican `hdr_puntual` (con el k_max de la
+    HDR del modelo y el mismo `recorte`) y `banda_simultanea`. Columnas por origen:
+
+    frac_multitramo_*   fraccion de tau_g en que la HDR tiene mas de un tramo
+    masa_hdr_*          fraccion de las extracciones oraculo dentro de la HDR, promedio
+                        en tau: la cobertura VERDADERA (la del oraculo es ~nivel)
+    ancho_hdr_*         suma de las longitudes de los tramos, promedio en la grilla
+    masa_sim_*          fraccion de curvas oraculo contenidas ENTERAS en la banda
+                        simultanea; `ancho_sim_*` su ancho medio
+
+    con `*` = modelo | oraculo. Los anchos son promedios simples sobre la grilla.
+    """
+    idx = np.asarray(idx, dtype=int)
+    Lh, Uh = (np.asarray(a, float) for a in INT["hdr"])
+    Ls, Us = (np.asarray(a, float) for a in INT["simultanea"])
+    if Ls.ndim == 3:
+        Ls, Us = Ls[..., 0], Us[..., 0]
+    S, n, M = Z_or.shape
+    partes = []
+    for j0 in range(0, n, bloque):
+        jj = np.arange(j0, min(j0 + bloque, n))
+        Xo = a_curva(np.asarray(Z_or[:, jj], float).reshape(-1, M)).reshape(S, len(jj), -1)
+        Lo, Uo = hdr_puntual(Xo, nivel, k_max=Lh.shape[-1], recorte=recorte)
+        lso, uso = banda_simultanea(Xo, nivel)
+        cols = {"i": idx[jj]}
+        for quien, (L, U, ls, us) in {"modelo": (Lh[idx[jj]], Uh[idx[jj]], Ls[idx[jj]], Us[idx[jj]]),
+                                      "oraculo": (Lo, Uo, lso, uso)}.items():
+            cols[f"frac_multitramo_{quien}"] = (np.isfinite(L).sum(axis=-1) > 1).mean(axis=-1)
+            cols[f"masa_hdr_{quien}"] = np.mean([cobertura_tramos(Xo[s], L, U) for s in range(S)],
+                                                axis=0).mean(axis=-1)
+            cols[f"ancho_hdr_{quien}"] = ancho_tramos(L, U).mean(axis=-1)
+            cols[f"masa_sim_{quien}"] = np.mean([cobertura_simultanea_tramos(Xo[s], ls, us)
+                                                 for s in range(S)], axis=0)
+            cols[f"ancho_sim_{quien}"] = (us - ls).mean(axis=-1)
+        partes.append(pd.DataFrame(cols))
+    return pd.concat(partes, ignore_index=True)
 
 
 # ==========================================================================
@@ -413,7 +484,7 @@ def catalogo_barrido(EST: Dict, M_OK: Sequence[int], ORIG: Dict, path_barrido,
 
 def regimen_barrido(EST: Dict, M_OK: Sequence[int], ORIG: Dict, idx: np.ndarray,
                     Z_or: np.ndarray, R_or: np.ndarray, R_real: np.ndarray,
-                    Y_real: np.ndarray, path_barrido) -> pd.DataFrame:
+                    Y_real: np.ndarray, path_barrido, intervalos: bool = False) -> pd.DataFrame:
     """
     Por M, `validar_regimen` en los origenes `idx` con la predictiva oraculo
     `Z_or` (S', n', J), sus regimenes `R_or` (S', n', A) y los realizados `R_real`
@@ -421,6 +492,10 @@ def regimen_barrido(EST: Dict, M_OK: Sequence[int], ORIG: Dict, idx: np.ndarray,
     visibles. `Y_real` (n', J) son los scores verdaderos: se verifica que coincidan
     con los del modelo (mismo orden y escala). Persiste `65_validacion_regimen.csv`
     por M y `104_validacion_regimen_por_M.csv` (resumen) en el barrido.
+
+    Con `intervalos=True` agrega, al final de ambas tablas, las columnas de
+    `intervalos_contra_oraculo` sobre `e["INTERVALOS"]` (recorte de la HDR si
+    `debe_recortar`); las columnas anteriores no cambian.
     """
     filas = []
     for M in M_OK:
@@ -430,16 +505,28 @@ def regimen_barrido(EST: Dict, M_OK: Sequence[int], ORIG: Dict, idx: np.ndarray,
         a = min(R_or.shape[2], M)
         df = validar_regimen(e["COMP"], idx, Z_or[:, :, :M], R_or[:, :, :a], R_real[:, :a])
         df.insert(0, "t", ORIG["t_orig"][idx])
+        if intervalos:
+            rec = RECORTE_HDR if debe_recortar(e["hp_json"]) else None
+            dfi = intervalos_contra_oraculo(e["INTERVALOS"], idx, Z_or[:, :, :M], _a_curva(e),
+                                            e["COMP"]["nivel"], rec)
+            df = df.merge(dfi, on="i", how="left", validate="one_to_one")
         df.to_csv(e["paths"]["out_report"] / "65_validacion_regimen.csv", index=False)
         e["val_regimen"] = df
         r = resumen_regimen(df)
         filas.append({"M": M, "activos_visibles": a, "acuerdo_K": r["acuerdo_K"],
                       "frac_K2mas_modelo": float((df["K"] >= 2).mean()),
                       "frac_K2mas_oraculo": float((df["K_oraculo"] >= 2).mean()),
-                      **r["medias"].to_dict()})
+                      **r["medias"].to_dict(),
+                      **(df[list(_COLS_INT_ORACULO)].mean().to_dict() if intervalos else {})})
         print(f"M={M:>2}: acuerdo en K {r['acuerdo_K']:.1%} · TV {r['medias']['tv']:.3f} · "
               f"pureza {r['medias']['pureza']:.3f} · acierto de regimen modelo "
               f"{r['medias']['acierto_modelo']:.1%} / oraculo {r['medias']['acierto_oraculo']:.1%}")
+        if intervalos:
+            f = filas[-1]
+            print(f"      HDR con mas de un tramo: modelo {f['frac_multitramo_modelo']:.2%} / oraculo "
+                  f"{f['frac_multitramo_oraculo']:.2%} de las (t, tau) · masa verdadera cubierta: "
+                  f"HDR {f['masa_hdr_modelo']:.3f}, simultanea {f['masa_sim_modelo']:.3f} "
+                  f"(oraculo {f['masa_hdr_oraculo']:.3f} / {f['masa_sim_oraculo']:.3f})")
     out = pd.DataFrame(filas)
     out.to_csv(path_barrido / "104_validacion_regimen_por_M.csv", index=False)
     return out

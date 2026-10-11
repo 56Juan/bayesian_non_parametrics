@@ -2,12 +2,7 @@
 \label{ane_00_00_anexo}
 Este anexo presenta los algoritmos empleados para generar los datos del estudio de simulación del Capítulo~\ref{03_00_00_mezclas_ddp_series_tiempo_funcionales}. Cada algoritmo especifica su mecanismo generador, el rol de sus parámetros y los valores numéricos con que se emplea, los cuales se recogen en un cuadro al cierre de cada uno.\\
 
-Todos los algoritmos especifican la dinámica directamente sobre los scores de la representación funcional. Se consideran tres escenarios, enumerados a continuación, cada uno asociado a un rasgo distinto de la ley condicional del score que un modelo de media condicional lineal no puede representar.
-\begin{itemize}
-    \item Heterocedasticidad condicional persistente en los scores, mediante innovaciones GARCH.
-    \item Cambio de régimen por umbral sobre el propio rezago del score, con regímenes que difieren en nivel, persistencia y escala.
-    \item Multimodalidad en la ley condicional de los scores, mediante una mezcla de mecanismos cuya selección depende de la historia reciente.
-\end{itemize}
+Todos los algoritmos especifican la dinámica directamente sobre los scores de la representación funcional. Se consideran tres algoritmos, C-1 a C-3, uno por escenario del estudio; el rasgo que cada uno introduce en la ley condicional del score, su propósito y la configuración con que se ajustan los métodos se describen en la Sección~\ref{03_07_02_escenarios}.
 
 \section{Esquema común}
 \label{ane_00_01_esquema_comun}
@@ -30,9 +25,8 @@ donde $\xi_{tj}$ es el score de la $j$-ésima componente en el período $t$. Se 
 \varphi_{2k-1}(\tau)=\sqrt{2}\,\sin(2\pi k\tau),
 \qquad
 \varphi_{2k}(\tau)=\sqrt{2}\,\cos(2\pi k\tau),
-\qquad k=1,\ldots,J/2,
 \end{equation}
-con $J=10$, y $\mu(\tau)=\sin(2\pi\tau)$, que pertenece al espacio generado por la base.\\
+con $k=1,\ldots,J/2$, $J=10$, y $\mu(\tau)=\sin(2\pi\tau)$, que pertenece al espacio generado por la base.\\
 
 La estructura temporal se especifica en el espacio de los scores y las curvas se obtienen luego mediante \eqref{eq:ane_coef_curva}. Las curvas se evalúan sobre la grilla regular $\tau_l = (l-1)/(L-1)$, $l = 1, \dots, L$, común a todos los períodos. Como la base es ortonormal y $\mu$ está en su espacio, la representación es exacta.\\
 
@@ -67,11 +61,11 @@ $\phi_p$     & coeficiente autorregresivo de los scores pasivos          & $0.3$
 
 \section{Algoritmos basados en Scores de la Representación Funcional}
 \label{ane_00_02_algoritmos_scores}
-Esta sección presenta los tres algoritmos de simulación, cada uno asociado a un rasgo distinto de la ley condicional del score. Cada algoritmo describe su mecanismo generador, el rol de sus parámetros, el procedimiento de generación y los valores numéricos empleados.
+Esta sección presenta los tres algoritmos de simulación. Cada uno describe su mecanismo generador, el rol de sus parámetros, el procedimiento de generación y los valores numéricos empleados.
 
 \subsection{Algoritmo C-1: Heterocedasticidad condicional en los scores}
 \label{ane_00_02_01_alg_c1}
-Este algoritmo induce heterocedasticidad condicional persistente en los scores; la dependencia entre períodos consecutivos opera sobre la escala de la serie y no sobre su nivel. Cada score activo $j\le J_a$ sigue un proceso autorregresivo con innovaciones GARCH$(1,1)$ \cite{ane_00_01_bollerslev1986generalized},
+Cada score activo $j\le J_a$ sigue un proceso autorregresivo con innovaciones GARCH$(1,1)$ \cite{ane_00_01_bollerslev1986generalized},
 \begin{equation}\label{eq:ane_algC1_argarch}
     u_{tj} = \phi\, u_{t-1,j} + a_{tj},
     \qquad
@@ -84,8 +78,6 @@ con varianza condicional
     h_{tj} = \alpha_0 + \alpha_1\, a_{t-1,j}^2 + \beta_1\, h_{t-1,j},
 \end{equation}
 donde $\alpha_1$ gobierna la sensibilidad de la varianza futura a la innovación más reciente y $\beta_1$ la persistencia de la varianza condicional pasada. La estacionariedad de segundo orden requiere $\alpha_1+\beta_1<1$, y esta persistencia total fija la memoria de la volatilidad, del orden de $1/(1-\alpha_1-\beta_1)$ períodos. El nivel base se despeja de la varianza incondicional de la innovación como $\alpha_0=\sigma_a^{2}(1-\alpha_1-\beta_1)$, y $\phi$, con $|\phi|<1$, determina la persistencia del nivel del score.\\
-
-La media condicional de $u_{tj}$ es lineal en $u_{t-1,j}$ con coeficiente $\phi$ y la no linealidad está únicamente en la varianza.\\
 
 El proceso $u_{tj}$ tiene varianza marginal $\sigma_a^{2}/(1-\phi^{2})$, de modo que
 \begin{equation}
@@ -125,30 +117,28 @@ $\sigma_a^{2}$  & varianza incondicional de la innovación             & $1.0$ \
 
 \subsection{Algoritmo C-2: Cambio de régimen por umbral en los scores}
 \label{ane_00_02_02_alg_c2}
-Este algoritmo induce una media condicional no lineal y una varianza que depende del estado mediante un cambio de régimen por umbral sobre el propio rezago del score. Cada score activo $j\le J_a$ evoluciona en una coordenada cruda $u_{tj}$ con dos regímenes, $A$ y $B$, asignados mediante un umbral $c_j$ sobre $u_{t-1,j}$. Condicionalmente al régimen $R_{tj}=k\in\{A,B\}$,
+Cada score activo $j\le J_a$ evoluciona en una coordenada cruda $u_{tj}$ con dos regímenes, $A$ y $B$, asignados mediante un umbral $c_j$ sobre $u_{t-1,j}$. Condicionalmente al régimen $R_{tj}=k\in\{A,B\}$,
 \begin{equation}\label{eq:ane_algC2}
     u_{tj}=\mu_{kj}+\phi_{kj}\,u_{t-1,j}+s_{kj}\,e_{tj},
     \qquad
     e_{tj}\overset{\mathrm{iid}}{\sim}\mathcal{N}(0,1),
 \end{equation}
-de modo que los regímenes difieren en nivel $\mu_{kj}$, persistencia $\phi_{kj}$ y escala $s_{kj}$: el régimen $A$ es persistente y de escala pequeña, y el $B$ revierte y es más volátil.\
+de modo que los regímenes difieren en nivel $\mu_{kj}$, persistencia $\phi_{kj}$ y escala $s_{kj}$: el régimen $A$ es persistente y de escala pequeña, y el $B$ revierte y es más volátil.\\
 
 La asignación es un probit sobre el rezago propio. Con $\Phi$ la función de distribución normal estándar y $h_j>0$ el ancho de la transición,
-\begin{equation}\label{eq:ane_algC2_probs}
-    P(R_{tj}=B\mid u_{t-1,j})=\Phi\!\left(\frac{u_{t-1,j}-c_j}{h_j}\right),
-    \qquad
-    P(R_{tj}=A\mid u_{t-1,j})=1-P(R_{tj}=B\mid u_{t-1,j}).
-\end{equation}
-Con $h_j\to0$ la asignación se vuelve determinista y el escenario es un SETAR clásico, mientras que un $h_j$ positivo hace la transición suave.\
+\begin{align}
+    P(R_{tj}=B\mid u_{t-1,j}) &= \Phi\!\left(\frac{u_{t-1,j}-c_j}{h_j}\right), \label{eq:ane_algC2_probs}\\
+    P(R_{tj}=A\mid u_{t-1,j}) &= 1-P(R_{tj}=B\mid u_{t-1,j}). \nonumber
+\end{align}
+Con $h_j\to0$ la asignación se vuelve determinista y el escenario es un SETAR clásico, mientras que un $h_j$ positivo hace la transición suave.\\
 
 La media condicional es exacta,
-\begin{equation}\label{eq:ane_algC2_oraculo}
+\begin{align}
     \mathbb{E}\bigl[u_{tj}\mid u_{t-1,j}\bigr]
-    =\bigl(1-p_{tj}\bigr)\bigl(\mu_{Aj}+\phi_{Aj}\,u_{t-1,j}\bigr)+p_{tj}\bigl(\mu_{Bj}+\phi_{Bj}\,u_{t-1,j}\bigr),
-    \qquad
-    p_{tj}=P(R_{tj}=B\mid u_{t-1,j}),
-\end{equation}
-y se conserva como referencia de lo alcanzable. La dinámica usa un único rezago.\
+    &=\bigl(1-p_{tj}\bigr)\bigl(\mu_{Aj}+\phi_{Aj}\,u_{t-1,j}\bigr)+p_{tj}\bigl(\mu_{Bj}+\phi_{Bj}\,u_{t-1,j}\bigr), \label{eq:ane_algC2_oraculo}\\
+    p_{tj}&=P(R_{tj}=B\mid u_{t-1,j}), \nonumber
+\end{align}
+y se registra en cada período junto con el régimen sorteado. La dinámica usa un único rezago.\\
 
 El score se obtiene estandarizando $u_{tj}$ con sus momentos poblacionales $(m_j,d_j)$, estimados una sola vez mediante una simulación larga, y escalando por \eqref{eq:ane_escala},
 \begin{equation}
@@ -157,9 +147,7 @@ z_{tj}=\frac{u_{tj}-m_j}{d_j},
 \qquad
 \xi_{tj}=\sqrt{\lambda_j}\,z_{tj}.
 \end{equation}
-La estandarización pertenece al generador, que fija la escala del escenario, y no se aplica a los datos que recibe un método.\
-
-Los parámetros se eligen de modo que cada régimen tenga una ocupación no despreciable, los regímenes persistan varios períodos y la media condicional \eqref{eq:ane_algC2_oraculo} se aparte de cualquier relación lineal.\
+La estandarización pertenece al generador, que fija la escala del escenario, y no se aplica a los datos que recibe un método.\\
 
 La generación procede en los pasos que siguen.
 \begin{enumerate}
@@ -180,13 +168,13 @@ La generación procede en los pasos que siguen.
 \label{tab:ane_algC2}
 \begin{tabular}{llc}
 \hline
-Símbolo & Descripción & Valor \
+Símbolo & Descripción & Valor \\
 \hline
-$K$                       & número de regímenes                                    & $2$ \
-$c_j$                     & umbral sobre el rezago propio                          & $0$ \
-$h_j$                     & ancho de la transición probit                          & Cuadro~\ref{tab:ane_algC2_scores} \
-$\mu_{kj},\ \phi_{kj},\ s_{kj}$ & nivel, coeficiente autorregresivo y escala del régimen $k$ & Cuadro~\ref{tab:ane_algC2_scores} \
-$(m_j,d_j)$               & media y desviación poblacionales de $u_{tj}$           & simulación larga \
+$K$                       & número de regímenes                                    & $2$ \\
+$c_j$                     & umbral sobre el rezago propio                          & $0$ \\
+$h_j$                     & ancho de la transición probit                          & Cuadro~\ref{tab:ane_algC2_scores} \\
+$\mu_{kj},\ \phi_{kj},\ s_{kj}$ & nivel, coeficiente autorregresivo y escala del régimen $k$ & Cuadro~\ref{tab:ane_algC2_scores} \\
+$(m_j,d_j)$               & media y desviación poblacionales de $u_{tj}$           & simulación larga \\
 \hline
 \end{tabular}
 \end{table}
@@ -195,21 +183,22 @@ $(m_j,d_j)$               & media y desviación poblacionales de $u_{tj}$       
 \centering
 \caption{Parámetros del Algoritmo~C-2 por score activo.}
 \label{tab:ane_algC2_scores}
+\small\setlength{\tabcolsep}{5pt}
 \begin{tabular}{lcccccccc}
 \hline
-$j$ & $h_j$ & $\mu_{Aj}$ & $\phi_{Aj}$ & $s_{Aj}$ & $\mu_{Bj}$ & $\phi_{Bj}$ & $s_{Bj}$ & $c_j$ \
+$j$ & $h_j$ & $\mu_{Aj}$ & $\phi_{Aj}$ & $s_{Aj}$ & $\mu_{Bj}$ & $\phi_{Bj}$ & $s_{Bj}$ & $c_j$ \\
 \hline
-$1$ & $0.10$ & $0$ & $0.8$ & $0.25$ & $2.5$ & $-0.9$ & $1.0$ & $0$ \
-$2$ & $0.10$ & $0$ & $0.6$ & $0.25$ & $2.0$ & $-0.9$ & $1.0$ & $0$ \
-$3$ & $0.25$ & $0$ & $0.8$ & $0.40$ & $2.0$ & $-0.9$ & $1.0$ & $0$ \
-$4$ & $0.25$ & $0$ & $0.6$ & $0.40$ & $2.5$ & $-0.9$ & $1.0$ & $0$ \
+$1$ & $0.10$ & $0$ & $0.8$ & $0.25$ & $2.5$ & $-0.9$ & $1.0$ & $0$ \\
+$2$ & $0.10$ & $0$ & $0.6$ & $0.25$ & $2.0$ & $-0.9$ & $1.0$ & $0$ \\
+$3$ & $0.25$ & $0$ & $0.8$ & $0.40$ & $2.0$ & $-0.9$ & $1.0$ & $0$ \\
+$4$ & $0.25$ & $0$ & $0.6$ & $0.40$ & $2.5$ & $-0.9$ & $1.0$ & $0$ \\
 \hline
 \end{tabular}
 \end{table}
 
 \subsection{Algoritmo C-3: Multimodalidad en los scores}
 \label{ane_00_02_03_alg_c3}
-Este algoritmo genera una distribución condicional multimodal en el espacio de los scores mediante distintos mecanismos de generación, cuya selección depende de múltiples características de la historia reciente del proceso.\\
+Este algoritmo genera el vector de scores con una mezcla de $K$ mecanismos lineales, cuya selección depende de la historia reciente del proceso.\\
 
 Sea $Z_t\in\{1,\ldots,K\}$ la variable latente que identifica el mecanismo utilizado en el período $t$. Condicionalmente a $Z_t=k$, el vector de scores se genera mediante
 \begin{equation}
@@ -260,9 +249,17 @@ q_h
 \bigr\}
 },
 \end{equation}
-donde $q_k(\cdot)$ es lineal en los scores considerados y el mecanismo 1 es la referencia del softmax. La multimodalidad proviene de la existencia de distintos mecanismos cuyas localizaciones difieren por más que la escala de la innovación, mientras que la asignación probabilística determina cuál de ellos genera la observación en cada período.\\
+donde $q_k(\cdot)$ es afín en los scores considerados y el mecanismo 1 es la referencia del softmax, $q_1\equiv 0$.\\
 
 Para incorporar dependencia temporal de más de un período se emplean $L=2$ rezagos, de modo que tanto la selección del mecanismo como la generación de los scores utilizan $\boldsymbol{\xi}_{t-1}$ y $\boldsymbol{\xi}_{t-2}$. La dinámica distintiva se concentra en los $J_a$ scores activos; los scores restantes siguen el proceso autorregresivo del esquema común, de modo que el espectro de varianzas sea el de \eqref{eq:ane_escala}.\\
+
+Los valores se especifican en la coordenada estandarizada $z_{tj}=\xi_{tj}/\sqrt{\lambda_j}$ de \eqref{eq:ane_escala}, de modo que un coeficiente cruzado se lee igual cualquiera sea la varianza de las componentes que conecta. En la escala de los scores, con $D=\mathrm{diag}(\sqrt{\lambda_1},\ldots,\sqrt{\lambda_J})$, $\boldsymbol{\mu}_k=D\tilde{\boldsymbol{\mu}}_k$, $A_{k,\ell}=D\tilde{A}_{k,\ell}D^{-1}$, $q_k(\boldsymbol{\xi})=\tilde q_k(D^{-1}\boldsymbol{\xi})$ y $\mathrm{Var}(\varepsilon_{tj})=\lambda_j\tilde\sigma_j^{2}$. Los tres mecanismos son un centro ($k=1$) y dos niveles, alto ($k=2$) y bajo ($k=3$), que se separan solo en la localización del primer score, $\tilde\mu_{k1}=0,\,+1,\,-1$, con $\tilde\mu_{kj}=0$ para $j\ge2$. La asignación es
+\begin{align}
+\tilde q_1 &= 0, \nonumber\\
+\tilde q_2 &= -2.1 + 1.75\,z_{1,t-1} + 0.7\,z_{1,t-2} + 0.5\,z_{2,t-1}, \label{eq:ane_algC3_q}\\
+\tilde q_3 &= -2.1 - 1.75\,z_{1,t-1} - 0.7\,z_{1,t-2} + 0.5\,z_{2,t-1}. \nonumber
+\end{align}
+Las matrices $\tilde A_{k,\ell}$ comparten el patrón del Cuadro~\ref{tab:ane_algC3_mecanismos}, la diagonal del bloque activo en el primer rezago y cuatro entradas cruzadas, y difieren en los valores; las entradas no listadas son cero. La entrada $(j,m)$ de $\tilde A_{k,\ell}$ es el coeficiente con que el score $m$ rezagado $\ell$ períodos entra en el score $j$. Los scores pasivos conservan su coeficiente $\phi_p$ en el primer rezago, igual en los tres mecanismos. La innovación tiene desviación $\tilde\sigma_j$ en el bloque activo y $\sqrt{1-\phi_p^{2}}$ en el pasivo.\\
 
 La generación procede en los pasos que siguen.
 \begin{enumerate}
@@ -279,17 +276,35 @@ La generación procede en los pasos que siguen.
 
 \begin{table}[H]
 \centering
-\caption{Parámetros del Algoritmo~C-3.}
+\caption{Parámetros del Algoritmo~C-3 (coordenada estandarizada $z$).}
 \label{tab:ane_algC3}
 \begin{tabular}{llc}
 \hline
 Símbolo & Descripción & Valor \\
 \hline
-$K$                  & número de mecanismos                      & $3$ \\
-$L$                  & número de rezagos utilizados              & $2$ \\
-$q_k$                & función de asignación del mecanismo $k$   & lineal \\
-$\boldsymbol{\mu}_k$ & localización del mecanismo $k$            & prefijada \\
-$A_{k,\ell}$         & matriz de dependencia del mecanismo $k$   & prefijada \\
+$K$                  & número de mecanismos                                   & $3$ \\
+$L$                  & número de rezagos utilizados                           & $2$ \\
+$\tilde\mu_{k1}$     & localización del primer score, $k=1,2,3$               & $0,\ +1,\ -1$ \\
+$\tilde q_k$         & funciones de asignación                                & \eqref{eq:ane_algC3_q} \\
+$\tilde A_{k,\ell}$  & matrices de dependencia                                & Cuadro~\ref{tab:ane_algC3_mecanismos} \\
+$\tilde\sigma_j$     & desviación de la innovación, $j=1,\ldots,4$            & $0.45,\ 0.75,\ 0.80,\ 0.80$ \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Entradas no nulas de $\tilde A_{k,\ell}$ en el bloque activo, por mecanismo.}
+\label{tab:ane_algC3_mecanismos}
+\small\setlength{\tabcolsep}{4pt}
+\begin{tabular}{clrrrrrrrr}
+\hline
+ & & \multicolumn{6}{c}{$\ell=1$} & \multicolumn{2}{c}{$\ell=2$} \\
+$k$ & mecanismo & $(1,1)$ & $(2,2)$ & $(3,3)$ & $(4,4)$ & $(2,1)$ & $(3,2)$ & $(1,1)$ & $(4,3)$ \\
+\hline
+$1$ & centro      & $0.2$ & $0.3$ & $0.3$ & $0.3$ & $0.2$  & $0.8$  & $-0.1$ & $-0.6$ \\
+$2$ & nivel alto  & $0.2$ & $0.4$ & $0.2$ & $0.2$ & $0.5$  & $-0.3$ & $0.1$  & $0.3$ \\
+$3$ & nivel bajo  & $0.2$ & $0.4$ & $0.2$ & $0.2$ & $-0.5$ & $-0.3$ & $0.1$  & $0.3$ \\
 \hline
 \end{tabular}
 \end{table}

@@ -222,6 +222,7 @@ __all__ = [
     "generar_escenario_C1",
     "resumen_mezcla_scores",
     "resumen_escenario_C1",
+    "predictiva_oraculo_C1",
 ]
 
 J_SCORES = 10
@@ -636,3 +637,37 @@ def resumen_escenario_C1(salida: SalidaSimulacion) -> dict:
         raise TypeError("resumen_escenario_C1 requiere ConfigEscenarioC1; se "
                         f"recibio {type(salida.config).__name__}.")
     return resumen_mezcla_scores(salida)
+
+
+def predictiva_oraculo_C1(esc: dict, t_idx, S: int, seed: int = 0, replica: int = 0):
+    """
+    Extracciones de la ley condicional VERDADERA de xi_t dado el pasado en las
+    curvas `t_idx` (base 0, t >= n_rezagos), gemela de `predictiva_oraculo_TAR`.
+    `esc` es la salida de `cargar_escenario` (claves `interno_*`).
+
+    Z_t ~ Cat(softmax q~(z_{t-1}, z_{t-2})) y, dado Z_t, z_t = f~_{Z_t} + sigma * e,
+    con los parametros de `mecanismo_C1`. Retorna `(Z, R)`: Z (S, n, J) en la
+    escala de xi y R (S, n, 1) entero, el mecanismo de cada extraccion. Verifica
+    que pi y la media condicional reproduzcan las guardadas por el generador.
+    """
+    mec = mecanismo_C1()
+    s = np.asarray(esc["interno_escala_scores"])
+    xi = np.asarray(esc["interno_scores"])[replica]
+    t_idx = np.asarray(t_idx, dtype=int)
+    L = mec.n_rezagos
+    assert t_idx.min() >= L, f"t_idx debe ser >= {L}: el oraculo condiciona en {L} rezagos."
+    J, n = xi.shape[1], len(t_idx)
+    P, F = np.empty((n, K_MECANISMOS)), np.empty((n, K_MECANISMOS, J))
+    for j, t in enumerate(t_idx):
+        x = xi[t - L:t][::-1] / s[None, :]                            # x[l-1] = z_{t-l}
+        P[j] = _softmax(np.asarray(mec.asignacion(x), dtype=float))
+        F[j] = mec.medias(x)
+    assert np.allclose(P, np.asarray(esc["interno_pi"])[replica, t_idx], atol=1e-8), \
+        "pi no reproduce la del generador."
+    mc = np.einsum("nk,nkj->nj", P, F) * s
+    assert np.allclose(mc, np.asarray(esc["interno_media_condicional"])[replica, t_idx], atol=1e-8), \
+        "la media condicional no reproduce la del generador."
+    rng = np.random.default_rng(seed)
+    R = (rng.random((S, n, 1)) > np.cumsum(P, axis=1)[None, :, :-1]).sum(axis=2, keepdims=True)
+    Z = (F[np.arange(n)[None, :], R[..., 0]] + mec.sigma * rng.standard_normal((S, n, J))) * s
+    return Z, R

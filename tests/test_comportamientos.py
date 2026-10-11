@@ -15,8 +15,8 @@ Reglas para contar comportamientos predictivos (`fit/comportamientos.py`, docs
     cola rala de masa 0.6 % a 8 sd                         -> K = 1 (masa)
     colas no acotadas (atau <= 1)                          -> K = 2 solo con recorte
 
-y el catalogo global, la validacion contra lo observado, la del regimen y la
-persistencia.
+y el catalogo global, la validacion contra lo observado, la del regimen (con los
+intervalos contra el oraculo) y la persistencia.
 
     python -m pytest tests/test_comportamientos.py -v
 """
@@ -36,8 +36,9 @@ if str(RAIZ) not in sys.path:
 from model_psbp_fd.fit.comportamientos import (  # noqa: E402
     numero_comportamientos, recortar, debe_recortar, comportamientos_origenes,
     catalogo_global, validar_observado, validar_regimen, guardar_comportamientos,
-    cargar_comportamientos,
+    cargar_comportamientos, intervalos_contra_oraculo,
 )
+from model_psbp_fd.fit.intervalos_predictiva import banda_simultanea, hdr_puntual  # noqa: E402
 
 ALPHA = 0.05
 S = 6000
@@ -179,6 +180,12 @@ def test_validar_observado_y_regimen():
     assert (pares["acierto"] == 1).all() and np.allclose(pares["p_obs"], 0.6, atol=0.05)
     assert (pares["mpiw_real"] < pares["mpiw_marg"]).all()
     assert (v[v.K == 1]["mpiw_real"] - v[v.K == 1]["mpiw_marg"]).abs().max() < 0.05
+    # Error de la curva tipica: en los pares realizado = mas probable; una referencia
+    # igual a lo observado da error cero y RMSE >= MAE siempre.
+    v2 = validar_observado(C, Y, X, li, ls, np.linspace(0, 1, G), curvas_ref={"obs": X, "cero": 0 * X})
+    assert np.allclose(v2["mae_obs"], 0) and np.allclose(v2["rmse_obs"], 0)
+    assert (v2["mae_cero"] > 0).all() and (v2["rmse_cero"] >= v2["mae_cero"] - 1e-12).all()
+    assert np.allclose(v2.loc[v2.i % 2 == 0, "mae_real"], v2.loc[v2.i % 2 == 0, "mae_mp"])
 
     # Oraculo = la misma ley, con el regimen de cada extraccion conocido.
     idx = np.arange(n)
@@ -188,6 +195,30 @@ def test_validar_observado_y_regimen():
     assert (df["K"] == df["K_oraculo"]).all()
     assert df["tv"].max() < 0.02 and df["pureza"].min() > 0.99
     assert (df["acierto_modelo"] == 1).all() and (df["acierto_oraculo"] == 1).all()
+
+
+def test_intervalos_contra_oraculo():
+    rng = np.random.default_rng(8)
+    SC = _panel(rng, n=10)
+    n = SC.shape[1]
+    idx = np.arange(n)
+    X = _a_curva(SC.reshape(-1, 2)).reshape(SC.shape[0], n, G)
+    # Modelo = la misma ley: sus columnas coinciden con las del oraculo.
+    L, U = hdr_puntual(X, 0.95)
+    ls, us = banda_simultanea(X, 0.95)
+    d = intervalos_contra_oraculo({"hdr": (L, U), "simultanea": (ls, us)}, idx, SC, _a_curva, 0.95)
+    for c in ("frac_multitramo", "masa_hdr", "ancho_hdr", "masa_sim", "ancho_sim"):
+        assert np.allclose(d[f"{c}_modelo"], d[f"{c}_oraculo"]), c
+    assert (d["frac_multitramo_oraculo"][::2] > 0.3).all() and (d["frac_multitramo_oraculo"][1::2] == 0).all()
+    assert np.allclose(d["masa_hdr_oraculo"], 0.95, atol=0.01) and np.allclose(d["masa_sim_oraculo"], 0.95, atol=0.01)
+    # Modelo gaussiano con los mismos momentos: un tramo, mas ancho y la masa verdadera se conserva.
+    Xg = X.mean(0) + X.std(0) * rng.standard_normal(X.shape)
+    L, U = hdr_puntual(Xg, 0.95)
+    d = intervalos_contra_oraculo({"hdr": (L, U), "simultanea": banda_simultanea(Xg, 0.95)},
+                                  idx, SC, _a_curva, 0.95)
+    assert (d["frac_multitramo_modelo"] == 0).all()
+    assert (d["ancho_hdr_modelo"][::2] > d["ancho_hdr_oraculo"][::2]).all()
+    assert (d["masa_hdr_modelo"] > 0.9).all()
 
 
 if __name__ == "__main__":

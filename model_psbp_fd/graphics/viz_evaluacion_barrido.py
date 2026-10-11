@@ -9,6 +9,9 @@ Funciones publicas
 plot_ganador_ventana    : % de ventanas ganadas por cada M, train y test.
 plot_scores_banda       : serie de cada score con su banda de credibilidad.
 plot_scores_dispersion  : xi_hat contra xi, un panel por componente.
+plot_ventana_grupos_por_M : ventana movil con un panel por (M, metrica) y una linea por
+                          grupo (predictor o intervalo).
+plot_ganador_grupo_vs_M : % de ventanas de test que gana cada grupo, contra M.
 
 Las dos ultimas arman una REJILLA (`ncols` columnas) en vez de una sola fila o
 columna: con M hasta 10 la figura de una fila pasaba de 40 pulgadas.
@@ -22,7 +25,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-__all__ = ["plot_ganador_ventana", "plot_scores_banda", "plot_scores_dispersion"]
+__all__ = ["plot_ganador_ventana", "plot_scores_banda", "plot_scores_dispersion",
+           "plot_ventana_grupos_por_M", "plot_ganador_grupo_vs_M"]
 
 _AZUL, _ROJO = "#2c7fb8", "#c0392b"
 
@@ -136,6 +140,70 @@ def plot_scores_dispersion(e: Dict, ORIG: Dict, DIS: Dict, M: int, cada_barra: i
     axes[0, 0].legend(fontsize=7, loc="upper left")
     fig.suptitle(rf"M={M} · $\hat\xi$ contra $\xi$ · barras = IC {NIVEL:.0%} (una de cada {cada_barra})",
                  fontsize=12)
+    fig.tight_layout()
+    if save_path:
+        fig.savefig(str(save_path), dpi=150, bbox_inches="tight")
+    return fig
+
+
+def plot_ventana_grupos_por_M(tablas: Dict[int, pd.DataFrame], metricas: Sequence[str],
+                              columna_grupo: str, T0: int, estilos: Dict[str, dict] = None,
+                              title: str = "", save_path=None) -> plt.Figure:
+    """
+    Ventana movil con una fila de paneles por M (`tablas[M]`, una tabla de ventana
+    de un ancho) y una columna por metrica; dentro de cada panel una linea por
+    valor de `columna_grupo`. Las ventanas que cruzan T0 no se dibujan: se
+    excluyen de todo agregado. El bloque de prueba va sombreado.
+    """
+    Ms = sorted(tablas)
+    estilos = estilos or {}
+    fig, axes = plt.subplots(len(Ms), len(metricas), figsize=(5.2 * len(metricas), 1.9 * len(Ms) + 0.9),
+                             sharex=True, squeeze=False)
+    for i, M in enumerate(Ms):
+        t = tablas[M][~tablas[M]["cruza_T0"]]
+        for j, met in enumerate(metricas):
+            ax = axes[i, j]
+            ax.axvspan(T0, float(t["t_centro"].max()), color="0.93", zorder=0)
+            for g in t[columna_grupo].unique():
+                sub = t[t[columna_grupo] == g]
+                for bloque in ("train", "test"):
+                    b = sub[sub["bloque"] == bloque]
+                    ax.plot(b["t_centro"], b[met], label=g if bloque == "train" else None,
+                            **{"lw": 1.0, **estilos.get(g, {})})
+            ax.axvline(T0, color="crimson", ls="--", lw=0.9)
+            ax.tick_params(labelsize=7)
+            if i == 0:
+                ax.set_title(met, fontsize=9)
+            if j == 0:
+                ax.set_ylabel(f"M={M}", fontsize=8)
+    axes[-1, 0].set_xlabel("t (centro de la ventana)")
+    axes[0, 0].legend(fontsize=7, ncol=2)
+    fig.suptitle(title, fontsize=11)
+    fig.tight_layout()
+    if save_path:
+        fig.savefig(str(save_path), dpi=150, bbox_inches="tight")
+    return fig
+
+
+def plot_ganador_grupo_vs_M(gana: pd.DataFrame, columna_grupo: str, metricas, titulo: str,
+                            estilos: Dict[str, dict] = None, bloque: str = "test",
+                            save_path=None) -> plt.Figure:
+    """% de ventanas de `bloque` que gana cada valor de `columna_grupo`, contra M,
+    un panel por metrica (salida de `comparacion_barrido.ganadores_por_ventana`)."""
+    estilos = estilos or {}
+    fig, axes = plt.subplots(1, len(metricas), figsize=(4.2 * len(metricas), 3.4), sharey=True, squeeze=False)
+    for ax, (etiqueta, _c) in zip(axes[0], metricas):
+        sub = gana[(gana.metrica == etiqueta) & (gana.bloque == bloque)]
+        piv = sub.pivot_table(index="M", columns=columna_grupo, values="pct_ventanas_ganadas")
+        for g in piv.columns:
+            ax.plot(piv.index, piv[g], marker="o", ms=4, label=g, **{"lw": 1.4, **estilos.get(g, {})})
+        ax.set_xticks(list(piv.index))
+        ax.set_xlabel("M")
+        ax.set_ylim(0, 1.02)
+        ax.set_title(etiqueta, fontsize=9)
+    axes[0, 0].set_ylabel(f"% de ventanas {bloque} ganadas")
+    axes[0, 0].legend(fontsize=7)
+    fig.suptitle(titulo, fontsize=11)
     fig.tight_layout()
     if save_path:
         fig.savefig(str(save_path), dpi=150, bbox_inches="tight")

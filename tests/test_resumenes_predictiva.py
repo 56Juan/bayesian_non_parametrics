@@ -8,10 +8,10 @@ con los notebooks de la 200.
     python -m pytest tests/test_resumenes_predictiva.py -v
 
 1. Mezcla bimodal 60/40 (separacion 1.8, sd 0.17) a traves del `PSBPPredictor`
-   real: mediana, medoide, MBD y modal caen en el modo mayoritario; la esperanza,
-   en el valle.
-2. Unimodal gaussiana: los cinco coinciden salvo error Monte Carlo.
-3. MBD por rangos, suma de desvios y medoide contra su definicion directa.
+   real: mediana, medoide y modal caen en el modo mayoritario; la esperanza, en el
+   valle.
+2. Unimodal gaussiana: los cuatro coinciden salvo error Monte Carlo.
+3. Suma de desvios y medoide contra su definicion directa.
 4. Persistencia: el npz con los predictores, un npz antiguo sin ellos, y
    `cargar_draws_scores` -> None si no hay draws.
 5. La ventana movil con el predictor por defecto es la de siempre (sin columna
@@ -24,7 +24,6 @@ import ast
 import inspect
 import json
 import sys
-from math import comb
 from pathlib import Path
 
 import numpy as np
@@ -36,7 +35,7 @@ if str(RAIZ) not in sys.path:
     sys.path.insert(0, str(RAIZ))
 
 from model_psbp_fd.fit.resumenes_predictiva import (  # noqa: E402
-    mediana_puntual, medoide_l1, mediana_mbd, profundidad_mbd, suma_desvios_absolutos,
+    PREDICTORES, mediana_puntual, medoide_l1, suma_desvios_absolutos,
     atomo_modal, distancia_a_muestra_mas_cercana,
 )
 from model_psbp_fd.models.pspb_fd_v3 import ModeloTraza  # noqa: E402
@@ -66,8 +65,7 @@ def _predictores_desde_trazas(trazas, n=3, S_por_iter=15, seed=1):
     X = Z[:, :, None] * PHI[None, None, :]                                # (S, n, G)
     modal = atomo_modal({0: {0: mt}}, {0: df})[:, 0]                      # (n,)
     return {"esperanza": esperanza[:, None] * PHI, "mediana": mediana_puntual(X),
-            "medoide": medoide_l1(X, TAU), "mbd": mediana_mbd(X),
-            "modal": modal[:, None] * PHI}, X
+            "medoide": medoide_l1(X, TAU), "modal": modal[:, None] * PHI}, X
 
 
 def _nivel(curva):
@@ -80,7 +78,7 @@ def test_bimodal_60_40():
     P, _ = _predictores_desde_trazas(_trazas_mezcla(0.6, 0.0, 1.8, 0.17))
     niveles = {k: _nivel(v[0]) for k, v in P.items()}
     assert abs(niveles["esperanza"] - 0.72) < 0.02, niveles               # en el valle
-    for k in ("mediana", "medoide", "mbd", "modal"):
+    for k in ("mediana", "medoide", "modal"):
         assert abs(niveles[k]) < 0.3, (k, niveles)                        # modo mayoritario
         assert abs(niveles[k] - 1.8) > 1.2, (k, niveles)
 
@@ -104,19 +102,10 @@ def test_unimodal_coinciden():
         assert abs(_nivel(v[0]) - ref) < 0.05, (k, _nivel(v[0]), ref)
 
 
-def test_mbd_por_rangos_contra_definicion():
-    rng = np.random.default_rng(0)
-    S, n, G = 7, 2, 5
-    X = rng.standard_normal((S, n, G))
-    D = profundidad_mbd(X)
-    for i in range(n):
-        for s in range(S):
-            tot = 0.0
-            for a in range(S):
-                for b in range(a + 1, S):
-                    lo, hi = np.minimum(X[a, i], X[b, i]), np.maximum(X[a, i], X[b, i])
-                    tot += np.mean((X[s, i] >= lo) & (X[s, i] <= hi))
-            assert abs(D[s, i] - tot / comb(S, 2)) < 1e-12
+def test_cuatro_predictores_sin_mbd():
+    import model_psbp_fd.fit.resumenes_predictiva as rp
+    assert PREDICTORES == ("esperanza", "mediana", "medoide", "modal")
+    assert not hasattr(rp, "mediana_mbd") and not hasattr(rp, "profundidad_mbd")
 
 
 def test_suma_desvios_y_medoide_contra_fuerza_bruta():

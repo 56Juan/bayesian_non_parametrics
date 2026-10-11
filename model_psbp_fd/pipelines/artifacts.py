@@ -778,7 +778,14 @@ def verificar_contrato(paths: dict, estricto: bool = True) -> dict:
     # Las exogenas (no scores) se declaran en el manifest y no cuentan como rezagos.
     exo_man = list(manifest.get("exogenas", {}))
     p_prev = len([c for c in manifest.get("cov_names", []) if c not in exo_man])
-    p_esp = n_man * int(manifest.get("n_lags", 0))
+    # `n_lags` es el desplazamiento (primer origen predecible). Con rezagos NO contiguos
+    # el manifest declara ademas `lags` (p. ej. [1, 7], corrida 32) y las covariables son
+    # una por rezago efectivo, no una por cada 1..n_lags. Sin `lags`, como siempre.
+    lags_man = manifest.get("lags")
+    n_rezagos = len(lags_man) if lags_man else int(manifest.get("n_lags", 0))
+    if lags_man and int(manifest.get("n_lags", 0)) != max(int(l) for l in lags_man):
+        problemas.append(f"manifest: n_lags={manifest.get('n_lags')} debe ser max(lags)={max(lags_man)}")
+    p_esp = n_man * n_rezagos
     if any(not c.startswith("fpc_") for c in manifest.get("cov_names", []) if c not in exo_man):
         problemas.append("cov_names trae covariables que no son scores y no estan en 'exogenas'")
     if p_prev != p_esp:

@@ -54,6 +54,7 @@ from .viz_convergencia import (
 from .viz_comparacion import (
     ESTILOS_MODELOS,
     ESTILOS_MODELOS_PREDICTORES,
+    ESTILOS_BANDAS,
     plot_ganador_modelo,
     plot_metricas_vs_M,
     plot_bandas_contraste,
@@ -119,6 +120,7 @@ __all__ = [
     # viz_comparacion
     "ESTILOS_MODELOS",
     "ESTILOS_MODELOS_PREDICTORES",
+    "ESTILOS_BANDAS",
     "plot_ganador_modelo",
     "plot_metricas_vs_M",
     "plot_bandas_contraste",

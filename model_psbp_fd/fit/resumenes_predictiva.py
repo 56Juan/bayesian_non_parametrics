@@ -12,16 +12,14 @@ extracciones de curvas `X` (S, n, G) o de scores (S, n, M):
                 punto a punto; puede ser un collage de tramos de curvas distintas.
     medoide     mediana de Frechet muestral en L^1: la extraccion que minimiza la
                 suma de distancias L^1 a las demas. Es una curva que el modelo genera.
-    mbd         la extraccion de mayor profundidad de banda modificada (J = 2,
-                Lopez-Pintado y Romo 2009) calculada por rangos (Sun y Genton 2011).
     modal       atomo mas probable: por iteracion y componente la media del atomo
                 de mayor peso, mediana sobre iteraciones y cadenas, transportada
                 a la curva (`atomo_modal`).
 
-Medoide y MBD son O(S log S) por (origen, tau): la suma de distancias L^1 se
+El medoide es O(S log S) por (origen, tau): la suma de distancias L^1 se
 descompone por punto del dominio y, ordenando los S valores, sale de sumas
-acumuladas; la MBD sale del rango de cada valor. No se forma ninguna matriz
-S x S.
+acumuladas. No se forma ninguna matriz S x S. La mediana por profundidad de banda
+(MBD) estuvo aqui y se elimino: el estudio reporta los cuatro predictores de docs.
 """
 
 from __future__ import annotations
@@ -34,11 +32,11 @@ from .metrics_puntual import pesos_normalizados
 
 __all__ = [
     "PREDICTORES", "mediana_puntual", "suma_desvios_absolutos", "medoide_l1",
-    "profundidad_mbd", "mediana_mbd", "atomo_modal", "distancia_a_muestra_mas_cercana",
+    "atomo_modal", "distancia_a_muestra_mas_cercana",
 ]
 
-#: Los cinco predictores del estudio, en el orden en que se reportan.
-PREDICTORES = ("esperanza", "mediana", "medoide", "mbd", "modal")
+#: Los cuatro predictores del estudio, en el orden en que se reportan.
+PREDICTORES = ("esperanza", "mediana", "medoide", "modal")
 
 _TROZO = 64     # origenes por trozo: acota la memoria de los temporales (S, trozo, G)
 
@@ -87,31 +85,6 @@ def medoide_l1(X: np.ndarray, tau: np.ndarray, pesos_tau=None,
         D = suma_desvios_absolutos(X[:, sl]) @ w                  # (S, trozo)
         idx[sl] = np.argmin(D, axis=0)
     out = X[idx, np.arange(n)]
-    return (out, idx) if devolver_indice else out
-
-
-def profundidad_mbd(X: np.ndarray) -> np.ndarray:
-    """
-    (S, n, G) -> (S, n): profundidad de banda modificada con J = 2 de cada
-    extraccion respecto de la muestra (incluida ella misma), por rangos:
-    MBD(s) = (1/G) sum_g [(S - r)(r - 1) + (S - 1)] / C(S, 2), con r el rango
-    (base 1) de X_s(g) entre los S valores en g. Exacta sin empates.
-    """
-    X = np.asarray(X)
-    S, n, G = X.shape
-    pares = S * (S - 1) / 2.0
-    out = np.empty((S, n))
-    for sl in _trozos(n):
-        r = np.argsort(np.argsort(X[:, sl], axis=0), axis=0).astype(float) + 1.0
-        out[:, sl] = (((S - r) * (r - 1.0) + (S - 1.0)) / pares).mean(axis=2)
-    return out
-
-
-def mediana_mbd(X: np.ndarray, devolver_indice: bool = False):
-    """(S, n, G) -> (n, G): la extraccion mas profunda segun la MBD."""
-    X = np.asarray(X)
-    idx = np.argmax(profundidad_mbd(X), axis=0)
-    out = X[idx, np.arange(X.shape[1])]
     return (out, idx) if devolver_indice else out
 
 

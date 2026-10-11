@@ -12,8 +12,9 @@ ESTILOS_PREDICTORES        : color y trazo de cada predictor.
 plot_predictores_vs_M      : Bloque A en test contra M, una linea por predictor.
 plot_histogramas_draws     : extracciones de cada score en un origen, con esperanza,
                              mediana, modal y observado.
-plot_curvas_predictores    : extracciones funcionales con los cinco predictores.
-plot_comportamientos       : curvas tipicas y bandas condicionales por origen.
+plot_curvas_predictores    : extracciones funcionales con los cuatro predictores.
+plot_comportamientos       : curvas tipicas y bandas condicionales por origen (y,
+                             opcional, los tramos de la HDR puntual).
 plot_K_barrido             : distribucion de K por M.
 plot_K_serie               : K por origen a lo largo del tiempo.
 plot_catalogo              : comportamientos globales y su probabilidad por origen.
@@ -39,7 +40,6 @@ ESTILOS_PREDICTORES = {
     "esperanza": dict(color="#c0392b", lw=1.8, ls="-"),
     "mediana":   dict(color="#2c7fb8", lw=1.5, ls="--"),
     "medoide":   dict(color="#2ca25f", lw=1.5, ls="-."),
-    "mbd":       dict(color="#8856a7", lw=1.5, ls=":"),
     "modal":     dict(color="#e08e0b", lw=1.5, ls=(0, (5, 1, 1, 1))),
 }
 _PALETA = plt.get_cmap("tab10").colors
@@ -109,10 +109,16 @@ def plot_curvas_predictores(Xd: np.ndarray, preds: Dict[str, np.ndarray], X_obj:
                             grilla: np.ndarray, t: Sequence[int], M: int, n_curvas: int = 150,
                             ncols: int = 4, seed: int = 0, save_path=None) -> plt.Figure:
     """Por origen (columnas de `Xd` (S, n', G)): `n_curvas` extracciones en gris,
-    los predictores `preds` {nombre: (n', G)} y la curva objetivo en negro."""
+    los predictores `preds` {nombre: (n', G)} y la curva objetivo en negro. El eje y
+    se acota a los cuantiles 0.5-99.5 % de las extracciones: con atau <= 1 unas
+    pocas lo aplastarian."""
     rng = np.random.default_rng(seed)
     sel = rng.choice(Xd.shape[0], size=min(n_curvas, Xd.shape[0]), replace=False)
     fig, axes = _rejilla(len(t), ncols, 3.6, 3.0, sharey=True)
+    lo, hi = np.quantile(np.asarray(Xd, float), [0.005, 0.995])
+    lo = min(lo, float(np.min(X_obj)), *(float(np.min(X)) for X in preds.values()))
+    hi = max(hi, float(np.max(X_obj)), *(float(np.max(X)) for X in preds.values()))
+    axes[0].set_ylim(lo - 0.05 * (hi - lo), hi + 0.05 * (hi - lo))
     for j, ax in enumerate(axes):
         ax.plot(grilla, np.asarray(Xd[sel, j]).T, color="0.6", lw=0.4, alpha=0.35)
         for nombre, X in preds.items():
@@ -129,11 +135,15 @@ def plot_curvas_predictores(Xd: np.ndarray, preds: Dict[str, np.ndarray], X_obj:
 def plot_comportamientos(C: Dict, idx: Sequence[int], X_obj: np.ndarray, li_f: np.ndarray,
                          ls_f: np.ndarray, grilla: np.ndarray, t_orig: np.ndarray, M: int,
                          X_esp: Optional[np.ndarray] = None, ncols: int = 4,
+                         hdr: Optional[Sequence[np.ndarray]] = None,
                          save_path=None) -> plt.Figure:
     """
     Por origen de `idx`: banda marginal (gris), y por comportamiento su banda
     condicional y su curva tipica con la masa en la leyenda; la esperanza
-    (opcional) punteada y la curva objetivo en negro.
+    (opcional) punteada y la curva objetivo en negro. Con `hdr` = (L, U) de forma
+    (n, G, K) (`intervalos_predictiva.hdr_puntual`), los tramos de la region de
+    maxima densidad en cada tau_g, como segmentos verticales; el titulo lleva el
+    maximo de tramos del origen.
     """
     fig, axes = _rejilla(len(idx), ncols, 3.8, 3.1, sharey=True)
     for ax, i in zip(axes, idx):
@@ -145,7 +155,14 @@ def plot_comportamientos(C: Dict, idx: Sequence[int], X_obj: np.ndarray, li_f: n
         if X_esp is not None:
             ax.plot(grilla, X_esp[i], color="#c0392b", lw=1.1, ls=":", label="esperanza")
         ax.plot(grilla, X_obj[i], color="k", lw=1.6, label="objetivo")
-        ax.set_title(f"t={int(t_orig[i])} · K={int(C['K'][i])}", fontsize=9)
+        titulo = f"t={int(t_orig[i])} · K={int(C['K'][i])}"
+        if hdr is not None:
+            L, U = (np.asarray(a, float)[i] for a in hdr)
+            for k in range(L.shape[-1]):
+                ax.vlines(grilla, L[:, k], U[:, k], color="0.25", lw=0.7, alpha=0.55,
+                          label="HDR (tramos)" if k == 0 else None)
+            titulo += f" · HDR hasta {int(np.isfinite(L).sum(axis=-1).max())} tramo(s)"
+        ax.set_title(titulo, fontsize=9)
         ax.legend(fontsize=6.5, loc="best")
         ax.tick_params(labelsize=7)
     fig.suptitle(f"M={M} · comportamientos predictivos: curva tipica y banda condicional "
@@ -213,8 +230,12 @@ def plot_catalogo(cat: Dict, grilla: np.ndarray, t: np.ndarray, M: int, save_pat
 
 def plot_validacion_regimen(tabla: pd.DataFrame, titulo: str, save_path=None) -> plt.Figure:
     """`104_validacion_regimen_por_M.csv` contra M: acuerdo en K y fracciones con
-    K >= 2, TV y pureza, aciertos del modelo y del oraculo."""
-    fig, axes = plt.subplots(1, 3, figsize=(13, 3.5))
+    K >= 2, TV y pureza, aciertos del modelo y del oraculo. Si la tabla trae las
+    columnas de `intervalos_contra_oraculo`, un cuarto panel: fraccion de (t, tau)
+    con HDR de mas de un tramo y masa verdadera cubierta por la HDR y la simultanea,
+    del modelo y del oraculo."""
+    con_int = "frac_multitramo_modelo" in tabla
+    fig, axes = plt.subplots(1, 4 if con_int else 3, figsize=(17.5 if con_int else 13, 3.5))
     M = tabla["M"]
     axes[0].plot(M, tabla["acuerdo_K"], "o-", color="k", label="acuerdo K modelo = K oraculo")
     axes[0].plot(M, tabla["frac_K2mas_modelo"], "s--", color="#c0392b", label="K>=2 modelo")
@@ -223,6 +244,12 @@ def plot_validacion_regimen(tabla: pd.DataFrame, titulo: str, save_path=None) ->
     axes[1].plot(M, tabla["pureza"], "s-", color="#2ca25f", label="pureza de regimen")
     axes[2].plot(M, tabla["acierto_modelo"], "o-", color="#c0392b", label="acierto modelo")
     axes[2].plot(M, tabla["acierto_oraculo"], "s--", color="#2c7fb8", label="acierto oraculo")
+    if con_int:
+        for q, est in (("modelo", dict(ls="-", color="#c0392b")), ("oraculo", dict(ls="--", color="#2c7fb8"))):
+            axes[3].plot(M, tabla[f"frac_multitramo_{q}"], marker="o", label=f"HDR >1 tramo, {q}", **est)
+            axes[3].plot(M, tabla[f"masa_hdr_{q}"], marker="s", label=f"masa en HDR, {q}", **est)
+            axes[3].plot(M, tabla[f"masa_sim_{q}"], marker="^", label=f"masa en simultanea, {q}", **est)
+        axes[3].set_title("intervalos contra la ley verdadera", fontsize=9)
     for ax in axes:
         ax.set_xticks(list(M))
         ax.set_xlabel("M")
