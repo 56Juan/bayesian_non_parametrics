@@ -1,0 +1,227 @@
+{
+  "global": {
+    "atau": 2.0,
+    "btau": 0.5,
+    "ag": 0.5,
+    "bg": 0.5,
+    "mumu": 0.0,
+    "taumu": 1.0,
+    "pwj": 0.5
+  },
+  "by_type": {
+    "own_lag1": {
+      "apij": 1.0,
+      "bpij": 5.0
+    },
+    "cross_lag1": {
+      "apij": 1.0,
+      "bpij": 5.0
+    }
+  },
+  "variante": {
+    "nombre": "chungEscG",
+    "hiperparametros": "chung_escala_cruda",
+    "N": 30,
+    "taupsij_z": 10.0,
+    "grid_gamma": "por_predictor_rango_train_con_extremos",
+    "chung_escala_cruda": {
+      "taupsij_z": 10.0,
+      "btau_z": 0.5,
+      "ab_por_lag": {
+        "1": [
+          1.0,
+          5.0
+        ]
+      },
+      "ab_cruzado": [
+        1.0,
+        5.0
+      ]
+    }
+  },
+  "mcmc_config": {
+    "nsim": 2500,
+    "burn": 500,
+    "N": 30,
+    "M": 50
+  },
+  "n_iter": 1,
+  "seed_scheme": "seed_base + chain*9973 + k*31",
+  "serie_id": "trafico_mi",
+  "ventana_id": 1,
+  "m_fpca": 4,
+  "m_entrenamiento": 4,
+  "trazas_en": "real_trafico_mi_v01_m04",
+  "covariables": "todos_los_rezagos",
+  "seed_base": 41232,
+  "scores_scale": "raw_fpca_scores",
+  "partition": {
+    "T": 1188,
+    "T0": 831,
+    "prop_train": 0.7,
+    "n_train_eff": 830,
+    "n_test_eff": 357,
+    "train_files": [
+      "dataset_fpc_1_train.csv",
+      "dataset_fpc_2_train.csv",
+      "dataset_fpc_3_train.csv",
+      "dataset_fpc_4_train.csv"
+    ],
+    "test_files": [
+      "dataset_fpc_1_test.csv",
+      "dataset_fpc_2_test.csv",
+      "dataset_fpc_3_test.csv",
+      "dataset_fpc_4_test.csv"
+    ]
+  },
+  "hyperparams_list": [
+    {
+      "component_k": 0,
+      "fpc_idx": 1,
+      "hyperparams": {
+        "atau": 2.0,
+        "btau": 0.2734175659695658,
+        "ag": 0.5,
+        "bg": 0.5,
+        "mumu": 0.0,
+        "taumu": 1.0,
+        "pwj": 0.5,
+        "apij": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "bpij": [
+          5.0,
+          5.0,
+          5.0,
+          5.0
+        ],
+        "mupsij": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "taupsij": [
+          5.45582889858966,
+          0.8497170921839527,
+          0.25010689408678743,
+          0.11688744427240214
+        ]
+      }
+    },
+    {
+      "component_k": 1,
+      "fpc_idx": 2,
+      "hyperparams": {
+        "atau": 2.0,
+        "btau": 0.04247660188982031,
+        "ag": 0.5,
+        "bg": 0.5,
+        "mumu": 0.0,
+        "taumu": 1.0,
+        "pwj": 0.5,
+        "apij": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "bpij": [
+          5.0,
+          5.0,
+          5.0,
+          5.0
+        ],
+        "mupsij": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "taupsij": [
+          5.45582889858966,
+          0.8497170921839527,
+          0.25010689408678743,
+          0.11688744427240214
+        ]
+      }
+    },
+    {
+      "component_k": 2,
+      "fpc_idx": 3,
+      "hyperparams": {
+        "atau": 2.0,
+        "btau": 0.012511073786639229,
+        "ag": 0.5,
+        "bg": 0.5,
+        "mumu": 0.0,
+        "taumu": 1.0,
+        "pwj": 0.5,
+        "apij": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "bpij": [
+          5.0,
+          5.0,
+          5.0,
+          5.0
+        ],
+        "mupsij": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "taupsij": [
+          5.45582889858966,
+          0.8497170921839527,
+          0.25010689408678743,
+          0.11688744427240214
+        ]
+      }
+    },
+    {
+      "component_k": 3,
+      "fpc_idx": 4,
+      "hyperparams": {
+        "atau": 2.0,
+        "btau": 0.00586810762442151,
+        "ag": 0.5,
+        "bg": 0.5,
+        "mumu": 0.0,
+        "taumu": 1.0,
+        "pwj": 0.5,
+        "apij": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "bpij": [
+          5.0,
+          5.0,
+          5.0,
+          5.0
+        ],
+        "mupsij": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "taupsij": [
+          5.45582889858966,
+          0.8497170921839527,
+          0.25010689408678743,
+          0.11688744427240214
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,186 @@
+{
+  "global": {
+    "atau": 0.5,
+    "btau": 0.5,
+    "ag": 0.5,
+    "bg": 0.5,
+    "mumu": 0.0,
+    "taumu": 1.0,
+    "pwj": 0.5
+  },
+  "by_type": {
+    "own_lag1": {
+      "apij": 0.5,
+      "bpij": 0.5
+    },
+    "own_lag2": {
+      "apij": 0.5,
+      "bpij": 5.0
+    },
+    "own_lag3": {
+      "apij": 0.5,
+      "bpij": 5.0
+    },
+    "own_lag4": {
+      "apij": 0.5,
+      "bpij": 5.0
+    },
+    "cross_lag1": {
+      "apij": 0.5,
+      "bpij": 5.0
+    },
+    "cross_lag2": {
+      "apij": 0.5,
+      "bpij": 5.0
+    },
+    "cross_lag3": {
+      "apij": 0.5,
+      "bpij": 5.0
+    },
+    "cross_lag4": {
+      "apij": 0.5,
+      "bpij": 5.0
+    }
+  },
+  "variante": {
+    "nombre": "chungEscG",
+    "covariables": "propio",
+    "hiperparametros": "chung_escala_cruda",
+    "N": 30,
+    "taupsij_z": 10.0,
+    "grid_gamma": "por_predictor_rango_train_con_extremos",
+    "chung_escala_cruda": {
+      "taupsij_z": 10.0,
+      "btau_z": 0.5,
+      "ab_por_lag": {
+        "1": [
+          0.5,
+          0.5
+        ],
+        "2": [
+          0.5,
+          5.0
+        ],
+        "3": [
+          0.5,
+          5.0
+        ],
+        "4": [
+          0.5,
+          5.0
+        ]
+      },
+      "ab_cruzado": [
+        0.5,
+        5.0
+      ]
+    }
+  },
+  "mcmc_config": {
+    "nsim": 2500,
+    "burn": 500,
+    "N": 30,
+    "M": 50
+  },
+  "n_iter": 3,
+  "seed_scheme": "seed_base + chain*9973 + k*31",
+  "escenario_id": 1,
+  "replica_id": 1,
+  "m_fpca": 2,
+  "m_entrenamiento": 10,
+  "trazas_en": "escenario_300_chungEscG_1_r01_m10",
+  "covariables": "rezago_propio",
+  "seed_base": 41232,
+  "scores_scale": "raw_fpca_scores",
+  "partition": {
+    "T": 1000,
+    "T0": 700,
+    "prop_train": 0.7,
+    "n_train_eff": 696,
+    "n_test_eff": 300,
+    "train_files": [
+      "dataset_fpc_1_train.csv",
+      "dataset_fpc_2_train.csv"
+    ],
+    "test_files": [
+      "dataset_fpc_1_test.csv",
+      "dataset_fpc_2_test.csv"
+    ]
+  },
+  "hyperparams_list": [
+    {
+      "component_k": 0,
+      "fpc_idx": 1,
+      "hyperparams": {
+        "atau": 0.5,
+        "btau": 0.2337157140894195,
+        "ag": 0.5,
+        "bg": 0.5,
+        "mumu": 0.0,
+        "taumu": 1.0,
+        "pwj": 0.5,
+        "apij": [
+          0.5,
+          0.5,
+          0.5,
+          0.5
+        ],
+        "bpij": [
+          0.5,
+          5.0,
+          5.0,
+          5.0
+        ],
+        "mupsij": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "taupsij": [
+          4.687414842758533,
+          4.673954583378833,
+          4.632192329481923,
+          4.632685010025471
+        ]
+      }
+    },
+    {
+      "component_k": 1,
+      "fpc_idx": 2,
+      "hyperparams": {
+        "atau": 0.5,
+        "btau": 0.14896079919013283,
+        "ag": 0.5,
+        "bg": 0.5,
+        "mumu": 0.0,
+        "taumu": 1.0,
+        "pwj": 0.5,
+        "apij": [
+          0.5,
+          0.5,
+          0.5,
+          0.5
+        ],
+        "bpij": [
+          0.5,
+          5.0,
+          5.0,
+          5.0
+        ],
+        "mupsij": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "taupsij": [
+          2.9831224776164147,
+          2.9852081933525905,
+          2.9884225739430326,
+          2.9758456357965017
+        ]
+      }
+    }
+  ]
+}
