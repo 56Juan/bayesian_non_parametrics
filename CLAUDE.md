@@ -44,8 +44,9 @@ decisión numérica y suelen traer la respuesta antes que el código.
   anexo + una copia de la 200 con otro generador). Cuáles se muestran en el
   documento es una decisión pendiente del autor (§8).
 - **La predictiva del PSBPM-FD es una mezcla** y se resume de más de una forma.
-  `docs/03 Modelo.tex §03_05` define cuatro predictores puntuales (esperanza,
-  mediana puntual, mediana de Fréchet/medoide L¹, átomo más probable; la mediana
+  `docs/03 Modelo.tex §03_05` define **tres** predictores puntuales (esperanza,
+  mediana puntual, átomo más probable; la mediana de Fréchet/medoide L¹ se quitó del
+  documento el 2026-10-11 por decisión del autor pero el código la sigue calculando; la mediana
   por profundidad MBD se eliminó del código el 2026-10-11), tres intervalos
   (equi-colas, banda simultánea, región de máxima densidad puntual) y `§03_06` los
   **comportamientos predictivos** (k-medias sobre los draws de scores con reglas
@@ -116,6 +117,9 @@ piso de truncamiento), no métricas reportables.
 - Partición: `PROP_TRAIN = 0.70`, `T0` marca el corte y va en el manifest.
 - Se **leen** de `eval_config.json["ventana_movil"]`; **no se redeclaran** en
   `_04` / `_05`.
+- El documento reporta `w = 30`, el mismo del código (decisión 2026-10-12, para no reejecutar los
+  `_04`). Los `_05` y `_06` llevan `W_REF_DOC = None` en `[CONFIG]`; un entero de `VENTANAS_W`
+  sobrescribiría `DIS["W_REF"]` sin tocar `eval_config.json`.
 
 ### 3.3 Evaluación sobre todos los `M`
 
@@ -201,46 +205,35 @@ PSBPM-FD) · §4 Bloque A (los tres modelos) · §5 Bloque B (sólo FAR y PSBPM-
 §6–§7 quién gana cada ventana · §8 resumen y métricas contra `M` · §9 intervalos
 curva a curva.
 
-En las 30x (`300_sim_TAR_estimadores/` es la de referencia) el `_04` y el `_05`
-agregan, sin quitar nada: `_04` §3 los cuatro predictores, las tres construcciones de
-intervalo (equi-colas, simultánea y HDR puntual, sobre las mismas extracciones) y
-`draws_scores_psbp.npy`, §4 y §8 el Bloque A por predictor (§4 también en la ventana
-móvil, §4.2 qué predictor gana cada ventana, §8.1 la tabla por predictor y `M`), §5.1
-el Bloque B por construcción de intervalo (con la esperanza; qué construcción gana
-cada ventana) y §8.2 su tabla por intervalo y `M`, **§11 diagnóstico de multimodalidad** (|esperanza −
-mediana| por score; distancia de la mediana puntual a la extracción más cercana) y
-**§12 comportamientos predictivos** (§12.1 `K` por origen, §12.2 curvas típicas y
-bandas condicionales, §12.3 catálogo global, §12.4 validación contra el régimen
-verdadero con la predictiva oráculo del generador; en la 301, sin régimen, distribución
-de `K` y ancho de la banda contra `h_t` verdadera, para las tres construcciones; en la
-302, contra el mecanismo `Z_t` y, además, la HDR y la simultánea contra las mismas
-construcciones sobre la ley verdadera); `_05`
-§3.3 una fila por predictor, §5 una banda por construcción del PSBPM-FD junto al FAR
-(con `IC_PSBP_TAMBIEN_GAUSSIANA = False`, cuatro filas: FAR, equi-colas, simultánea,
-HDR) y el contraste "misma predictiva, distinta construcción", §6 cada predictor contra
-FAR y RF, §7 cada construcción contra el FAR cara a cara (`111_*`), §9 el FAR contra
-cada construcción curva a curva, y **§10 comportamientos contra lo observado** (desde el
-2026-10-11 `validar_observado(..., curvas_ref=)` agrega el MAE y RMSE en el origen de la curva
-típica del comportamiento realizado y del más probable, y de la esperanza, el FAR y el RF en los
-mismos orígenes: columnas `mae_*`/`rmse_*` en `82`, `83` y `105`; los `_05` de las 30x y la 32
-tienen la celda, falta reejecutarla). Los artefactos de una 30x se **copian** de su 20x con
-`00_copiar_200.py` (`--origen/--destino/--M`): no se corre `_01` ni MATLAB.
+**Las 30x** (`300_sim_TAR_estimadores/` es la referencia; 301 y 302, copias con otro escenario)
+agregan al `_04`/`_05` de la 200, sin quitar nada, lo que define `docs §03_05–§03_06`: cuatro
+predictores puntuales (`predictores=`), tres construcciones de intervalo (`intervalos=`),
+diagnóstico de multimodalidad (`_04` §11) y comportamientos predictivos (`_04` §12, validados
+contra el régimen o mecanismo verdadero en 300 y 302 y contra `h_t` en 301); en el `_05`, una
+fila por predictor, una banda por construcción junto al FAR (`111_*`) y §10 los comportamientos
+contra lo observado, sobre todo el test y, aparte, sobre la ventana de detalle (`subconjunto` y
+`origenes` = todos / `K>=2` en `83` y `105`; `validar_observado(..., curvas_ref=)` da el error
+de la curva típica y de esperanza, FAR y RF en los mismos orígenes). Los artefactos se **copian**
+de la 20x con `00_copiar_200.py`; `_01`, MATLAB y `_03` no se ejecutan.
 
-**Ventana de detalle** (`notebooks/simulaciones/PROMPT_30x_ventana_detalle.md`, 2026-10-11).
-Las diez métricas de la ventana móvil, las tres bandas y los cuatro predictores en todos
-los orígenes, y §12.1 (`K` por origen) siguen sobre toda la serie. El **análisis
-predictivo por origen** va sobre `N_DETALLE = 10` orígenes consecutivos de prueba desde
-`T0_DETALLE` (`[CONFIG]` de `_04` y `_05`; `None` = criterio automático del escenario,
-calculado sobre los `internos`, nunca sobre lo predicho): `_04` §3.2 la elige y la escribe
-en `112_ventana_detalle.json`; §6 (extractos `54`), §11, §12.2 (grilla `63` y una figura
-por origen `63_detalle_t<t>.png`), §12.3, §12.4 y §12.5 (`112_ventana_detalle_por_origen.csv`)
-van sobre ella; el `_05` la **lee** del JSON (§9, `79_ic_contraste_detalle{,_hdr,_simultanea}.png`;
-§10). Con 10 orígenes aciertos y coberturas se reportan como cuentas (k de 10). Las
-funciones del paquete que separan train/test reciben `ORIG_DET = {**ORIG, "es_train":
-~MASK_DET}`: su bloque "test" es la ventana. No hubo cambios en el paquete. Criterios:
-300, más cambios de régimen verdadero; 301, contiene el máximo de `h_t` agregada
-(`sum_j lambda_j h_tj`, el máximo en la tercera posición); 302, más orígenes con `K ≥ 2` en
-la ley verdadera.
+- **Ventana de detalle** (`PROMPT_30x_ventana_detalle.md`): métricas de ventana, bandas,
+  predictores y `K` por origen van sobre toda la serie; el análisis origen a origen (`_04` §6,
+  §11, §12.2–§12.5; `_05` §9) va sobre `N_DETALLE = 10` orígenes consecutivos de prueba que el
+  `_04` §3.2 elige con un criterio del escenario sobre los `internos`, nunca sobre lo predicho
+  (300: más cambios de régimen; 301: máximo de `h_t` agregada en tercera posición; 302: más
+  orígenes con `K ≥ 2` en la ley verdadera; reales: calendario) y escribe en
+  `112_ventana_detalle.json`, que `_05` y `_06` leen. Con 10 orígenes las cifras son cuentas.
+- **`_06_opciones`** (2026-10-11; en 300–302, 101 y 102; sin ejecutar): los comportamientos como
+  opciones de pronóstico. Lee draws, comportamientos y banda del `_04`, reajusta FAR y RF como el
+  `_05` y, por comportamiento, calcula curva típica, mediana puntual y medoide del grupo. Dos
+  filas de modelo por opción: **más probable** (el pronóstico por comportamiento de docs
+  §03_06_03) y **mejor comportamiento** (menor error L² en el origen: una cota, usa lo observado);
+  con `K = 1` ambas son el predictor marginal de la misma opción. Cada una contra FAR y RF **por
+  separado**, en ventana móvil, contra `M` y por origen (test; todos / `K ≥ 2`), y acierto (el
+  mejor es el más probable) por tramos de `p_1`. Salidas `113`–`115` por `M`, `116`–`119` en el
+  barrido. Sin control de extracciones al azar (decisión del autor).
+- **`W_REF_DOC`** en `[CONFIG]` de `_05` y `_06` (30x, 32, 101, 102): `None` (= 30, lo que reporta
+  el documento); un entero de `VENTANAS_W` sobrescribiría `DIS["W_REF"]` sin tocar el `_04`.
 
 ### Dónde vive el código de cada notebook
 
@@ -454,6 +447,7 @@ se registra desde `_01`; **no se decide en el notebook de evaluación**.
   | `_04` de las 30x, intervalos | `58`–`59` (§4 por predictor, §5.1 por intervalo) | `108`–`110` |
   | `_05` de las 30x, intervalos | `81b_*_PSBPM-FD-simultanea/-hdr` | `111` |
   | 30x, ventana de detalle | `_04`: `63_detalle_t<t>.png`; `_05`: `79_ic_contraste_detalle{,_hdr,_simultanea}.png` | `112_ventana_detalle.json`, `112_ventana_detalle_por_origen.csv` |
+  | `_06` de las 30x y la 32 | `113_opciones_por_origen.csv`, `114_ventana_{mas_probable,mejor}_w<w>.png`, `115_ventana_modelos_w<w>.csv` | `116_resumen_bloqueA_opciones.csv`, `117_{ganador_ventana,razones}_opciones.csv`, `118_{mas_probable,mejor}_vs_M.png`, `119_resumen_opciones_por_M.csv`, `119_acierto_por_p1.{csv,png}` |
 
   En la 301 los prefijos de la validación contra régimen (`65` por `M`, `104` en el
   barrido) llevan el diagnóstico de banda contra `h_t`.
@@ -524,114 +518,15 @@ y los otros seis son AR(1) de coeficiente 0.3.
 | `301_sim_GARCH_estimadores` | el de la 201 | ninguno (copia de la 201 con `00_copiar_200.py --origen escenario_201_chungEscG_1_r01 --destino escenario_301_chungEscG_1_r01`) | `escenario_301` | `(1, …, 10)` | las de la 201 | **evaluada** (`_04`, `_05`); `_01`/`.m`/`_03` copiados, no se ejecutan |
 | `302_sim_MULT_estimadores` | el de la 202 | ninguno (copia de la 202 con `00_copiar_200.py --origen escenario_202_chungEscX_1_r01 --destino escenario_302_chungEscX_1_r01 --M 3 4 5 6`; cada `M` con sus trazas) | `escenario_302` | `(3, 4, 5, 6)` | las de la 202 | **evaluada** (`_04`, `_05`); `_01`/`.m`/`_03` copiados, no se ejecutan |
 
-Las 30x reevalúan 200–202 con los predictores, intervalos y comportamientos de
-`docs §03_05–§03_06`. El plan completo, con el contexto que lo justifica, está en
-`notebooks/simulaciones/PROMPT_300_estimadores.md` (300, y al final 301 y 302).
-Hallazgos que motivan las 30x: con predictiva multimodal la esperanza cae entre
-los modos y pierde bajo MAE (tráfico −9 % con la mediana; Mapocho −13 % por
-asimetría; 200 −1 %: sus regímenes difieren en dinámica, no en nivel; 201, 202 y
-las demás reales sin diferencia); las reglas de comportamientos dan K = 2 en el
-tráfico (69 % de los días) y K = 1 en 201, 202 y las reales restantes.
-
-**Resultados de la 300** (test, w = 30; reproduce la 200 al bit en esperanza,
-banda, FAR y RF). Bloque A contra la curva suavizada: la **mediana puntual** baja
-el MAE 1.3 % y el E_max medio 2 % frente a la esperanza con M ≥ 5 (0.6087 → 0.6006
-en M = 10); contra X^(M) hasta −5 % en M = 2. La **esperanza** gana el RMSE y el
-E_max^glob (las medianas lo suben ~5 %). El medoide gana con M ≤ 5 y empeora con M
-alto (es UNA extracción: arrastra el ruido de los scores pasivos); el **modal** es
-el peor (+3.6 % MAE, +7 % RMSE). El RF sigue ganándole a todos en el Bloque A (MAE
-0.591 en M = 10). |esperanza − mediana| > 0.25 sd robusta en 52–67 % de los
-orígenes de test de los scores activos y 0 % de los pasivos. Comportamientos (todo
-el test): K = 1 / 2 / 3 en 70 / 17 / 13 % con M ≥ 2 (lo fijan ξ_1, ξ_2); el modelo
-declara K ≥ 2 en 30 % y la ley verdadera (`predictiva_oraculo_TAR`) en 9 %, porque
-el gating deja ~11 % de masa en un modo tipo B donde P(B) ≈ 0; donde la ley sí es
-bimodal, el modelo lo detecta en 22 de 25 (M = 1).
-Intervalos (docs §03_05_05, con la esperanza; equi-colas, FAR y predictores
-reproducidos al bit, RF a 1e-15): la **HDR** es la única construcción que se parte
-(un solo tramo en 63 % de los (t, τ) con M = 1 y 88–90 % con M ≥ 5; fusiones ≤ 0.35 %) y
-gana el Winkler a la equi-colas en 94 % de las ventanas (3.75 contra 3.91 en M = 5,
-MPIW 3.35 contra 3.45, PICP 0.965 contra 0.957); las dos le ganan al FAR (4.86) en el
-100 % de las ventanas desde M = 4. La **simultánea** lleva el PICPB a 0.98 (equi-colas
-0.57, HDR 0.67, FAR 0.70) con MPIW 6.55 y pierde el Winkler (6.57). Con M ≤ 2 el
-Winkler medio de las tres es peor que el del FAR (truncamiento).
-Ventana de detalle (`PROMPT_30x_ventana_detalle.md`): t = 807..816, la de más cambios
-de régimen verdadero en los scores activos (14). Cuentas sobre esos 10 orígenes, M = 5,
-descriptivas: K ≥ 2 en 6 (oráculo 2), K igual al del oráculo en 6, el comportamiento
-del régimen realizado es el más probable en 7 (oráculo 9); lo observado cae en el
-comportamiento más probable en 7; curvas enteras dentro de la banda: equi-colas 8,
-HDR 7, simultánea 10, FAR 4; la banda condicional del comportamiento realizado tiene
-MPIW 3.03 contra 3.87 de la marginal.
-
-**Resultados de la 301** (test, w = 30; reproduce la 201 a precisión de máquina en
-esperanza, banda, FAR, RF y Bloque B). Predictiva unimodal: |esperanza − mediana| /
-sd robusta tiene mediana 0.01–0.03 y p90 0.03–0.08 por score, > 0.25 en 0–0.3 % de
-los orígenes; la **mediana puntual** queda a ≤ 0.3 % de la esperanza en MAE, RMSE y
-Ē_max y a ≤ 0.8 % en E_max^glob (MAE 0.7113 / 0.7116 en M = 10), y la esperanza gana
-por poco. El medoide empeora con M alto (+2.5 % MAE en M = 10) y el modal +0.7 % (la MBD
-se eliminó; con ella la 301 reproduce al bit las filas de los otros cuatro).
-Desde M = 4 el PSBPM-FD (esperanza) le gana en MAE y RMSE al FAR (0.7113 contra
-0.7232; 0.8899 contra 0.9056 en M = 10) y al RF; con M ≤ 2 gana el FAR. Bloque B: el
-Winkler le gana al FAR desde M = 4 (4.23 contra 4.35 en M = 10, 81 % de las
-ventanas), W_max^glob desde M = 5, W̄_max desde M = 6 (9.85 contra 10.40) y PICPB
-desde M = 7 (0.65 contra 0.62), con MPIW parecido (3.49 contra 3.42) y PICP 0.947
-contra 0.940. Comportamientos: K = 1 en 99.7 % de test (≥ 98.7 % de train) y
-catálogo global L = 1 en todo M; los K = 2 (t = 933 en test; 460–464 y 547–551 en
-train) son orígenes con el score rezagado a 5–6 sd y h_t en su percentil 100, donde
-la mezcla separa una curva de reversión (p ≈ 0.6) de una persistente y más ancha
-(p ≈ 0.4). Banda contra h_t (fuera de las diez métricas; sobre todo el test, evaluación
-previa a la ventana de detalle, mismo código): Spearman 0.61 en la curva
-(0.58–0.70 por score activo), ancho medio 0.99 del oráculo, pero CV 0.07 contra 0.13:
-la banda respira con h_t y sigue sus picos, con un piso más alto y menos amplitud
-que la verdad.
-Intervalos (docs §03_05_05, con la esperanza; equi-colas, FAR y predictores
-reproducidos al bit): la **HDR** es un solo tramo en ≥ 99.85 % de los (t, g), sin
-fusiones (en t = 933, el origen con K = 2, tampoco se parte: los dos comportamientos
-se solapan en cada τ), y coincide con la equi-colas (Winkler 4.231 / 4.233 en M = 10,
-MPIW 3.49 / 3.49; cara a cara le gana al FAR en 88 % de las ventanas contra 81 % de la
-equi-colas, en M = 10). La
-**simultánea** alcanza el nominal de curva completa (PICPB 0.94 / 0.97 en M = 5 / 10,
-contra 0.60–0.66 de equi-colas y HDR y 0.62 del FAR) y baja W̄_max y W_max^glob (6.5 y
-17–22 contra 9.6–10.7 y 44–49), pero es 1.5 veces más ancha (MPIW 5.0–5.3) y pierde en
-Winkler (5.1–5.3 contra 4.35 del FAR; sólo es la mejor de las tres en M = 2, donde
-equi-colas y HDR quedan cortas): el Winkler puntual elicita
-la equi-colas. Contra h_t la HDR da lo mismo que la equi-colas y la simultánea algo
-menos (Spearman 0.57): cambian el nivel del ancho, no la lectura.
-**Ventana de detalle** t = 931..940 (contiene el máximo de h_t agregada en test, t = 933,
-en la tercera posición; h_t agregada 1.28 → 2.34 → 0.55, mediana del test 0.70; métricas de
-la ventana móvil reproducidas al bit). K = 2 sólo en t = 933 (1 de 10) y la HDR es un tramo
-en los 10 orígenes. Banda contra h_t en la ventana (10 puntos, descriptivo): Spearman
-0.79–0.88 para las tres construcciones, CV del ancho 0.19–0.24 contra 0.21–0.22 del
-oráculo: en el episodio de volatilidad la banda sí acompaña a h_t. Contra lo observado: lo
-observado cae en el comportamiento más probable en 10 de 10; equi-colas, HDR y simultánea
-cubren la curva entera en 8 de 10 (fallan t = 932 y 940), el FAR en 7 de 10 (además t = 931);
-t = 932, el origen anterior al pico, es el peor para todas (cobertura puntual 0.40 del FAR,
-0.44–0.49 de equi-colas y HDR, 0.75 de la simultánea).
-
-**Resultados de la 302** (test, w = 30, M = 4 / 6; las filas esperanza/equi-colas, la
-banda del FAR y la validación previa se reproducen al bit). Predictiva unimodal:
-|esperanza − mediana| > 0.25 sd robusta en 0 % de los orígenes (3 % sólo en ξ_5 con
-M = 6). Bloque A: la
-**esperanza** es el mejor predictor en MAE y RMSE en todo M (0.6895 / 0.6890 y
-0.8658 / 0.8655); mediana +0.0–0.3 %, medoide +0.9–1.6 %, modal +1.4–1.6 %; FAR 0.6997 /
-0.8804 y RF 0.699 / 0.877. Bloque B contra la curva suavizada: equi-colas Winkler 4.15 /
-4.11 contra 4.23 del FAR (gana 76 / 81 % de las ventanas), PICP 0.931 / 0.944; la **HDR**
-coincide con la equi-colas (4.16 / 4.11, un tramo en el 99.99 % de los (t, τ), sin
-fusiones); la **simultánea** lleva el PICPB a 0.90 / 0.93 (FAR 0.56) con MPIW 4.6 / 4.9 y
-pierde el Winkler (4.71 / 4.99, gana 3 / 1 % de las ventanas al FAR): el Winkler elicita
-el intervalo central. Comportamientos (§12.1, todo el test): K = 1 en el 100 % de los
-orígenes. Sobre todo el test (evaluación previa a la ventana de detalle, mismo código de
-§12.4): la ley verdadera (`predictiva_oraculo_C1`) tiene K ≥ 2 en 3.0–3.3 % de test y
-sólo en la **conjunta** (la marginal de ξ_1 nunca es bimodal); argmax π_t acierta Z_t en
-74 %; la HDR del modelo tiene más de un tramo en 0.00–0.01 % de los (t, τ) contra
-0.95–2.0 % del oráculo, y la masa verdadera que cubre es 0.956–0.959 (simultánea
-0.959–0.962) contra 0.951 / 0.950 del oráculo, con la HDR ~8 % más ancha. **Ventana de
-detalle** t = 776..785 (criterio: la de más orígenes con K ≥ 2 en la ley verdadera; 3 de
-10, t = 782, 784, 785), cuentas descriptivas: el modelo da K = 1 en los 10 y en todo M
-(acuerdo en K 7 de 10; catálogo L = 1); la HDR del modelo no se parte en ningún (t, τ)
-y la del oráculo en el 4–8 % de ellos; la observada cae entera en la banda equi-colas
-en 4–8 de 10 orígenes contra X^(M), según M. Lectura: la multimodalidad de C-3 casi no llega a
-la ley marginal en τ; la banda unimodal del modelo está bien calibrada contra la verdad,
-y su ventaja en el Bloque B no viene de la multimodalidad.
+Las 30x reevalúan 200–202 con `docs §03_05–§03_06`. **Cifras completas en
+`notebooks/simulaciones/RESULTADOS_30x.md`** (300, 301, 302 y sus ventanas de detalle; test,
+`w = 30`). La lectura: la esperanza gana el RMSE en los tres escenarios; la mediana puntual baja
+el MAE ~1.3 % en la 300 y coincide con la esperanza en 301 y 302 (predictivas unimodales); el
+medoide empeora con `M` alto y el modal es el peor; el RF gana el Bloque A en la 300. La HDR sólo
+se parte en la 300 y ahí le gana el Winkler a la equi-colas; la simultánea es la única calibrada
+en PICPB y pierde el Winkler; las tres le ganan al FAR desde `M = 4`. Comportamientos: `K ≥ 2` en
+30 % del test de la 300 (ley verdadera 9 %), 0.3 % en la 301 y 0 % en la 302 (la multimodalidad
+de C-3 no llega a la marginal). **Pendiente**: reejecutar `_05` (§10 sobre todo el test) y correr `_06` en las tres.
 
 El generador común (`pipelines/sim_scores_comun.py`) arma la salida a partir de un
 simulador de `z`, calcula `mu_theta`, `theta` y el control de calidad
@@ -668,9 +563,9 @@ eso se entrega a la estimación**.
 | `REPLICA_ID` / `R` | 1 |
 | `J` / `K` | 10 / 10 (base de Fourier del generador; acota el barrido en `M`) |
 | `MCMC_CONFIG` | `{"nsim": 2500, "burn": 500, "N": 30, "M": 50}`, `N_CHAINS = 3` |
-| ventanas | `w ∈ {20, 30, 40}`, `W_REF = 30` |
+| ventanas | `w ∈ {20, 30, 40}`, `W_REF = 30` (también en el documento) |
 | scores | **sin estandarizar**: `scores_scale = "raw_fpca_scores"` |
-| `M` (regla) | primera `M` con varianza acumulada `>= 95 %` (5 en estas corridas) |
+| `M` (regla) | primera `M` con varianza acumulada `>= 95 %` da 5; el documento usa `M_ref = 10` (6 en C-3), la mayor del barrido |
 
 **Hiperparámetros: Chung y Dunson §4.2 en escala cruda, sin escalera.** Valen igual
 para todas las componentes: `atau = ag = bg = 0.5`, `btau = 0.5·sd_y²`,
@@ -698,32 +593,32 @@ BTCUSDT de Binance en velas de 5 min (25, 288 barras por día UTC). `24` y `25`
 son las vivas de esa generación (rezago propio `N_LAGS = 7`, `MCMC_CONFIG =
 {5000, 2000, 40, 60}`, `N_CHAINS = 2`); 21–23 **no son comparables** con la 24.
 
-`26`–`31` llevan el **pipeline de la 200 portado a reales** (B-spline 10/3 elegida
-por el analista, FPCA en train, scores crudos, `chungEscG`, `atau = 2`,
-covariables **cruzadas con un rezago** salvo que se indique): `26` BTC cierre,
-`27` precio SA1 (AEMO), `28` PM2.5 Parque O'Higgins (SINCA), `29` BTC volatilidad
-realizada (+ exógenas), `30` tráfico I-94 barrido `M = 1..6` y `31` tráfico
-`M = 10` (1 cadena). Los datasets de la tesis de Katerin (`references/`) están en
-`data/reales/raw/katerin_*`; el tráfico (régimen semanal) y el PM2.5 crudo
-(volatilidad) son los candidatos; household no. **`32` = la 31 con rezagos `{1, 7}`**
-(`notebooks/reales/32_real_trafico_l17/`, `SERIE_ID = trafico_l17`, M = 10, 1 cadena,
-inclusión (1, 5) también para el rezago 7): los cuatro notebooks y los `.m` están creados
-(2026-10-11) y **sin ejecutar**. `32_01`/`32_03`/`.m` son la 31 con `LAGS = (1, 7)`;
-`32_04`/`32_05` son los `300_04`/`300_05` (plantilla 30x: cuatro predictores, tres
-intervalos, comportamientos, ventana de detalle) adaptados a reales: identidad
-`real_<serie>_v<NN>`, `BURN_EVAL = 1000`, sin generador ni oráculo; la ventana de detalle
-se elige por **calendario** (la de 10 días de prueba con más días no laborables, con la
-columna `holiday` del CSV crudo) y el §12.4 cruza `K` con el día de la semana y los feriados
-(`65_comportamientos_calendario.csv`, `104_comportamientos_calendario_por_M.csv`). Orden de
-ejecución: `32_01`, MATLAB (10 jobs), `32_03`, `32_04`, `32_05`. Rezagos no contiguos: el
-manifest lleva `lags = [1, 7]` y `n_lags = 7` (= `max(lags)`, el desplazamiento y
-`t_offset`); `verificar_contrato` acepta `lags` (cambio aditivo en `artifacts.py`);
-MATLAB lee `feature_names` y no cambia. Decisiones para el `_05`: el FAR de referencia es
-el **FAR(7) completo** (`p = N_LAGS = 7`, sale solo), y el RF debe barrer los
-subconjuntos `{1}` y `{1, 7}` (`ajustar_rf(..., ordenes=LAGS)`, argumento aditivo: `r = 1`
-usa `{1}` y `r = 7` usa `{1, 7}` porque `_cols_propias` filtra `lag <= r`; sin `ordenes`,
-`1..N_LAGS` como siempre). Los datos de cada serie, su calidad y su calibración están en los
-`_01`, no se repiten aquí.
+`26`–`31` llevan el pipeline de la 200 portado a reales (B-spline 10/3 elegida por el analista,
+FPCA en train, scores crudos, `chungEscG`, `atau = 2`, covariables cruzadas con un rezago salvo
+indicación): `26` BTC cierre, `27` precio SA1 (AEMO), `28` PM2.5 Parque O'Higgins (SINCA), `29`
+BTC volatilidad realizada (+ exógenas), `30` tráfico I-94 barrido `M = 1..6`, `31` tráfico
+`M = 10` (1 cadena). Datasets de la tesis de Katerin en `data/reales/raw/katerin_*` (tráfico y
+PM2.5 crudo son los candidatos; household no). Los datos de cada serie, su calidad y su
+calibración están en los `_01`.
+
+**Tráfico I-94, las corridas del capítulo de aplicación** (M = 10, 1 cadena, `atau = 2`,
+ventana 2015-07-01..2018-09-30, 70/30):
+
+| Carpeta | `SERIE_ID` | rezagos | trazas | estado |
+|---|---|---|---|---|
+| `31_real_trafico_m10` | `trafico_m10` | `{1}` | entrenada | evaluada con el pipeline 200; histórica |
+| `32_real_trafico_l17` | `trafico_l17` | `{1, 7}` | entrenada (2026-10-11) | `_04` y `_05` ejecutados; origen de la 102 |
+| `101_real_trafico` | `trafico_101` | `{1}` | copia de la 31 (`00_copiar_31.py`) | `_04`/`_05` ejecutados con el pipeline 30x; falta reejecutar `_05` y correr `_06` |
+| `102_real_trafico_l17` | `trafico_102` | `{1, 7}` | copia de la 32 | `_04` **por copia** de las salidas de la 32 (2026-10-12; mismo notebook, otro ID); falta `_05` y `_06` |
+
+Rezagos no contiguos (32/102): el manifest lleva `lags = [1, 7]` y `n_lags = max(lags) = 7`
+(desplazamiento, `t_offset` y orden del FAR completo); `verificar_contrato` acepta `lags`; el
+FAR(7) completo es la referencia y el RF barre `{1}` y `{1, 7}` (`ajustar_rf(..., ordenes=LAGS)`);
+inclusión (1, 5) también para el rezago 7. El `_04` de reales es el `300_04` sin generador ni
+oráculo: `BURN_EVAL = 1000`, ventana de detalle por calendario (los 10 días de prueba con más
+días no laborables, columna `holiday` del CSV) y §12.4 cruza `K` con el día de la semana y los
+feriados (`65_comportamientos_calendario.csv`, `104_*`). `32_06` existe y no se usa (lo reemplaza
+el `102_06`).
 
 ### Historia — no se edita ni se cita como estado actual
 
@@ -745,68 +640,35 @@ usa `{1}` y `r = 7` usa `{1, 7}` porque `_cols_propias` filtra `lag <= r`; sin `
 
 ---
 
-## 8. Contradicciones abiertas
+## 8. Decisiones abiertas y hechos que no se reabren
 
-Señaladas, no resueltas. **Preguntar antes de codificar contra ellas.**
+**Abiertas — preguntar antes de codificar contra ellas:**
 
-1. **`docs/03 Modelo.tex`: "Diseño del Estudio de Simulación" tiene dos párrafos
-   y una subsección "Escenarios" vacía; "Resultados" es un esqueleto con
-   `% [PENDIENTE]`.** Falta escribir objetivos de evaluación, modelos de
-   referencia, especificación del PSBPM-FD, qué resumen va con qué métrica y qué
-   se reporta. Esquema propuesto en la sesión del 2026-10-10 (seis subsecciones);
-   no redactar sin pedido.
-2. **Qué escenarios se muestran en el documento.** Hoy son tres (C-1 GARCH, C-2
-   TAR, C-3 multimodal) pero el conjunto puede crecer. Con las reglas de
-   comportamientos, sólo el tráfico produce predictivas multimodales; 200–202 tal
-   como están calibradas no (el TAR separa dinámica, no nivel). Si se quiere un
-   escenario simulado donde los comportamientos aparezcan, hace falta un
-   generador con regímenes que difieran en **nivel** (tipo calendario).
-3. ~~Prefijo `03_06_` duplicado~~ Resuelto el 2026-10-11: Diseño del estudio es
-   `03_07_*`, Resultados `03_08_00`, Intervalos `03_05_05_*`. El prompt de la 300
-   puede citar las etiquetas viejas; las `
-ef` de `docs/` ya están actualizadas.
-4. **El anexo (`docs/01 Anexo.tex`) y el capítulo 03 no coinciden en el predictor.**
-   El capítulo describe un predictor común con los rezagos de **todas** las
-   componentes; 200 y 201 usan **rezago propio** (sólo 202 es cruzado). Se
-   resuelve escribiéndolo como decisión por escenario en el diseño del estudio.
-5. **Una réplica por escenario, por decisión (2026-10-10).** No habrá réplicas;
-   `REPLICA_ID` se conserva en el `EXPERIMENT_ID` y en las rutas para que el
-   código lo permita, pero siempre vale 1. Consecuencia que el documento declara:
-   las diferencias entre modelos son evidencia descriptiva, y una diferencia de
-   pocos puntos porcentuales no se lee como superioridad. No proponer réplicas.
-6. **`200_sim_TAR` está calibrada para favorecer al gating** (calibración de la
-   114 "exagerada"). Las conclusiones sobre el TAR valen para esa calibración, no
-   para un TAR genérico.
-7. **`atau = 0.5` en 200–202 deja átomos con precisión ≈ 0**: los draws tienen
-   colas no acotadas (curtosis 10⁵–10⁶). La esperanza analítica y los cuantiles no
-   lo sufren; **la media de los draws sí** y nunca se usa como estimador; antes de
-   clusterizar se recortan los draws a los cuantiles 0.5–99.5 %. Las reales usan
-   `atau = 2`. Si se reentrena una simulación, decidir `atau` antes.
-8. **La banda equi-colas es puntual y PICPB mide cobertura simultánea**: queda bajo
-   el nominal para todos los modelos por construcción (0.72 FAR / 0.75 PSBPM-FD en
-   tráfico). Compara modelos, no mide calibración. Desde el 2026-10-11 la banda
-   simultánea y la HDR de `§03_05_05` están implementadas
-   (`fit/intervalos_predictiva.py`) y se reportan en las 30x; PICPB sigue siendo
-   cobertura de curva completa y sólo la simultánea está calibrada para ella.
-9. **Las etiquetas de los átomos no convergen** (ψ, Γ, α; los β sí) y la mezcla
-   toca `N = 30` en varias componentes de las reales. No afecta a la predictiva
-   (invariante a etiquetas), pero R̂ no se calcula con 1 cadena (30/31).
-10. **`pipelines/real_pipeline.py` es un stub `TODO`** de seis líneas. El flujo de
-    datos reales vive en `notebooks/reales/`.
-11. **La regla de valle (`docs` eq. `valle`) evalúa la densidad en los
-    centroides**, pero el texto dice "el menor de los dos picos". Con tres modos
-    colineales, k-medias con K = 2 junta dos y su centroide cae en el valle entre
-    ellos: la razón no baja de 0.5 y la regla da K = 1 (a veces 2), nunca 3
-    (`tests/test_comportamientos.py`). En R² no colineales funciona. Implementado
-    como dice la ecuación; evaluar en los picos lo arreglaría, pero cambia la regla.
-12. ~~"Cinco predictores" en el docs~~ Resuelto el 2026-10-11 por decisión: el
-    documento define y reporta **cuatro** (sin la mediana MBD), y la MBD se eliminó
-    del código (`PREDICTORES` tiene cuatro; sin `profundidad_mbd` ni `mediana_mbd`,
-    sin filas `PSBPM-FD (mbd)`).
-13. **Las 30x duplican las trazas de su 20x** (~220 MB de `.mat` en la 300), y los
-    `.mat` se versionan. `trazas_en` podría apuntar a la 20x sin copiarlas, pero el
-    plan pidió una 30x autocontenida.
+1. **Capítulo de aplicación**: `docs/04 Aplicacion.tex` es un esqueleto (2026-10-12) con las
+   secciones de §03_08 y comentarios con la fuente de cada cuadro; sin prosa.
+2. **Trazas duplicadas**: las 30x copian los `.mat` de su 20x (~220 MB en la 300) y 101/102 los
+   de 31/32; todo se versiona. Se deja así salvo que el repo pese demasiado.
 
-Resueltas en la sesión del 2026-10-10 (no reabrir): la referencia a
-`03_06_04_objetivos_evaluacion` ya no existe; `§03_05` quedó sin estandarización
-(`ξ` crudo, sin `(c_m, d_m)`); 201 y 202 están entrenadas y evaluadas.
+**Hechos — no reabrir (decididos el 2026-10-10/12):**
+
+- Escenarios del documento: C-1, C-2 y C-3. Un escenario simulado con comportamientos (regímenes
+  que difieran en nivel) es trabajo futuro, no pendiente.
+- `W_REF = 30` en código y documento; `W_REF_DOC = None` en `_05`/`_06`.
+- Una réplica por escenario; las cifras son descriptivas y así lo declara el documento.
+- `200_sim_TAR` está calibrada a favor del gating; las conclusiones valen para esa calibración.
+- `atau = 0.5` en 200–202 deja colas no acotadas en los draws: nunca la media de los draws como
+  estimador; recorte a 0.5–99.5 % antes de agrupar. Las reales usan `atau = 2`.
+- Equi-colas y HDR son puntuales; PICPB es cobertura de curva completa y sólo la simultánea está
+  calibrada para ella.
+- Las etiquetas de los átomos no convergen (ψ, Γ, α; los β sí); la predictiva es invariante; R̂
+  no se calcula con 1 cadena.
+- La regla de valle evalúa la densidad en los centroides, como dice la ecuación; con tres modos
+  colineales nunca da `K = 3` (`tests/test_comportamientos.py`). No se cambia.
+- `pipelines/real_pipeline.py` (stub) se borró; el flujo real vive en `notebooks/reales/`.
+- `102_04` no se ejecuta: sus salidas son copia de la 32 (mismo notebook, otro ID).
+- Documento: se reportan **tres** predictores (esperanza, mediana puntual, átomo modal); el
+  medoide se calcula y no se reporta; la MBD se eliminó del código. El diseño del estudio (§03_07) es una introducción general más `tab:dis_escenarios` (rezago
+  propio o cruzado por escenario, `M_ref = 10`, 6 en C-3); la configuración (partición, muestreador,
+  referencias, métricas por resumen, constantes de comportamientos) vive en el Anexo
+  `ane_00_03_configuracion` (2026-10-12); el pronóstico por comportamiento vive en §03_06_03 y la
+  cota sólo en el diseño; sin control de extracciones al azar.

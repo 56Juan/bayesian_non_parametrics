@@ -308,3 +308,112 @@ $3$ & nivel bajo  & $0.2$ & $0.4$ & $0.2$ & $0.2$ & $-0.5$ & $-0.3$ & $0.1$  & $
 \hline
 \end{tabular}
 \end{table}
+
+\section{Configuración del estudio de simulación}
+\label{ane_00_03_configuracion}
+Esta sección recoge la configuración con que se corrió el estudio de simulación de la Sección~\ref{03_07_00_diseno_estudio_simulacion}: partición y ventana móvil, muestreador y predictiva, modelos de referencia, métricas por resumen y constantes de los comportamientos.\\
+
+
+Partiendo por Cuadro~\ref{tab:dis_particion} el cual presenta la partición temporal, la ventana móvil y las referencias de los cuadros del capítulo; las ventanas que cruzan $T_0$ se excluyen de todo agregado.
+
+\begin{table}[H]
+\centering\small
+\caption{Partición temporal, ventana móvil y referencias de los cuadros.}
+\label{tab:dis_particion}
+\begin{tabular}{p{0.14\textwidth} p{0.56\textwidth} p{0.18\textwidth}}
+\hline
+Símbolo & Descripción & Valor \\
+\hline
+$T_0$              & corte entrenamiento / prueba ($70\%$ de las $T = 1000$ curvas del Cuadro~\ref{tab:ane_comun}) & $700$ \\
+$h$                & horizonte de predicción                         & $1$ \\
+$w$                & anchos de la ventana móvil                      & $\{20, 30, 40\}$ \\
+$w_{\mathrm{ref}}$ & ancho reportado en el capítulo                  & $30$ \\
+paso               & desplazamiento entre ventanas                   & $1$ \\
+$M_{\mathrm{ref}}$ & dimensión del estado en los cuadros, la mayor del barrido de cada escenario (Cuadro~\ref{tab:dis_escenarios}) & $10$ ($6$ en C-3) \\
+$1-\zeta$          & nivel de los intervalos de credibilidad         & $0.95$ \\
+\hline
+\end{tabular}
+\end{table}
+
+El Cuadro~\ref{tab:dis_mcmc} recoge la configuración del muestreador (Sección~\ref{03_04_00_modelo_propuesto_psbpm_fd}) y de la predictiva; con $a_\nu = 0.5$ la varianza predictiva de la Sección~\ref{03_05_02_varianza} no existe y no se reporta.
+
+\begin{table}[H]
+\centering\small
+\caption{Configuración del muestreador y de la predictiva.}
+\label{tab:dis_mcmc}
+\begin{tabular}{p{0.16\textwidth} p{0.50\textwidth} p{0.22\textwidth}}
+\hline
+Símbolo & Descripción & Valor \\
+\hline
+$N$                   & truncamiento del stick-breaking                         & $30$ \\
+$L_j$                 & puntos de la grilla de localización por predictor       & $50$ \\
+iteraciones           & por cadena / descartadas                                & $2500$ / $500$ \\
+cadenas               & cadenas independientes por score                        & $3$ \\
+$a_\nu, a_g, b_g$     & forma de las precisiones y de la contracción            & $0.5$ \\
+$b_\nu$               & escala de la precisión del átomo                        & $0.5\,\mathrm{sd}^2(\xi_m)$ \\
+$\nu_{\rho_j}$        & precisión a priori de los coeficientes de decaimiento $\rho_{hj}$ & $10\,\mathrm{sd}^2(z_j)$ \\
+$(a_{\kappa_j}, b_{\kappa_j})$ & inclusión, rezago propio de orden uno / resto      & $(0.5, 0.5)$ / $(0.5, 5)$ \\
+$S$                   & extracciones de la predictiva por origen                & $1000$ \\
+\hline
+\end{tabular}
+\end{table}
+
+Los modelos de referencia siguen el Cuadro~\ref{tab:dis_referencia}. El FAR se estima sobre los coeficientes completos de la representación, en la métrica $L^2$, con orden fijo igual al número de rezagos del escenario, para no darle una ventaja de especificación que el PSBPM-FD no tiene; su intervalo es gaussiano con los residuos de entrenamiento. El Random Forest comparte la especificación del PSBPM-FD, un modelo por score con las mismas covariables, de modo que la diferencia entre ambos es solo el mecanismo que liga covariables y respuesta.
+
+\begin{table}[H]
+\centering\small
+\caption{Ajuste de los modelos de referencia.}
+\label{tab:dis_referencia}
+\begin{tabular}{p{0.16\textwidth} p{0.36\textwidth} p{0.38\textwidth}}
+\hline
+Modelo & Elemento & Valor \\
+\hline
+FAR($p$) & orden $p$                       & número de rezagos del escenario, fijo \\
+         & dimensión del subespacio $k_n$  & por predicción a un paso, tope $K$ \\
+         & tramo de selección              & último $20\%$ del entrenamiento \\
+         & intervalo                       & gaussiano, residuos de entrenamiento, $\sigma(\tau)$ \\
+Random Forest & árboles / hojas mínimas / covariables por corte & $500$ / $5$ / $\sqrt{p}$ \\
+         & orden de rezago                 & por error absoluto en ventanas de entrenamiento \\
+\hline
+\end{tabular}
+\end{table}
+
+El Cuadro~\ref{tab:dis_resumen_metrica} indica, para cada métrica, sobre qué resumen de la predictiva del PSBPM-FD se calcula y contra qué modelos se compara; el Random Forest no entrega intervalos.
+
+\begin{table}[H]
+\centering\small
+\caption{Métricas reportadas, resumen del PSBPM-FD sobre el que se calculan y modelos comparados.}
+\label{tab:dis_resumen_metrica}
+\begin{tabular}{p{0.30\textwidth} p{0.38\textwidth} p{0.22\textwidth}}
+\hline
+Métrica (Sección~\ref{02_02_03_criterios_evaluacion}) & Resumen del PSBPM-FD & Modelos comparados \\
+\hline
+RMSE, MAE & esperanza, mediana puntual, átomo más probable & FAR, Random Forest \\
+RMSE, MAE & pronóstico por comportamiento (Sección~\ref{03_06_03_descripcion}) y mejor comportamiento (cota) & FAR, Random Forest, por separado \\
+$\overline{\mathrm{E}}_{\max}$, $\mathrm{E}_{\max}^{\mathrm{glob}}$ (anexo) & los mismos predictores & FAR, Random Forest \\
+Winkler, MPIW, PICP & intervalo equi-colas, banda simultánea, región de máxima densidad & FAR \\
+$\overline{W}_{\max}$, $W_{\max}^{\mathrm{glob}}$, PICPB (anexo) & los mismos intervalos & FAR \\
+\hline
+\end{tabular}
+\end{table}
+
+El Cuadro~\ref{tab:dis_comportamientos} fija las constantes del análisis de comportamientos. La ventana de detalle de $N_{\mathrm{det}}$ orígenes consecutivos de prueba se elige con un criterio propio de cada escenario, calculado sobre lo que el generador registra y nunca sobre lo predicho: la que contiene el máximo de la varianza condicional verdadera en C-1, la de más cambios de régimen en C-2 y la de más orígenes con ley condicional multimodal en C-3. El pronóstico por comportamiento y su cota se comparan con el FAR y el Random Forest en figuras separadas, sobre todos los orígenes de prueba y sobre los de $K_t \geq 2$, y el acierto de la elección se lee por tramos de $p_{t,c^{*}}$.
+
+\begin{table}[H]
+\centering\small
+\caption{Constantes del análisis de comportamientos.}
+\label{tab:dis_comportamientos}
+\begin{tabular}{p{0.20\textwidth} p{0.46\textwidth} p{0.22\textwidth}}
+\hline
+Elemento & Descripción & Valor \\
+\hline
+$S$               & extracciones del vector de scores por origen       & $1000$ \\
+inicios           & inicios aleatorios de $k$-medias                   & $10$ \\
+cociente de valle & umbral de \eqref{eq:valle} para declarar dos modos & $0.5$ \\
+núcleo            & estimador de densidad sobre la proyección          & gaussiano, ancho de Scott \\
+$\zeta$           & masa mínima de un comportamiento                   & $0.05$ \\
+recorte           & cuantiles de recorte cuando $a_\nu \leq 1$         & $0.5\%$ y $99.5\%$ \\
+$N_{\mathrm{det}}$ & orígenes de la ventana de detalle                 & $10$ \\
+\hline
+\end{tabular}
+\end{table}

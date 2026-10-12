@@ -1,0 +1,49 @@
+M,metrica,columna,bloque,modelo,n_ventanas,pct_ventanas_ganadas,criterio
+10,1. MAE  (L^1),mae_f,train,FAR,801,0.0,menor es mejor
+10,1. MAE  (L^1),mae_f,train,RF,801,1.0,menor es mejor
+10,1. MAE  (L^1),mae_f,train,PSBPM-FD (esperanza),801,0.0,menor es mejor
+10,1. MAE  (L^1),mae_f,train,PSBPM-FD (mediana),801,0.0,menor es mejor
+10,1. MAE  (L^1),mae_f,train,PSBPM-FD (medoide),801,0.0,menor es mejor
+10,1. MAE  (L^1),mae_f,train,PSBPM-FD (modal),801,0.0,menor es mejor
+10,1. MAE  (L^1),mae_f,test,FAR,328,0.06707317073170732,menor es mejor
+10,1. MAE  (L^1),mae_f,test,RF,328,0.5365853658536586,menor es mejor
+10,1. MAE  (L^1),mae_f,test,PSBPM-FD (esperanza),328,0.0,menor es mejor
+10,1. MAE  (L^1),mae_f,test,PSBPM-FD (mediana),328,0.23170731707317074,menor es mejor
+10,1. MAE  (L^1),mae_f,test,PSBPM-FD (medoide),328,0.027439024390243903,menor es mejor
+10,1. MAE  (L^1),mae_f,test,PSBPM-FD (modal),328,0.13719512195121952,menor es mejor
+10,2. RMSE (L^2),rmse_f,train,FAR,801,0.0,menor es mejor
+10,2. RMSE (L^2),rmse_f,train,RF,801,1.0,menor es mejor
+10,2. RMSE (L^2),rmse_f,train,PSBPM-FD (esperanza),801,0.0,menor es mejor
+10,2. RMSE (L^2),rmse_f,train,PSBPM-FD (mediana),801,0.0,menor es mejor
+10,2. RMSE (L^2),rmse_f,train,PSBPM-FD (medoide),801,0.0,menor es mejor
+10,2. RMSE (L^2),rmse_f,train,PSBPM-FD (modal),801,0.0,menor es mejor
+10,2. RMSE (L^2),rmse_f,test,FAR,328,0.11280487804878049,menor es mejor
+10,2. RMSE (L^2),rmse_f,test,RF,328,0.774390243902439,menor es mejor
+10,2. RMSE (L^2),rmse_f,test,PSBPM-FD (esperanza),328,0.0,menor es mejor
+10,2. RMSE (L^2),rmse_f,test,PSBPM-FD (mediana),328,0.06097560975609756,menor es mejor
+10,2. RMSE (L^2),rmse_f,test,PSBPM-FD (medoide),328,0.04573170731707317,menor es mejor
+10,2. RMSE (L^2),rmse_f,test,PSBPM-FD (modal),328,0.006097560975609756,menor es mejor
+10,3. E_max promedio por curva,linf_medio,train,FAR,801,0.0,menor es mejor
+10,3. E_max promedio por curva,linf_medio,train,RF,801,0.9987515605493134,menor es mejor
+10,3. E_max promedio por curva,linf_medio,train,PSBPM-FD (esperanza),801,0.0,menor es mejor
+10,3. E_max promedio por curva,linf_medio,train,PSBPM-FD (mediana),801,0.0,menor es mejor
+10,3. E_max promedio por curva,linf_medio,train,PSBPM-FD (medoide),801,0.0,menor es mejor
+10,3. E_max promedio por curva,linf_medio,train,PSBPM-FD (modal),801,0.0012484394506866417,menor es mejor
+10,3. E_max promedio por curva,linf_medio,test,FAR,328,0.06402439024390244,menor es mejor
+10,3. E_max promedio por curva,linf_medio,test,RF,328,0.4969512195121951,menor es mejor
+10,3. E_max promedio por curva,linf_medio,test,PSBPM-FD (esperanza),328,0.0,menor es mejor
+10,3. E_max promedio por curva,linf_medio,test,PSBPM-FD (mediana),328,0.20426829268292682,menor es mejor
+10,3. E_max promedio por curva,linf_medio,test,PSBPM-FD (medoide),328,0.10670731707317073,menor es mejor
+10,3. E_max promedio por curva,linf_medio,test,PSBPM-FD (modal),328,0.12804878048780488,menor es mejor
+10,4. E_max peor de la ventana,linf_max,train,FAR,801,0.019975031210986267,menor es mejor
+10,4. E_max peor de la ventana,linf_max,train,RF,801,0.9762796504369539,menor es mejor
+10,4. E_max peor de la ventana,linf_max,train,PSBPM-FD (esperanza),801,0.0,menor es mejor
+10,4. E_max peor de la ventana,linf_max,train,PSBPM-FD (mediana),801,0.003745318352059925,menor es mejor
+10,4. E_max peor de la ventana,linf_max,train,PSBPM-FD (medoide),801,0.0,menor es mejor
+10,4. E_max peor de la ventana,linf_max,train,PSBPM-FD (modal),801,0.0,menor es mejor
+10,4. E_max peor de la ventana,linf_max,test,FAR,328,0.36585365853658536,menor es mejor
+10,4. E_max peor de la ventana,linf_max,test,RF,328,0.4146341463414634,menor es mejor
+10,4. E_max peor de la ventana,linf_max,test,PSBPM-FD (esperanza),328,0.17073170731707318,menor es mejor
+10,4. E_max peor de la ventana,linf_max,test,PSBPM-FD (mediana),328,0.0,menor es mejor
+10,4. E_max peor de la ventana,linf_max,test,PSBPM-FD (medoide),328,0.04878048780487805,menor es mejor
+10,4. E_max peor de la ventana,linf_max,test,PSBPM-FD (modal),328,0.0,menor es mejor

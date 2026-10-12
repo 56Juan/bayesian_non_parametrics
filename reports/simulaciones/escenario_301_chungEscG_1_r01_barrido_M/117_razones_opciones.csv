@@ -1,0 +1,961 @@
+M,metrica,bloque,modelo,razon_vs_mejor,razon_vs_FAR
+1,1. MAE  (L^1),train,FAR,1.023312106498513,1.0
+1,1. MAE  (L^1),train,RF,1.0383555155076958,1.016520731613153
+1,1. MAE  (L^1),train,PSBPM-FD (esperanza),1.1262095569319996,1.101937897284257
+1,1. MAE  (L^1),train,PSBPM-FD (mediana),1.126018109522651,1.101758963125244
+1,1. MAE  (L^1),train,PSBPM-FD (medoide),1.1259919520780355,1.1017342118072564
+1,1. MAE  (L^1),train,PSBPM-FD (modal),1.1269601455081149,1.1026448757712588
+1,1. MAE  (L^1),train,"PSBPM-FD (más probable, tipica)",1.1262095569319996,1.101937897284257
+1,1. MAE  (L^1),train,"PSBPM-FD (mejor comportamiento, tipica)",1.1262095569319996,1.101937897284257
+1,1. MAE  (L^1),train,"PSBPM-FD (más probable, mediana)",1.126018109522651,1.101758963125244
+1,1. MAE  (L^1),train,"PSBPM-FD (mejor comportamiento, mediana)",1.126018109522651,1.101758963125244
+1,1. MAE  (L^1),train,"PSBPM-FD (más probable, medoide)",1.1259919520780355,1.1017342118072564
+1,1. MAE  (L^1),train,"PSBPM-FD (mejor comportamiento, medoide)",1.1259919520780355,1.1017342118072564
+1,1. MAE  (L^1),test,FAR,1.0054361037385577,1.0
+1,1. MAE  (L^1),test,RF,1.0604886613349147,1.0552140329005824
+1,1. MAE  (L^1),test,PSBPM-FD (esperanza),1.0473535042266349,1.042113410692883
+1,1. MAE  (L^1),test,PSBPM-FD (mediana),1.0486765827837117,1.0434300948157234
+1,1. MAE  (L^1),test,PSBPM-FD (medoide),1.0486191945814594,1.0433734827371584
+1,1. MAE  (L^1),test,PSBPM-FD (modal),1.048589040827029,1.0433443051702715
+1,1. MAE  (L^1),test,"PSBPM-FD (más probable, tipica)",1.0473535042266349,1.042113410692883
+1,1. MAE  (L^1),test,"PSBPM-FD (mejor comportamiento, tipica)",1.0473535042266349,1.042113410692883
+1,1. MAE  (L^1),test,"PSBPM-FD (más probable, mediana)",1.0486765827837117,1.0434300948157234
+1,1. MAE  (L^1),test,"PSBPM-FD (mejor comportamiento, mediana)",1.0486765827837117,1.0434300948157234
+1,1. MAE  (L^1),test,"PSBPM-FD (más probable, medoide)",1.0486191945814594,1.0433734827371584
+1,1. MAE  (L^1),test,"PSBPM-FD (mejor comportamiento, medoide)",1.0486191945814594,1.0433734827371584
+1,2. RMSE (L^2),train,FAR,1.0209750663850494,1.0
+1,2. RMSE (L^2),train,RF,1.0483179254817394,1.0287193902949712
+1,2. RMSE (L^2),train,PSBPM-FD (esperanza),1.1317305846810215,1.1098835159833411
+1,2. RMSE (L^2),train,PSBPM-FD (mediana),1.1318792837094225,1.1100397042443182
+1,2. RMSE (L^2),train,PSBPM-FD (medoide),1.131848153047356,1.1100103300309772
+1,2. RMSE (L^2),train,PSBPM-FD (modal),1.1326152928326125,1.1107390856880988
+1,2. RMSE (L^2),train,"PSBPM-FD (más probable, tipica)",1.1317305846810215,1.1098835159833411
+1,2. RMSE (L^2),train,"PSBPM-FD (mejor comportamiento, tipica)",1.1317305846810215,1.1098835159833411
+1,2. RMSE (L^2),train,"PSBPM-FD (más probable, mediana)",1.1318792837094225,1.1100397042443182
+1,2. RMSE (L^2),train,"PSBPM-FD (mejor comportamiento, mediana)",1.1318792837094225,1.1100397042443182
+1,2. RMSE (L^2),train,"PSBPM-FD (más probable, medoide)",1.131848153047356,1.1100103300309772
+1,2. RMSE (L^2),train,"PSBPM-FD (mejor comportamiento, medoide)",1.131848153047356,1.1100103300309772
+1,2. RMSE (L^2),test,FAR,1.0043560595542487,1.0
+1,2. RMSE (L^2),test,RF,1.0696534683723549,1.0654077193101883
+1,2. RMSE (L^2),test,PSBPM-FD (esperanza),1.0523965269974211,1.0482044585262764
+1,2. RMSE (L^2),test,PSBPM-FD (mediana),1.05438400531727,1.0501874360890933
+1,2. RMSE (L^2),test,PSBPM-FD (medoide),1.054344981678275,1.0501488642676828
+1,2. RMSE (L^2),test,PSBPM-FD (modal),1.0546248309850603,1.0504267307487798
+1,2. RMSE (L^2),test,"PSBPM-FD (más probable, tipica)",1.0523965269974211,1.0482044585262764
+1,2. RMSE (L^2),test,"PSBPM-FD (mejor comportamiento, tipica)",1.0523965269974211,1.0482044585262764
+1,2. RMSE (L^2),test,"PSBPM-FD (más probable, mediana)",1.05438400531727,1.0501874360890933
+1,2. RMSE (L^2),test,"PSBPM-FD (mejor comportamiento, mediana)",1.05438400531727,1.0501874360890933
+1,2. RMSE (L^2),test,"PSBPM-FD (más probable, medoide)",1.054344981678275,1.0501488642676828
+1,2. RMSE (L^2),test,"PSBPM-FD (mejor comportamiento, medoide)",1.054344981678275,1.0501488642676828
+1,3. E_max promedio por curva,train,FAR,1.0132833072993725,1.0
+1,3. E_max promedio por curva,train,RF,1.0395486415592101,1.026906708332415
+1,3. E_max promedio por curva,train,PSBPM-FD (esperanza),1.106882922568435,1.0933042360692815
+1,3. E_max promedio por curva,train,PSBPM-FD (mediana),1.1074691844680262,1.0938839017532214
+1,3. E_max promedio por curva,train,PSBPM-FD (medoide),1.1074580388499722,1.0938740113908503
+1,3. E_max promedio por curva,train,PSBPM-FD (modal),1.107601485915865,1.094003253609858
+1,3. E_max promedio por curva,train,"PSBPM-FD (más probable, tipica)",1.106882922568435,1.0933042360692815
+1,3. E_max promedio por curva,train,"PSBPM-FD (mejor comportamiento, tipica)",1.106882922568435,1.0933042360692815
+1,3. E_max promedio por curva,train,"PSBPM-FD (más probable, mediana)",1.1074691844680262,1.0938839017532214
+1,3. E_max promedio por curva,train,"PSBPM-FD (mejor comportamiento, mediana)",1.1074691844680262,1.0938839017532214
+1,3. E_max promedio por curva,train,"PSBPM-FD (más probable, medoide)",1.1074580388499722,1.0938740113908503
+1,3. E_max promedio por curva,train,"PSBPM-FD (mejor comportamiento, medoide)",1.1074580388499722,1.0938740113908503
+1,3. E_max promedio por curva,test,FAR,1.0055547331695749,1.0
+1,3. E_max promedio por curva,test,RF,1.0473261258569873,1.0419798758238006
+1,3. E_max promedio por curva,test,PSBPM-FD (esperanza),1.0397510525663043,1.0343998184649474
+1,3. E_max promedio por curva,test,PSBPM-FD (mediana),1.0409156321057789,1.0355559988377783
+1,3. E_max promedio por curva,test,PSBPM-FD (medoide),1.0408770400848937,1.0355180556689019
+1,3. E_max promedio por curva,test,PSBPM-FD (modal),1.042318173574748,1.0369587752929934
+1,3. E_max promedio por curva,test,"PSBPM-FD (más probable, tipica)",1.0397510525663043,1.0343998184649474
+1,3. E_max promedio por curva,test,"PSBPM-FD (mejor comportamiento, tipica)",1.0397510525663043,1.0343998184649474
+1,3. E_max promedio por curva,test,"PSBPM-FD (más probable, mediana)",1.0409156321057789,1.0355559988377783
+1,3. E_max promedio por curva,test,"PSBPM-FD (mejor comportamiento, mediana)",1.0409156321057789,1.0355559988377783
+1,3. E_max promedio por curva,test,"PSBPM-FD (más probable, medoide)",1.0408770400848937,1.0355180556689019
+1,3. E_max promedio por curva,test,"PSBPM-FD (mejor comportamiento, medoide)",1.0408770400848937,1.0355180556689019
+1,4. E_max peor de la ventana,train,FAR,1.0682826112152972,1.0
+1,4. E_max peor de la ventana,train,RF,1.1039617015749634,1.048428797875597
+1,4. E_max peor de la ventana,train,PSBPM-FD (esperanza),1.17474378836352,1.1097614686680588
+1,4. E_max peor de la ventana,train,PSBPM-FD (mediana),1.1755005551935862,1.1104078654736806
+1,4. E_max peor de la ventana,train,PSBPM-FD (medoide),1.1755560252176767,1.1104646889864593
+1,4. E_max peor de la ventana,train,PSBPM-FD (modal),1.1765042658839413,1.1113816760240167
+1,4. E_max peor de la ventana,train,"PSBPM-FD (más probable, tipica)",1.17474378836352,1.1097614686680588
+1,4. E_max peor de la ventana,train,"PSBPM-FD (mejor comportamiento, tipica)",1.17474378836352,1.1097614686680588
+1,4. E_max peor de la ventana,train,"PSBPM-FD (más probable, mediana)",1.1755005551935862,1.1104078654736806
+1,4. E_max peor de la ventana,train,"PSBPM-FD (mejor comportamiento, mediana)",1.1755005551935862,1.1104078654736806
+1,4. E_max peor de la ventana,train,"PSBPM-FD (más probable, medoide)",1.1755560252176767,1.1104646889864593
+1,4. E_max peor de la ventana,train,"PSBPM-FD (mejor comportamiento, medoide)",1.1755560252176767,1.1104646889864593
+1,4. E_max peor de la ventana,test,FAR,1.0139419527925593,1.0
+1,4. E_max peor de la ventana,test,RF,1.1199469535268889,1.105797099383743
+1,4. E_max peor de la ventana,test,PSBPM-FD (esperanza),1.075064838910072,1.0618314110699416
+1,4. E_max peor de la ventana,test,PSBPM-FD (mediana),1.0776656102839608,1.0643340514742516
+1,4. E_max peor de la ventana,test,PSBPM-FD (medoide),1.0777118777540051,1.0643817179989916
+1,4. E_max peor de la ventana,test,PSBPM-FD (modal),1.0819570909481706,1.0685840371547237
+1,4. E_max peor de la ventana,test,"PSBPM-FD (más probable, tipica)",1.075064838910072,1.0618314110699416
+1,4. E_max peor de la ventana,test,"PSBPM-FD (mejor comportamiento, tipica)",1.075064838910072,1.0618314110699416
+1,4. E_max peor de la ventana,test,"PSBPM-FD (más probable, mediana)",1.0776656102839608,1.0643340514742516
+1,4. E_max peor de la ventana,test,"PSBPM-FD (mejor comportamiento, mediana)",1.0776656102839608,1.0643340514742516
+1,4. E_max peor de la ventana,test,"PSBPM-FD (más probable, medoide)",1.0777118777540051,1.0643817179989916
+1,4. E_max peor de la ventana,test,"PSBPM-FD (mejor comportamiento, medoide)",1.0777118777540051,1.0643817179989916
+2,1. MAE  (L^1),train,FAR,1.0939737499604936,1.0
+2,1. MAE  (L^1),train,RF,1.0057291652415516,0.9217392728100905
+2,1. MAE  (L^1),train,PSBPM-FD (esperanza),1.1571140837200948,1.0593562403743146
+2,1. MAE  (L^1),train,PSBPM-FD (mediana),1.1578277927623646,1.0600418584479205
+2,1. MAE  (L^1),train,PSBPM-FD (medoide),1.1584730071445684,1.0606203968231431
+2,1. MAE  (L^1),train,PSBPM-FD (modal),1.1612391624250602,1.063160368841066
+2,1. MAE  (L^1),train,"PSBPM-FD (más probable, tipica)",1.158590436621939,1.0607062398926417
+2,1. MAE  (L^1),train,"PSBPM-FD (mejor comportamiento, tipica)",1.152709170953297,1.0553312541571869
+2,1. MAE  (L^1),train,"PSBPM-FD (más probable, mediana)",1.1590292849652752,1.0611407400205497
+2,1. MAE  (L^1),train,"PSBPM-FD (mejor comportamiento, mediana)",1.1534590489369645,1.0560500177333922
+2,1. MAE  (L^1),train,"PSBPM-FD (más probable, medoide)",1.159544584724734,1.0616004395072938
+2,1. MAE  (L^1),train,"PSBPM-FD (mejor comportamiento, medoide)",1.1540030557205152,1.0565359362650224
+2,1. MAE  (L^1),test,FAR,1.004909244995804,1.0
+2,1. MAE  (L^1),test,RF,1.0462977189062361,1.0413860371882198
+2,1. MAE  (L^1),test,PSBPM-FD (esperanza),1.026675845522937,1.0218558521686891
+2,1. MAE  (L^1),test,PSBPM-FD (mediana),1.0266094535862316,1.0217990918474746
+2,1. MAE  (L^1),test,PSBPM-FD (medoide),1.0264913114051895,1.021683926435278
+2,1. MAE  (L^1),test,PSBPM-FD (modal),1.0268945683353106,1.0220895484855064
+2,1. MAE  (L^1),test,"PSBPM-FD (más probable, tipica)",1.0276538088902418,1.022829641175177
+2,1. MAE  (L^1),test,"PSBPM-FD (mejor comportamiento, tipica)",1.0276538088902418,1.022829641175177
+2,1. MAE  (L^1),test,"PSBPM-FD (más probable, mediana)",1.0276534052491757,1.0228385874836774
+2,1. MAE  (L^1),test,"PSBPM-FD (mejor comportamiento, mediana)",1.0276534052491757,1.0228385874836774
+2,1. MAE  (L^1),test,"PSBPM-FD (más probable, medoide)",1.0274781990000572,1.0226666015769548
+2,1. MAE  (L^1),test,"PSBPM-FD (mejor comportamiento, medoide)",1.0274781990000572,1.0226666015769548
+2,2. RMSE (L^2),train,FAR,1.0888101742641705,1.0
+2,2. RMSE (L^2),train,RF,1.0076524785813419,0.9281423918225373
+2,2. RMSE (L^2),train,PSBPM-FD (esperanza),1.1538986822551722,1.0615943650538586
+2,2. RMSE (L^2),train,PSBPM-FD (mediana),1.1553089564413612,1.06291331007426
+2,2. RMSE (L^2),train,PSBPM-FD (medoide),1.1555718898873553,1.0631540995298798
+2,2. RMSE (L^2),train,PSBPM-FD (modal),1.1591131075912051,1.0664453419861109
+2,2. RMSE (L^2),train,"PSBPM-FD (más probable, tipica)",1.1565835932675652,1.0641005124096485
+2,2. RMSE (L^2),train,"PSBPM-FD (mejor comportamiento, tipica)",1.150425785262748,1.058355342258924
+2,2. RMSE (L^2),train,"PSBPM-FD (más probable, mediana)",1.157151306206214,1.0646331047566044
+2,2. RMSE (L^2),train,"PSBPM-FD (mejor comportamiento, mediana)",1.1515318554852305,1.0593902759005787
+2,2. RMSE (L^2),train,"PSBPM-FD (más probable, medoide)",1.1573675986247525,1.064830079839561
+2,2. RMSE (L^2),train,"PSBPM-FD (mejor comportamiento, medoide)",1.151754437452064,1.059593069604774
+2,2. RMSE (L^2),test,FAR,1.0043485862826647,1.0
+2,2. RMSE (L^2),test,RF,1.046201711863409,1.0418580407046338
+2,2. RMSE (L^2),test,PSBPM-FD (esperanza),1.0232475175077442,1.0189716310658203
+2,2. RMSE (L^2),test,PSBPM-FD (mediana),1.0242950689900532,1.0200235246689318
+2,2. RMSE (L^2),test,PSBPM-FD (medoide),1.0246899604957302,1.020413535760172
+2,2. RMSE (L^2),test,PSBPM-FD (modal),1.025147070557733,1.0208864164395406
+2,2. RMSE (L^2),test,"PSBPM-FD (más probable, tipica)",1.0236470183948403,1.0193711319529162
+2,2. RMSE (L^2),test,"PSBPM-FD (mejor comportamiento, tipica)",1.0236470183948403,1.0193711319529162
+2,2. RMSE (L^2),test,"PSBPM-FD (más probable, mediana)",1.0246468781593134,1.0203753338381922
+2,2. RMSE (L^2),test,"PSBPM-FD (mejor comportamiento, mediana)",1.0246468781593134,1.0203753338381922
+2,2. RMSE (L^2),test,"PSBPM-FD (más probable, medoide)",1.0250320556994874,1.020755630963929
+2,2. RMSE (L^2),test,"PSBPM-FD (mejor comportamiento, medoide)",1.0250320556994874,1.020755630963929
+2,3. E_max promedio por curva,train,FAR,1.0633290882438422,1.0
+2,3. E_max promedio por curva,train,RF,1.0039686235068235,0.9460238944026882
+2,3. E_max promedio por curva,train,PSBPM-FD (esperanza),1.1234020257083839,1.0579445846076718
+2,3. E_max promedio por curva,train,PSBPM-FD (mediana),1.125796961728951,1.0602133976641588
+2,3. E_max promedio por curva,train,PSBPM-FD (medoide),1.1244850190928435,1.0589431387759416
+2,3. E_max promedio por curva,train,PSBPM-FD (modal),1.1262490833024223,1.0606649690616023
+2,3. E_max promedio por curva,train,"PSBPM-FD (más probable, tipica)",1.124239561133636,1.0587459194861895
+2,3. E_max promedio por curva,train,"PSBPM-FD (mejor comportamiento, tipica)",1.1200145789641534,1.0547064398956283
+2,3. E_max promedio por curva,train,"PSBPM-FD (más probable, mediana)",1.1259428017378317,1.06035337905414
+2,3. E_max promedio por curva,train,"PSBPM-FD (mejor comportamiento, mediana)",1.1219500089172783,1.056535890921132
+2,3. E_max promedio por curva,train,"PSBPM-FD (más probable, medoide)",1.125005339855893,1.0594408933758612
+2,3. E_max promedio por curva,train,"PSBPM-FD (mejor comportamiento, medoide)",1.1209759133819301,1.0555883807477813
+2,3. E_max promedio por curva,test,FAR,1.00410787919923,1.0
+2,3. E_max promedio por curva,test,RF,1.035984806190263,1.031926325387489
+2,3. E_max promedio por curva,test,PSBPM-FD (esperanza),1.0217045548112695,1.0176586501838276
+2,3. E_max promedio por curva,test,PSBPM-FD (mediana),1.022498303977782,1.0184541932065756
+2,3. E_max promedio por curva,test,PSBPM-FD (medoide),1.0219518908952316,1.0179101379843447
+2,3. E_max promedio por curva,test,PSBPM-FD (modal),1.0209682760681198,1.0169300477939884
+2,3. E_max promedio por curva,test,"PSBPM-FD (más probable, tipica)",1.0216789716176102,1.0176330669901685
+2,3. E_max promedio por curva,test,"PSBPM-FD (mejor comportamiento, tipica)",1.0216789716176102,1.0176330669901685
+2,3. E_max promedio por curva,test,"PSBPM-FD (más probable, mediana)",1.0224102023180393,1.0183660915468327
+2,3. E_max promedio por curva,test,"PSBPM-FD (mejor comportamiento, mediana)",1.0224102023180393,1.0183660915468327
+2,3. E_max promedio por curva,test,"PSBPM-FD (más probable, medoide)",1.0220533768880145,1.0180116239771275
+2,3. E_max promedio por curva,test,"PSBPM-FD (mejor comportamiento, medoide)",1.0220533768880145,1.0180116239771275
+2,4. E_max peor de la ventana,train,FAR,1.112491362091725,1.0
+2,4. E_max peor de la ventana,train,RF,1.0347330279880385,0.9429658760826329
+2,4. E_max peor de la ventana,train,PSBPM-FD (esperanza),1.1741304500831944,1.0650972951946827
+2,4. E_max peor de la ventana,train,PSBPM-FD (mediana),1.178012071079423,1.0686801861332003
+2,4. E_max peor de la ventana,train,PSBPM-FD (medoide),1.1762200982128754,1.0672081417475228
+2,4. E_max peor de la ventana,train,PSBPM-FD (modal),1.1813804237204504,1.0720294231964334
+2,4. E_max peor de la ventana,train,"PSBPM-FD (más probable, tipica)",1.1745173218177316,1.0654841669292199
+2,4. E_max peor de la ventana,train,"PSBPM-FD (mejor comportamiento, tipica)",1.1741304500831944,1.0650972951946827
+2,4. E_max peor de la ventana,train,"PSBPM-FD (más probable, mediana)",1.1782560790267544,1.0689241940805316
+2,4. E_max peor de la ventana,train,"PSBPM-FD (mejor comportamiento, mediana)",1.178012071079423,1.0686801861332003
+2,4. E_max peor de la ventana,train,"PSBPM-FD (más probable, medoide)",1.1764737586803709,1.0674618022150184
+2,4. E_max peor de la ventana,train,"PSBPM-FD (mejor comportamiento, medoide)",1.1762200982128754,1.0672081417475228
+2,4. E_max peor de la ventana,test,FAR,1.0249360925514586,1.0
+2,4. E_max peor de la ventana,test,RF,1.0805655861081231,1.0553892682903612
+2,4. E_max peor de la ventana,test,PSBPM-FD (esperanza),1.025089454542405,1.0010080467185392
+2,4. E_max peor de la ventana,test,PSBPM-FD (mediana),1.031911571565027,1.0076813266170594
+2,4. E_max peor de la ventana,test,PSBPM-FD (medoide),1.0313408448678627,1.0071488286105748
+2,4. E_max peor de la ventana,test,PSBPM-FD (modal),1.0403121520826695,1.0159208465003848
+2,4. E_max peor de la ventana,test,"PSBPM-FD (más probable, tipica)",1.025089454542405,1.0010080467185392
+2,4. E_max peor de la ventana,test,"PSBPM-FD (mejor comportamiento, tipica)",1.025089454542405,1.0010080467185392
+2,4. E_max peor de la ventana,test,"PSBPM-FD (más probable, mediana)",1.031911571565027,1.0076813266170594
+2,4. E_max peor de la ventana,test,"PSBPM-FD (mejor comportamiento, mediana)",1.031911571565027,1.0076813266170594
+2,4. E_max peor de la ventana,test,"PSBPM-FD (más probable, medoide)",1.0313408448678627,1.0071488286105748
+2,4. E_max peor de la ventana,test,"PSBPM-FD (mejor comportamiento, medoide)",1.0313408448678627,1.0071488286105748
+3,1. MAE  (L^1),train,FAR,1.1695705017349607,1.0
+3,1. MAE  (L^1),train,RF,1.0034731383245759,0.8603895529582922
+3,1. MAE  (L^1),train,PSBPM-FD (esperanza),1.2077922102290204,1.0343708724639726
+3,1. MAE  (L^1),train,PSBPM-FD (mediana),1.2095114189709484,1.0358780363450146
+3,1. MAE  (L^1),train,PSBPM-FD (medoide),1.215807665660411,1.0412877916870178
+3,1. MAE  (L^1),train,PSBPM-FD (modal),1.2174746192770245,1.0427204435847135
+3,1. MAE  (L^1),train,"PSBPM-FD (más probable, tipica)",1.20943271872566,1.0358004744753313
+3,1. MAE  (L^1),train,"PSBPM-FD (mejor comportamiento, tipica)",1.203089497768304,1.0302757430660776
+3,1. MAE  (L^1),train,"PSBPM-FD (más probable, mediana)",1.2108818612452341,1.037072208530965
+3,1. MAE  (L^1),train,"PSBPM-FD (mejor comportamiento, mediana)",1.2047815411330627,1.0317590898448217
+3,1. MAE  (L^1),train,"PSBPM-FD (más probable, medoide)",1.217147559739767,1.0424551493185767
+3,1. MAE  (L^1),train,"PSBPM-FD (mejor comportamiento, medoide)",1.2109194508648717,1.037030475706493
+3,1. MAE  (L^1),test,FAR,1.0125862527942888,1.0
+3,1. MAE  (L^1),test,RF,1.0350717423216307,1.0225086976724918
+3,1. MAE  (L^1),test,PSBPM-FD (esperanza),1.0131972478107845,1.0008605560056651
+3,1. MAE  (L^1),test,PSBPM-FD (mediana),1.0130445090301732,1.0007465687804675
+3,1. MAE  (L^1),test,PSBPM-FD (medoide),1.0161245942919501,1.0037857342223508
+3,1. MAE  (L^1),test,PSBPM-FD (modal),1.0158513475629596,1.003568758579807
+3,1. MAE  (L^1),test,"PSBPM-FD (más probable, tipica)",1.014029426814061,1.0016818746401457
+3,1. MAE  (L^1),test,"PSBPM-FD (mejor comportamiento, tipica)",1.014029426814061,1.0016818746401457
+3,1. MAE  (L^1),test,"PSBPM-FD (más probable, mediana)",1.0139845706294772,1.0016743620869895
+3,1. MAE  (L^1),test,"PSBPM-FD (mejor comportamiento, mediana)",1.0139845706294772,1.0016743620869895
+3,1. MAE  (L^1),test,"PSBPM-FD (más probable, medoide)",1.017245692568451,1.0048922015832782
+3,1. MAE  (L^1),test,"PSBPM-FD (mejor comportamiento, medoide)",1.017245692568451,1.0048922015832782
+3,2. RMSE (L^2),train,FAR,1.1644891563543194,1.0
+3,2. RMSE (L^2),train,RF,1.0053461107707637,0.8662182424064999
+3,2. RMSE (L^2),train,PSBPM-FD (esperanza),1.2057200764891163,1.0374151448609628
+3,2. RMSE (L^2),train,PSBPM-FD (mediana),1.207649743991325,1.0391240962158828
+3,2. RMSE (L^2),train,PSBPM-FD (medoide),1.2125648634523871,1.0433985269907324
+3,2. RMSE (L^2),train,PSBPM-FD (modal),1.2171071092695063,1.0473249940222218
+3,2. RMSE (L^2),train,"PSBPM-FD (más probable, tipica)",1.208582426191532,1.0399653214321902
+3,2. RMSE (L^2),train,"PSBPM-FD (mejor comportamiento, tipica)",1.2020201573171583,1.034121627575829
+3,2. RMSE (L^2),train,"PSBPM-FD (más probable, mediana)",1.2098047660947007,1.0410439659544322
+3,2. RMSE (L^2),train,"PSBPM-FD (mejor comportamiento, mediana)",1.2037556811166772,1.0356572991028992
+3,2. RMSE (L^2),train,"PSBPM-FD (más probable, medoide)",1.214786788435733,1.045377658424917
+3,2. RMSE (L^2),train,"PSBPM-FD (mejor comportamiento, medoide)",1.2085975491062333,1.039866112460393
+3,2. RMSE (L^2),test,FAR,1.0115933424805021,1.0
+3,2. RMSE (L^2),test,RF,1.0354990354527922,1.023948907548072
+3,2. RMSE (L^2),test,PSBPM-FD (esperanza),1.008162312425342,0.9968232643800861
+3,2. RMSE (L^2),test,PSBPM-FD (mediana),1.009204648445614,0.9978914906052466
+3,2. RMSE (L^2),test,PSBPM-FD (medoide),1.0119789320526729,1.0006559124866081
+3,2. RMSE (L^2),test,PSBPM-FD (modal),1.0136110777121445,1.0023017964373044
+3,2. RMSE (L^2),test,"PSBPM-FD (más probable, tipica)",1.008569523308675,0.997229359682431
+3,2. RMSE (L^2),test,"PSBPM-FD (mejor comportamiento, tipica)",1.008569523308675,0.997229359682431
+3,2. RMSE (L^2),test,"PSBPM-FD (más probable, mediana)",1.0095468930256404,0.9982327975884715
+3,2. RMSE (L^2),test,"PSBPM-FD (mejor comportamiento, mediana)",1.0095468930256404,0.9982327975884715
+3,2. RMSE (L^2),test,"PSBPM-FD (más probable, medoide)",1.0124746032797791,1.0011502218764172
+3,2. RMSE (L^2),test,"PSBPM-FD (mejor comportamiento, medoide)",1.0124746032797791,1.0011502218764172
+3,3. E_max promedio por curva,train,FAR,1.1308976593418254,1.0
+3,3. E_max promedio por curva,train,RF,1.0021273671280277,0.8880288127709044
+3,3. E_max promedio por curva,train,PSBPM-FD (esperanza),1.1699326361858677,1.035840691004407
+3,3. E_max promedio por curva,train,PSBPM-FD (mediana),1.1727714515181833,1.0383912318995132
+3,3. E_max promedio por curva,train,PSBPM-FD (medoide),1.175081873898069,1.0404621323419576
+3,3. E_max promedio por curva,train,PSBPM-FD (modal),1.1786368550496273,1.0436285708715314
+3,3. E_max promedio por curva,train,"PSBPM-FD (más probable, tipica)",1.1707087504503002,1.036532245432701
+3,3. E_max promedio por curva,train,"PSBPM-FD (mejor comportamiento, tipica)",1.1664530304786038,1.0327440989453331
+3,3. E_max promedio por curva,train,"PSBPM-FD (más probable, mediana)",1.172769700437835,1.038390295120392
+3,3. E_max promedio por curva,train,"PSBPM-FD (mejor comportamiento, mediana)",1.1687717642880369,1.0348316051235213
+3,3. E_max promedio por curva,train,"PSBPM-FD (más probable, medoide)",1.1756079538403719,1.0409307975746167
+3,3. E_max promedio por curva,train,"PSBPM-FD (mejor comportamiento, medoide)",1.1714922471664135,1.0372673051451886
+3,3. E_max promedio por curva,test,FAR,1.011654441397415,1.0
+3,3. E_max promedio por curva,test,RF,1.0215029234419357,1.0099295163004476
+3,3. E_max promedio por curva,test,PSBPM-FD (esperanza),1.007399681482006,0.9959176052251002
+3,3. E_max promedio por curva,test,PSBPM-FD (mediana),1.0087561306881763,0.9972738381864484
+3,3. E_max promedio por curva,test,PSBPM-FD (medoide),1.0114705807318127,0.9999746760053547
+3,3. E_max promedio por curva,test,PSBPM-FD (modal),1.0147691366461153,1.0032534007943454
+3,3. E_max promedio por curva,test,"PSBPM-FD (más probable, tipica)",1.0075451263870454,0.9960622248195061
+3,3. E_max promedio por curva,test,"PSBPM-FD (mejor comportamiento, tipica)",1.0075451263870454,0.9960622248195061
+3,3. E_max promedio por curva,test,"PSBPM-FD (más probable, mediana)",1.0088285549344775,0.9973458514695704
+3,3. E_max promedio por curva,test,"PSBPM-FD (mejor comportamiento, mediana)",1.0088285549344775,0.9973458514695704
+3,3. E_max promedio por curva,test,"PSBPM-FD (más probable, medoide)",1.0116944001938266,1.0001972254291926
+3,3. E_max promedio por curva,test,"PSBPM-FD (mejor comportamiento, medoide)",1.0116944001938266,1.0001972254291926
+3,4. E_max peor de la ventana,train,FAR,1.1654639000968585,1.0
+3,4. E_max peor de la ventana,train,RF,1.0176206376866004,0.886066098490746
+3,4. E_max peor de la ventana,train,PSBPM-FD (esperanza),1.205711146655018,1.0428095580191603
+3,4. E_max peor de la ventana,train,PSBPM-FD (mediana),1.2127242839143588,1.0492116221636625
+3,4. E_max peor de la ventana,train,PSBPM-FD (medoide),1.204641666033543,1.0418479873660365
+3,4. E_max peor de la ventana,train,PSBPM-FD (modal),1.2404792616255182,1.073243274642619
+3,4. E_max peor de la ventana,train,"PSBPM-FD (más probable, tipica)",1.205830974595013,1.0429293859591555
+3,4. E_max peor de la ventana,train,"PSBPM-FD (mejor comportamiento, tipica)",1.205711146655018,1.0428095580191603
+3,4. E_max peor de la ventana,train,"PSBPM-FD (más probable, mediana)",1.2127242839143588,1.0492116221636625
+3,4. E_max peor de la ventana,train,"PSBPM-FD (mejor comportamiento, mediana)",1.2127242839143588,1.0492116221636625
+3,4. E_max peor de la ventana,train,"PSBPM-FD (más probable, medoide)",1.2046774256269412,1.0418837469594342
+3,4. E_max peor de la ventana,train,"PSBPM-FD (mejor comportamiento, medoide)",1.204641666033543,1.0418479873660365
+3,4. E_max peor de la ventana,test,FAR,1.0405135585522998,1.0
+3,4. E_max peor de la ventana,test,RF,1.0612071487491241,1.0212716350308053
+3,4. E_max peor de la ventana,test,PSBPM-FD (esperanza),1.0296426139248012,0.9910109180427161
+3,4. E_max peor de la ventana,test,PSBPM-FD (mediana),1.0371809109547836,0.9984232810811794
+3,4. E_max peor de la ventana,test,PSBPM-FD (medoide),1.0434312630900573,1.004500205941272
+3,4. E_max peor de la ventana,test,PSBPM-FD (modal),1.0460959911058165,1.0074368132458356
+3,4. E_max peor de la ventana,test,"PSBPM-FD (más probable, tipica)",1.0296426139248012,0.9910109180427161
+3,4. E_max peor de la ventana,test,"PSBPM-FD (mejor comportamiento, tipica)",1.0296426139248012,0.9910109180427161
+3,4. E_max peor de la ventana,test,"PSBPM-FD (más probable, mediana)",1.0371809109547836,0.9984232810811794
+3,4. E_max peor de la ventana,test,"PSBPM-FD (mejor comportamiento, mediana)",1.0371809109547836,0.9984232810811794
+3,4. E_max peor de la ventana,test,"PSBPM-FD (más probable, medoide)",1.0434312630900573,1.004500205941272
+3,4. E_max peor de la ventana,test,"PSBPM-FD (mejor comportamiento, medoide)",1.0434312630900573,1.004500205941272
+4,1. MAE  (L^1),train,FAR,1.23492777604877,1.0
+4,1. MAE  (L^1),train,RF,1.0,0.8105127739002621
+4,1. MAE  (L^1),train,PSBPM-FD (esperanza),1.2485044198705344,1.011192013900296
+4,1. MAE  (L^1),train,PSBPM-FD (mediana),1.249064631668932,1.011646573494906
+4,1. MAE  (L^1),train,PSBPM-FD (medoide),1.2609364359936686,1.021288430456889
+4,1. MAE  (L^1),train,PSBPM-FD (modal),1.2625254290345274,1.0224610911641236
+4,1. MAE  (L^1),train,"PSBPM-FD (más probable, tipica)",1.2488061879683126,1.0114568961785957
+4,1. MAE  (L^1),train,"PSBPM-FD (mejor comportamiento, tipica)",1.2423340161761691,1.0059551066936316
+4,1. MAE  (L^1),train,"PSBPM-FD (más probable, mediana)",1.2495364787497207,1.0120540739310535
+4,1. MAE  (L^1),train,"PSBPM-FD (mejor comportamiento, mediana)",1.2433197275673002,1.0067695170652406
+4,1. MAE  (L^1),train,"PSBPM-FD (más probable, medoide)",1.2610732188493328,1.021412374136146
+4,1. MAE  (L^1),train,"PSBPM-FD (mejor comportamiento, medoide)",1.2547486448784788,1.0160359706254054
+4,1. MAE  (L^1),test,FAR,1.0161032673187806,1.0
+4,1. MAE  (L^1),test,RF,1.0309441057206585,1.0149341509198488
+4,1. MAE  (L^1),test,PSBPM-FD (esperanza),1.0062230704064024,0.9905446081932018
+4,1. MAE  (L^1),test,PSBPM-FD (mediana),1.00680891490143,0.9911420600275929
+4,1. MAE  (L^1),test,PSBPM-FD (medoide),1.0188857751066869,1.0030752564588434
+4,1. MAE  (L^1),test,PSBPM-FD (modal),1.0136636124186007,0.9979755423450934
+4,1. MAE  (L^1),test,"PSBPM-FD (más probable, tipica)",1.0070564071199588,0.9913647548211969
+4,1. MAE  (L^1),test,"PSBPM-FD (mejor comportamiento, tipica)",1.0070564071199588,0.9913647548211969
+4,1. MAE  (L^1),test,"PSBPM-FD (más probable, mediana)",1.0077028181752612,0.9920218145660168
+4,1. MAE  (L^1),test,"PSBPM-FD (mejor comportamiento, mediana)",1.0077028181752612,0.9920218145660168
+4,1. MAE  (L^1),test,"PSBPM-FD (más probable, medoide)",1.0194345115052172,1.0036153074365473
+4,1. MAE  (L^1),test,"PSBPM-FD (mejor comportamiento, medoide)",1.0194345115052172,1.0036153074365473
+4,2. RMSE (L^2),train,FAR,1.2274214235785115,1.0
+4,2. RMSE (L^2),train,RF,1.0,0.8155102884848513
+4,2. RMSE (L^2),train,PSBPM-FD (esperanza),1.2430529096374168,1.0129786957561555
+4,2. RMSE (L^2),train,PSBPM-FD (mediana),1.2440473739446105,1.0138095843044983
+4,2. RMSE (L^2),train,PSBPM-FD (medoide),1.2543186262272088,1.0222066119302802
+4,2. RMSE (L^2),train,PSBPM-FD (modal),1.2614438207861691,1.0280215427686175
+4,2. RMSE (L^2),train,"PSBPM-FD (más probable, tipica)",1.2449651994099658,1.0146547543941966
+4,2. RMSE (L^2),train,"PSBPM-FD (mejor comportamiento, tipica)",1.2382080206151491,1.0087808920161085
+4,2. RMSE (L^2),train,"PSBPM-FD (más probable, mediana)",1.2456553881659533,1.0152165150014791
+4,2. RMSE (L^2),train,"PSBPM-FD (mejor comportamiento, mediana)",1.2394079179312172,1.0097858278646554
+4,2. RMSE (L^2),train,"PSBPM-FD (más probable, medoide)",1.2556464150081237,1.0233711462731523
+4,2. RMSE (L^2),train,"PSBPM-FD (mejor comportamiento, medoide)",1.2492279341398453,1.017791949874299
+4,2. RMSE (L^2),test,FAR,1.0155609090519613,1.0
+4,2. RMSE (L^2),test,RF,1.0331845957598684,1.017668243834709
+4,2. RMSE (L^2),test,PSBPM-FD (esperanza),1.0030140816935802,0.9878537400485317
+4,2. RMSE (L^2),test,PSBPM-FD (mediana),1.0046243067827287,0.9894705294292323
+4,2. RMSE (L^2),test,PSBPM-FD (medoide),1.0164475470113068,1.0011652399020192
+4,2. RMSE (L^2),test,PSBPM-FD (modal),1.0143154880972014,0.9990782727055171
+4,2. RMSE (L^2),test,"PSBPM-FD (más probable, tipica)",1.0034245940377997,0.9882623048048043
+4,2. RMSE (L^2),test,"PSBPM-FD (mejor comportamiento, tipica)",1.0034245940377997,0.9882623048048043
+4,2. RMSE (L^2),test,"PSBPM-FD (más probable, mediana)",1.0049605706557807,0.9898051971088809
+4,2. RMSE (L^2),test,"PSBPM-FD (mejor comportamiento, mediana)",1.0049605706557807,0.9898051971088809
+4,2. RMSE (L^2),test,"PSBPM-FD (más probable, medoide)",1.0166438141999794,1.0013605789148345
+4,2. RMSE (L^2),test,"PSBPM-FD (mejor comportamiento, medoide)",1.0166438141999794,1.0013605789148345
+4,3. E_max promedio por curva,train,FAR,1.1968833558679226,1.0
+4,3. E_max promedio por curva,train,RF,1.0,0.836310396280613
+4,3. E_max promedio por curva,train,PSBPM-FD (esperanza),1.2117868380487649,1.0127807565703362
+4,3. E_max promedio por curva,train,PSBPM-FD (mediana),1.2138138495701558,1.014490852761707
+4,3. E_max promedio por curva,train,PSBPM-FD (medoide),1.2217219361275047,1.0210924622710558
+4,3. E_max promedio por curva,train,PSBPM-FD (modal),1.2295203533376704,1.0276246520596093
+4,3. E_max promedio por curva,train,"PSBPM-FD (más probable, tipica)",1.2114618001433706,1.0124833775777804
+4,3. E_max promedio por curva,train,"PSBPM-FD (mejor comportamiento, tipica)",1.2070765910375243,1.0087141677303286
+4,3. E_max promedio por curva,train,"PSBPM-FD (más probable, mediana)",1.2132578227835897,1.0140035044427578
+4,3. E_max promedio por curva,train,"PSBPM-FD (mejor comportamiento, mediana)",1.2091621837015831,1.010483213180765
+4,3. E_max promedio por curva,train,"PSBPM-FD (más probable, medoide)",1.2216660502763221,1.0210358220733327
+4,3. E_max promedio por curva,train,"PSBPM-FD (mejor comportamiento, medoide)",1.217489506102526,1.0174459260167932
+4,3. E_max promedio por curva,test,FAR,1.0149812107192262,1.0
+4,3. E_max promedio por curva,test,RF,1.0217973328380159,1.0068414057763466
+4,3. E_max promedio por curva,test,PSBPM-FD (esperanza),1.0053134220760434,0.9905881287941642
+4,3. E_max promedio por curva,test,PSBPM-FD (mediana),1.0074867794214781,0.9927374139596896
+4,3. E_max promedio por curva,test,PSBPM-FD (medoide),1.022827804394571,1.0078853041222045
+4,3. E_max promedio por curva,test,PSBPM-FD (modal),1.0192726617961014,1.0043817776876451
+4,3. E_max promedio por curva,test,"PSBPM-FD (más probable, tipica)",1.0054093322833622,0.9906830432555022
+4,3. E_max promedio por curva,test,"PSBPM-FD (mejor comportamiento, tipica)",1.0054093322833622,0.9906830432555022
+4,3. E_max promedio por curva,test,"PSBPM-FD (más probable, mediana)",1.0074810877020959,0.9927317813321064
+4,3. E_max promedio por curva,test,"PSBPM-FD (mejor comportamiento, mediana)",1.0074810877020959,0.9927317813321064
+4,3. E_max promedio por curva,test,"PSBPM-FD (más probable, medoide)",1.0226409021057221,1.007700342265017
+4,3. E_max promedio por curva,test,"PSBPM-FD (mejor comportamiento, medoide)",1.0226409021057221,1.007700342265017
+4,4. E_max peor de la ventana,train,FAR,1.2238443651975406,1.0
+4,4. E_max peor de la ventana,train,RF,1.001887953808131,0.8257765525068794
+4,4. E_max peor de la ventana,train,PSBPM-FD (esperanza),1.2467491584695467,1.023179940917798
+4,4. E_max peor de la ventana,train,PSBPM-FD (mediana),1.2513501629850696,1.0273182976050994
+4,4. E_max peor de la ventana,train,PSBPM-FD (medoide),1.251342199403412,1.0277475848960058
+4,4. E_max peor de la ventana,train,PSBPM-FD (modal),1.2991131167100587,1.0667071777798496
+4,4. E_max peor de la ventana,train,"PSBPM-FD (más probable, tipica)",1.247036955064598,1.023466031822289
+4,4. E_max peor de la ventana,train,"PSBPM-FD (mejor comportamiento, tipica)",1.2467491584695467,1.023179940917798
+4,4. E_max peor de la ventana,train,"PSBPM-FD (más probable, mediana)",1.2514826913320078,1.0274500404932996
+4,4. E_max peor de la ventana,train,"PSBPM-FD (mejor comportamiento, mediana)",1.2513501629850696,1.0273182976050994
+4,4. E_max peor de la ventana,train,"PSBPM-FD (más probable, medoide)",1.2514908419266364,1.027895346456241
+4,4. E_max peor de la ventana,train,"PSBPM-FD (mejor comportamiento, medoide)",1.251342199403412,1.0277475848960058
+4,4. E_max peor de la ventana,test,FAR,1.0362722823798545,1.0
+4,4. E_max peor de la ventana,test,RF,1.0711468055445181,1.0341720921325284
+4,4. E_max peor de la ventana,test,PSBPM-FD (esperanza),1.0280585066168604,0.993010528157578
+4,4. E_max peor de la ventana,test,PSBPM-FD (mediana),1.034715292343575,0.9994860949030531
+4,4. E_max peor de la ventana,test,PSBPM-FD (medoide),1.035552059378851,1.0002048221471684
+4,4. E_max peor de la ventana,test,PSBPM-FD (modal),1.0522750076450094,1.0164766959719131
+4,4. E_max peor de la ventana,test,"PSBPM-FD (más probable, tipica)",1.0280585066168604,0.993010528157578
+4,4. E_max peor de la ventana,test,"PSBPM-FD (mejor comportamiento, tipica)",1.0280585066168604,0.993010528157578
+4,4. E_max peor de la ventana,test,"PSBPM-FD (más probable, mediana)",1.034715292343575,0.9994860949030531
+4,4. E_max peor de la ventana,test,"PSBPM-FD (mejor comportamiento, mediana)",1.034715292343575,0.9994860949030531
+4,4. E_max peor de la ventana,test,"PSBPM-FD (más probable, medoide)",1.035552059378851,1.0002048221471684
+4,4. E_max peor de la ventana,test,"PSBPM-FD (mejor comportamiento, medoide)",1.035552059378851,1.0002048221471684
+5,1. MAE  (L^1),train,FAR,1.267166244635051,1.0
+5,1. MAE  (L^1),train,RF,1.0,0.7898961830693637
+5,1. MAE  (L^1),train,PSBPM-FD (esperanza),1.2769219190357368,1.0078213251176782
+5,1. MAE  (L^1),train,PSBPM-FD (mediana),1.2779343150365985,1.008600209664519
+5,1. MAE  (L^1),train,PSBPM-FD (medoide),1.2972449010221976,1.0238267279616164
+5,1. MAE  (L^1),train,PSBPM-FD (modal),1.2912242525224953,1.0190076883680432
+5,1. MAE  (L^1),train,"PSBPM-FD (más probable, tipica)",1.2771819830016566,1.0080661851522128
+5,1. MAE  (L^1),train,"PSBPM-FD (mejor comportamiento, tipica)",1.270660001390987,1.0025864162753
+5,1. MAE  (L^1),train,"PSBPM-FD (más probable, mediana)",1.2783726642816677,1.0089870616599064
+5,1. MAE  (L^1),train,"PSBPM-FD (mejor comportamiento, mediana)",1.2720991753224138,1.003716195339845
+5,1. MAE  (L^1),train,"PSBPM-FD (más probable, medoide)",1.2971155636765943,1.023736919923513
+5,1. MAE  (L^1),train,"PSBPM-FD (mejor comportamiento, medoide)",1.2907126762327625,1.0183570882875759
+5,1. MAE  (L^1),test,FAR,1.01860594964809,1.0
+5,1. MAE  (L^1),test,RF,1.0316795041039741,1.0131947702687985
+5,1. MAE  (L^1),test,PSBPM-FD (esperanza),1.0048544553108463,0.9867586607217668
+5,1. MAE  (L^1),test,PSBPM-FD (mediana),1.0051094318356162,0.9870254065180705
+5,1. MAE  (L^1),test,PSBPM-FD (medoide),1.0219927947571894,1.0035677252794561
+5,1. MAE  (L^1),test,PSBPM-FD (modal),1.0125469708482473,0.9944243115675465
+5,1. MAE  (L^1),test,"PSBPM-FD (más probable, tipica)",1.00568850731665,0.9875783609291977
+5,1. MAE  (L^1),test,"PSBPM-FD (mejor comportamiento, tipica)",1.00568850731665,0.9875783609291977
+5,1. MAE  (L^1),test,"PSBPM-FD (más probable, mediana)",1.0059765069309952,0.9878775615762617
+5,1. MAE  (L^1),test,"PSBPM-FD (mejor comportamiento, mediana)",1.0059765069309952,0.9878775615762617
+5,1. MAE  (L^1),test,"PSBPM-FD (más probable, medoide)",1.022080418270852,1.0036538410274254
+5,1. MAE  (L^1),test,"PSBPM-FD (mejor comportamiento, medoide)",1.022080418270852,1.0036538410274254
+5,2. RMSE (L^2),train,FAR,1.2590615763401292,1.0
+5,2. RMSE (L^2),train,RF,1.0,0.7951172447287741
+5,2. RMSE (L^2),train,PSBPM-FD (esperanza),1.2702869004577817,1.0091151039990391
+5,2. RMSE (L^2),train,PSBPM-FD (mediana),1.2713617789562335,1.009980474717957
+5,2. RMSE (L^2),train,PSBPM-FD (medoide),1.2913514393407202,1.0258787396001388
+5,2. RMSE (L^2),train,PSBPM-FD (modal),1.2893710416361532,1.0243318325251385
+5,2. RMSE (L^2),train,"PSBPM-FD (más probable, tipica)",1.2721998225708628,1.0107897808733544
+5,2. RMSE (L^2),train,"PSBPM-FD (mejor comportamiento, tipica)",1.2653749523144504,1.0049089402511346
+5,2. RMSE (L^2),train,"PSBPM-FD (más probable, mediana)",1.2729714240288477,1.011384873927058
+5,2. RMSE (L^2),train,"PSBPM-FD (mejor comportamiento, mediana)",1.2666501551592757,1.0059380430397655
+5,2. RMSE (L^2),train,"PSBPM-FD (más probable, medoide)",1.2925689867846035,1.0269435917430976
+5,2. RMSE (L^2),train,"PSBPM-FD (mejor comportamiento, medoide)",1.2862353344759947,1.0214858737097794
+5,2. RMSE (L^2),test,FAR,1.0182271437638846,1.0
+5,2. RMSE (L^2),test,RF,1.035207471565622,1.01699762372848
+5,2. RMSE (L^2),test,PSBPM-FD (esperanza),1.002808494930926,0.9850742591795125
+5,2. RMSE (L^2),test,PSBPM-FD (mediana),1.0037702091584921,0.9860510685399141
+5,2. RMSE (L^2),test,PSBPM-FD (medoide),1.0224669603767609,1.0043855772214079
+5,2. RMSE (L^2),test,PSBPM-FD (modal),1.014278679806843,0.9964463336918126
+5,2. RMSE (L^2),test,"PSBPM-FD (más probable, tipica)",1.0032200574957835,0.9854832586015387
+5,2. RMSE (L^2),test,"PSBPM-FD (mejor comportamiento, tipica)",1.0032200574957835,0.9854832586015387
+5,2. RMSE (L^2),test,"PSBPM-FD (más probable, mediana)",1.004107820839092,0.9863865759417395
+5,2. RMSE (L^2),test,"PSBPM-FD (mejor comportamiento, mediana)",1.004107820839092,0.9863865759417395
+5,2. RMSE (L^2),test,"PSBPM-FD (más probable, medoide)",1.0223945589052552,1.0043136274806912
+5,2. RMSE (L^2),test,"PSBPM-FD (mejor comportamiento, medoide)",1.0223945589052552,1.0043136274806912
+5,3. E_max promedio por curva,train,FAR,1.2386304561858061,1.0
+5,3. E_max promedio por curva,train,RF,1.0,0.8081036269695546
+5,3. E_max promedio por curva,train,PSBPM-FD (esperanza),1.2453153276569227,1.0056596658550503
+5,3. E_max promedio por curva,train,PSBPM-FD (mediana),1.2477098911402293,1.007618253159819
+5,3. E_max promedio por curva,train,PSBPM-FD (medoide),1.267746668129315,1.0238497793032957
+5,3. E_max promedio por curva,train,PSBPM-FD (modal),1.265107254784259,1.0216148503985825
+5,3. E_max promedio por curva,train,"PSBPM-FD (más probable, tipica)",1.2450289583160261,1.005409077418231
+5,3. E_max promedio por curva,train,"PSBPM-FD (mejor comportamiento, tipica)",1.2404806474674843,1.0015827597829394
+5,3. E_max promedio por curva,train,"PSBPM-FD (más probable, mediana)",1.2471176128472754,1.0071147815144685
+5,3. E_max promedio por curva,train,"PSBPM-FD (mejor comportamiento, mediana)",1.2428200096081006,1.0034994030383526
+5,3. E_max promedio por curva,train,"PSBPM-FD (más probable, medoide)",1.2681186360772654,1.0241610099721539
+5,3. E_max promedio por curva,train,"PSBPM-FD (mejor comportamiento, medoide)",1.263735471733608,1.0204735436516994
+5,3. E_max promedio por curva,test,FAR,1.0190388440748395,1.0
+5,3. E_max promedio por curva,test,RF,1.023354228806112,1.004441681143871
+5,3. E_max promedio por curva,test,PSBPM-FD (esperanza),1.0042873861547321,0.985655833441361
+5,3. E_max promedio por curva,test,PSBPM-FD (mediana),1.005196467598594,0.9865814420444059
+5,3. E_max promedio por curva,test,PSBPM-FD (medoide),1.0263715086308984,1.0073722583922233
+5,3. E_max promedio por curva,test,PSBPM-FD (modal),1.018385973944964,0.9995939685837975
+5,3. E_max promedio por curva,test,"PSBPM-FD (más probable, tipica)",1.0043756033175546,0.9857425603790233
+5,3. E_max promedio por curva,test,"PSBPM-FD (mejor comportamiento, tipica)",1.0043756033175546,0.9857425603790233
+5,3. E_max promedio por curva,test,"PSBPM-FD (más probable, mediana)",1.005207830486404,0.9865926129824776
+5,3. E_max promedio por curva,test,"PSBPM-FD (mejor comportamiento, mediana)",1.005207830486404,0.9865926129824776
+5,3. E_max promedio por curva,test,"PSBPM-FD (más probable, medoide)",1.0260294346780907,1.007035962988564
+5,3. E_max promedio por curva,test,"PSBPM-FD (mejor comportamiento, medoide)",1.0260294346780907,1.007035962988564
+5,4. E_max peor de la ventana,train,FAR,1.2456711435215924,1.0
+5,4. E_max peor de la ventana,train,RF,1.0000237445942088,0.8081447848146476
+5,4. E_max peor de la ventana,train,PSBPM-FD (esperanza),1.272848214400336,1.0255621946151159
+5,4. E_max peor de la ventana,train,PSBPM-FD (mediana),1.2763489656260507,1.0289358548252365
+5,4. E_max peor de la ventana,train,PSBPM-FD (medoide),1.2800379583466062,1.0325791944643015
+5,4. E_max peor de la ventana,train,PSBPM-FD (modal),1.3247098037479552,1.0673997544699465
+5,4. E_max peor de la ventana,train,"PSBPM-FD (más probable, tipica)",1.2731725324129732,1.025886512627753
+5,4. E_max peor de la ventana,train,"PSBPM-FD (mejor comportamiento, tipica)",1.272848214400336,1.0255621946151159
+5,4. E_max peor de la ventana,train,"PSBPM-FD (más probable, mediana)",1.2765252542441106,1.0291121434432962
+5,4. E_max peor de la ventana,train,"PSBPM-FD (mejor comportamiento, mediana)",1.2763489656260507,1.0289358548252365
+5,4. E_max peor de la ventana,train,"PSBPM-FD (más probable, medoide)",1.2801940903988416,1.0327353265165369
+5,4. E_max peor de la ventana,train,"PSBPM-FD (mejor comportamiento, medoide)",1.2800379583466062,1.0325791944643015
+5,4. E_max peor de la ventana,test,FAR,1.040633954255973,1.0
+5,4. E_max peor de la ventana,test,RF,1.0663775022461004,1.0248679846555744
+5,4. E_max peor de la ventana,test,PSBPM-FD (esperanza),1.0240094531689483,0.9849041119225689
+5,4. E_max peor de la ventana,test,PSBPM-FD (mediana),1.0307654804660162,0.9915356231154543
+5,4. E_max peor de la ventana,test,PSBPM-FD (medoide),1.0322896061104,0.9933124430083221
+5,4. E_max peor de la ventana,test,PSBPM-FD (modal),1.0475721085021394,1.0072738248475934
+5,4. E_max peor de la ventana,test,"PSBPM-FD (más probable, tipica)",1.0240094531689483,0.9849041119225689
+5,4. E_max peor de la ventana,test,"PSBPM-FD (mejor comportamiento, tipica)",1.0240094531689483,0.9849041119225689
+5,4. E_max peor de la ventana,test,"PSBPM-FD (más probable, mediana)",1.0307654804660162,0.9915356231154543
+5,4. E_max peor de la ventana,test,"PSBPM-FD (mejor comportamiento, mediana)",1.0307654804660162,0.9915356231154543
+5,4. E_max peor de la ventana,test,"PSBPM-FD (más probable, medoide)",1.0322896061104,0.9933124430083221
+5,4. E_max peor de la ventana,test,"PSBPM-FD (mejor comportamiento, medoide)",1.0322896061104,0.9933124430083221
+6,1. MAE  (L^1),train,FAR,1.2850080692994377,1.0
+6,1. MAE  (L^1),train,RF,1.0,0.7790510026961115
+6,1. MAE  (L^1),train,PSBPM-FD (esperanza),1.292882103650294,1.0062966984278618
+6,1. MAE  (L^1),train,PSBPM-FD (mediana),1.2935517436038075,1.0067923799226879
+6,1. MAE  (L^1),train,PSBPM-FD (medoide),1.3210552355063485,1.0281745911448665
+6,1. MAE  (L^1),train,PSBPM-FD (modal),1.307552896189229,1.0176029842043945
+6,1. MAE  (L^1),train,"PSBPM-FD (más probable, tipica)",1.2931332841836618,1.006532537974356
+6,1. MAE  (L^1),train,"PSBPM-FD (mejor comportamiento, tipica)",1.2865890570081624,1.0010782619298124
+6,1. MAE  (L^1),train,"PSBPM-FD (más probable, mediana)",1.2939369380894479,1.007132939789944
+6,1. MAE  (L^1),train,"PSBPM-FD (mejor comportamiento, mediana)",1.287648675799001,1.0018921190032157
+6,1. MAE  (L^1),train,"PSBPM-FD (más probable, medoide)",1.321330757593099,1.0284270662000052
+6,1. MAE  (L^1),train,"PSBPM-FD (mejor comportamiento, medoide)",1.314982218416962,1.023135993159115
+6,1. MAE  (L^1),test,FAR,1.0192380224687438,1.0
+6,1. MAE  (L^1),test,RF,1.0313929307082288,1.0122404233499034
+6,1. MAE  (L^1),test,PSBPM-FD (esperanza),1.004469898509712,0.9857338538423109
+6,1. MAE  (L^1),test,PSBPM-FD (mediana),1.0047691955690077,0.986044207080985
+6,1. MAE  (L^1),test,PSBPM-FD (medoide),1.0268889763246767,1.0077107510286791
+6,1. MAE  (L^1),test,PSBPM-FD (modal),1.011873746925624,0.9930889458239149
+6,1. MAE  (L^1),test,"PSBPM-FD (más probable, tipica)",1.0052896727646063,0.9865402322679906
+6,1. MAE  (L^1),test,"PSBPM-FD (mejor comportamiento, tipica)",1.0052896727646063,0.9865402322679906
+6,1. MAE  (L^1),test,"PSBPM-FD (más probable, mediana)",1.005641337457473,0.9869020974072444
+6,1. MAE  (L^1),test,"PSBPM-FD (mejor comportamiento, mediana)",1.005641337457473,0.9869020974072444
+6,1. MAE  (L^1),test,"PSBPM-FD (más probable, medoide)",1.0272611343677693,1.008076827683443
+6,1. MAE  (L^1),test,"PSBPM-FD (mejor comportamiento, medoide)",1.0272611343677693,1.008076827683443
+6,2. RMSE (L^2),train,FAR,1.276738774782405,1.0
+6,2. RMSE (L^2),train,RF,1.0,0.7842470687729514
+6,2. RMSE (L^2),train,PSBPM-FD (esperanza),1.2853877483985892,1.0070224651894384
+6,2. RMSE (L^2),train,PSBPM-FD (mediana),1.2861859026572204,1.0076565089928062
+6,2. RMSE (L^2),train,PSBPM-FD (medoide),1.3117344737685865,1.027675548944745
+6,2. RMSE (L^2),train,PSBPM-FD (modal),1.3049358332277092,1.022399423221918
+6,2. RMSE (L^2),train,"PSBPM-FD (más probable, tipica)",1.2873101855991296,1.008698285924824
+6,2. RMSE (L^2),train,"PSBPM-FD (mejor comportamiento, tipica)",1.2804364003181936,1.002809551355616
+6,2. RMSE (L^2),train,"PSBPM-FD (más probable, mediana)",1.2877799885216288,1.0090422112709132
+6,2. RMSE (L^2),train,"PSBPM-FD (mejor comportamiento, mediana)",1.2814166751657052,1.003590867096387
+6,2. RMSE (L^2),train,"PSBPM-FD (más probable, medoide)",1.3130554024813537,1.0288342617659707
+6,2. RMSE (L^2),train,"PSBPM-FD (mejor comportamiento, medoide)",1.3066886778610085,1.0233798250846267
+6,2. RMSE (L^2),test,FAR,1.0193434411905344,1.0
+6,2. RMSE (L^2),test,RF,1.035266310717645,1.0159061005569434
+6,2. RMSE (L^2),test,PSBPM-FD (esperanza),1.0025279218516345,0.9836931337520436
+6,2. RMSE (L^2),test,PSBPM-FD (mediana),1.0035792507184207,0.9847557726881643
+6,2. RMSE (L^2),test,PSBPM-FD (medoide),1.0263354239196278,1.0070246137988614
+6,2. RMSE (L^2),test,PSBPM-FD (modal),1.0143381897388042,0.9953663774894539
+6,2. RMSE (L^2),test,"PSBPM-FD (más probable, tipica)",1.0029399433219577,0.9841024244495143
+6,2. RMSE (L^2),test,"PSBPM-FD (mejor comportamiento, tipica)",1.0029399433219577,0.9841024244495143
+6,2. RMSE (L^2),test,"PSBPM-FD (más probable, mediana)",1.0039267372166536,0.9851009545684339
+6,2. RMSE (L^2),test,"PSBPM-FD (mejor comportamiento, mediana)",1.0039267372166536,0.9851009545684339
+6,2. RMSE (L^2),test,"PSBPM-FD (más probable, medoide)",1.0263214981826727,1.0070107803255672
+6,2. RMSE (L^2),test,"PSBPM-FD (mejor comportamiento, medoide)",1.0263214981826727,1.0070107803255672
+6,3. E_max promedio por curva,train,FAR,1.2692607404914618,1.0
+6,3. E_max promedio por curva,train,RF,1.0,0.7887578745493428
+6,3. E_max promedio por curva,train,PSBPM-FD (esperanza),1.2698935702010523,1.0008517506009431
+6,3. E_max promedio por curva,train,PSBPM-FD (mediana),1.2720409228147815,1.0025691498536173
+6,3. E_max promedio por curva,train,PSBPM-FD (medoide),1.3020215167461529,1.0261952668805254
+6,3. E_max promedio por curva,train,PSBPM-FD (modal),1.2905069220234275,1.0170590004509765
+6,3. E_max promedio por curva,train,"PSBPM-FD (más probable, tipica)",1.2695696803398244,1.000577871252649
+6,3. E_max promedio por curva,train,"PSBPM-FD (mejor comportamiento, tipica)",1.2648551524858644,0.996650655918403
+6,3. E_max promedio por curva,train,"PSBPM-FD (más probable, mediana)",1.2714212306818253,1.0020507220088344
+6,3. E_max promedio por curva,train,"PSBPM-FD (mejor comportamiento, mediana)",1.2669816656273654,0.9983526004924193
+6,3. E_max promedio por curva,train,"PSBPM-FD (más probable, medoide)",1.3014679299092267,1.02573345721867
+6,3. E_max promedio por curva,train,"PSBPM-FD (mejor comportamiento, medoide)",1.2971878876854401,1.0221682468636055
+6,3. E_max promedio por curva,test,FAR,1.0209021375106768,1.0
+6,3. E_max promedio por curva,test,RF,1.0221736876864373,1.0014308409563037
+6,3. E_max promedio por curva,test,PSBPM-FD (esperanza),1.003456470727011,0.9830210921826829
+6,3. E_max promedio por curva,test,PSBPM-FD (mediana),1.0055155586246098,0.9850614089863525
+6,3. E_max promedio por curva,test,PSBPM-FD (medoide),1.0355119151212853,1.0144397137169598
+6,3. E_max promedio por curva,test,PSBPM-FD (modal),1.0198404054932921,0.9991179472795888
+6,3. E_max promedio por curva,test,"PSBPM-FD (más probable, tipica)",1.003576739249319,0.9831395450168652
+6,3. E_max promedio por curva,test,"PSBPM-FD (mejor comportamiento, tipica)",1.003576739249319,0.9831395450168652
+6,3. E_max promedio por curva,test,"PSBPM-FD (más probable, mediana)",1.005565025236311,0.9851101288029843
+6,3. E_max promedio por curva,test,"PSBPM-FD (mejor comportamiento, mediana)",1.005565025236311,0.9851101288029843
+6,3. E_max promedio por curva,test,"PSBPM-FD (más probable, medoide)",1.0344694124907836,1.0134129496987794
+6,3. E_max promedio por curva,test,"PSBPM-FD (mejor comportamiento, medoide)",1.0344694124907836,1.0134129496987794
+6,4. E_max peor de la ventana,train,FAR,1.2607557154076208,1.0
+6,4. E_max peor de la ventana,train,RF,1.0000987627738827,0.7977140807306065
+6,4. E_max peor de la ventana,train,PSBPM-FD (esperanza),1.2862554040492225,1.0233419319515262
+6,4. E_max peor de la ventana,train,PSBPM-FD (mediana),1.2896419376077177,1.0265999928622473
+6,4. E_max peor de la ventana,train,PSBPM-FD (medoide),1.3192477560589393,1.0496070661108092
+6,4. E_max peor de la ventana,train,PSBPM-FD (modal),1.3402024440316114,1.0662708983735671
+6,4. E_max peor de la ventana,train,"PSBPM-FD (más probable, tipica)",1.2866542575921947,1.0237407854944982
+6,4. E_max peor de la ventana,train,"PSBPM-FD (mejor comportamiento, tipica)",1.2862554040492225,1.0233419319515262
+6,4. E_max peor de la ventana,train,"PSBPM-FD (más probable, mediana)",1.2898789113288238,1.0268369665833534
+6,4. E_max peor de la ventana,train,"PSBPM-FD (mejor comportamiento, mediana)",1.2896419376077177,1.0265999928622473
+6,4. E_max peor de la ventana,train,"PSBPM-FD (más probable, medoide)",1.319537089345705,1.049896399397575
+6,4. E_max peor de la ventana,train,"PSBPM-FD (mejor comportamiento, medoide)",1.3192477560589393,1.0496070661108092
+6,4. E_max peor de la ventana,test,FAR,1.0481250235240016,1.0
+6,4. E_max peor de la ventana,test,RF,1.0696318152865596,1.0204665949175364
+6,4. E_max peor de la ventana,test,PSBPM-FD (esperanza),1.0270718605513613,0.9807314372635583
+6,4. E_max peor de la ventana,test,PSBPM-FD (mediana),1.0342321014076126,0.9877449694406091
+6,4. E_max peor de la ventana,test,PSBPM-FD (medoide),1.044991193644492,0.9984429681277485
+6,4. E_max peor de la ventana,test,PSBPM-FD (modal),1.052698534366392,1.0047134019196131
+6,4. E_max peor de la ventana,test,"PSBPM-FD (más probable, tipica)",1.0270718605513613,0.9807314372635583
+6,4. E_max peor de la ventana,test,"PSBPM-FD (mejor comportamiento, tipica)",1.0270718605513613,0.9807314372635583
+6,4. E_max peor de la ventana,test,"PSBPM-FD (más probable, mediana)",1.0342321014076126,0.9877449694406091
+6,4. E_max peor de la ventana,test,"PSBPM-FD (mejor comportamiento, mediana)",1.0342321014076126,0.9877449694406091
+6,4. E_max peor de la ventana,test,"PSBPM-FD (más probable, medoide)",1.044991193644492,0.9984429681277485
+6,4. E_max peor de la ventana,test,"PSBPM-FD (mejor comportamiento, medoide)",1.044991193644492,0.9984429681277485
+7,1. MAE  (L^1),train,FAR,1.2961741179522828,1.0
+7,1. MAE  (L^1),train,RF,1.0,0.7723772924596582
+7,1. MAE  (L^1),train,PSBPM-FD (esperanza),1.3029147366675229,1.0053907421081811
+7,1. MAE  (L^1),train,PSBPM-FD (mediana),1.303417756741089,1.0057530735262152
+7,1. MAE  (L^1),train,PSBPM-FD (medoide),1.3326170064549108,1.0283005125271556
+7,1. MAE  (L^1),train,PSBPM-FD (modal),1.3178597745950065,1.016825221979353
+7,1. MAE  (L^1),train,"PSBPM-FD (más probable, tipica)",1.3031160847285845,1.0055843439839622
+7,1. MAE  (L^1),train,"PSBPM-FD (mejor comportamiento, tipica)",1.296554331388022,1.0001437308129235
+7,1. MAE  (L^1),train,"PSBPM-FD (más probable, mediana)",1.3037883714743876,1.0060801166569338
+7,1. MAE  (L^1),train,"PSBPM-FD (mejor comportamiento, mediana)",1.2974869999514054,1.0008555143397857
+7,1. MAE  (L^1),train,"PSBPM-FD (más probable, medoide)",1.3324208530654709,1.0281670635627167
+7,1. MAE  (L^1),train,"PSBPM-FD (mejor comportamiento, medoide)",1.3261067584215531,1.0229320228555652
+7,1. MAE  (L^1),test,FAR,1.0201180988975105,1.0
+7,1. MAE  (L^1),test,RF,1.0330236439361646,1.0129681196586284
+7,1. MAE  (L^1),test,PSBPM-FD (esperanza),1.004283192662262,0.9847013163417321
+7,1. MAE  (L^1),test,PSBPM-FD (mediana),1.0047673641001633,0.985196463903021
+7,1. MAE  (L^1),test,PSBPM-FD (medoide),1.0323243399436668,1.012138784944186
+7,1. MAE  (L^1),test,PSBPM-FD (modal),1.011676153383337,0.992040992282346
+7,1. MAE  (L^1),test,"PSBPM-FD (más probable, tipica)",1.0050930129831108,0.9854976084249494
+7,1. MAE  (L^1),test,"PSBPM-FD (mejor comportamiento, tipica)",1.0050930129831108,0.9854976084249494
+7,1. MAE  (L^1),test,"PSBPM-FD (más probable, mediana)",1.0056329496774332,0.9860475896710242
+7,1. MAE  (L^1),test,"PSBPM-FD (mejor comportamiento, mediana)",1.0056329496774332,0.9860475896710242
+7,1. MAE  (L^1),test,"PSBPM-FD (más probable, medoide)",1.0332539534933074,1.0130528690823248
+7,1. MAE  (L^1),test,"PSBPM-FD (mejor comportamiento, medoide)",1.0332539534933074,1.0130528690823248
+7,2. RMSE (L^2),train,FAR,1.2867797808384176,1.0
+7,2. RMSE (L^2),train,RF,1.0,0.7781847678040478
+7,2. RMSE (L^2),train,PSBPM-FD (esperanza),1.2941432280920262,1.0059798392928598
+7,2. RMSE (L^2),train,PSBPM-FD (mediana),1.2948179682938172,1.006511021063714
+7,2. RMSE (L^2),train,PSBPM-FD (medoide),1.323458820878991,1.028753433837899
+7,2. RMSE (L^2),train,PSBPM-FD (modal),1.3138630552106043,1.0213797716908266
+7,2. RMSE (L^2),train,"PSBPM-FD (más probable, tipica)",1.2960697357310123,1.0076557975239124
+7,2. RMSE (L^2),train,"PSBPM-FD (mejor comportamiento, tipica)",1.2891746096700016,1.0017652048355963
+7,2. RMSE (L^2),train,"PSBPM-FD (más probable, mediana)",1.2964542646273174,1.007929812136574
+7,2. RMSE (L^2),train,"PSBPM-FD (mejor comportamiento, mediana)",1.290062978643501,1.002469727374599
+7,2. RMSE (L^2),train,"PSBPM-FD (más probable, medoide)",1.3247875558893454,1.0299196050872435
+7,2. RMSE (L^2),train,"PSBPM-FD (mejor comportamiento, medoide)",1.3184713442362024,1.0245237933118927
+7,2. RMSE (L^2),test,FAR,1.0200735214761014,1.0
+7,2. RMSE (L^2),test,RF,1.0362396946545724,1.016128347501757
+7,2. RMSE (L^2),test,PSBPM-FD (esperanza),1.0023689029750613,0.9828389225286902
+7,2. RMSE (L^2),test,PSBPM-FD (mediana),1.0035784847483065,0.9840569601475916
+7,2. RMSE (L^2),test,PSBPM-FD (medoide),1.0313834688503327,1.0112164837784243
+7,2. RMSE (L^2),test,PSBPM-FD (modal),1.0142109958284566,0.9945357259884302
+7,2. RMSE (L^2),test,"PSBPM-FD (más probable, tipica)",1.0027811184390167,0.9832483100806241
+7,2. RMSE (L^2),test,"PSBPM-FD (mejor comportamiento, tipica)",1.0027811184390167,0.9832483100806241
+7,2. RMSE (L^2),test,"PSBPM-FD (más probable, mediana)",1.0039308825746969,0.9844069393542606
+7,2. RMSE (L^2),test,"PSBPM-FD (mejor comportamiento, mediana)",1.0039308825746969,0.9844069393542606
+7,2. RMSE (L^2),test,"PSBPM-FD (más probable, medoide)",1.0316334772314613,1.0114647813567499
+7,2. RMSE (L^2),test,"PSBPM-FD (mejor comportamiento, medoide)",1.0316334772314613,1.0114647813567499
+7,3. E_max promedio por curva,train,FAR,1.28966376247049,1.0
+7,3. E_max promedio por curva,train,RF,1.0,0.7763307320807024
+7,3. E_max promedio por curva,train,PSBPM-FD (esperanza),1.286605994152577,0.9980048674049988
+7,3. E_max promedio por curva,train,PSBPM-FD (mediana),1.2890457690519046,0.999941325692722
+7,3. E_max promedio por curva,train,PSBPM-FD (medoide),1.3302160242540353,1.0318018654979666
+7,3. E_max promedio por curva,train,PSBPM-FD (modal),1.3075418282487088,1.014195781025737
+7,3. E_max promedio por curva,train,"PSBPM-FD (más probable, tipica)",1.2864249308258815,0.9978541141956679
+7,3. E_max promedio por curva,train,"PSBPM-FD (mejor comportamiento, tipica)",1.2815845985083472,0.9938414509796939
+7,3. E_max promedio por curva,train,"PSBPM-FD (más probable, mediana)",1.2884717926082596,0.9994650933911856
+7,3. E_max promedio por curva,train,"PSBPM-FD (mejor comportamiento, mediana)",1.283891530359851,0.995668123946009
+7,3. E_max promedio por curva,train,"PSBPM-FD (más probable, medoide)",1.3299362553848089,1.0315702595773333
+7,3. E_max promedio por curva,train,"PSBPM-FD (mejor comportamiento, medoide)",1.3256594814604317,1.0280252319893224
+7,3. E_max promedio por curva,test,FAR,1.02377303957518,1.0
+7,3. E_max promedio por curva,test,RF,1.0232932085106043,0.9997343811782871
+7,3. E_max promedio por curva,test,PSBPM-FD (esperanza),1.0031366131200097,0.9799867357738918
+7,3. E_max promedio por curva,test,PSBPM-FD (mediana),1.0049707532484262,0.981799755607656
+7,3. E_max promedio por curva,test,PSBPM-FD (medoide),1.0405393778869796,1.0164564801621252
+7,3. E_max promedio por curva,test,PSBPM-FD (modal),1.0208671045293536,0.9973562074947137
+7,3. E_max promedio por curva,test,"PSBPM-FD (más probable, tipica)",1.0032266945292687,0.9800756103780651
+7,3. E_max promedio por curva,test,"PSBPM-FD (mejor comportamiento, tipica)",1.0032266945292687,0.9800756103780651
+7,3. E_max promedio por curva,test,"PSBPM-FD (más probable, mediana)",1.0050174226635145,0.9818457998006483
+7,3. E_max promedio por curva,test,"PSBPM-FD (mejor comportamiento, mediana)",1.0050174226635145,0.9818457998006483
+7,3. E_max promedio por curva,test,"PSBPM-FD (más probable, medoide)",1.0401299972694162,1.0160525839460088
+7,3. E_max promedio por curva,test,"PSBPM-FD (mejor comportamiento, medoide)",1.0401299972694162,1.0160525839460088
+7,4. E_max peor de la ventana,train,FAR,1.2671901694028767,1.0
+7,4. E_max peor de la ventana,train,RF,1.000091251728464,0.7941749731576833
+7,4. E_max peor de la ventana,train,PSBPM-FD (esperanza),1.2909656112554018,1.022408869205964
+7,4. E_max peor de la ventana,train,PSBPM-FD (mediana),1.2937159505007572,1.0250755095441322
+7,4. E_max peor de la ventana,train,PSBPM-FD (medoide),1.3235107587921164,1.0485673185972448
+7,4. E_max peor de la ventana,train,PSBPM-FD (modal),1.3418720596742564,1.0629114264405681
+7,4. E_max peor de la ventana,train,"PSBPM-FD (más probable, tipica)",1.2913396926848757,1.022782950635438
+7,4. E_max peor de la ventana,train,"PSBPM-FD (mejor comportamiento, tipica)",1.2909656112554018,1.022408869205964
+7,4. E_max peor de la ventana,train,"PSBPM-FD (más probable, mediana)",1.2939343818028255,1.0252939408462007
+7,4. E_max peor de la ventana,train,"PSBPM-FD (mejor comportamiento, mediana)",1.2937159505007572,1.0250755095441322
+7,4. E_max peor de la ventana,train,"PSBPM-FD (más probable, medoide)",1.3238155664058928,1.0488721262110217
+7,4. E_max peor de la ventana,train,"PSBPM-FD (mejor comportamiento, medoide)",1.3235107587921164,1.0485673185972448
+7,4. E_max peor de la ventana,test,FAR,1.0454423385604543,1.0
+7,4. E_max peor de la ventana,test,RF,1.0643364516189808,1.0186061477965296
+7,4. E_max peor de la ventana,test,PSBPM-FD (esperanza),1.019163547422294,0.975670194255616
+7,4. E_max peor de la ventana,test,PSBPM-FD (mediana),1.0242822706145334,0.9806546210061834
+7,4. E_max peor de la ventana,test,PSBPM-FD (medoide),1.0535180748316593,1.0087478332308824
+7,4. E_max peor de la ventana,test,PSBPM-FD (modal),1.0419897288976803,0.9975278031807802
+7,4. E_max peor de la ventana,test,"PSBPM-FD (más probable, tipica)",1.019163547422294,0.975670194255616
+7,4. E_max peor de la ventana,test,"PSBPM-FD (mejor comportamiento, tipica)",1.019163547422294,0.975670194255616
+7,4. E_max peor de la ventana,test,"PSBPM-FD (más probable, mediana)",1.0242822706145334,0.9806546210061834
+7,4. E_max peor de la ventana,test,"PSBPM-FD (mejor comportamiento, mediana)",1.0242822706145334,0.9806546210061834
+7,4. E_max peor de la ventana,test,"PSBPM-FD (más probable, medoide)",1.0535180748316593,1.0087478332308824
+7,4. E_max peor de la ventana,test,"PSBPM-FD (mejor comportamiento, medoide)",1.0535180748316593,1.0087478332308824
+8,1. MAE  (L^1),train,FAR,1.301908438526752,1.0
+8,1. MAE  (L^1),train,RF,1.0,0.7689794721065385
+8,1. MAE  (L^1),train,PSBPM-FD (esperanza),1.3080091474430655,1.00487971723621
+8,1. MAE  (L^1),train,PSBPM-FD (mediana),1.3087825127704706,1.0054465864998914
+8,1. MAE  (L^1),train,PSBPM-FD (medoide),1.338255662593391,1.0280603980994791
+8,1. MAE  (L^1),train,PSBPM-FD (modal),1.3230671891424388,1.0163472912011982
+8,1. MAE  (L^1),train,"PSBPM-FD (más probable, tipica)",1.3081855896727443,1.0050506134345125
+8,1. MAE  (L^1),train,"PSBPM-FD (mejor comportamiento, tipica)",1.3016134625436364,0.999624035176652
+8,1. MAE  (L^1),train,"PSBPM-FD (más probable, mediana)",1.309119635041346,1.0057436994806526
+8,1. MAE  (L^1),train,"PSBPM-FD (mejor comportamiento, mediana)",1.3028030915486357,1.0005282907708246
+8,1. MAE  (L^1),train,"PSBPM-FD (más probable, medoide)",1.3379138440142118,1.0278041208468638
+8,1. MAE  (L^1),train,"PSBPM-FD (mejor comportamiento, medoide)",1.332001020861114,1.0229216469871147
+8,1. MAE  (L^1),test,FAR,1.0207845405303118,1.0
+8,1. MAE  (L^1),test,RF,1.0343558069639665,1.0136258295843577
+8,1. MAE  (L^1),test,PSBPM-FD (esperanza),1.0040801921285167,0.9838737147230315
+8,1. MAE  (L^1),test,PSBPM-FD (mediana),1.0043443287643181,0.9841557566752692
+8,1. MAE  (L^1),test,PSBPM-FD (medoide),1.0313408413279779,1.0105599366686384
+8,1. MAE  (L^1),test,PSBPM-FD (modal),1.0114993635110285,0.9912422220084212
+8,1. MAE  (L^1),test,"PSBPM-FD (más probable, tipica)",1.0048911676148975,0.9846698877211029
+8,1. MAE  (L^1),test,"PSBPM-FD (mejor comportamiento, tipica)",1.0048911676148975,0.9846698877211029
+8,1. MAE  (L^1),test,"PSBPM-FD (más probable, mediana)",1.0051980835390513,0.984993928124385
+8,1. MAE  (L^1),test,"PSBPM-FD (mejor comportamiento, mediana)",1.0051980835390513,0.984993928124385
+8,1. MAE  (L^1),test,"PSBPM-FD (más probable, medoide)",1.0322102111967242,1.0114134381942168
+8,1. MAE  (L^1),test,"PSBPM-FD (mejor comportamiento, medoide)",1.0322102111967242,1.0114134381942168
+8,2. RMSE (L^2),train,FAR,1.2922456918306409,1.0
+8,2. RMSE (L^2),train,RF,1.0,0.774928980411085
+8,2. RMSE (L^2),train,PSBPM-FD (esperanza),1.298899360194828,1.0054132782143042
+8,2. RMSE (L^2),train,PSBPM-FD (mediana),1.2998070153523218,1.0061201836881724
+8,2. RMSE (L^2),train,PSBPM-FD (medoide),1.3292744670148842,1.0288547202819853
+8,2. RMSE (L^2),train,PSBPM-FD (modal),1.3187233052053327,1.0208283385694867
+8,2. RMSE (L^2),train,"PSBPM-FD (más probable, tipica)",1.3008288641158474,1.0070892885033096
+8,2. RMSE (L^2),train,"PSBPM-FD (mejor comportamiento, tipica)",1.2939168187746912,1.0011966909434304
+8,2. RMSE (L^2),train,"PSBPM-FD (más probable, mediana)",1.3014387659957074,1.007532795449355
+8,2. RMSE (L^2),train,"PSBPM-FD (mejor comportamiento, mediana)",1.2950257048374256,1.0020656671332329
+8,2. RMSE (L^2),train,"PSBPM-FD (más probable, medoide)",1.330484636853412,1.0299168614041478
+8,2. RMSE (L^2),train,"PSBPM-FD (mejor comportamiento, medoide)",1.324493192460844,1.0248086416792888
+8,2. RMSE (L^2),test,FAR,1.020317185020961,1.0
+8,2. RMSE (L^2),test,RF,1.0365010957564782,1.0161509876232464
+8,2. RMSE (L^2),test,PSBPM-FD (esperanza),1.0022062749925957,0.9824503450556785
+8,2. RMSE (L^2),test,PSBPM-FD (mediana),1.0033429322426932,0.9835970322849993
+8,2. RMSE (L^2),test,PSBPM-FD (medoide),1.03077686598311,1.010377241491779
+8,2. RMSE (L^2),test,PSBPM-FD (modal),1.0140513822691153,0.9941494386796002
+8,2. RMSE (L^2),test,"PSBPM-FD (más probable, tipica)",1.0026188881756164,0.9828598569996878
+8,2. RMSE (L^2),test,"PSBPM-FD (mejor comportamiento, tipica)",1.0026188881756164,0.9828598569996878
+8,2. RMSE (L^2),test,"PSBPM-FD (más probable, mediana)",1.003695343745116,0.9839467942384703
+8,2. RMSE (L^2),test,"PSBPM-FD (mejor comportamiento, mediana)",1.003695343745116,0.9839467942384703
+8,2. RMSE (L^2),test,"PSBPM-FD (más probable, medoide)",1.0309932791849388,1.0105920286490657
+8,2. RMSE (L^2),test,"PSBPM-FD (mejor comportamiento, medoide)",1.0309932791849388,1.0105920286490657
+8,3. E_max promedio por curva,train,FAR,1.3020204417049452,1.0
+8,3. E_max promedio por curva,train,RF,1.0,0.7690229225831539
+8,3. E_max promedio por curva,train,PSBPM-FD (esperanza),1.2978428252620016,0.9971728994980399
+8,3. E_max promedio por curva,train,PSBPM-FD (mediana),1.3005914450202467,0.999320856320413
+8,3. E_max promedio por curva,train,PSBPM-FD (medoide),1.3482248922271003,1.0359106638082975
+8,3. E_max promedio por curva,train,PSBPM-FD (modal),1.3185145701622938,1.0129926108308875
+8,3. E_max promedio por curva,train,"PSBPM-FD (más probable, tipica)",1.2977717264050062,0.9971204823170636
+8,3. E_max promedio por curva,train,"PSBPM-FD (mejor comportamiento, tipica)",1.2928415162332272,0.9930483122848119
+8,3. E_max promedio por curva,train,"PSBPM-FD (más probable, mediana)",1.2999938139098632,0.9988317819708598
+8,3. E_max promedio por curva,train,"PSBPM-FD (mejor comportamiento, mediana)",1.2953268700335445,0.9949771291337182
+8,3. E_max promedio por curva,train,"PSBPM-FD (más probable, medoide)",1.3483750002871344,1.036040263826441
+8,3. E_max promedio por curva,train,"PSBPM-FD (mejor comportamiento, medoide)",1.3438136604864956,1.0322731347047887
+8,3. E_max promedio por curva,test,FAR,1.024775210883699,1.0
+8,3. E_max promedio por curva,test,RF,1.022371561809375,0.9978172072220878
+8,3. E_max promedio por curva,test,PSBPM-FD (esperanza),1.0027488019763968,0.9786269516778826
+8,3. E_max promedio por curva,test,PSBPM-FD (mediana),1.0049619039494617,0.9807947642859621
+8,3. E_max promedio por curva,test,PSBPM-FD (medoide),1.044677215520522,1.0194589919573351
+8,3. E_max promedio por curva,test,PSBPM-FD (modal),1.0207054920910972,0.9961873354437218
+8,3. E_max promedio por curva,test,"PSBPM-FD (más probable, tipica)",1.002833426534312,0.978710311275511
+8,3. E_max promedio por curva,test,"PSBPM-FD (mejor comportamiento, tipica)",1.002833426534312,0.978710311275511
+8,3. E_max promedio por curva,test,"PSBPM-FD (más probable, mediana)",1.0049983973064058,0.9808307121434864
+8,3. E_max promedio por curva,test,"PSBPM-FD (mejor comportamiento, mediana)",1.0049983973064058,0.9808307121434864
+8,3. E_max promedio por curva,test,"PSBPM-FD (más probable, medoide)",1.0439837780863264,1.018775919963589
+8,3. E_max promedio por curva,test,"PSBPM-FD (mejor comportamiento, medoide)",1.0439837780863264,1.018775919963589
+8,4. E_max peor de la ventana,train,FAR,1.2707217183122095,1.0
+8,4. E_max peor de la ventana,train,RF,1.0001178499282593,0.7924518108184673
+8,4. E_max peor de la ventana,train,PSBPM-FD (esperanza),1.2947497525846432,1.0226204218203303
+8,4. E_max peor de la ventana,train,PSBPM-FD (mediana),1.2979218088478348,1.025704636596709
+8,4. E_max peor de la ventana,train,PSBPM-FD (medoide),1.3431436090052575,1.0609303634513514
+8,4. E_max peor de la ventana,train,PSBPM-FD (modal),1.347711260933509,1.0648158435776662
+8,4. E_max peor de la ventana,train,"PSBPM-FD (más probable, tipica)",1.2951391465688333,1.0230098158045202
+8,4. E_max peor de la ventana,train,"PSBPM-FD (mejor comportamiento, tipica)",1.2947497525846432,1.0226204218203303
+8,4. E_max peor de la ventana,train,"PSBPM-FD (más probable, mediana)",1.2981657726506077,1.0259486003994822
+8,4. E_max peor de la ventana,train,"PSBPM-FD (mejor comportamiento, mediana)",1.2979218088478348,1.025704636596709
+8,4. E_max peor de la ventana,train,"PSBPM-FD (más probable, medoide)",1.3435275745632507,1.0613143290093443
+8,4. E_max peor de la ventana,train,"PSBPM-FD (mejor comportamiento, medoide)",1.3431436090052575,1.0609303634513514
+8,4. E_max peor de la ventana,test,FAR,1.0508485125856692,1.0
+8,4. E_max peor de la ventana,test,RF,1.063620928216541,1.012526632182642
+8,4. E_max peor de la ventana,test,PSBPM-FD (esperanza),1.0207296611152386,0.9720911156788248
+8,4. E_max peor de la ventana,test,PSBPM-FD (mediana),1.0262215231282248,0.9774463650180577
+8,4. E_max peor de la ventana,test,PSBPM-FD (medoide),1.0521778077760569,1.0028056169241784
+8,4. E_max peor de la ventana,test,PSBPM-FD (modal),1.0433891461556364,0.9933847606925919
+8,4. E_max peor de la ventana,test,"PSBPM-FD (más probable, tipica)",1.0207296611152386,0.9720911156788248
+8,4. E_max peor de la ventana,test,"PSBPM-FD (mejor comportamiento, tipica)",1.0207296611152386,0.9720911156788248
+8,4. E_max peor de la ventana,test,"PSBPM-FD (más probable, mediana)",1.0262215231282248,0.9774463650180577
+8,4. E_max peor de la ventana,test,"PSBPM-FD (mejor comportamiento, mediana)",1.0262215231282248,0.9774463650180577
+8,4. E_max peor de la ventana,test,"PSBPM-FD (más probable, medoide)",1.0521778077760569,1.0028056169241784
+8,4. E_max peor de la ventana,test,"PSBPM-FD (mejor comportamiento, medoide)",1.0521778077760569,1.0028056169241784
+9,1. MAE  (L^1),train,FAR,1.3059611816915428,1.0
+9,1. MAE  (L^1),train,RF,1.0,0.7666540953222614
+9,1. MAE  (L^1),train,PSBPM-FD (esperanza),1.3116169015690362,1.0045336898721606
+9,1. MAE  (L^1),train,PSBPM-FD (mediana),1.312563871605898,1.005225057088164
+9,1. MAE  (L^1),train,PSBPM-FD (medoide),1.3476761768800642,1.0320864671512133
+9,1. MAE  (L^1),train,PSBPM-FD (modal),1.326901376121624,1.0161336088289432
+9,1. MAE  (L^1),train,"PSBPM-FD (más probable, tipica)",1.3118160583055438,1.0047234694384404
+9,1. MAE  (L^1),train,"PSBPM-FD (mejor comportamiento, tipica)",1.30523121600864,0.9992925548964144
+9,1. MAE  (L^1),train,"PSBPM-FD (más probable, mediana)",1.3129086738665656,1.0055287199339784
+9,1. MAE  (L^1),train,"PSBPM-FD (mejor comportamiento, mediana)",1.3065808181061818,1.000309892931853
+9,1. MAE  (L^1),train,"PSBPM-FD (más probable, medoide)",1.3477921973489275,1.0322031728394532
+9,1. MAE  (L^1),train,"PSBPM-FD (mejor comportamiento, medoide)",1.3419650820959734,1.0273972424383018
+9,1. MAE  (L^1),test,FAR,1.021197475463923,1.0
+9,1. MAE  (L^1),test,RF,1.035230662974471,1.0140627506070063
+9,1. MAE  (L^1),test,PSBPM-FD (esperanza),1.0039565718206482,0.9833614510950879
+9,1. MAE  (L^1),test,PSBPM-FD (mediana),1.0042911851518845,0.9837115244445828
+9,1. MAE  (L^1),test,PSBPM-FD (medoide),1.0310051446664543,1.0097847710412164
+9,1. MAE  (L^1),test,PSBPM-FD (modal),1.0112450966987698,0.9906051476068729
+9,1. MAE  (L^1),test,"PSBPM-FD (más probable, tipica)",1.0047690225424695,0.984157692859777
+9,1. MAE  (L^1),test,"PSBPM-FD (mejor comportamiento, tipica)",1.0047690225424695,0.984157692859777
+9,1. MAE  (L^1),test,"PSBPM-FD (más probable, mediana)",1.0051425136212933,0.984545868318747
+9,1. MAE  (L^1),test,"PSBPM-FD (mejor comportamiento, mediana)",1.0051425136212933,0.984545868318747
+9,1. MAE  (L^1),test,"PSBPM-FD (más probable, medoide)",1.0318451382777463,1.0106080061955693
+9,1. MAE  (L^1),test,"PSBPM-FD (mejor comportamiento, medoide)",1.0318451382777463,1.0106080061955693
+9,2. RMSE (L^2),train,FAR,1.296099884129224,1.0
+9,2. RMSE (L^2),train,RF,1.0,0.772682608416653
+9,2. RMSE (L^2),train,PSBPM-FD (esperanza),1.3022463116979672,1.0050223648872014
+9,2. RMSE (L^2),train,PSBPM-FD (mediana),1.3031537972328435,1.0057249099187997
+9,2. RMSE (L^2),train,PSBPM-FD (medoide),1.3412983925050783,1.035061952128312
+9,2. RMSE (L^2),train,PSBPM-FD (modal),1.322131707015349,1.0204418706025606
+9,2. RMSE (L^2),train,"PSBPM-FD (más probable, tipica)",1.304177112207192,1.0066986030686091
+9,2. RMSE (L^2),train,"PSBPM-FD (mejor comportamiento, tipica)",1.2972595835777636,1.0008053999494508
+9,2. RMSE (L^2),train,"PSBPM-FD (más probable, mediana)",1.3047836329017313,1.0071353798824023
+9,2. RMSE (L^2),train,"PSBPM-FD (mejor comportamiento, mediana)",1.2983677469374768,1.0016696196222072
+9,2. RMSE (L^2),train,"PSBPM-FD (más probable, medoide)",1.3427050892368464,1.0362838969868646
+9,2. RMSE (L^2),train,"PSBPM-FD (mejor comportamiento, medoide)",1.336801819663614,1.0312546144660095
+9,2. RMSE (L^2),test,FAR,1.020456480452227,1.0
+9,2. RMSE (L^2),test,RF,1.0366919593168886,1.0161915232532162
+9,2. RMSE (L^2),test,PSBPM-FD (esperanza),1.0021406311997205,0.9822500364288874
+9,2. RMSE (L^2),test,PSBPM-FD (mediana),1.0033374060099827,0.9834547738130693
+9,2. RMSE (L^2),test,PSBPM-FD (medoide),1.0311419285548147,1.0106005685877013
+9,2. RMSE (L^2),test,PSBPM-FD (modal),1.0140030478237798,0.9939631474382556
+9,2. RMSE (L^2),test,"PSBPM-FD (más probable, tipica)",1.0025534065801982,0.9826595870017636
+9,2. RMSE (L^2),test,"PSBPM-FD (mejor comportamiento, tipica)",1.0025534065801982,0.9826595870017636
+9,2. RMSE (L^2),test,"PSBPM-FD (más probable, mediana)",1.0036882686472646,0.9838028943563947
+9,2. RMSE (L^2),test,"PSBPM-FD (mejor comportamiento, mediana)",1.0036882686472646,0.9838028943563947
+9,2. RMSE (L^2),test,"PSBPM-FD (más probable, medoide)",1.0313768420310891,1.0108336519743826
+9,2. RMSE (L^2),test,"PSBPM-FD (mejor comportamiento, medoide)",1.0313768420310891,1.0108336519743826
+9,3. E_max promedio por curva,train,FAR,1.3122073348060972,1.0
+9,3. E_max promedio por curva,train,RF,1.0,0.7631699672257045
+9,3. E_max promedio por curva,train,PSBPM-FD (esperanza),1.3071617957284376,0.9965652565381103
+9,3. E_max promedio por curva,train,PSBPM-FD (mediana),1.3099073021337664,0.9986893697411072
+9,3. E_max promedio por curva,train,PSBPM-FD (medoide),1.3699091187965464,1.044479758185034
+9,3. E_max promedio por curva,train,PSBPM-FD (modal),1.328412998158142,1.0126876688583202
+9,3. E_max promedio por curva,train,"PSBPM-FD (más probable, tipica)",1.307064082864143,0.9964924485766934
+9,3. E_max promedio por curva,train,"PSBPM-FD (mejor comportamiento, tipica)",1.302151705991097,0.9924383688940198
+9,3. E_max promedio por curva,train,"PSBPM-FD (más probable, mediana)",1.309257519977571,0.9981588015035598
+9,3. E_max promedio por curva,train,"PSBPM-FD (mejor comportamiento, mediana)",1.3046172795783018,0.9943293637483334
+9,3. E_max promedio por curva,train,"PSBPM-FD (más probable, medoide)",1.3697277885986094,1.0443359519426956
+9,3. E_max promedio por curva,train,"PSBPM-FD (mejor comportamiento, medoide)",1.3652305529459003,1.0406248465583476
+9,3. E_max promedio por curva,test,FAR,1.0255576826515287,1.0
+9,3. E_max promedio por curva,test,RF,1.02356024952456,0.9981919815084888
+9,3. E_max promedio por curva,test,PSBPM-FD (esperanza),1.0027080076784856,0.9778333656181486
+9,3. E_max promedio por curva,test,PSBPM-FD (mediana),1.0050929189416342,0.9801729512669939
+9,3. E_max promedio por curva,test,PSBPM-FD (medoide),1.0485381444643451,1.022422144191203
+9,3. E_max promedio por curva,test,PSBPM-FD (modal),1.0208092476096309,0.9955232072882616
+9,3. E_max promedio por curva,test,"PSBPM-FD (más probable, tipica)",1.0027861696944824,0.9779102672388892
+9,3. E_max promedio por curva,test,"PSBPM-FD (mejor comportamiento, tipica)",1.0027861696944824,0.9779102672388892
+9,3. E_max promedio por curva,test,"PSBPM-FD (más probable, mediana)",1.0051908136728502,0.9802692674046533
+9,3. E_max promedio por curva,test,"PSBPM-FD (mejor comportamiento, mediana)",1.0051908136728502,0.9802692674046533
+9,3. E_max promedio por curva,test,"PSBPM-FD (más probable, medoide)",1.0479846437835771,1.0218775689408188
+9,3. E_max promedio por curva,test,"PSBPM-FD (mejor comportamiento, medoide)",1.0479846437835771,1.0218775689408188
+9,4. E_max peor de la ventana,train,FAR,1.2785681744942516,1.0
+9,4. E_max peor de la ventana,train,RF,1.0001159861087703,0.7881948387655007
+9,4. E_max peor de la ventana,train,PSBPM-FD (esperanza),1.3044814396260502,1.024205480515414
+9,4. E_max peor de la ventana,train,PSBPM-FD (mediana),1.3079436880840218,1.0275230371094033
+9,4. E_max peor de la ventana,train,PSBPM-FD (medoide),1.371865109719013,1.0759584788749261
+9,4. E_max peor de la ventana,train,PSBPM-FD (modal),1.357386126273102,1.0662739434627033
+9,4. E_max peor de la ventana,train,"PSBPM-FD (más probable, tipica)",1.30486484753803,1.0245888884273937
+9,4. E_max peor de la ventana,train,"PSBPM-FD (mejor comportamiento, tipica)",1.3044814396260502,1.024205480515414
+9,4. E_max peor de la ventana,train,"PSBPM-FD (más probable, mediana)",1.3081779500022641,1.0277572990276456
+9,4. E_max peor de la ventana,train,"PSBPM-FD (mejor comportamiento, mediana)",1.3079436880840218,1.0275230371094033
+9,4. E_max peor de la ventana,train,"PSBPM-FD (más probable, medoide)",1.3721554094229094,1.0762487785788226
+9,4. E_max peor de la ventana,train,"PSBPM-FD (mejor comportamiento, medoide)",1.371865109719013,1.0759584788749261
+9,4. E_max peor de la ventana,test,FAR,1.0528084001544253,1.0
+9,4. E_max peor de la ventana,test,RF,1.064121576881641,1.011115666371801
+9,4. E_max peor de la ventana,test,PSBPM-FD (esperanza),1.0191459268781595,0.9689067922829435
+9,4. E_max peor de la ventana,test,PSBPM-FD (mediana),1.0261373604010646,0.9757296583713483
+9,4. E_max peor de la ventana,test,PSBPM-FD (medoide),1.058054949982281,1.0066711940588418
+9,4. E_max peor de la ventana,test,PSBPM-FD (modal),1.0423392919194603,0.9907246150517492
+9,4. E_max peor de la ventana,test,"PSBPM-FD (más probable, tipica)",1.0191459268781595,0.9689067922829435
+9,4. E_max peor de la ventana,test,"PSBPM-FD (mejor comportamiento, tipica)",1.0191459268781595,0.9689067922829435
+9,4. E_max peor de la ventana,test,"PSBPM-FD (más probable, mediana)",1.0261373604010646,0.9757296583713483
+9,4. E_max peor de la ventana,test,"PSBPM-FD (mejor comportamiento, mediana)",1.0261373604010646,0.9757296583713483
+9,4. E_max peor de la ventana,test,"PSBPM-FD (más probable, medoide)",1.058054949982281,1.0066711940588418
+9,4. E_max peor de la ventana,test,"PSBPM-FD (mejor comportamiento, medoide)",1.058054949982281,1.0066711940588418
+10,1. MAE  (L^1),train,FAR,1.3077082839568797,1.0
+10,1. MAE  (L^1),train,RF,1.0,0.7656467452140319
+10,1. MAE  (L^1),train,PSBPM-FD (esperanza),1.3132012544938063,1.0044057053053643
+10,1. MAE  (L^1),train,PSBPM-FD (mediana),1.3139968022577144,1.0049785563400837
+10,1. MAE  (L^1),train,PSBPM-FD (medoide),1.3484673904525921,1.0313480752645032
+10,1. MAE  (L^1),train,PSBPM-FD (modal),1.3285449347932767,1.0160329701596367
+10,1. MAE  (L^1),train,"PSBPM-FD (más probable, tipica)",1.3133971280949588,1.0045935877928733
+10,1. MAE  (L^1),train,"PSBPM-FD (mejor comportamiento, tipica)",1.3068128425666974,0.9991658441289316
+10,1. MAE  (L^1),train,"PSBPM-FD (más probable, mediana)",1.3143326830786939,1.0052754225400964
+10,1. MAE  (L^1),train,"PSBPM-FD (mejor comportamiento, mediana)",1.3080046756022943,1.0000590677770695
+10,1. MAE  (L^1),train,"PSBPM-FD (más probable, medoide)",1.348627908560432,1.0315034026290069
+10,1. MAE  (L^1),train,"PSBPM-FD (mejor comportamiento, medoide)",1.3427058694027079,1.0266213610976735
+10,1. MAE  (L^1),test,FAR,1.0211422874538725,1.0
+10,1. MAE  (L^1),test,RF,1.0351497690609817,1.0140414348262465
+10,1. MAE  (L^1),test,PSBPM-FD (esperanza),1.0038699023579611,0.9833298274204336
+10,1. MAE  (L^1),test,PSBPM-FD (mediana),1.0042656286898717,0.9837396330900888
+10,1. MAE  (L^1),test,PSBPM-FD (medoide),1.030053663221313,1.0089155616662835
+10,1. MAE  (L^1),test,PSBPM-FD (modal),1.0112436823203268,0.990657672014604
+10,1. MAE  (L^1),test,"PSBPM-FD (más probable, tipica)",1.0046991509128556,0.9841426858277187
+10,1. MAE  (L^1),test,"PSBPM-FD (mejor comportamiento, tipica)",1.0046991509128556,0.9841426858277187
+10,1. MAE  (L^1),test,"PSBPM-FD (más probable, mediana)",1.0051350888583148,0.9845919083259604
+10,1. MAE  (L^1),test,"PSBPM-FD (mejor comportamiento, mediana)",1.0051350888583148,0.9845919083259604
+10,1. MAE  (L^1),test,"PSBPM-FD (más probable, medoide)",1.0308888853846399,1.0097342756132708
+10,1. MAE  (L^1),test,"PSBPM-FD (mejor comportamiento, medoide)",1.0308888853846399,1.0097342756132708
+10,2. RMSE (L^2),train,FAR,1.2978220057450138,1.0
+10,2. RMSE (L^2),train,RF,1.0,0.7716747741440557
+10,2. RMSE (L^2),train,PSBPM-FD (esperanza),1.303827723184496,1.0049106453437504
+10,2. RMSE (L^2),train,PSBPM-FD (mediana),1.304657184957193,1.0055508760715564
+10,2. RMSE (L^2),train,PSBPM-FD (medoide),1.3418560559815234,1.0341473431517063
+10,2. RMSE (L^2),train,PSBPM-FD (modal),1.3237444969407142,1.020335481300559
+10,2. RMSE (L^2),train,"PSBPM-FD (más probable, tipica)",1.3057596521837147,1.0065872966639413
+10,2. RMSE (L^2),train,"PSBPM-FD (mejor comportamiento, tipica)",1.298838170698945,1.0006936000133901
+10,2. RMSE (L^2),train,"PSBPM-FD (más probable, mediana)",1.3062876426429633,1.0069614885053042
+10,2. RMSE (L^2),train,"PSBPM-FD (mejor comportamiento, mediana)",1.299863980479006,1.0014917638533682
+10,2. RMSE (L^2),train,"PSBPM-FD (más probable, medoide)",1.3431797376155914,1.0353010509771692
+10,2. RMSE (L^2),train,"PSBPM-FD (mejor comportamiento, medoide)",1.3372579731563465,1.0302583229588198
+10,2. RMSE (L^2),test,FAR,1.0205785503739293,1.0
+10,2. RMSE (L^2),test,RF,1.0367736526462978,1.0161506837196235
+10,2. RMSE (L^2),test,PSBPM-FD (esperanza),1.0021242665934218,0.9821173268384085
+10,2. RMSE (L^2),test,PSBPM-FD (mediana),1.0034673970502268,0.9834667360737454
+10,2. RMSE (L^2),test,PSBPM-FD (medoide),1.0310797893101427,1.0104249018585656
+10,2. RMSE (L^2),test,PSBPM-FD (modal),1.0139811789140376,0.9938241398020646
+10,2. RMSE (L^2),test,"PSBPM-FD (más probable, tipica)",1.0025371361072413,0.9825269475799939
+10,2. RMSE (L^2),test,"PSBPM-FD (mejor comportamiento, tipica)",1.0025371361072413,0.9825269475799939
+10,2. RMSE (L^2),test,"PSBPM-FD (más probable, mediana)",1.0038174601288172,0.9838140433763535
+10,2. RMSE (L^2),test,"PSBPM-FD (mejor comportamiento, mediana)",1.0038174601288172,0.9838140433763535
+10,2. RMSE (L^2),test,"PSBPM-FD (más probable, medoide)",1.0313116363726116,1.010654928578966
+10,2. RMSE (L^2),test,"PSBPM-FD (mejor comportamiento, medoide)",1.0313116363726116,1.010654928578966
+10,3. E_max promedio por curva,train,FAR,1.3181486519749428,1.0
+10,3. E_max promedio por curva,train,RF,1.0,0.7597815396482942
+10,3. E_max promedio por curva,train,PSBPM-FD (esperanza),1.3127115432913001,0.9963044683582377
+10,3. E_max promedio por curva,train,PSBPM-FD (mediana),1.3152839852418963,0.9982865559540718
+10,3. E_max promedio por curva,train,PSBPM-FD (medoide),1.3775115395273505,1.0455352245239171
+10,3. E_max promedio por curva,train,PSBPM-FD (modal),1.3345709385693543,1.0128120871076751
+10,3. E_max promedio por curva,train,"PSBPM-FD (más probable, tipica)",1.3125433984325408,0.9961736954060784
+10,3. E_max promedio por curva,train,"PSBPM-FD (mejor comportamiento, tipica)",1.3075851785046197,0.9920947522860298
+10,3. E_max promedio por curva,train,"PSBPM-FD (más probable, mediana)",1.3146661729890028,0.9977833366462898
+10,3. E_max promedio por curva,train,"PSBPM-FD (mejor comportamiento, mediana)",1.309970244206327,0.9939202258391141
+10,3. E_max promedio por curva,train,"PSBPM-FD (más probable, medoide)",1.3769829156796711,1.0451074686452981
+10,3. E_max promedio por curva,train,"PSBPM-FD (mejor comportamiento, medoide)",1.3724805823063622,1.0414041250469874
+10,3. E_max promedio por curva,test,FAR,1.0260815294623276,1.0
+10,3. E_max promedio por curva,test,RF,1.023938559323267,0.9980399617169806
+10,3. E_max promedio por curva,test,PSBPM-FD (esperanza),1.0027532593007744,0.9773768071822593
+10,3. E_max promedio por curva,test,PSBPM-FD (mediana),1.0050620815413251,0.9796386895173868
+10,3. E_max promedio por curva,test,PSBPM-FD (medoide),1.0514389816244056,1.0247483986320778
+10,3. E_max promedio por curva,test,PSBPM-FD (modal),1.0205573551775138,0.9947635422705503
+10,3. E_max promedio por curva,test,"PSBPM-FD (más probable, tipica)",1.0028042941854556,0.9774270246093197
+10,3. E_max promedio por curva,test,"PSBPM-FD (mejor comportamiento, tipica)",1.0028042941854556,0.9774270246093197
+10,3. E_max promedio por curva,test,"PSBPM-FD (más probable, mediana)",1.0051238974113212,0.9796995152439871
+10,3. E_max promedio por curva,test,"PSBPM-FD (mejor comportamiento, mediana)",1.0051238974113212,0.9796995152439871
+10,3. E_max promedio por curva,test,"PSBPM-FD (más probable, medoide)",1.0508727998888487,1.0241912857829778
+10,3. E_max promedio por curva,test,"PSBPM-FD (mejor comportamiento, medoide)",1.0508727998888487,1.0241912857829778
+10,4. E_max peor de la ventana,train,FAR,1.2775543822461526,1.0
+10,4. E_max peor de la ventana,train,RF,1.0001272644587662,0.7887927255974555
+10,4. E_max peor de la ventana,train,PSBPM-FD (esperanza),1.303368816539453,1.0240479763549584
+10,4. E_max peor de la ventana,train,PSBPM-FD (mediana),1.3066212151549017,1.0272462647921028
+10,4. E_max peor de la ventana,train,PSBPM-FD (medoide),1.3803554210358995,1.0839925495802163
+10,4. E_max peor de la ventana,train,PSBPM-FD (modal),1.3563771089749612,1.0661747816230578
+10,4. E_max peor de la ventana,train,"PSBPM-FD (más probable, tipica)",1.3037535314034947,1.024432691219
+10,4. E_max peor de la ventana,train,"PSBPM-FD (mejor comportamiento, tipica)",1.303368816539453,1.0240479763549584
+10,4. E_max peor de la ventana,train,"PSBPM-FD (más probable, mediana)",1.3068650093280443,1.0274900589652456
+10,4. E_max peor de la ventana,train,"PSBPM-FD (mejor comportamiento, mediana)",1.3066212151549017,1.0272462647921028
+10,4. E_max peor de la ventana,train,"PSBPM-FD (más probable, medoide)",1.3806089555377068,1.0842460840820236
+10,4. E_max peor de la ventana,train,"PSBPM-FD (mejor comportamiento, medoide)",1.3803554210358995,1.0839925495802163
+10,4. E_max peor de la ventana,test,FAR,1.0519521807538796,1.0
+10,4. E_max peor de la ventana,test,RF,1.0669155030325617,1.014589581388587
+10,4. E_max peor de la ventana,test,PSBPM-FD (esperanza),1.0191957658948596,0.9697751073275062
+10,4. E_max peor de la ventana,test,PSBPM-FD (mediana),1.0251874558668115,0.9756238671742421
+10,4. E_max peor de la ventana,test,PSBPM-FD (medoide),1.059734049078518,1.0092774686607642
+10,4. E_max peor de la ventana,test,PSBPM-FD (modal),1.0417444768604192,0.9909975047266449
+10,4. E_max peor de la ventana,test,"PSBPM-FD (más probable, tipica)",1.0191957658948596,0.9697751073275062
+10,4. E_max peor de la ventana,test,"PSBPM-FD (mejor comportamiento, tipica)",1.0191957658948596,0.9697751073275062
+10,4. E_max peor de la ventana,test,"PSBPM-FD (más probable, mediana)",1.0251874558668115,0.9756238671742421
+10,4. E_max peor de la ventana,test,"PSBPM-FD (mejor comportamiento, mediana)",1.0251874558668115,0.9756238671742421
+10,4. E_max peor de la ventana,test,"PSBPM-FD (más probable, medoide)",1.059734049078518,1.0092774686607642
+10,4. E_max peor de la ventana,test,"PSBPM-FD (mejor comportamiento, medoide)",1.059734049078518,1.0092774686607642

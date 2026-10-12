@@ -1,0 +1,38 @@
+\chapter{Aplicación a Datos Reales}
+\label{04_00_00_aplicacion}
+
+% Esqueleto (2026-10-12). Misma estructura que los resultados de simulación (§03_08); las corridas son
+% 101 (rezago 1) y 102 (rezagos {1, 7}) de notebooks/reales/, con las mismas salidas que las 30x.
+
+\section{Datos}
+\label{04_01_00_datos}
+% Tráfico I-94 (Metro Interstate Traffic Volume): curvas diarias, ventana 2015-07-01..2018-09-30, 70/30.
+% Representación B-spline 10/3, FPCA en train, M = 10. Fuente: 101_01 §2–§3.
+
+\section{Diseño}
+\label{04_02_00_diseno}
+% Lo que difiere del estudio de simulación: dos especificaciones (rezago 1; rezagos {1, 7} = día anterior y
+% mismo día de la semana anterior), FAR(7) completo, RF con subconjuntos {1} y {1, 7}, atau = 2, 1 cadena,
+% ventana de detalle por calendario (10 días de prueba con más no laborables). Cuadro con la configuración.
+
+\section{Resultados}
+\label{04_03_00_resultados}
+
+\subsection{Error puntual}
+\label{04_03_01_error_puntual}
+% Cuadro: MAE de los tres predictores, FAR y RF para las dos especificaciones (M = 10). Fuente: 98_* de 101_05 y 102_05.
+
+\subsection{Intervalos de predicción}
+\label{04_03_02_intervalos}
+% Cuadro: Winkler, MPIW, PICP de las tres construcciones y del FAR; % de ventanas que gana al FAR. Fuente: 99_*, 111_*.
+
+\subsection{Comportamientos predictivos}
+\label{04_03_03_comportamientos}
+% Distribución de K en test; K contra día de la semana y feriados (65_*, 104_*); ventana de detalle (112_*).
+
+\subsection{Pronóstico por comportamiento}
+\label{04_03_04_pronostico}
+% Cuadro del _06 (119_*): pronóstico, cota, esperanza, FAR, RF; todos / K >= 2; acierto por tramos de p_1.
+
+\section{Discusión}
+\label{04_04_00_discusion}

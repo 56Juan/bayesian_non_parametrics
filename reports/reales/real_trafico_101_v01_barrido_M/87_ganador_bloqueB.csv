@@ -1,0 +1,37 @@
+w,metrica,columna,criterio,bloque,M,n_ventanas,pct_ventanas_ganadas
+20,5. MPIW,mpiw,menor es mejor,train,10,811,1.0
+20,5. MPIW,mpiw,menor es mejor,test,10,338,1.0
+20,6. PICP puntual,picp,|valor - nominal|,train,10,811,1.0
+20,6. PICP puntual,picp,|valor - nominal|,test,10,338,1.0
+20,7. PICPB curva completa,picp_simultaneo,|valor - nominal|,train,10,811,1.0
+20,7. PICPB curva completa,picp_simultaneo,|valor - nominal|,test,10,338,1.0
+20,8. Winkler,winkler,menor es mejor,train,10,811,1.0
+20,8. Winkler,winkler,menor es mejor,test,10,338,1.0
+20,9. Winkler max promedio,winkler_max_medio,menor es mejor,train,10,811,1.0
+20,9. Winkler max promedio,winkler_max_medio,menor es mejor,test,10,338,1.0
+20,10. Winkler max peor ventana,winkler_max_glob,menor es mejor,train,10,811,1.0
+20,10. Winkler max peor ventana,winkler_max_glob,menor es mejor,test,10,338,1.0
+30,5. MPIW,mpiw,menor es mejor,train,10,801,1.0
+30,5. MPIW,mpiw,menor es mejor,test,10,328,1.0
+30,6. PICP puntual,picp,|valor - nominal|,train,10,801,1.0
+30,6. PICP puntual,picp,|valor - nominal|,test,10,328,1.0
+30,7. PICPB curva completa,picp_simultaneo,|valor - nominal|,train,10,801,1.0
+30,7. PICPB curva completa,picp_simultaneo,|valor - nominal|,test,10,328,1.0
+30,8. Winkler,winkler,menor es mejor,train,10,801,1.0
+30,8. Winkler,winkler,menor es mejor,test,10,328,1.0
+30,9. Winkler max promedio,winkler_max_medio,menor es mejor,train,10,801,1.0
+30,9. Winkler max promedio,winkler_max_medio,menor es mejor,test,10,328,1.0
+30,10. Winkler max peor ventana,winkler_max_glob,menor es mejor,train,10,801,1.0
+30,10. Winkler max peor ventana,winkler_max_glob,menor es mejor,test,10,328,1.0
+40,5. MPIW,mpiw,menor es mejor,train,10,791,1.0
+40,5. MPIW,mpiw,menor es mejor,test,10,318,1.0
+40,6. PICP puntual,picp,|valor - nominal|,train,10,791,1.0
+40,6. PICP puntual,picp,|valor - nominal|,test,10,318,1.0
+40,7. PICPB curva completa,picp_simultaneo,|valor - nominal|,train,10,791,1.0
+40,7. PICPB curva completa,picp_simultaneo,|valor - nominal|,test,10,318,1.0
+40,8. Winkler,winkler,menor es mejor,train,10,791,1.0
+40,8. Winkler,winkler,menor es mejor,test,10,318,1.0
+40,9. Winkler max promedio,winkler_max_medio,menor es mejor,train,10,791,1.0
+40,9. Winkler max promedio,winkler_max_medio,menor es mejor,test,10,318,1.0
+40,10. Winkler max peor ventana,winkler_max_glob,menor es mejor,train,10,791,1.0
+40,10. Winkler max peor ventana,winkler_max_glob,menor es mejor,test,10,318,1.0

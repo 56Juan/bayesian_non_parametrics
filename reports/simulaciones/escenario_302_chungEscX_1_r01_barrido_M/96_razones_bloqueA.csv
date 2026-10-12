@@ -36,7 +36,7 @@ M,metrica,bloque,modelo,razon_vs_mejor,razon_vs_FAR
 3,3. E_max promedio por curva,test,PSBPM-FD (medoide),1.009722594556257,0.9866169820296385
 3,3. E_max promedio por curva,test,PSBPM-FD (modal),1.0133108760305358,0.9903521513550222
 3,4. E_max peor de la ventana,train,FAR,1.2190590797534286,1.0
-3,4. E_max peor de la ventana,train,RF,1.000571157132148,0.8252068353291165
+3,4. E_max peor de la ventana,train,RF,1.000571157132148,0.8252068353291163
 3,4. E_max peor de la ventana,train,PSBPM-FD (esperanza),1.2423846616468088,1.0214394595179084
 3,4. E_max peor de la ventana,train,PSBPM-FD (mediana),1.2498429689420565,1.027589588365155
 3,4. E_max peor de la ventana,train,PSBPM-FD (medoide),1.2470666338179783,1.0256932733851303
@@ -48,8 +48,8 @@ M,metrica,bloque,modelo,razon_vs_mejor,razon_vs_FAR
 3,4. E_max peor de la ventana,test,PSBPM-FD (medoide),1.0849752846267335,1.031231787679654
 3,4. E_max peor de la ventana,test,PSBPM-FD (modal),1.1097228966559787,1.0581929069911167
 4,1. MAE  (L^1),train,FAR,1.2768137204778367,1.0
-4,1. MAE  (L^1),train,RF,1.0,0.7839018363657824
-4,1. MAE  (L^1),train,PSBPM-FD (esperanza),1.2862068910723148,1.007513046560139
+4,1. MAE  (L^1),train,RF,1.0,0.7839018363657825
+4,1. MAE  (L^1),train,PSBPM-FD (esperanza),1.286206891072315,1.007513046560139
 4,1. MAE  (L^1),train,PSBPM-FD (mediana),1.286477579522414,1.0076871952956639
 4,1. MAE  (L^1),train,PSBPM-FD (medoide),1.2945586237495854,1.0139981587275395
 4,1. MAE  (L^1),train,PSBPM-FD (modal),1.3074904275071495,1.0240687278533263
@@ -67,9 +67,9 @@ M,metrica,bloque,modelo,razon_vs_mejor,razon_vs_FAR
 4,2. RMSE (L^2),train,PSBPM-FD (modal),1.3108555592671853,1.027924065495405
 4,2. RMSE (L^2),test,FAR,1.0219888555254106,1.0
 4,2. RMSE (L^2),test,RF,1.0174990379620599,0.9958285026625466
-4,2. RMSE (L^2),test,PSBPM-FD (esperanza),1.0045036707599482,0.9830683083126727
+4,2. RMSE (L^2),test,PSBPM-FD (esperanza),1.004503670759948,0.9830683083126727
 4,2. RMSE (L^2),test,PSBPM-FD (mediana),1.007338751066861,0.9858361968524445
-4,2. RMSE (L^2),test,PSBPM-FD (medoide),1.013956660879475,0.9923176124275556
+4,2. RMSE (L^2),test,PSBPM-FD (medoide),1.0139566608794748,0.9923176124275556
 4,2. RMSE (L^2),test,PSBPM-FD (modal),1.02292433543313,1.001108735422551
 4,3. E_max promedio por curva,train,FAR,1.2330676620373306,1.0
 4,3. E_max promedio por curva,train,RF,1.0,0.8115112572674763
@@ -81,12 +81,12 @@ M,metrica,bloque,modelo,razon_vs_mejor,razon_vs_FAR
 4,3. E_max promedio por curva,test,RF,1.0279479766972441,1.0004837299414486
 4,3. E_max promedio por curva,test,PSBPM-FD (esperanza),1.0064370267518532,0.9795195930372576
 4,3. E_max promedio por curva,test,PSBPM-FD (mediana),1.010010808504114,0.9829813572038221
-4,3. E_max promedio por curva,test,PSBPM-FD (medoide),1.0137432970599782,0.9865978231818092
+4,3. E_max promedio por curva,test,PSBPM-FD (medoide),1.013743297059978,0.9865978231818092
 4,3. E_max promedio por curva,test,PSBPM-FD (modal),1.0185315350068904,0.9915162207238428
-4,4. E_max peor de la ventana,train,FAR,1.2643858178063454,1.0
+4,4. E_max peor de la ventana,train,FAR,1.2643858178063456,1.0
 4,4. E_max peor de la ventana,train,RF,1.0,0.7950252566304125
 4,4. E_max peor de la ventana,train,PSBPM-FD (esperanza),1.282636839380276,1.0167389546662244
-4,4. E_max peor de la ventana,train,PSBPM-FD (mediana),1.2861682088499196,1.019646286935993
+4,4. E_max peor de la ventana,train,PSBPM-FD (mediana),1.2861682088499193,1.019646286935993
 4,4. E_max peor de la ventana,train,PSBPM-FD (medoide),1.3017601213303442,1.0317291699858295
 4,4. E_max peor de la ventana,train,PSBPM-FD (modal),1.3404419308165008,1.0625090969298607
 4,4. E_max peor de la ventana,test,FAR,1.0608469987360991,1.0
@@ -96,13 +96,13 @@ M,metrica,bloque,modelo,razon_vs_mejor,razon_vs_FAR
 4,4. E_max peor de la ventana,test,PSBPM-FD (medoide),1.0774631407791586,1.0209600440253999
 4,4. E_max peor de la ventana,test,PSBPM-FD (modal),1.1116125171103017,1.0522881433989577
 5,1. MAE  (L^1),train,FAR,1.3624817144747965,1.0
-5,1. MAE  (L^1),train,RF,1.0,0.734514461292155
+5,1. MAE  (L^1),train,RF,1.0,0.7345144612921549
 5,1. MAE  (L^1),train,PSBPM-FD (esperanza),1.3566115098689446,0.9958043017165018
 5,1. MAE  (L^1),train,PSBPM-FD (mediana),1.3563213653350954,0.9955735268158522
 5,1. MAE  (L^1),train,PSBPM-FD (medoide),1.374049470721436,1.0085928776234698
 5,1. MAE  (L^1),train,PSBPM-FD (modal),1.3653535935943926,1.002265518186349
 5,1. MAE  (L^1),test,FAR,1.0312949066351094,1.0
-5,1. MAE  (L^1),test,RF,1.0205701654184514,0.9899406303429632
+5,1. MAE  (L^1),test,RF,1.0205701654184514,0.9899406303429634
 5,1. MAE  (L^1),test,PSBPM-FD (esperanza),1.0082097890388693,0.9779182365775022
 5,1. MAE  (L^1),test,PSBPM-FD (mediana),1.0096911082913513,0.9793909620377131
 5,1. MAE  (L^1),test,PSBPM-FD (medoide),1.021378289886683,0.9906470250699881
@@ -114,7 +114,7 @@ M,metrica,bloque,modelo,razon_vs_mejor,razon_vs_FAR
 5,2. RMSE (L^2),train,PSBPM-FD (medoide),1.3699339004668423,1.0080720212291012
 5,2. RMSE (L^2),train,PSBPM-FD (modal),1.3697284288896103,1.0079912513881182
 5,2. RMSE (L^2),test,FAR,1.0303498438348255,1.0
-5,2. RMSE (L^2),test,RF,1.017059699638979,0.9873821206986306
+5,2. RMSE (L^2),test,RF,1.0170596996389791,0.9873821206986304
 5,2. RMSE (L^2),test,PSBPM-FD (esperanza),1.0054760174518693,0.9761745644489597
 5,2. RMSE (L^2),test,PSBPM-FD (mediana),1.0070488670608426,0.9777412064641842
 5,2. RMSE (L^2),test,PSBPM-FD (medoide),1.0195578286833047,0.9898172438238175
@@ -131,7 +131,7 @@ M,metrica,bloque,modelo,razon_vs_mejor,razon_vs_FAR
 5,3. E_max promedio por curva,test,PSBPM-FD (mediana),1.0078740679425249,0.9723330283128063
 5,3. E_max promedio por curva,test,PSBPM-FD (medoide),1.0193168245504847,0.9833908713377622
 5,3. E_max promedio por curva,test,PSBPM-FD (modal),1.0109965674428993,0.9754543608040595
-5,4. E_max peor de la ventana,train,FAR,1.3305132843543586,1.0
+5,4. E_max peor de la ventana,train,FAR,1.3305132843543588,1.0
 5,4. E_max peor de la ventana,train,RF,1.0,0.756513359366278
 5,4. E_max peor de la ventana,train,PSBPM-FD (esperanza),1.349858917982452,1.017058540790965
 5,4. E_max peor de la ventana,train,PSBPM-FD (mediana),1.351257592285236,1.018276920738942
@@ -143,10 +143,10 @@ M,metrica,bloque,modelo,razon_vs_mejor,razon_vs_FAR
 5,4. E_max peor de la ventana,test,PSBPM-FD (mediana),1.0559539804692384,1.0006939344907344
 5,4. E_max peor de la ventana,test,PSBPM-FD (medoide),1.091173977195645,1.0338923754985756
 5,4. E_max peor de la ventana,test,PSBPM-FD (modal),1.0944032708901708,1.0400769925141695
-6,1. MAE  (L^1),train,FAR,1.3886367402735804,1.0
+6,1. MAE  (L^1),train,FAR,1.3886367402735802,1.0
 6,1. MAE  (L^1),train,RF,1.0,0.7206003110121397
 6,1. MAE  (L^1),train,PSBPM-FD (esperanza),1.3926988562112448,1.0029075279704946
-6,1. MAE  (L^1),train,PSBPM-FD (mediana),1.392715229895129,1.0029103452188246
+6,1. MAE  (L^1),train,PSBPM-FD (mediana),1.3927152298951293,1.0029103452188246
 6,1. MAE  (L^1),train,PSBPM-FD (medoide),1.4217396466893775,1.0238146334399767
 6,1. MAE  (L^1),train,PSBPM-FD (modal),1.4139178077734793,1.018123389191187
 6,1. MAE  (L^1),test,FAR,1.0210623080229935,1.0
@@ -160,17 +160,17 @@ M,metrica,bloque,modelo,razon_vs_mejor,razon_vs_FAR
 6,2. RMSE (L^2),train,PSBPM-FD (esperanza),1.3908997280176798,1.0034645783806657
 6,2. RMSE (L^2),train,PSBPM-FD (mediana),1.391503633155712,1.0038985252779413
 6,2. RMSE (L^2),train,PSBPM-FD (medoide),1.4194037534364765,1.0240619555433785
-6,2. RMSE (L^2),train,PSBPM-FD (modal),1.4168109806191818,1.0221393513045283
+6,2. RMSE (L^2),train,PSBPM-FD (modal),1.416810980619182,1.0221393513045283
 6,2. RMSE (L^2),test,FAR,1.0225704185155822,1.0
 6,2. RMSE (L^2),test,RF,1.0180209200178423,0.9957381745427631
 6,2. RMSE (L^2),test,PSBPM-FD (esperanza),1.0049034334910765,0.9828816481478327
 6,2. RMSE (L^2),test,PSBPM-FD (mediana),1.0052277284163778,0.9832134635530433
 6,2. RMSE (L^2),test,PSBPM-FD (medoide),1.0181605001270415,0.9958604930462986
 6,2. RMSE (L^2),test,PSBPM-FD (modal),1.0205993659499346,0.9982367033864423
-6,3. E_max promedio por curva,train,FAR,1.3632602176878645,1.0
+6,3. E_max promedio por curva,train,FAR,1.3632602176878643,1.0
 6,3. E_max promedio por curva,train,RF,1.0,0.7338633828920333
 6,3. E_max promedio por curva,train,PSBPM-FD (esperanza),1.3759633068921981,1.0094382636678927
-6,3. E_max promedio por curva,train,PSBPM-FD (mediana),1.3793632200868873,1.0119390462415936
+6,3. E_max promedio por curva,train,PSBPM-FD (mediana),1.3793632200868875,1.0119390462415936
 6,3. E_max promedio por curva,train,PSBPM-FD (medoide),1.4080643894571976,1.033075674364936
 6,3. E_max promedio por curva,train,PSBPM-FD (modal),1.3966747462228337,1.0246048289490828
 6,3. E_max promedio por curva,test,FAR,1.0307940873927826,1.0
@@ -183,7 +183,7 @@ M,metrica,bloque,modelo,razon_vs_mejor,razon_vs_FAR
 6,4. E_max peor de la ventana,train,RF,1.0,0.7415563492826576
 6,4. E_max peor de la ventana,train,PSBPM-FD (esperanza),1.3777320430578535,1.01837909074443
 6,4. E_max peor de la ventana,train,PSBPM-FD (mediana),1.3794388676037723,1.0196492573967104
-6,4. E_max peor de la ventana,train,PSBPM-FD (medoide),1.410664101746537,1.0422401832143036
+6,4. E_max peor de la ventana,train,PSBPM-FD (medoide),1.4106641017465371,1.0422401832143036
 6,4. E_max peor de la ventana,train,PSBPM-FD (modal),1.4499242863615673,1.072230793168625
 6,4. E_max peor de la ventana,test,FAR,1.054228375153198,1.0
 6,4. E_max peor de la ventana,test,RF,1.059266163103137,1.0106115936488727
