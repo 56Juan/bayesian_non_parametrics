@@ -1,0 +1,641 @@
+objetivo,predictor,intervalo,metrica,bloque,columna,minimo,maximo,promedio,M
+curva_suavizada,esperanza,equicolas,1. MAE  (L^1),train,mae_f,0.27257950808013354,0.6948819230807108,0.43622265785407394,1
+curva_suavizada,esperanza,equicolas,1. MAE  (L^1),test,mae_f,0.3037628704962078,0.5953350598282607,0.40398470496101496,1
+curva_suavizada,esperanza,equicolas,2. RMSE (L^2),train,rmse_f,0.35159617216785455,0.8726489648557183,0.5698127823754069,1
+curva_suavizada,esperanza,equicolas,2. RMSE (L^2),test,rmse_f,0.3884069882804475,0.8251092517862171,0.5226116045601928,1
+curva_suavizada,esperanza,equicolas,3. E_max promedio por curva,train,linf_medio,0.7474223773160098,1.893951589981368,1.181750985904385,1
+curva_suavizada,esperanza,equicolas,3. E_max promedio por curva,test,linf_medio,0.8164875361918231,1.5066161957065989,1.0637642804168235,1
+curva_suavizada,esperanza,equicolas,4. E_max peor de la ventana,train,linf_max,1.3207225390829573,5.88111206771685,3.0115562460391057,1
+curva_suavizada,esperanza,equicolas,4. E_max peor de la ventana,test,linf_max,1.354933896488088,4.710936640209137,2.366235940809769,1
+curva_suavizada,mediana,equicolas,1. MAE  (L^1),train,mae_f,0.269346492191514,0.6828427045018749,0.4357315260849843,1
+curva_suavizada,mediana,equicolas,1. MAE  (L^1),test,mae_f,0.30565046667353213,0.6007545752911518,0.40489526910816925,1
+curva_suavizada,mediana,equicolas,2. RMSE (L^2),train,rmse_f,0.34900015239159116,0.8698720601045434,0.5703493902909809,1
+curva_suavizada,mediana,equicolas,2. RMSE (L^2),test,rmse_f,0.3883838457939554,0.8304590705445287,0.5228873942779274,1
+curva_suavizada,mediana,equicolas,3. E_max promedio por curva,train,linf_medio,0.7512375514978208,1.895972432481718,1.1816770309295148,1
+curva_suavizada,mediana,equicolas,3. E_max promedio por curva,test,linf_medio,0.8176883563237237,1.5029874782318775,1.0645323197844787,1
+curva_suavizada,mediana,equicolas,4. E_max peor de la ventana,train,linf_max,1.3139701860412454,5.863592746915724,3.017221285356592,1
+curva_suavizada,mediana,equicolas,4. E_max peor de la ventana,test,linf_max,1.3798260567074991,4.7207282048511106,2.3683595637797703,1
+curva_suavizada,medoide,equicolas,1. MAE  (L^1),train,mae_f,0.26948370890950796,0.6827666562879651,0.4357346746085841,1
+curva_suavizada,medoide,equicolas,1. MAE  (L^1),test,mae_f,0.3057231001449741,0.6007317258367786,0.40492400749643,1
+curva_suavizada,medoide,equicolas,2. RMSE (L^2),train,rmse_f,0.3490930360197198,0.8698191772735354,0.5703595164729763,1
+curva_suavizada,medoide,equicolas,2. RMSE (L^2),test,rmse_f,0.38846622663122926,0.8305402794269344,0.5229163499469441,1
+curva_suavizada,medoide,equicolas,3. E_max promedio por curva,train,linf_medio,0.7514396467555905,1.8961707819024793,1.1816857235133995,1
+curva_suavizada,medoide,equicolas,3. E_max promedio por curva,test,linf_medio,0.8178461073712177,1.5030544114830549,1.0645929935749203,1
+curva_suavizada,medoide,equicolas,4. E_max peor de la ventana,train,linf_max,1.3141851276369316,5.864206413879412,3.017395138227472,1
+curva_suavizada,medoide,equicolas,4. E_max peor de la ventana,test,linf_max,1.3798742060678033,4.720361478041284,2.368556643235292,1
+curva_suavizada,modal,equicolas,1. MAE  (L^1),train,mae_f,0.29001357918226034,0.6569294286446595,0.43958209631521733,1
+curva_suavizada,modal,equicolas,1. MAE  (L^1),test,mae_f,0.30271732221079617,0.6188849639954835,0.41683337682937155,1
+curva_suavizada,modal,equicolas,2. RMSE (L^2),train,rmse_f,0.37572211730173694,0.8510551815365228,0.5800822334435574,1
+curva_suavizada,modal,equicolas,2. RMSE (L^2),test,rmse_f,0.38798762715286633,0.8308786925407671,0.5407252858044198,1
+curva_suavizada,modal,equicolas,3. E_max promedio por curva,train,linf_medio,0.7569348269782082,1.9029465793928062,1.1925173355977197,1
+curva_suavizada,modal,equicolas,3. E_max promedio por curva,test,linf_medio,0.7967997375994861,1.5379832029573,1.0833615566846657,1
+curva_suavizada,modal,equicolas,4. E_max peor de la ventana,train,linf_max,1.3852247427664979,5.769959210880064,2.9820082239986934,1
+curva_suavizada,modal,equicolas,4. E_max peor de la ventana,test,linf_max,1.5266749031586402,4.666482669144652,2.4162513374471395,1
+representacion_fpca,esperanza,equicolas,1. MAE  (L^1),train,mae_f,0.1576953477945754,0.5059524366584124,0.3004876027770247,1
+representacion_fpca,esperanza,equicolas,1. MAE  (L^1),test,mae_f,0.16992267242462014,0.4876963218333556,0.2762272991014467,1
+representacion_fpca,esperanza,equicolas,2. RMSE (L^2),train,rmse_f,0.2140426290947306,0.665223169705348,0.38512254622964637,1
+representacion_fpca,esperanza,equicolas,2. RMSE (L^2),test,rmse_f,0.22190285149541158,0.6517428533711223,0.3586780003341119,1
+representacion_fpca,esperanza,equicolas,3. E_max promedio por curva,train,linf_medio,0.21718574450314126,0.696822437539376,0.41384622080358696,1
+representacion_fpca,esperanza,equicolas,3. E_max promedio por curva,test,linf_medio,0.2340258139167122,0.671679223453062,0.380433744219202,1
+representacion_fpca,esperanza,equicolas,4. E_max peor de la ventana,train,linf_max,0.587716786955179,2.6817765004258836,1.2455500264239376,1
+representacion_fpca,esperanza,equicolas,4. E_max peor de la ventana,test,linf_max,0.5882578470332397,2.762281905183071,1.2028813245740089,1
+representacion_fpca,mediana,equicolas,1. MAE  (L^1),train,mae_f,0.1585994668636956,0.4951206697816969,0.3003959464638585,1
+representacion_fpca,mediana,equicolas,1. MAE  (L^1),test,mae_f,0.1676061100553302,0.49821292130531186,0.27698235446543373,1
+representacion_fpca,mediana,equicolas,2. RMSE (L^2),train,rmse_f,0.21597753669232148,0.6615761865421065,0.385787601765264,1
+representacion_fpca,mediana,equicolas,2. RMSE (L^2),test,rmse_f,0.2179772659461062,0.658502647972507,0.35879015888840077,1
+representacion_fpca,mediana,equicolas,3. E_max promedio por curva,train,linf_medio,0.21843094149780568,0.6819043985083934,0.41371998724697406,1
+representacion_fpca,mediana,equicolas,3. E_max promedio por curva,test,linf_medio,0.23083533093862457,0.6861631985220887,0.3814736433897357,1
+representacion_fpca,mediana,equicolas,4. E_max peor de la ventana,train,linf_max,0.6018652729490832,2.695285410219041,1.2488942508162495,1
+representacion_fpca,mediana,equicolas,4. E_max peor de la ventana,test,linf_max,0.6237993224443188,2.778420041871003,1.194109649951206,1
+representacion_fpca,medoide,equicolas,1. MAE  (L^1),train,mae_f,0.15848579274225466,0.4951253267179066,0.3003938429113125,1
+representacion_fpca,medoide,equicolas,1. MAE  (L^1),test,mae_f,0.16762585410105013,0.49829982959535035,0.27700693872535886,1
+representacion_fpca,medoide,equicolas,2. RMSE (L^2),train,rmse_f,0.2159364784697715,0.6615066521221713,0.38580259478923745,1
+representacion_fpca,medoide,equicolas,2. RMSE (L^2),test,rmse_f,0.21790128243165985,0.658605060174678,0.35882950082866155,1
+representacion_fpca,medoide,equicolas,3. E_max promedio por curva,train,linf_medio,0.2182743839389355,0.681910812268672,0.41371709013154107,1
+representacion_fpca,medoide,equicolas,3. E_max promedio por curva,test,linf_medio,0.23086252340390132,0.6862828928690656,0.3815075020347089,1
+representacion_fpca,medoide,equicolas,4. E_max peor de la ventana,train,linf_max,0.6017550293026489,2.6953898813310935,1.2489059858519314,1
+representacion_fpca,medoide,equicolas,4. E_max peor de la ventana,test,linf_max,0.6241456144548485,2.7778156147339215,1.194006433366575,1
+representacion_fpca,modal,equicolas,1. MAE  (L^1),train,mae_f,0.18319629147134028,0.48293751207688246,0.31067165486158,1
+representacion_fpca,modal,equicolas,1. MAE  (L^1),test,mae_f,0.19160259087685502,0.5029641187617908,0.29383802929899694,1
+representacion_fpca,modal,equicolas,2. RMSE (L^2),train,rmse_f,0.23804852906605967,0.631875112693952,0.40049646228534735,1
+representacion_fpca,modal,equicolas,2. RMSE (L^2),test,rmse_f,0.2497468908381989,0.6590317680168198,0.385096152249403,1
+representacion_fpca,modal,equicolas,3. E_max promedio por curva,train,linf_medio,0.25230689116617167,0.6651251579440732,0.4278721953486585,1
+representacion_fpca,modal,equicolas,3. E_max promedio por curva,test,linf_medio,0.26388445778710545,0.6927067799992739,0.40468810303631403,1
+representacion_fpca,modal,equicolas,4. E_max peor de la ventana,train,linf_max,0.5992814641765573,2.592142878793903,1.330571020641903,1
+representacion_fpca,modal,equicolas,4. E_max peor de la ventana,test,linf_max,0.6897921249639285,2.6890143235868935,1.3316816647294476,1
+curva_suavizada,esperanza,equicolas,1. MAE  (L^1),train,mae_f,0.26497471057032435,0.6745464105716897,0.42861419662449685,2
+curva_suavizada,esperanza,equicolas,1. MAE  (L^1),test,mae_f,0.30465310127848017,0.5838890602929786,0.39355540387496013,2
+curva_suavizada,esperanza,equicolas,2. RMSE (L^2),train,rmse_f,0.3460978553702799,0.8564379738479964,0.5633902438533389,2
+curva_suavizada,esperanza,equicolas,2. RMSE (L^2),test,rmse_f,0.39206001232109433,0.8167341006195669,0.512418245963828,2
+curva_suavizada,esperanza,equicolas,3. E_max promedio por curva,train,linf_medio,0.7486557123210215,1.8777687277488804,1.17623608104702,2
+curva_suavizada,esperanza,equicolas,3. E_max promedio por curva,test,linf_medio,0.8233731386892321,1.4686000023290695,1.0501575716252087,2
+curva_suavizada,esperanza,equicolas,4. E_max peor de la ventana,train,linf_max,1.3343258130970275,5.8703874106253915,2.996078453973073,2
+curva_suavizada,esperanza,equicolas,4. E_max peor de la ventana,test,linf_max,1.3420076100558656,4.71008342402137,2.363325537500639,2
+curva_suavizada,mediana,equicolas,1. MAE  (L^1),train,mae_f,0.2647334001315556,0.6650009716701679,0.42792220979773105,2
+curva_suavizada,mediana,equicolas,1. MAE  (L^1),test,mae_f,0.30652328151160463,0.5890541655521309,0.3948519274700657,2
+curva_suavizada,mediana,equicolas,2. RMSE (L^2),train,rmse_f,0.3460630392786475,0.8545994103592036,0.5642975354063688,2
+curva_suavizada,mediana,equicolas,2. RMSE (L^2),test,rmse_f,0.3926967427550562,0.8204182193687608,0.5143028277488083,2
+curva_suavizada,mediana,equicolas,3. E_max promedio por curva,train,linf_medio,0.7495156995960328,1.8847426158087217,1.178423653917355,2
+curva_suavizada,mediana,equicolas,3. E_max promedio por curva,test,linf_medio,0.8238951233667817,1.4680388398830122,1.052601211343783,2
+curva_suavizada,mediana,equicolas,4. E_max peor de la ventana,train,linf_max,1.3374790652459598,5.840179627852807,2.9990883611921046,2
+curva_suavizada,mediana,equicolas,4. E_max peor de la ventana,test,linf_max,1.3436116043139275,4.721517421822115,2.3613294291809783,2
+curva_suavizada,medoide,equicolas,1. MAE  (L^1),train,mae_f,0.2658071829604386,0.6651680276043003,0.4279472327914782,2
+curva_suavizada,medoide,equicolas,1. MAE  (L^1),test,mae_f,0.30625026289851387,0.5885438428022772,0.39449573636964497,2
+curva_suavizada,medoide,equicolas,2. RMSE (L^2),train,rmse_f,0.346700381246093,0.8534615434841646,0.5645701162379089,2
+curva_suavizada,medoide,equicolas,2. RMSE (L^2),test,rmse_f,0.39152954848777405,0.8209010586424151,0.5141875720810521,2
+curva_suavizada,medoide,equicolas,3. E_max promedio por curva,train,linf_medio,0.7484666245357301,1.8822508558798854,1.178425344267818,2
+curva_suavizada,medoide,equicolas,3. E_max promedio por curva,test,linf_medio,0.8233960364884959,1.465532867950892,1.052272026515038,2
+curva_suavizada,medoide,equicolas,4. E_max peor de la ventana,train,linf_max,1.3476237926395465,5.838192569450181,3.0017620825904094,2
+curva_suavizada,medoide,equicolas,4. E_max peor de la ventana,test,linf_max,1.3294286121977041,4.726846419580922,2.365474348834531,2
+curva_suavizada,modal,equicolas,1. MAE  (L^1),train,mae_f,0.2798399557225161,0.6500115661730238,0.43447077356257185,2
+curva_suavizada,modal,equicolas,1. MAE  (L^1),test,mae_f,0.2992710654892424,0.6238855963619975,0.41128315672996285,2
+curva_suavizada,modal,equicolas,2. RMSE (L^2),train,rmse_f,0.36490654754227925,0.8685443842542566,0.5796035992902532,2
+curva_suavizada,modal,equicolas,2. RMSE (L^2),test,rmse_f,0.3890705141283745,0.8418907418160505,0.5401490822097104,2
+curva_suavizada,modal,equicolas,3. E_max promedio por curva,train,linf_medio,0.7523203433999485,1.9005808021765438,1.2014145560387353,2
+curva_suavizada,modal,equicolas,3. E_max promedio por curva,test,linf_medio,0.8228556153904925,1.5010868322713653,1.081877366868617,2
+curva_suavizada,modal,equicolas,4. E_max peor de la ventana,train,linf_max,1.4294855783091682,5.729203329263214,3.000155500847096,2
+curva_suavizada,modal,equicolas,4. E_max peor de la ventana,test,linf_max,1.4938309456370653,4.751666934915564,2.403012630068155,2
+representacion_fpca,esperanza,equicolas,1. MAE  (L^1),train,mae_f,0.18390727814776758,0.553684842921222,0.33925261941814266,2
+representacion_fpca,esperanza,equicolas,1. MAE  (L^1),test,mae_f,0.24162626270402748,0.5154531120582502,0.3139403925072507,2
+representacion_fpca,esperanza,equicolas,2. RMSE (L^2),train,rmse_f,0.24842314983818786,0.7042723388447655,0.43554813372566814,2
+representacion_fpca,esperanza,equicolas,2. RMSE (L^2),test,rmse_f,0.3043741536526984,0.6852298369073767,0.40391692011613645,2
+representacion_fpca,esperanza,equicolas,3. E_max promedio por curva,train,linf_medio,0.3278876912207288,0.9186067269305629,0.5786681492698279,2
+representacion_fpca,esperanza,equicolas,3. E_max promedio por curva,test,linf_medio,0.3887120007873832,0.8132592146649328,0.5387259665572574,2
+representacion_fpca,esperanza,equicolas,4. E_max peor de la ventana,train,linf_max,0.7309913910877934,2.5786324126246467,1.490770025131876,2
+representacion_fpca,esperanza,equicolas,4. E_max peor de la ventana,test,linf_max,0.8510154619002639,2.752655876719742,1.3275892367300253,2
+representacion_fpca,mediana,equicolas,1. MAE  (L^1),train,mae_f,0.18480307177992958,0.5395447724146287,0.33895299551447805,2
+representacion_fpca,mediana,equicolas,1. MAE  (L^1),test,mae_f,0.2366073620535146,0.5196150403785423,0.3154493862770814,2
+representacion_fpca,mediana,equicolas,2. RMSE (L^2),train,rmse_f,0.25097468789695976,0.6990968513496294,0.4367538766596018,2
+representacion_fpca,mediana,equicolas,2. RMSE (L^2),test,rmse_f,0.2989779288852785,0.6899538890239594,0.40634712242309656,2
+representacion_fpca,mediana,equicolas,3. E_max promedio por curva,train,linf_medio,0.3302902242306503,0.9067822320923928,0.5802649420556247,2
+representacion_fpca,mediana,equicolas,3. E_max promedio por curva,test,linf_medio,0.4021171894276699,0.8266100823879153,0.5432635507278144,2
+representacion_fpca,mediana,equicolas,4. E_max peor de la ventana,train,linf_max,0.7419615845315087,2.6370237091079662,1.501364338419825,2
+representacion_fpca,mediana,equicolas,4. E_max peor de la ventana,test,linf_max,0.8553889553355937,2.7780156308400907,1.337308632688374,2
+representacion_fpca,medoide,equicolas,1. MAE  (L^1),train,mae_f,0.18264808198708632,0.539373592043274,0.3389238311690201,2
+representacion_fpca,medoide,equicolas,1. MAE  (L^1),test,mae_f,0.2353892070270147,0.5189951849501486,0.3150654070494939,2
+representacion_fpca,medoide,equicolas,2. RMSE (L^2),train,rmse_f,0.24918855420753142,0.6982367856575469,0.4369957220403122,2
+representacion_fpca,medoide,equicolas,2. RMSE (L^2),test,rmse_f,0.29752753792121645,0.6901911955056335,0.4061149740690953,2
+representacion_fpca,medoide,equicolas,3. E_max promedio por curva,train,linf_medio,0.3268491869409716,0.9047859104160066,0.5785612550684031,2
+representacion_fpca,medoide,equicolas,3. E_max promedio por curva,test,linf_medio,0.3994876052178737,0.8259099975515626,0.5410029663773143,2
+representacion_fpca,medoide,equicolas,4. E_max peor de la ventana,train,linf_max,0.7461818512841413,2.596439504325947,1.5057391796712911,2
+representacion_fpca,medoide,equicolas,4. E_max peor de la ventana,test,linf_max,0.8608944476958535,2.7797162142451812,1.3406446914708547,2
+representacion_fpca,modal,equicolas,1. MAE  (L^1),train,mae_f,0.20817316247092052,0.5272832160622409,0.3506383583260042,2
+representacion_fpca,modal,equicolas,1. MAE  (L^1),test,mae_f,0.22685472961361325,0.5361992570645611,0.33380636870103314,2
+representacion_fpca,modal,equicolas,2. RMSE (L^2),train,rmse_f,0.27262253015701304,0.715199007676947,0.4564024357088579,2
+representacion_fpca,modal,equicolas,2. RMSE (L^2),test,rmse_f,0.30516877977101,0.7230973818611138,0.43853080057008564,2
+representacion_fpca,modal,equicolas,3. E_max promedio por curva,train,linf_medio,0.33952615566854155,0.91640063769872,0.596893405239669,2
+representacion_fpca,modal,equicolas,3. E_max promedio por curva,test,linf_medio,0.3639774382218549,0.9010640636104296,0.570478266246958,2
+representacion_fpca,modal,equicolas,4. E_max peor de la ventana,train,linf_max,0.8144530694418268,2.7058082381127293,1.5541763501743124,2
+representacion_fpca,modal,equicolas,4. E_max peor de la ventana,test,linf_max,0.922174216782363,2.8229917912329117,1.466975507958167,2
+curva_suavizada,esperanza,equicolas,1. MAE  (L^1),train,mae_f,0.24970486836294273,0.6262967492619295,0.40792173775089396,3
+curva_suavizada,esperanza,equicolas,1. MAE  (L^1),test,mae_f,0.29417285372275775,0.5620799847428278,0.38272827895443484,3
+curva_suavizada,esperanza,equicolas,2. RMSE (L^2),train,rmse_f,0.33130131756277575,0.8095734011396691,0.5450662936585656,3
+curva_suavizada,esperanza,equicolas,2. RMSE (L^2),test,rmse_f,0.3753270011595929,0.7785063443579837,0.5015224521828178,3
+curva_suavizada,esperanza,equicolas,3. E_max promedio por curva,train,linf_medio,0.7366697249223187,1.855886384443614,1.1574857300294998,3
+curva_suavizada,esperanza,equicolas,3. E_max promedio por curva,test,linf_medio,0.8143106224578086,1.5088624593443805,1.0386808448307405,3
+curva_suavizada,esperanza,equicolas,4. E_max peor de la ventana,train,linf_max,1.3172685231584753,5.776404990556166,2.9603195607658592,3
+curva_suavizada,esperanza,equicolas,4. E_max peor de la ventana,test,linf_max,1.225708296359938,4.524074137751074,2.3544041220879244,3
+curva_suavizada,mediana,equicolas,1. MAE  (L^1),train,mae_f,0.24995877989838935,0.6080788897898658,0.40650818291718904,3
+curva_suavizada,mediana,equicolas,1. MAE  (L^1),test,mae_f,0.29384061158101876,0.5578699627973502,0.38254164037013616,3
+curva_suavizada,mediana,equicolas,2. RMSE (L^2),train,rmse_f,0.3307375472637623,0.806625669479304,0.5454600469428479,3
+curva_suavizada,mediana,equicolas,2. RMSE (L^2),test,rmse_f,0.375804185084927,0.7727444560599086,0.5018260237089455,3
+curva_suavizada,mediana,equicolas,3. E_max promedio por curva,train,linf_medio,0.7356002408523243,1.8578683487769752,1.1586787761528692,3
+curva_suavizada,mediana,equicolas,3. E_max promedio por curva,test,linf_medio,0.8145678278374997,1.5062263694189368,1.0369599379472583,3
+curva_suavizada,mediana,equicolas,4. E_max peor de la ventana,train,linf_max,1.3215424926467134,5.731432605085178,2.9576728722518033,3
+curva_suavizada,mediana,equicolas,4. E_max peor de la ventana,test,linf_max,1.2718468140446695,4.54366692747023,2.350807532697624,3
+curva_suavizada,medoide,equicolas,1. MAE  (L^1),train,mae_f,0.2505524339230213,0.6076367604126278,0.4080747654905088,3
+curva_suavizada,medoide,equicolas,1. MAE  (L^1),test,mae_f,0.2921414193360368,0.5546666587548255,0.3835702936069714,3
+curva_suavizada,medoide,equicolas,2. RMSE (L^2),train,rmse_f,0.3317531783986557,0.8102484382717613,0.5473103459129695,3
+curva_suavizada,medoide,equicolas,2. RMSE (L^2),test,rmse_f,0.37565219461659255,0.7704226690737483,0.5031870521472112,3
+curva_suavizada,medoide,equicolas,3. E_max promedio por curva,train,linf_medio,0.7363552513015093,1.8480146328807752,1.1605851198255868,3
+curva_suavizada,medoide,equicolas,3. E_max promedio por curva,test,linf_medio,0.8175532083431702,1.4997296178484258,1.039037357308192,3
+curva_suavizada,medoide,equicolas,4. E_max peor de la ventana,train,linf_max,1.3040568682303766,5.677970053531943,2.949071961113204,3
+curva_suavizada,medoide,equicolas,4. E_max peor de la ventana,test,linf_max,1.2872939379038488,4.5487296520165845,2.359478855608649,3
+curva_suavizada,modal,equicolas,1. MAE  (L^1),train,mae_f,0.2521635675023794,0.5900309193391956,0.41145530723150114,3
+curva_suavizada,modal,equicolas,1. MAE  (L^1),test,mae_f,0.2835451288397947,0.5728132628923578,0.39214933289967474,3
+curva_suavizada,modal,equicolas,2. RMSE (L^2),train,rmse_f,0.33420393390437925,0.8312180818257203,0.5569437008206737,3
+curva_suavizada,modal,equicolas,2. RMSE (L^2),test,rmse_f,0.37622202713566155,0.79550586327582,0.5187185643095068,3
+curva_suavizada,modal,equicolas,3. E_max promedio por curva,train,linf_medio,0.7280156739296477,1.8834692656656977,1.1678189093933276,3
+curva_suavizada,modal,equicolas,3. E_max promedio por curva,test,linf_medio,0.7853843990024777,1.5186294180921327,1.04785838255243,3
+curva_suavizada,modal,equicolas,4. E_max peor de la ventana,train,linf_max,1.2668709571386734,5.594475079338612,2.989560237034103,3
+curva_suavizada,modal,equicolas,4. E_max peor de la ventana,test,linf_max,1.3286964203528462,4.665124041196654,2.393550079852681,3
+representacion_fpca,esperanza,equicolas,1. MAE  (L^1),train,mae_f,0.19590606703261104,0.5297207477596902,0.3488592855128995,3
+representacion_fpca,esperanza,equicolas,1. MAE  (L^1),test,mae_f,0.25072505238245774,0.5222888272516367,0.33370913391143475,3
+representacion_fpca,esperanza,equicolas,2. RMSE (L^2),train,rmse_f,0.26508013319437923,0.6839729381007743,0.4559363102697536,3
+representacion_fpca,esperanza,equicolas,2. RMSE (L^2),test,rmse_f,0.31804812255575626,0.6987173606871431,0.43069663142882514,3
+representacion_fpca,esperanza,equicolas,3. E_max promedio por curva,train,linf_medio,0.3922916608501289,0.9574110432972095,0.6696466636260295,3
+representacion_fpca,esperanza,equicolas,3. E_max promedio por curva,test,linf_medio,0.4473032413508187,0.9862721915483875,0.6431468837851324,3
+representacion_fpca,esperanza,equicolas,4. E_max peor de la ventana,train,linf_max,0.8463880891009516,2.856994390099338,1.6907292379688734,3
+representacion_fpca,esperanza,equicolas,4. E_max peor de la ventana,test,linf_max,0.858776141672012,3.519183197895667,1.6160760674954922,3
+representacion_fpca,mediana,equicolas,1. MAE  (L^1),train,mae_f,0.19578552884437078,0.5074213121397508,0.347807750886148,3
+representacion_fpca,mediana,equicolas,1. MAE  (L^1),test,mae_f,0.25108779038572054,0.5148460917541313,0.33336683882953483,3
+representacion_fpca,mediana,equicolas,2. RMSE (L^2),train,rmse_f,0.2644256640620597,0.6784969808476976,0.45647454561015804,3
+representacion_fpca,mediana,equicolas,2. RMSE (L^2),test,rmse_f,0.32053614633467514,0.691559994416045,0.4309978883485468,3
+representacion_fpca,mediana,equicolas,3. E_max promedio por curva,train,linf_medio,0.393283020079466,0.9487592990417224,0.671747812015075,3
+representacion_fpca,mediana,equicolas,3. E_max promedio por curva,test,linf_medio,0.4494981245157651,0.9827120504946181,0.6462267829610534,3
+representacion_fpca,mediana,equicolas,4. E_max peor de la ventana,train,linf_max,0.8304511279338311,2.8262632248655657,1.701099696949752,3
+representacion_fpca,mediana,equicolas,4. E_max peor de la ventana,test,linf_max,0.8439412594793257,3.543270840689928,1.6250294335042201,3
+representacion_fpca,medoide,equicolas,1. MAE  (L^1),train,mae_f,0.1987443534442,0.5079135777846256,0.3493973453965921,3
+representacion_fpca,medoide,equicolas,1. MAE  (L^1),test,mae_f,0.2502142681460801,0.51193589066616,0.3339909891010472,3
+representacion_fpca,medoide,equicolas,2. RMSE (L^2),train,rmse_f,0.2656446599748034,0.6826732678372034,0.4585957627357818,3
+representacion_fpca,medoide,equicolas,2. RMSE (L^2),test,rmse_f,0.32082956054051853,0.689699145238483,0.43264127134251107,3
+representacion_fpca,medoide,equicolas,3. E_max promedio por curva,train,linf_medio,0.3947633531642162,0.9532648773177249,0.6716460209203977,3
+representacion_fpca,medoide,equicolas,3. E_max promedio por curva,test,linf_medio,0.4568529298174785,0.9835735343526687,0.6464253630088153,3
+representacion_fpca,medoide,equicolas,4. E_max peor de la ventana,train,linf_max,0.8557936439122298,2.8469618042247236,1.6990380395860862,3
+representacion_fpca,medoide,equicolas,4. E_max peor de la ventana,test,linf_max,0.870197715778954,3.5470694706706567,1.6309204687623575,3
+representacion_fpca,modal,equicolas,1. MAE  (L^1),train,mae_f,0.19595402685724075,0.531850832782061,0.3548198224783639,3
+representacion_fpca,modal,equicolas,1. MAE  (L^1),test,mae_f,0.23500306524926048,0.5253028524305191,0.3436303302280174,3
+representacion_fpca,modal,equicolas,2. RMSE (L^2),train,rmse_f,0.2703280315271528,0.7204683226243762,0.469950532643572,3
+representacion_fpca,modal,equicolas,2. RMSE (L^2),test,rmse_f,0.32149657742879056,0.7176095041359073,0.4504021387328902,3
+representacion_fpca,modal,equicolas,3. E_max promedio por curva,train,linf_medio,0.38227955826923304,0.9762288844827995,0.6800072308011234,3
+representacion_fpca,modal,equicolas,3. E_max promedio por curva,test,linf_medio,0.4345720521895417,0.9779963102715324,0.6610170867420586,3
+representacion_fpca,modal,equicolas,4. E_max peor de la ventana,train,linf_max,0.8752933073712165,2.938892885343152,1.7532436776665419,3
+representacion_fpca,modal,equicolas,4. E_max peor de la ventana,test,linf_max,0.9355050848775369,3.718987341848507,1.7110971707730087,3
+curva_suavizada,esperanza,equicolas,1. MAE  (L^1),train,mae_f,0.25017825119926285,0.6080542137234717,0.40166683295695427,4
+curva_suavizada,esperanza,equicolas,1. MAE  (L^1),test,mae_f,0.2908417326911,0.5556959423997319,0.3770490473989623,4
+curva_suavizada,esperanza,equicolas,2. RMSE (L^2),train,rmse_f,0.33039533056844467,0.7868134793787779,0.5373898793836515,4
+curva_suavizada,esperanza,equicolas,2. RMSE (L^2),test,rmse_f,0.36997976672473565,0.7665304778437987,0.49471925550599594,4
+curva_suavizada,esperanza,equicolas,3. E_max promedio por curva,train,linf_medio,0.7367279258379721,1.8232120746450808,1.1463419654905784,4
+curva_suavizada,esperanza,equicolas,3. E_max promedio por curva,test,linf_medio,0.7942146043368046,1.5021842240697276,1.0281843267080517,4
+curva_suavizada,esperanza,equicolas,4. E_max peor de la ventana,train,linf_max,1.308337887884257,5.761451334523979,2.9204833243055646,4
+curva_suavizada,esperanza,equicolas,4. E_max peor de la ventana,test,linf_max,1.2400587112129928,4.381568298232277,2.323809424672215,4
+curva_suavizada,mediana,equicolas,1. MAE  (L^1),train,mae_f,0.2502038176004601,0.5937707247732747,0.40059676344308853,4
+curva_suavizada,mediana,equicolas,1. MAE  (L^1),test,mae_f,0.28891400202557094,0.5538819588205699,0.3775361948232909,4
+curva_suavizada,mediana,equicolas,2. RMSE (L^2),train,rmse_f,0.32928568817348036,0.7860485308251713,0.5379542577027262,4
+curva_suavizada,mediana,equicolas,2. RMSE (L^2),test,rmse_f,0.3683440335399832,0.7652052402499986,0.49604605192419066,4
+curva_suavizada,mediana,equicolas,3. E_max promedio por curva,train,linf_medio,0.7326207066942055,1.82285204499081,1.147605433960671,4
+curva_suavizada,mediana,equicolas,3. E_max promedio por curva,test,linf_medio,0.7912849245410963,1.5075550551158465,1.0290672324298082,4
+curva_suavizada,mediana,equicolas,4. E_max peor de la ventana,train,linf_max,1.3061592041547816,5.712955614254547,2.9262883008331038,4
+curva_suavizada,mediana,equicolas,4. E_max peor de la ventana,test,linf_max,1.2969193698535415,4.413051767392158,2.331145750526001,4
+curva_suavizada,medoide,equicolas,1. MAE  (L^1),train,mae_f,0.25376755328772205,0.5957692928049145,0.40376945957649063,4
+curva_suavizada,medoide,equicolas,1. MAE  (L^1),test,mae_f,0.29059126414763115,0.5544538387155058,0.3790696257014685,4
+curva_suavizada,medoide,equicolas,2. RMSE (L^2),train,rmse_f,0.33524570242263857,0.7858043661131556,0.542277373132535,4
+curva_suavizada,medoide,equicolas,2. RMSE (L^2),test,rmse_f,0.3726679991680364,0.7680881936906884,0.4996990669390452,4
+curva_suavizada,medoide,equicolas,3. E_max promedio por curva,train,linf_medio,0.7316815704613446,1.8451029457251686,1.1552773908500793,4
+curva_suavizada,medoide,equicolas,3. E_max promedio por curva,test,linf_medio,0.8016602783283834,1.5000212808193552,1.0354256429613726,4
+curva_suavizada,medoide,equicolas,4. E_max peor de la ventana,train,linf_max,1.3056116707150405,5.761285569747415,2.945428170995112,4
+curva_suavizada,medoide,equicolas,4. E_max peor de la ventana,test,linf_max,1.311891698899377,4.384977826027466,2.327880770908466,4
+curva_suavizada,modal,equicolas,1. MAE  (L^1),train,mae_f,0.2557276826123427,0.592662800500172,0.40521743905513613,4
+curva_suavizada,modal,equicolas,1. MAE  (L^1),test,mae_f,0.27137214545149213,0.5692910056384715,0.3877797098151724,4
+curva_suavizada,modal,equicolas,2. RMSE (L^2),train,rmse_f,0.3429244391405537,0.8099023962097862,0.5512236455998961,4
+curva_suavizada,modal,equicolas,2. RMSE (L^2),test,rmse_f,0.36062374839967254,0.7955552778537103,0.5186274442041428,4
+curva_suavizada,modal,equicolas,3. E_max promedio por curva,train,linf_medio,0.7324816997972856,1.8539619692215576,1.1611024364865425,4
+curva_suavizada,modal,equicolas,3. E_max promedio por curva,test,linf_medio,0.7569394957035294,1.5167603910596503,1.0491959775354966,4
+curva_suavizada,modal,equicolas,4. E_max peor de la ventana,train,linf_max,1.4223533758459719,5.564509594060639,2.9131548781862326,4
+curva_suavizada,modal,equicolas,4. E_max peor de la ventana,test,linf_max,1.3297466766499242,4.58736807195595,2.399898177878506,4
+representacion_fpca,esperanza,equicolas,1. MAE  (L^1),train,mae_f,0.20995622463628846,0.5547562191835229,0.3596148616937621,4
+representacion_fpca,esperanza,equicolas,1. MAE  (L^1),test,mae_f,0.2569984982868092,0.5239175787099195,0.34215092244472406,4
+representacion_fpca,esperanza,equicolas,2. RMSE (L^2),train,rmse_f,0.281701544290204,0.7070805258481457,0.47299561533297557,4
+representacion_fpca,esperanza,equicolas,2. RMSE (L^2),test,rmse_f,0.3243641166945897,0.6959184365184592,0.4403665653981446,4
+representacion_fpca,esperanza,equicolas,3. E_max promedio por curva,train,linf_medio,0.46742474449950727,1.1816837737548884,0.7692577867167292,4
+representacion_fpca,esperanza,equicolas,3. E_max promedio por curva,test,linf_medio,0.4870492411808089,1.0446077003411274,0.7080912610393915,4
+representacion_fpca,esperanza,equicolas,4. E_max peor de la ventana,train,linf_max,0.941329742531447,3.108703969151865,1.8404554965455486,4
+representacion_fpca,esperanza,equicolas,4. E_max peor de la ventana,test,linf_max,0.9029986278636344,3.331011903171296,1.6282924538891437,4
+representacion_fpca,mediana,equicolas,1. MAE  (L^1),train,mae_f,0.2096523604720713,0.5413455384280376,0.3587397402368912,4
+representacion_fpca,mediana,equicolas,1. MAE  (L^1),test,mae_f,0.25438936249848393,0.521428197121138,0.34232180497953396,4
+representacion_fpca,mediana,equicolas,2. RMSE (L^2),train,rmse_f,0.28073402320821733,0.7065102176670248,0.47366712149301915,4
+representacion_fpca,mediana,equicolas,2. RMSE (L^2),test,rmse_f,0.3230916522321427,0.6940296198783502,0.4417403931596766,4
+representacion_fpca,mediana,equicolas,3. E_max promedio por curva,train,linf_medio,0.472153293280167,1.181712779745696,0.7724693577867032,4
+representacion_fpca,mediana,equicolas,3. E_max promedio por curva,test,linf_medio,0.4889520256873841,1.0451241463847316,0.7120721556245134,4
+representacion_fpca,mediana,equicolas,4. E_max peor de la ventana,train,linf_max,0.9686829397249366,3.1033508039203435,1.8549986041657665,4
+representacion_fpca,mediana,equicolas,4. E_max peor de la ventana,test,linf_max,0.9061488847477918,3.359787324228839,1.642036278383304,4
+representacion_fpca,medoide,equicolas,1. MAE  (L^1),train,mae_f,0.2134630733506841,0.5411119463383219,0.3619690739284673,4
+representacion_fpca,medoide,equicolas,1. MAE  (L^1),test,mae_f,0.2573241698366762,0.5226120588255623,0.3445613925431909,4
+representacion_fpca,medoide,equicolas,2. RMSE (L^2),train,rmse_f,0.2873749581764254,0.7056756244846369,0.47855479831623254,4
+representacion_fpca,medoide,equicolas,2. RMSE (L^2),test,rmse_f,0.32804511048157203,0.6976338367008,0.4459571333755554,4
+representacion_fpca,medoide,equicolas,3. E_max promedio por curva,train,linf_medio,0.4758461792318334,1.202403559544716,0.7808900432317155,4
+representacion_fpca,medoide,equicolas,3. E_max promedio por curva,test,linf_medio,0.5049836995209076,1.0583468083999699,0.7216262862309765,4
+representacion_fpca,medoide,equicolas,4. E_max peor de la ventana,train,linf_max,0.9418428749777767,3.1236102499583227,1.8712161641787626,4
+representacion_fpca,medoide,equicolas,4. E_max peor de la ventana,test,linf_max,0.9054967693406336,3.352401655435078,1.6553089640682084,4
+representacion_fpca,modal,equicolas,1. MAE  (L^1),train,mae_f,0.21276315924839292,0.5512703712527899,0.3648282349945055,4
+representacion_fpca,modal,equicolas,1. MAE  (L^1),test,mae_f,0.23309513754498729,0.5353618723113455,0.35449628327229815,4
+representacion_fpca,modal,equicolas,2. RMSE (L^2),train,rmse_f,0.2963571111111989,0.7325822134420621,0.48863411667354395,4
+representacion_fpca,modal,equicolas,2. RMSE (L^2),test,rmse_f,0.31429547374531086,0.7277648637738349,0.4669832203255249,4
+representacion_fpca,modal,equicolas,3. E_max promedio por curva,train,linf_medio,0.4651584105598078,1.2178050627538564,0.7874792461911193,4
+representacion_fpca,modal,equicolas,3. E_max promedio por curva,test,linf_medio,0.4590009152057416,1.0749793685798736,0.7331218123692861,4
+representacion_fpca,modal,equicolas,4. E_max peor de la ventana,train,linf_max,1.0346983981549505,3.1194668742507403,1.8827568316574361,4
+representacion_fpca,modal,equicolas,4. E_max peor de la ventana,test,linf_max,1.0298013935978643,3.6078782291257294,1.7917981583145013,4
+curva_suavizada,esperanza,equicolas,1. MAE  (L^1),train,mae_f,0.24671664676312727,0.5741226996872217,0.38410488745756616,5
+curva_suavizada,esperanza,equicolas,1. MAE  (L^1),test,mae_f,0.2785908173566785,0.5248198191121198,0.3571435601107907,5
+curva_suavizada,esperanza,equicolas,2. RMSE (L^2),train,rmse_f,0.3265273254214879,0.7748207701792322,0.522833261829679,5
+curva_suavizada,esperanza,equicolas,2. RMSE (L^2),test,rmse_f,0.3569835788866026,0.7454943033195369,0.47992506804254864,5
+curva_suavizada,esperanza,equicolas,3. E_max promedio por curva,train,linf_medio,0.7274567163703362,1.7870212378665864,1.1298394156448588,5
+curva_suavizada,esperanza,equicolas,3. E_max promedio por curva,test,linf_medio,0.7789898901438405,1.4837479305636923,1.0185944142206391,5
+curva_suavizada,esperanza,equicolas,4. E_max peor de la ventana,train,linf_max,1.2550670212041728,5.313463433547492,2.8800028402422755,5
+curva_suavizada,esperanza,equicolas,4. E_max peor de la ventana,test,linf_max,1.3779405503707554,4.311232992692401,2.3341261837302625,5
+curva_suavizada,mediana,equicolas,1. MAE  (L^1),train,mae_f,0.2470831970449898,0.5665843209120605,0.382965535223674,5
+curva_suavizada,mediana,equicolas,1. MAE  (L^1),test,mae_f,0.27893172658059523,0.5196766928446067,0.35740053466350574,5
+curva_suavizada,mediana,equicolas,2. RMSE (L^2),train,rmse_f,0.326282405316742,0.7837235786004314,0.5231738975933649,5
+curva_suavizada,mediana,equicolas,2. RMSE (L^2),test,rmse_f,0.3578865308534686,0.7391420265082236,0.4808352654704844,5
+curva_suavizada,mediana,equicolas,3. E_max promedio por curva,train,linf_medio,0.7264173709930647,1.786928030726375,1.1302801698089204,5
+curva_suavizada,mediana,equicolas,3. E_max promedio por curva,test,linf_medio,0.781186568810132,1.4867501334734508,1.0200120936857704,5
+curva_suavizada,mediana,equicolas,4. E_max peor de la ventana,train,linf_max,1.261967116541463,5.278500749092357,2.8828735096508677,5
+curva_suavizada,mediana,equicolas,4. E_max peor de la ventana,test,linf_max,1.3753059064993969,4.3607904416276675,2.3470491060328103,5
+curva_suavizada,medoide,equicolas,1. MAE  (L^1),train,mae_f,0.25252859104348374,0.5733890529045576,0.3884509276950705,5
+curva_suavizada,medoide,equicolas,1. MAE  (L^1),test,mae_f,0.2929904203629878,0.5278614683077222,0.3622724821483053,5
+curva_suavizada,medoide,equicolas,2. RMSE (L^2),train,rmse_f,0.33333841887736954,0.7924625415687598,0.5281851279408881,5
+curva_suavizada,medoide,equicolas,2. RMSE (L^2),test,rmse_f,0.37542087856237255,0.7474812899467564,0.4866427845332629,5
+curva_suavizada,medoide,equicolas,3. E_max promedio por curva,train,linf_medio,0.7326353172977337,1.8074203299379141,1.1394863706844323,5
+curva_suavizada,medoide,equicolas,3. E_max promedio por curva,test,linf_medio,0.8147701635138581,1.4844297976718341,1.0329664697422223,5
+curva_suavizada,medoide,equicolas,4. E_max peor de la ventana,train,linf_max,1.2945934230754539,5.380066134099979,2.8865252393370056,5
+curva_suavizada,medoide,equicolas,4. E_max peor de la ventana,test,linf_max,1.3908878922428112,4.345083371176626,2.3597186366311744,5
+curva_suavizada,modal,equicolas,1. MAE  (L^1),train,mae_f,0.2457833931747252,0.5624022682332422,0.3836048995856025,5
+curva_suavizada,modal,equicolas,1. MAE  (L^1),test,mae_f,0.2593917786601649,0.5138335789603432,0.36164918603426427,5
+curva_suavizada,modal,equicolas,2. RMSE (L^2),train,rmse_f,0.32859995255534175,0.8112182970707749,0.5301133721451287,5
+curva_suavizada,modal,equicolas,2. RMSE (L^2),test,rmse_f,0.3418409355400205,0.7331912712069059,0.49318280295722633,5
+curva_suavizada,modal,equicolas,3. E_max promedio por curva,train,linf_medio,0.7037701512943114,1.842371968636055,1.134516149349989,5
+curva_suavizada,modal,equicolas,3. E_max promedio por curva,test,linf_medio,0.7494097315975068,1.4904258716804244,1.036981029945974,5
+curva_suavizada,modal,equicolas,4. E_max peor de la ventana,train,linf_max,1.297299324952775,5.202236586610228,2.893912805144065,5
+curva_suavizada,modal,equicolas,4. E_max peor de la ventana,test,linf_max,1.4577584403484982,4.295659927540272,2.389865741589306,5
+representacion_fpca,esperanza,equicolas,1. MAE  (L^1),train,mae_f,0.2203591881473778,0.538319250261869,0.35404962028268094,5
+representacion_fpca,esperanza,equicolas,1. MAE  (L^1),test,mae_f,0.2506013802792898,0.500117400815473,0.33348889816046695,5
+representacion_fpca,esperanza,equicolas,2. RMSE (L^2),train,rmse_f,0.2899001382724387,0.7081058630431664,0.4726135972256031,5
+representacion_fpca,esperanza,equicolas,2. RMSE (L^2),test,rmse_f,0.31836769305300167,0.688490513564852,0.4392924890314864,5
+representacion_fpca,esperanza,equicolas,3. E_max promedio por curva,train,linf_medio,0.4806409004784334,1.2294916149338186,0.7925693666846008,5
+representacion_fpca,esperanza,equicolas,3. E_max promedio por curva,test,linf_medio,0.52578983509444,1.0843814819643198,0.7370461841882768,5
+representacion_fpca,esperanza,equicolas,4. E_max peor de la ventana,train,linf_max,1.0755347777994007,3.220961064946626,1.8649425209687853,5
+representacion_fpca,esperanza,equicolas,4. E_max peor de la ventana,test,linf_max,1.017852926750984,3.566337907751188,1.7371984210227072,5
+representacion_fpca,mediana,equicolas,1. MAE  (L^1),train,mae_f,0.22048927543557853,0.531332513498627,0.3529722720234363,5
+representacion_fpca,mediana,equicolas,1. MAE  (L^1),test,mae_f,0.2517951348967076,0.492922806279736,0.3336550254148361,5
+representacion_fpca,mediana,equicolas,2. RMSE (L^2),train,rmse_f,0.28971788684620275,0.7167831434968462,0.47301575982923716,5
+representacion_fpca,mediana,equicolas,2. RMSE (L^2),test,rmse_f,0.3202954549992988,0.6812755882485567,0.44026004438563404,5
+representacion_fpca,mediana,equicolas,3. E_max promedio por curva,train,linf_medio,0.4867778525793087,1.2263004403782802,0.795044704756073,5
+representacion_fpca,mediana,equicolas,3. E_max promedio por curva,test,linf_medio,0.5344517484273179,1.0808997586168614,0.7400199886240535,5
+representacion_fpca,mediana,equicolas,4. E_max peor de la ventana,train,linf_max,1.0777647860672896,3.202151057435777,1.8757738748815693,5
+representacion_fpca,mediana,equicolas,4. E_max peor de la ventana,test,linf_max,1.0021571204635924,3.620052801403739,1.7513735371532608,5
+representacion_fpca,medoide,equicolas,1. MAE  (L^1),train,mae_f,0.2279098123001471,0.5384876328274667,0.3588332058382625,5
+representacion_fpca,medoide,equicolas,1. MAE  (L^1),test,mae_f,0.26530092085574325,0.49890954306445495,0.3385247662603019,5
+representacion_fpca,medoide,equicolas,2. RMSE (L^2),train,rmse_f,0.29755083166264806,0.7262277910447364,0.47854995585139515,5
+representacion_fpca,medoide,equicolas,2. RMSE (L^2),test,rmse_f,0.3392362347488826,0.6906415204774319,0.4466476724445689,5
+representacion_fpca,medoide,equicolas,3. E_max promedio por curva,train,linf_medio,0.4937861821812312,1.2286932134354027,0.8032626664405128,5
+representacion_fpca,medoide,equicolas,3. E_max promedio por curva,test,linf_medio,0.5659622262539279,1.111560547098525,0.7559710110182356,5
+representacion_fpca,medoide,equicolas,4. E_max peor de la ventana,train,linf_max,1.0768135489084858,3.3465502628084236,1.8910108986754983,5
+representacion_fpca,medoide,equicolas,4. E_max peor de la ventana,test,linf_max,1.0901760766267152,3.7894794157895566,1.761435251591174,5
+representacion_fpca,modal,equicolas,1. MAE  (L^1),train,mae_f,0.21696008979804896,0.5158443985782173,0.35406469990044503,5
+representacion_fpca,modal,equicolas,1. MAE  (L^1),test,mae_f,0.22961008758061205,0.4822787942868859,0.3383149991126063,5
+representacion_fpca,modal,equicolas,2. RMSE (L^2),train,rmse_f,0.29225108287098034,0.7466492149587425,0.48069728847461796,5
+representacion_fpca,modal,equicolas,2. RMSE (L^2),test,rmse_f,0.3029361330005778,0.6751495176336205,0.4536830521621211,5
+representacion_fpca,modal,equicolas,3. E_max promedio por curva,train,linf_medio,0.45487679977070555,1.2177333833457338,0.8021650101663311,5
+representacion_fpca,modal,equicolas,3. E_max promedio por curva,test,linf_medio,0.4973367687880835,1.0903128814712415,0.7530977841223998,5
+representacion_fpca,modal,equicolas,4. E_max peor de la ventana,train,linf_max,1.0994300838741862,3.1602591510323985,1.9115895405224113,5
+representacion_fpca,modal,equicolas,4. E_max peor de la ventana,test,linf_max,1.1000897379098693,3.7856953073450588,1.8567945788796165,5
+curva_suavizada,esperanza,equicolas,1. MAE  (L^1),train,mae_f,0.24058583936227462,0.5639391464768475,0.380650565627941,6
+curva_suavizada,esperanza,equicolas,1. MAE  (L^1),test,mae_f,0.2763324143859461,0.5259097825492367,0.3538227364843723,6
+curva_suavizada,esperanza,equicolas,2. RMSE (L^2),train,rmse_f,0.32255897597478234,0.7581933659489198,0.5193822815722285,6
+curva_suavizada,esperanza,equicolas,2. RMSE (L^2),test,rmse_f,0.3553394022967657,0.7474826677374354,0.4768233906859666,6
+curva_suavizada,esperanza,equicolas,3. E_max promedio por curva,train,linf_medio,0.7164941039167483,1.7662387078478579,1.1241765462649853,6
+curva_suavizada,esperanza,equicolas,3. E_max promedio por curva,test,linf_medio,0.7840898111674768,1.462492061012493,1.0143069711214638,6
+curva_suavizada,esperanza,equicolas,4. E_max peor de la ventana,train,linf_max,1.2567500495292958,5.1792424710316425,2.865805513940503,6
+curva_suavizada,esperanza,equicolas,4. E_max peor de la ventana,test,linf_max,1.3166265239004393,4.321970520628906,2.3248049075773247,6
+curva_suavizada,mediana,equicolas,1. MAE  (L^1),train,mae_f,0.24214736155707425,0.5531328854014745,0.37961401289458846,6
+curva_suavizada,mediana,equicolas,1. MAE  (L^1),test,mae_f,0.2765410189841899,0.521816060473269,0.3544200445153084,6
+curva_suavizada,mediana,equicolas,2. RMSE (L^2),train,rmse_f,0.3240615759746615,0.7604815038016294,0.5194878256449128,6
+curva_suavizada,mediana,equicolas,2. RMSE (L^2),test,rmse_f,0.3554292384782036,0.7421768579624219,0.47754893636821955,6
+curva_suavizada,mediana,equicolas,3. E_max promedio por curva,train,linf_medio,0.7201062205251324,1.76858699234992,1.1249248651051038,6
+curva_suavizada,mediana,equicolas,3. E_max promedio por curva,test,linf_medio,0.7858456474071661,1.4618879168786378,1.0153865381337082,6
+curva_suavizada,mediana,equicolas,4. E_max peor de la ventana,train,linf_max,1.2691342405384043,5.149439230348704,2.865764969461561,6
+curva_suavizada,mediana,equicolas,4. E_max peor de la ventana,test,linf_max,1.3156444204564153,4.351161886302329,2.3324528759964984,6
+curva_suavizada,medoide,equicolas,1. MAE  (L^1),train,mae_f,0.25362185762345973,0.5692187488934989,0.38552826580102706,6
+curva_suavizada,medoide,equicolas,1. MAE  (L^1),test,mae_f,0.29094298069004637,0.5366715634586646,0.36133935553996493,6
+curva_suavizada,medoide,equicolas,2. RMSE (L^2),train,rmse_f,0.33382781091769126,0.7747317816552478,0.5252772850127251,6
+curva_suavizada,medoide,equicolas,2. RMSE (L^2),test,rmse_f,0.3754479439516734,0.757700681820328,0.48633433385762903,6
+curva_suavizada,medoide,equicolas,3. E_max promedio por curva,train,linf_medio,0.7381455888149036,1.7816923509872902,1.1385302652492322,6
+curva_suavizada,medoide,equicolas,3. E_max promedio por curva,test,linf_medio,0.7993699606125164,1.4826442993980584,1.0332567576324883,6
+curva_suavizada,medoide,equicolas,4. E_max peor de la ventana,train,linf_max,1.257648256529481,5.113429738016775,2.8800536294608596,6
+curva_suavizada,medoide,equicolas,4. E_max peor de la ventana,test,linf_max,1.339558169793763,4.378868487446695,2.3603153950664635,6
+curva_suavizada,modal,equicolas,1. MAE  (L^1),train,mae_f,0.2433651364842648,0.5567678664375639,0.38105331575791873,6
+curva_suavizada,modal,equicolas,1. MAE  (L^1),test,mae_f,0.26022478657061693,0.5274459751538979,0.3626881780411604,6
+curva_suavizada,modal,equicolas,2. RMSE (L^2),train,rmse_f,0.32491759076055615,0.7922036332403256,0.5269661651922359,6
+curva_suavizada,modal,equicolas,2. RMSE (L^2),test,rmse_f,0.34281581257637445,0.7458934320017886,0.4951469354836052,6
+curva_suavizada,modal,equicolas,3. E_max promedio por curva,train,linf_medio,0.679037383806014,1.8238903465104466,1.12371346191713,6
+curva_suavizada,modal,equicolas,3. E_max promedio por curva,test,linf_medio,0.7576666627933816,1.4634429307707857,1.037394342322761,6
+curva_suavizada,modal,equicolas,4. E_max peor de la ventana,train,linf_max,1.2822355910692396,5.049028143035969,2.8590968434885475,6
+curva_suavizada,modal,equicolas,4. E_max peor de la ventana,test,linf_max,1.4028150148009488,4.557475459914196,2.4286008147729694,6
+representacion_fpca,esperanza,equicolas,1. MAE  (L^1),train,mae_f,0.21933495586554877,0.5299195049135718,0.355541651359523,6
+representacion_fpca,esperanza,equicolas,1. MAE  (L^1),test,mae_f,0.2523408192818925,0.5084490524551946,0.33526847636813123,6
+representacion_fpca,esperanza,equicolas,2. RMSE (L^2),train,rmse_f,0.2950728410726322,0.6996491720279874,0.4772153530188592,6
+representacion_fpca,esperanza,equicolas,2. RMSE (L^2),test,rmse_f,0.32469561852358686,0.6969756828621123,0.44296342928557747,6
+representacion_fpca,esperanza,equicolas,3. E_max promedio por curva,train,linf_medio,0.51940456186549,1.2995317315908055,0.8291615047757864,6
+representacion_fpca,esperanza,equicolas,3. E_max promedio por curva,test,linf_medio,0.5833434553845103,1.1071631929844614,0.7665736261716786,6
+representacion_fpca,esperanza,equicolas,4. E_max peor de la ventana,train,linf_max,1.1465959598035234,3.85534354564106,1.9931349380588244,6
+representacion_fpca,esperanza,equicolas,4. E_max peor de la ventana,test,linf_max,1.048591783378247,3.716877776710689,1.7702333505800567,6
+representacion_fpca,mediana,equicolas,1. MAE  (L^1),train,mae_f,0.2211722421974016,0.5201946798174651,0.3547793018867219,6
+representacion_fpca,mediana,equicolas,1. MAE  (L^1),test,mae_f,0.2537871049255761,0.5024193603326279,0.33583562642644554,6
+representacion_fpca,mediana,equicolas,2. RMSE (L^2),train,rmse_f,0.29694809537524314,0.7021951499861783,0.47735625549076793,6
+representacion_fpca,mediana,equicolas,2. RMSE (L^2),test,rmse_f,0.32543936007746227,0.6913453749147072,0.4437209953222469,6
+representacion_fpca,mediana,equicolas,3. E_max promedio por curva,train,linf_medio,0.5278067950633638,1.301417520952215,0.8315813630023066,6
+representacion_fpca,mediana,equicolas,3. E_max promedio por curva,test,linf_medio,0.5833480626206384,1.1053737651152313,0.7702740796199395,6
+representacion_fpca,mediana,equicolas,4. E_max peor de la ventana,train,linf_max,1.1654338905772925,3.80531157357356,1.9965049041581515,6
+representacion_fpca,mediana,equicolas,4. E_max peor de la ventana,test,linf_max,1.0169499094043006,3.7235657153099497,1.780706258675671,6
+representacion_fpca,medoide,equicolas,1. MAE  (L^1),train,mae_f,0.23448795114620227,0.5344338817516161,0.3609160179427506,6
+representacion_fpca,medoide,equicolas,1. MAE  (L^1),test,mae_f,0.2701820761771593,0.5160169197006643,0.3430598005113716,6
+representacion_fpca,medoide,equicolas,2. RMSE (L^2),train,rmse_f,0.30533977337760543,0.7175382340037431,0.4835972396728173,6
+representacion_fpca,medoide,equicolas,2. RMSE (L^2),test,rmse_f,0.3450419080895629,0.7079230799770725,0.4531841627307268,6
+representacion_fpca,medoide,equicolas,3. E_max promedio por curva,train,linf_medio,0.5450892993381067,1.323785153482363,0.8475446148971338,6
+representacion_fpca,medoide,equicolas,3. E_max promedio por curva,test,linf_medio,0.6160470625939302,1.1549970014673216,0.7944562327177375,6
+representacion_fpca,medoide,equicolas,4. E_max peor de la ventana,train,linf_max,1.0307547971823883,3.803327281792395,2.0290842891063825,6
+representacion_fpca,medoide,equicolas,4. E_max peor de la ventana,test,linf_max,1.0202523023591266,3.7136403242563585,1.8181074353506093,6
+representacion_fpca,modal,equicolas,1. MAE  (L^1),train,mae_f,0.2211566578564085,0.5171723853152275,0.3567431793062161,6
+representacion_fpca,modal,equicolas,1. MAE  (L^1),test,mae_f,0.2385403920241368,0.5062020239223765,0.34476667213122314,6
+representacion_fpca,modal,equicolas,2. RMSE (L^2),train,rmse_f,0.2969486527305785,0.7351278174205066,0.4855010811151859,6
+representacion_fpca,modal,equicolas,2. RMSE (L^2),test,rmse_f,0.3126871683162634,0.6950761155786822,0.4625502715165935,6
+representacion_fpca,modal,equicolas,3. E_max promedio por curva,train,linf_medio,0.4863131215408992,1.2960272353632087,0.8316455151349595,6
+representacion_fpca,modal,equicolas,3. E_max promedio por curva,test,linf_medio,0.537054936688473,1.0952032168458505,0.7911503749326989,6
+representacion_fpca,modal,equicolas,4. E_max peor de la ventana,train,linf_max,1.0911011539687314,3.76602995776854,2.0269804177433057,6
+representacion_fpca,modal,equicolas,4. E_max peor de la ventana,test,linf_max,1.1092590120755215,4.076537625346009,1.90013945885188,6
+curva_suavizada,esperanza,equicolas,1. MAE  (L^1),train,mae_f,0.23522092633504862,0.5465674897810258,0.3726860992660816,7
+curva_suavizada,esperanza,equicolas,1. MAE  (L^1),test,mae_f,0.2721121230038694,0.5381426063998694,0.3521013411478904,7
+curva_suavizada,esperanza,equicolas,2. RMSE (L^2),train,rmse_f,0.3128339134629361,0.7445615649826567,0.5124185323680435,7
+curva_suavizada,esperanza,equicolas,2. RMSE (L^2),test,rmse_f,0.35120926940194813,0.7641857950008704,0.474642657970845,7
+curva_suavizada,esperanza,equicolas,3. E_max promedio por curva,train,linf_medio,0.6990709509426056,1.7866450325522245,1.1171747764432742,7
+curva_suavizada,esperanza,equicolas,3. E_max promedio por curva,test,linf_medio,0.7834809245690179,1.4685477512961007,1.0138159845072476,7
+curva_suavizada,esperanza,equicolas,4. E_max peor de la ventana,train,linf_max,1.1773300000900186,5.295682553060274,2.862888383763805,7
+curva_suavizada,esperanza,equicolas,4. E_max peor de la ventana,test,linf_max,1.3747229732347686,4.289170529682345,2.3348695555555685,7
+curva_suavizada,mediana,equicolas,1. MAE  (L^1),train,mae_f,0.2363479333353436,0.5498440536185653,0.37209371143386905,7
+curva_suavizada,mediana,equicolas,1. MAE  (L^1),test,mae_f,0.2720272178233883,0.5376729160237741,0.35233872923352894,7
+curva_suavizada,mediana,equicolas,2. RMSE (L^2),train,rmse_f,0.3142951615061357,0.7479143449158592,0.513153419842263,7
+curva_suavizada,mediana,equicolas,2. RMSE (L^2),test,rmse_f,0.35161991613756927,0.7686516989343142,0.4757431269579834,7
+curva_suavizada,mediana,equicolas,3. E_max promedio por curva,train,linf_medio,0.7044847919901405,1.7871585191350492,1.1184423051397137,7
+curva_suavizada,mediana,equicolas,3. E_max promedio por curva,test,linf_medio,0.784698313981167,1.4631625498531777,1.0152560198429603,7
+curva_suavizada,mediana,equicolas,4. E_max peor de la ventana,train,linf_max,1.1915182967795261,5.298948911643485,2.866394221073111,7
+curva_suavizada,mediana,equicolas,4. E_max peor de la ventana,test,linf_max,1.4160536202801208,4.3090291932562526,2.3412772789724223,7
+curva_suavizada,medoide,equicolas,1. MAE  (L^1),train,mae_f,0.26074393063285883,0.5607985225066947,0.38136957100181734,7
+curva_suavizada,medoide,equicolas,1. MAE  (L^1),test,mae_f,0.2735823007922186,0.5369269704748586,0.3589737680356331,7
+curva_suavizada,medoide,equicolas,2. RMSE (L^2),train,rmse_f,0.3383140346462199,0.7504104179938593,0.5218446143182719,7
+curva_suavizada,medoide,equicolas,2. RMSE (L^2),test,rmse_f,0.3573976680152135,0.7750322768220532,0.4859995794385627,7
+curva_suavizada,medoide,equicolas,3. E_max promedio por curva,train,linf_medio,0.7335981955552574,1.8218094469353139,1.1381244518391989,7
+curva_suavizada,medoide,equicolas,3. E_max promedio por curva,test,linf_medio,0.8024564809524468,1.5163390113250956,1.0383740380630497,7
+curva_suavizada,medoide,equicolas,4. E_max peor de la ventana,train,linf_max,1.2604157855292852,5.163388906295482,2.8663953913804656,7
+curva_suavizada,medoide,equicolas,4. E_max peor de la ventana,test,linf_max,1.3961059182819904,4.483688284729174,2.4074213218705545,7
+curva_suavizada,modal,equicolas,1. MAE  (L^1),train,mae_f,0.24060683451293094,0.5719286590831806,0.375536791393543,7
+curva_suavizada,modal,equicolas,1. MAE  (L^1),test,mae_f,0.26063594132232226,0.5511121388088608,0.36117878055019376,7
+curva_suavizada,modal,equicolas,2. RMSE (L^2),train,rmse_f,0.31686407299316244,0.7910094423486184,0.5213142109190058,7
+curva_suavizada,modal,equicolas,2. RMSE (L^2),test,rmse_f,0.34371212767477394,0.7841208208725122,0.4904270757327696,7
+curva_suavizada,modal,equicolas,3. E_max promedio por curva,train,linf_medio,0.6980796392719135,1.7929958987797912,1.1166814742363356,7
+curva_suavizada,modal,equicolas,3. E_max promedio por curva,test,linf_medio,0.7797463407837297,1.4590731141712217,1.0345307128998915,7
+curva_suavizada,modal,equicolas,4. E_max peor de la ventana,train,linf_max,1.1977703855873936,5.417165326168096,2.867444514667646,7
+curva_suavizada,modal,equicolas,4. E_max peor de la ventana,test,linf_max,1.519354660011378,4.338610834473629,2.428838965449478,7
+representacion_fpca,esperanza,equicolas,1. MAE  (L^1),train,mae_f,0.21675599045177746,0.518011634009596,0.35292176015787313,7
+representacion_fpca,esperanza,equicolas,1. MAE  (L^1),test,mae_f,0.2527542086317001,0.5234749600089157,0.33634442411929544,7
+representacion_fpca,esperanza,equicolas,2. RMSE (L^2),train,rmse_f,0.288054291492653,0.6904975432366866,0.477301260502735,7
+representacion_fpca,esperanza,equicolas,2. RMSE (L^2),test,rmse_f,0.3259852970248428,0.7345006459985352,0.4483964822103613,7
+representacion_fpca,esperanza,equicolas,3. E_max promedio por curva,train,linf_medio,0.5243347585165127,1.3448249587340302,0.863509894234572,7
+representacion_fpca,esperanza,equicolas,3. E_max promedio por curva,test,linf_medio,0.5904564747189678,1.2350928565877484,0.8210036540848593,7
+representacion_fpca,esperanza,equicolas,4. E_max peor de la ventana,train,linf_max,1.076692564039088,3.921269951812853,2.1172218608068367,7
+representacion_fpca,esperanza,equicolas,4. E_max peor de la ventana,test,linf_max,1.1316449574895069,4.744695901250549,2.0135651674164423,7
+representacion_fpca,mediana,equicolas,1. MAE  (L^1),train,mae_f,0.21769406103239752,0.5207563525184677,0.35247531081834715,7
+representacion_fpca,mediana,equicolas,1. MAE  (L^1),test,mae_f,0.2542443789175875,0.5222817177249248,0.3367385694942257,7
+representacion_fpca,mediana,equicolas,2. RMSE (L^2),train,rmse_f,0.28957826660406266,0.695038190310295,0.478068568681979,7
+representacion_fpca,mediana,equicolas,2. RMSE (L^2),test,rmse_f,0.3265891494603795,0.7391096044040765,0.4496212977078505,7
+representacion_fpca,mediana,equicolas,3. E_max promedio por curva,train,linf_medio,0.5303873940563253,1.3429426091779102,0.8658957292520064,7
+representacion_fpca,mediana,equicolas,3. E_max promedio por curva,test,linf_medio,0.5948558571924809,1.2438631098902144,0.8251718107989925,7
+representacion_fpca,mediana,equicolas,4. E_max peor de la ventana,train,linf_max,1.0775126384011968,3.919439788115282,2.123368855449031,7
+representacion_fpca,mediana,equicolas,4. E_max peor de la ventana,test,linf_max,1.1849296660425872,4.791844238468691,2.0245181099846783,7
+representacion_fpca,medoide,equicolas,1. MAE  (L^1),train,mae_f,0.2401774330690454,0.5288750045372763,0.3619824646036054,7
+representacion_fpca,medoide,equicolas,1. MAE  (L^1),test,mae_f,0.25682257253616014,0.5230160553455859,0.34372892132743393,7
+representacion_fpca,medoide,equicolas,2. RMSE (L^2),train,rmse_f,0.3155417618531693,0.6936263178006796,0.48741578139195796,7
+representacion_fpca,medoide,equicolas,2. RMSE (L^2),test,rmse_f,0.3324675129654221,0.745778988579813,0.4604211013473908,7
+representacion_fpca,medoide,equicolas,3. E_max promedio por curva,train,linf_medio,0.5649081324242319,1.3438538065604326,0.8900742240416101,7
+representacion_fpca,medoide,equicolas,3. E_max promedio por curva,test,linf_medio,0.624626604439189,1.2847553543269667,0.8558566095546631,7
+representacion_fpca,medoide,equicolas,4. E_max peor de la ventana,train,linf_max,1.1303431922108038,3.9032772964719253,2.140871640767603,7
+representacion_fpca,medoide,equicolas,4. E_max peor de la ventana,test,linf_max,1.2376482111077944,4.906888048639722,2.1271528894126317,7
+representacion_fpca,modal,equicolas,1. MAE  (L^1),train,mae_f,0.22331254857896443,0.5446673677075375,0.35600773450849404,7
+representacion_fpca,modal,equicolas,1. MAE  (L^1),test,mae_f,0.2429678560966168,0.5349112878885641,0.34535887544288085,7
+representacion_fpca,modal,equicolas,2. RMSE (L^2),train,rmse_f,0.2930783941350679,0.737651050740223,0.48688671666934846,7
+representacion_fpca,modal,equicolas,2. RMSE (L^2),test,rmse_f,0.31789383396543697,0.7550449726424471,0.4650295444765401,7
+representacion_fpca,modal,equicolas,3. E_max promedio por curva,train,linf_medio,0.5310401676163263,1.332812315960742,0.8664297419890954,7
+representacion_fpca,modal,equicolas,3. E_max promedio por curva,test,linf_medio,0.5838212203469794,1.2599261280076397,0.8450620040392959,7
+representacion_fpca,modal,equicolas,4. E_max peor de la ventana,train,linf_max,1.0962426944629833,3.989319565443348,2.1432720879333194,7
+representacion_fpca,modal,equicolas,4. E_max peor de la ventana,test,linf_max,1.2290101757168015,4.667259320853322,2.0946148986273467,7
+curva_suavizada,esperanza,equicolas,1. MAE  (L^1),train,mae_f,0.23477493884890374,0.5463019874245665,0.3726599245082297,8
+curva_suavizada,esperanza,equicolas,1. MAE  (L^1),test,mae_f,0.26874203441612465,0.5334474906332223,0.35201875363650686,8
+curva_suavizada,esperanza,equicolas,2. RMSE (L^2),train,rmse_f,0.31271581033159956,0.7533219819249656,0.5123987531699119,8
+curva_suavizada,esperanza,equicolas,2. RMSE (L^2),test,rmse_f,0.3484155189690381,0.7595401853045939,0.4750701338249612,8
+curva_suavizada,esperanza,equicolas,3. E_max promedio por curva,train,linf_medio,0.7005633252533774,1.805240625500723,1.1173779013827845,8
+curva_suavizada,esperanza,equicolas,3. E_max promedio por curva,test,linf_medio,0.7778805945460265,1.4836448028972764,1.0155698552675285,8
+curva_suavizada,esperanza,equicolas,4. E_max peor de la ventana,train,linf_max,1.2038347206535047,5.236962643200222,2.8599359517121967,8
+curva_suavizada,esperanza,equicolas,4. E_max peor de la ventana,test,linf_max,1.3690917579609332,4.339182915130879,2.345428179235154,8
+curva_suavizada,mediana,equicolas,1. MAE  (L^1),train,mae_f,0.23592916537942965,0.5488866550911788,0.37165656291205973,8
+curva_suavizada,mediana,equicolas,1. MAE  (L^1),test,mae_f,0.26817587151770184,0.5354797580554281,0.3529320553417012,8
+curva_suavizada,mediana,equicolas,2. RMSE (L^2),train,rmse_f,0.3140229364801675,0.7573185106003297,0.5126863093839246,8
+curva_suavizada,mediana,equicolas,2. RMSE (L^2),test,rmse_f,0.34813854244074105,0.7624166977464762,0.47591742292242045,8
+curva_suavizada,mediana,equicolas,3. E_max promedio por curva,train,linf_medio,0.7077843848062465,1.8148345747074826,1.1188218772160878,8
+curva_suavizada,mediana,equicolas,3. E_max promedio por curva,test,linf_medio,0.7763286278379055,1.4783718582973981,1.0170550726198226,8
+curva_suavizada,mediana,equicolas,4. E_max peor de la ventana,train,linf_max,1.2240140978213736,5.2341155670465636,2.8628299064988196,8
+curva_suavizada,mediana,equicolas,4. E_max peor de la ventana,test,linf_max,1.4160447947008659,4.340915060312023,2.3477973005089674,8
+curva_suavizada,medoide,equicolas,1. MAE  (L^1),train,mae_f,0.253017825687617,0.5617138550103508,0.3831024392067418,8
+curva_suavizada,medoide,equicolas,1. MAE  (L^1),test,mae_f,0.27393913557445565,0.5378462183645083,0.3613942039245178,8
+curva_suavizada,medoide,equicolas,2. RMSE (L^2),train,rmse_f,0.3286244514460776,0.7743896253440263,0.5248913229659293,8
+curva_suavizada,medoide,equicolas,2. RMSE (L^2),test,rmse_f,0.35350857717567036,0.7693258563595908,0.48637105984840595,8
+curva_suavizada,medoide,equicolas,3. E_max promedio por curva,train,linf_medio,0.7075048356080517,1.8427170601267615,1.1446905785348702,8
+curva_suavizada,medoide,equicolas,3. E_max promedio por curva,test,linf_medio,0.7697855282061984,1.4809093282803387,1.0388746735630474,8
+curva_suavizada,medoide,equicolas,4. E_max peor de la ventana,train,linf_max,1.3105844405337888,5.383773620478248,2.90282803177452,8
+curva_suavizada,medoide,equicolas,4. E_max peor de la ventana,test,linf_max,1.2359268163588477,4.5012961534322615,2.399473630496685,8
+curva_suavizada,modal,equicolas,1. MAE  (L^1),train,mae_f,0.23933420046660211,0.5741657725291596,0.37317902346808607,8
+curva_suavizada,modal,equicolas,1. MAE  (L^1),test,mae_f,0.25900047794640707,0.5448088991597573,0.36217297640152807,8
+curva_suavizada,modal,equicolas,2. RMSE (L^2),train,rmse_f,0.31750626370287666,0.7865822529453248,0.5202315247280648,8
+curva_suavizada,modal,equicolas,2. RMSE (L^2),test,rmse_f,0.3433147163986747,0.7764236117758131,0.4930342535255258,8
+curva_suavizada,modal,equicolas,3. E_max promedio por curva,train,linf_medio,0.6882919672224568,1.8241355661649046,1.1191618065549798,8
+curva_suavizada,modal,equicolas,3. E_max promedio por curva,test,linf_medio,0.7709235482607816,1.4863617994298248,1.0444148633758414,8
+curva_suavizada,modal,equicolas,4. E_max peor de la ventana,train,linf_max,1.2546988814725712,5.3837778736246875,2.888929438889419,8
+curva_suavizada,modal,equicolas,4. E_max peor de la ventana,test,linf_max,1.4784132190722543,4.341440787091942,2.456383507762243,8
+representacion_fpca,esperanza,equicolas,1. MAE  (L^1),train,mae_f,0.2191150260720394,0.5289218600158097,0.3564632390422477,8
+representacion_fpca,esperanza,equicolas,1. MAE  (L^1),test,mae_f,0.2507925162791563,0.5241216584087801,0.3387657149440648,8
+representacion_fpca,esperanza,equicolas,2. RMSE (L^2),train,rmse_f,0.2919196056020737,0.7102299997949706,0.48238673858743214,8
+representacion_fpca,esperanza,equicolas,2. RMSE (L^2),test,rmse_f,0.32565571806611743,0.735395213091311,0.4522214523693832,8
+representacion_fpca,esperanza,equicolas,3. E_max promedio por curva,train,linf_medio,0.5413479850344037,1.3865219077109046,0.8826000346460932,8
+representacion_fpca,esperanza,equicolas,3. E_max promedio por curva,test,linf_medio,0.604528328700345,1.2590532113327295,0.8377822046997296,8
+representacion_fpca,esperanza,equicolas,4. E_max peor de la ventana,train,linf_max,1.1527964741188463,4.059267631389275,2.138141983351949,8
+representacion_fpca,esperanza,equicolas,4. E_max peor de la ventana,test,linf_max,1.1104996654549075,4.770365799117678,2.034732283940019,8
+representacion_fpca,mediana,equicolas,1. MAE  (L^1),train,mae_f,0.2198794643314626,0.5223936794462393,0.35554070164542734,8
+representacion_fpca,mediana,equicolas,1. MAE  (L^1),test,mae_f,0.25126873200099514,0.5249790149019613,0.3396268133704239,8
+representacion_fpca,mediana,equicolas,2. RMSE (L^2),train,rmse_f,0.29339750698831707,0.714538800459043,0.4826929993288739,8
+representacion_fpca,mediana,equicolas,2. RMSE (L^2),test,rmse_f,0.32541040189213893,0.73835616953967,0.4531052468093488,8
+representacion_fpca,mediana,equicolas,3. E_max promedio por curva,train,linf_medio,0.5502244127987499,1.3877412257877362,0.885367347432757,8
+representacion_fpca,mediana,equicolas,3. E_max promedio por curva,test,linf_medio,0.6062615262058478,1.2650600508390728,0.8402613181899193,8
+representacion_fpca,mediana,equicolas,4. E_max peor de la ventana,train,linf_max,1.1759552673701297,4.062403704856712,2.141347633103367,8
+representacion_fpca,mediana,equicolas,4. E_max peor de la ventana,test,linf_max,1.1487921305758648,4.7882875273648695,2.039878965192151,8
+representacion_fpca,medoide,equicolas,1. MAE  (L^1),train,mae_f,0.2389682356300864,0.5413471853701134,0.3670433373173802,8
+representacion_fpca,medoide,equicolas,1. MAE  (L^1),test,mae_f,0.25666694798126743,0.5256200791763314,0.3476595891111144,8
+representacion_fpca,medoide,equicolas,2. RMSE (L^2),train,rmse_f,0.3089011301237935,0.7325380099338649,0.4956328831841667,8
+representacion_fpca,medoide,equicolas,2. RMSE (L^2),test,rmse_f,0.33109905917634563,0.7454978870583707,0.4640839375397179,8
+representacion_fpca,medoide,equicolas,3. E_max promedio por curva,train,linf_medio,0.5625537705278343,1.4279692092494927,0.9173677448817457,8
+representacion_fpca,medoide,equicolas,3. E_max promedio por curva,test,linf_medio,0.6381210169273628,1.3309950808580164,0.8708055122612915,8
+representacion_fpca,medoide,equicolas,4. E_max peor de la ventana,train,linf_max,1.172268482479459,4.261742993295584,2.1838602236188103,8
+representacion_fpca,medoide,equicolas,4. E_max peor de la ventana,test,linf_max,1.1441602036081564,4.918996742391537,2.0862955359110047,8
+representacion_fpca,modal,equicolas,1. MAE  (L^1),train,mae_f,0.22615393689874932,0.549837259962508,0.35725384364485774,8
+representacion_fpca,modal,equicolas,1. MAE  (L^1),test,mae_f,0.241941966153559,0.5353058267264411,0.3492575363269299,8
+representacion_fpca,modal,equicolas,2. RMSE (L^2),train,rmse_f,0.29657625652544495,0.7409024507058969,0.49072294622949403,8
+representacion_fpca,modal,equicolas,2. RMSE (L^2),test,rmse_f,0.3201925473002093,0.7526756094320037,0.4710209960156626,8
+representacion_fpca,modal,equicolas,3. E_max promedio por curva,train,linf_medio,0.5387652884431596,1.405032523224847,0.888140451434052,8
+representacion_fpca,modal,equicolas,3. E_max promedio por curva,test,linf_medio,0.5891999359111771,1.3221808932158046,0.8677773191035866,8
+representacion_fpca,modal,equicolas,4. E_max peor de la ventana,train,linf_max,1.2042827594346168,4.154947286949624,2.180919511468901,8
+representacion_fpca,modal,equicolas,4. E_max peor de la ventana,test,linf_max,1.2595630353788683,4.711636223658694,2.1331806659413153,8
+curva_suavizada,esperanza,equicolas,1. MAE  (L^1),train,mae_f,0.2309456055922206,0.5398364679768586,0.3676061263721269,9
+curva_suavizada,esperanza,equicolas,1. MAE  (L^1),test,mae_f,0.2610197165836679,0.5387341401854111,0.34724476972020624,9
+curva_suavizada,esperanza,equicolas,2. RMSE (L^2),train,rmse_f,0.30689654944184863,0.7485128559668318,0.5082997404858887,9
+curva_suavizada,esperanza,equicolas,2. RMSE (L^2),test,rmse_f,0.3410582627986097,0.7665098129709252,0.4701934588145044,9
+curva_suavizada,esperanza,equicolas,3. E_max promedio por curva,train,linf_medio,0.6839374595269144,1.7774220447961662,1.1106406486383074,9
+curva_suavizada,esperanza,equicolas,3. E_max promedio por curva,test,linf_medio,0.7596016388777393,1.4472996747467137,1.0088588806493561,9
+curva_suavizada,esperanza,equicolas,4. E_max peor de la ventana,train,linf_max,1.1819420106775191,5.2648563192532265,2.860603045621417,9
+curva_suavizada,esperanza,equicolas,4. E_max peor de la ventana,test,linf_max,1.2699031896329271,4.318919826623797,2.3367893933635053,9
+curva_suavizada,mediana,equicolas,1. MAE  (L^1),train,mae_f,0.23123515886595747,0.5377129282302291,0.36709028137009214,9
+curva_suavizada,mediana,equicolas,1. MAE  (L^1),test,mae_f,0.26139039662377883,0.5334951690542985,0.3471047135957126,9
+curva_suavizada,mediana,equicolas,2. RMSE (L^2),train,rmse_f,0.3063183728261195,0.7512387022705546,0.5089096643838602,9
+curva_suavizada,mediana,equicolas,2. RMSE (L^2),test,rmse_f,0.3419037774139775,0.7643619649745493,0.4705602541877972,9
+curva_suavizada,mediana,equicolas,3. E_max promedio por curva,train,linf_medio,0.68697167195115,1.7800601997998247,1.1119462579434531,9
+curva_suavizada,mediana,equicolas,3. E_max promedio por curva,test,linf_medio,0.7601386111505841,1.4400076456752495,1.0096474582076507,9
+curva_suavizada,mediana,equicolas,4. E_max peor de la ventana,train,linf_max,1.1888823459538815,5.264991501543893,2.862714150425248,9
+curva_suavizada,mediana,equicolas,4. E_max peor de la ventana,test,linf_max,1.32450388834291,4.314796015440276,2.3393707622559496,9
+curva_suavizada,medoide,equicolas,1. MAE  (L^1),train,mae_f,0.23715952863893422,0.5565384960886425,0.37931462231429286,9
+curva_suavizada,medoide,equicolas,1. MAE  (L^1),test,mae_f,0.27268858411689206,0.5399125987372257,0.36196017374566225,9
+curva_suavizada,medoide,equicolas,2. RMSE (L^2),train,rmse_f,0.30664954654286747,0.7659158341927857,0.5211920191253042,9
+curva_suavizada,medoide,equicolas,2. RMSE (L^2),test,rmse_f,0.36033607873014334,0.7792581722185082,0.48726707408086767,9
+curva_suavizada,medoide,equicolas,3. E_max promedio por curva,train,linf_medio,0.6883513962961846,1.8153076856016697,1.1447024162077415,9
+curva_suavizada,medoide,equicolas,3. E_max promedio por curva,test,linf_medio,0.7740517448671942,1.481375193192,1.0405409324216985,9
+curva_suavizada,medoide,equicolas,4. E_max peor de la ventana,train,linf_max,1.1621649271836965,5.279062671199624,2.8740617931655974,9
+curva_suavizada,medoide,equicolas,4. E_max peor de la ventana,test,linf_max,1.3251000620880613,4.2003437013678555,2.364407908630374,9
+curva_suavizada,modal,equicolas,1. MAE  (L^1),train,mae_f,0.23582379320111307,0.5462626792288353,0.3668485825571873,9
+curva_suavizada,modal,equicolas,1. MAE  (L^1),test,mae_f,0.25807726340219067,0.5386102935812315,0.3563523961507021,9
+curva_suavizada,modal,equicolas,2. RMSE (L^2),train,rmse_f,0.3101527134296684,0.7791307615721059,0.5153972763895863,9
+curva_suavizada,modal,equicolas,2. RMSE (L^2),test,rmse_f,0.3432109327276524,0.782991624789728,0.4878430176861329,9
+curva_suavizada,modal,equicolas,3. E_max promedio por curva,train,linf_medio,0.6749385391181046,1.776712097725853,1.1120785615005404,9
+curva_suavizada,modal,equicolas,3. E_max promedio por curva,test,linf_medio,0.7772858227158022,1.4617526033158759,1.032985056667195,9
+curva_suavizada,modal,equicolas,4. E_max peor de la ventana,train,linf_max,1.1240559691277716,5.128011719114477,2.868102854049186,9
+curva_suavizada,modal,equicolas,4. E_max peor de la ventana,test,linf_max,1.510094436873839,4.366326671824027,2.41180577888285,9
+representacion_fpca,esperanza,equicolas,1. MAE  (L^1),train,mae_f,0.218251542836939,0.5252201843654124,0.35344852987565084,9
+representacion_fpca,esperanza,equicolas,1. MAE  (L^1),test,mae_f,0.2470840338126582,0.5308864279533035,0.33613333911847865,9
+representacion_fpca,esperanza,equicolas,2. RMSE (L^2),train,rmse_f,0.2896962808007345,0.708940389733666,0.4822438330762662,9
+representacion_fpca,esperanza,equicolas,2. RMSE (L^2),test,rmse_f,0.3241240317943483,0.7451956892196944,0.45084115786275347,9
+representacion_fpca,esperanza,equicolas,3. E_max promedio por curva,train,linf_medio,0.5447437206111115,1.4396743980221924,0.9021846837277834,9
+representacion_fpca,esperanza,equicolas,3. E_max promedio por curva,test,linf_medio,0.6452132272735482,1.2840109027346245,0.8594300457631933,9
+representacion_fpca,esperanza,equicolas,4. E_max peor de la ventana,train,linf_max,1.0632708130398463,4.279209109118645,2.202595790179172,9
+representacion_fpca,esperanza,equicolas,4. E_max peor de la ventana,test,linf_max,1.1651602113684056,4.838235274136555,2.040079682239282,9
+representacion_fpca,mediana,equicolas,1. MAE  (L^1),train,mae_f,0.2182116787506974,0.5213674542519807,0.3529956705911414,9
+representacion_fpca,mediana,equicolas,1. MAE  (L^1),test,mae_f,0.2485986429514452,0.5246323750193712,0.3357739935471098,9
+representacion_fpca,mediana,equicolas,2. RMSE (L^2),train,rmse_f,0.2889966987032827,0.7117653213935181,0.48288312154108287,9
+representacion_fpca,mediana,equicolas,2. RMSE (L^2),test,rmse_f,0.32498235631040706,0.7429539480036867,0.45120774418471077,9
+representacion_fpca,mediana,equicolas,3. E_max promedio por curva,train,linf_medio,0.5503855667331993,1.4549082820231027,0.9047272130578672,9
+representacion_fpca,mediana,equicolas,3. E_max promedio por curva,test,linf_medio,0.6516419868841038,1.2799916656436596,0.8622214787956239,9
+representacion_fpca,mediana,equicolas,4. E_max peor de la ventana,train,linf_max,1.078765551741335,4.311248632142525,2.2104730156344488,9
+representacion_fpca,mediana,equicolas,4. E_max peor de la ventana,test,linf_max,1.1829750347517736,4.8331619735558276,2.0419040186927666,9
+representacion_fpca,medoide,equicolas,1. MAE  (L^1),train,mae_f,0.22307692732227924,0.5356007060027533,0.3654517895686079,9
+representacion_fpca,medoide,equicolas,1. MAE  (L^1),test,mae_f,0.25942132521581385,0.5287021514484197,0.350622708585259,9
+representacion_fpca,medoide,equicolas,2. RMSE (L^2),train,rmse_f,0.28945654543319277,0.7272908948387362,0.4958291809085259,9
+representacion_fpca,medoide,equicolas,2. RMSE (L^2),test,rmse_f,0.3425294729338006,0.7583024599856067,0.46862322830543757,9
+representacion_fpca,medoide,equicolas,3. E_max promedio por curva,train,linf_medio,0.581965714213945,1.4724203189842362,0.9448549523617998,9
+representacion_fpca,medoide,equicolas,3. E_max promedio por curva,test,linf_medio,0.6687037727234529,1.3420555559003837,0.9036978592992873,9
+representacion_fpca,medoide,equicolas,4. E_max peor de la ventana,train,linf_max,0.9226037053697056,4.232375290815527,2.247810388013177,9
+representacion_fpca,medoide,equicolas,4. E_max peor de la ventana,test,linf_max,1.1294629111866952,4.752707818018757,2.1191232445684087,9
+representacion_fpca,modal,equicolas,1. MAE  (L^1),train,mae_f,0.2220234503950666,0.5285526688957,0.3531596044099716,9
+representacion_fpca,modal,equicolas,1. MAE  (L^1),test,mae_f,0.2455446373730514,0.5300169407572483,0.345304004577791,9
+representacion_fpca,modal,equicolas,2. RMSE (L^2),train,rmse_f,0.29258434501030944,0.7378056722628856,0.48972310628658233,9
+representacion_fpca,modal,equicolas,2. RMSE (L^2),test,rmse_f,0.326388409272148,0.7620915903404789,0.46920764297675416,9
+representacion_fpca,modal,equicolas,3. E_max promedio por curva,train,linf_medio,0.5507236810858712,1.4460447833568173,0.9063503050189288,9
+representacion_fpca,modal,equicolas,3. E_max promedio por curva,test,linf_medio,0.6529497449847147,1.337645570228379,0.88456391811526,9
+representacion_fpca,modal,equicolas,4. E_max peor de la ventana,train,linf_max,1.035635956069867,4.434086080724188,2.2519794952976744,9
+representacion_fpca,modal,equicolas,4. E_max peor de la ventana,test,linf_max,1.1615820768989493,4.898570412849604,2.1622452807038375,9
+curva_suavizada,esperanza,equicolas,1. MAE  (L^1),train,mae_f,0.22942471139093493,0.5511199194235495,0.3686374349967774,10
+curva_suavizada,esperanza,equicolas,1. MAE  (L^1),test,mae_f,0.26102366572622004,0.5363929875367524,0.3476208048760566,10
+curva_suavizada,esperanza,equicolas,2. RMSE (L^2),train,rmse_f,0.3058126772388964,0.752304942878886,0.5084600957010972,10
+curva_suavizada,esperanza,equicolas,2. RMSE (L^2),test,rmse_f,0.3409034595786923,0.7637019554211876,0.47126041019057124,10
+curva_suavizada,esperanza,equicolas,3. E_max promedio por curva,train,linf_medio,0.6858639222803259,1.773122400552276,1.1104873092440781,10
+curva_suavizada,esperanza,equicolas,3. E_max promedio por curva,test,linf_medio,0.7577517203173632,1.4488250337936215,1.0069598919843672,10
+curva_suavizada,esperanza,equicolas,4. E_max peor de la ventana,train,linf_max,1.1873613346558392,5.263962222129866,2.8555287271358654,10
+curva_suavizada,esperanza,equicolas,4. E_max peor de la ventana,test,linf_max,1.2348434063993214,4.338243188313709,2.339353923526686,10
+curva_suavizada,mediana,equicolas,1. MAE  (L^1),train,mae_f,0.23047589092215726,0.5406848144637738,0.36734020268464185,10
+curva_suavizada,mediana,equicolas,1. MAE  (L^1),test,mae_f,0.25992584898366583,0.5339450890956766,0.3478072602091897,10
+curva_suavizada,mediana,equicolas,2. RMSE (L^2),train,rmse_f,0.3064922438201237,0.754726797499508,0.5086015128348285,10
+curva_suavizada,mediana,equicolas,2. RMSE (L^2),test,rmse_f,0.3395286392069999,0.7637611838834909,0.47190450518642085,10
+curva_suavizada,mediana,equicolas,3. E_max promedio por curva,train,linf_medio,0.6906118828514418,1.7773056903596556,1.1118518429785729,10
+curva_suavizada,mediana,equicolas,3. E_max promedio por curva,test,linf_medio,0.7556204134143355,1.4421700820688343,1.0090319215212908,10
+curva_suavizada,mediana,equicolas,4. E_max peor de la ventana,train,linf_max,1.1833474199045844,5.292110762128136,2.8564248022813867,10
+curva_suavizada,mediana,equicolas,4. E_max peor de la ventana,test,linf_max,1.2552804502786825,4.371582012092037,2.342863398320923,10
+curva_suavizada,medoide,equicolas,1. MAE  (L^1),train,mae_f,0.25365275814588195,0.5616868478892377,0.3793990771253037,10
+curva_suavizada,medoide,equicolas,1. MAE  (L^1),test,mae_f,0.2797407686702406,0.536607301348094,0.3637948714133785,10
+curva_suavizada,medoide,equicolas,2. RMSE (L^2),train,rmse_f,0.33420854424052465,0.7887421005682509,0.5215687938004406,10
+curva_suavizada,medoide,equicolas,2. RMSE (L^2),test,rmse_f,0.36002292254722157,0.7654939000818748,0.48984910863135206,10
+curva_suavizada,medoide,equicolas,3. E_max promedio por curva,train,linf_medio,0.7631381616908306,1.7990478424293677,1.1424241924023633,10
+curva_suavizada,medoide,equicolas,3. E_max promedio por curva,test,linf_medio,0.8162350171675091,1.5116458319456478,1.0561388611712572,10
+curva_suavizada,medoide,equicolas,4. E_max peor de la ventana,train,linf_max,1.2569441681630782,5.077485444002114,2.872139681121482,10
+curva_suavizada,medoide,equicolas,4. E_max peor de la ventana,test,linf_max,1.3806796051380679,4.408076728519518,2.413713288939425,10
+curva_suavizada,modal,equicolas,1. MAE  (L^1),train,mae_f,0.2314042361381245,0.5679980795240899,0.37075249143577876,10
+curva_suavizada,modal,equicolas,1. MAE  (L^1),test,mae_f,0.25666192718104813,0.5493530246790848,0.3590023138357668,10
+curva_suavizada,modal,equicolas,2. RMSE (L^2),train,rmse_f,0.30989752880194704,0.7718222238052006,0.519025323129823,10
+curva_suavizada,modal,equicolas,2. RMSE (L^2),test,rmse_f,0.3410110638006219,0.7845154086024212,0.4910784275644633,10
+curva_suavizada,modal,equicolas,3. E_max promedio por curva,train,linf_medio,0.6898912200189365,1.7946614927343032,1.1173814638697048,10
+curva_suavizada,modal,equicolas,3. E_max promedio por curva,test,linf_medio,0.7741379900199462,1.4517559070067678,1.0350652330431462,10
+curva_suavizada,modal,equicolas,4. E_max peor de la ventana,train,linf_max,1.172415547054797,5.292451002173842,2.887449138619238,10
+curva_suavizada,modal,equicolas,4. E_max peor de la ventana,test,linf_max,1.431319523046199,4.396797911246267,2.428422032584559,10
+representacion_fpca,esperanza,equicolas,1. MAE  (L^1),train,mae_f,0.21949027882541622,0.5369203902480912,0.3563899571168222,10
+representacion_fpca,esperanza,equicolas,1. MAE  (L^1),test,mae_f,0.2480590711918859,0.5289679021111755,0.33785652860646614,10
+representacion_fpca,esperanza,equicolas,2. RMSE (L^2),train,rmse_f,0.29013632348524415,0.7177424723272449,0.4859978065480903,10
+representacion_fpca,esperanza,equicolas,2. RMSE (L^2),test,rmse_f,0.32576663590452587,0.7439966731485649,0.4546852452874831,10
+representacion_fpca,esperanza,equicolas,3. E_max promedio por curva,train,linf_medio,0.5510105472190846,1.4604396638469264,0.9243424649182292,10
+representacion_fpca,esperanza,equicolas,3. E_max promedio por curva,test,linf_medio,0.658112851187379,1.287893728541243,0.877696323856168,10
+representacion_fpca,esperanza,equicolas,4. E_max peor de la ventana,train,linf_max,1.1178200236425981,4.221723931160666,2.2568037134022583,10
+representacion_fpca,esperanza,equicolas,4. E_max peor de la ventana,test,linf_max,1.1540050202907042,4.576903411771669,2.071364454433702,10
+representacion_fpca,mediana,equicolas,1. MAE  (L^1),train,mae_f,0.22040705840707495,0.5273945622932765,0.35513949319979987,10
+representacion_fpca,mediana,equicolas,1. MAE  (L^1),test,mae_f,0.24750138157477425,0.5263356038944251,0.33789066188892525,10
+representacion_fpca,mediana,equicolas,2. RMSE (L^2),train,rmse_f,0.2908389669499575,0.7201532056090391,0.48613871600464287,10
+representacion_fpca,mediana,equicolas,2. RMSE (L^2),test,rmse_f,0.3243425813342057,0.7440246690456105,0.45533988657291385,10
+representacion_fpca,mediana,equicolas,3. E_max promedio por curva,train,linf_medio,0.5599637264973734,1.4617238345470465,0.9268955468975928,10
+representacion_fpca,mediana,equicolas,3. E_max promedio por curva,test,linf_medio,0.6602300351156501,1.2875452902609559,0.8816823222820728,10
+representacion_fpca,mediana,equicolas,4. E_max peor de la ventana,train,linf_max,1.1466724027183486,4.209761168621132,2.26207771799301,10
+representacion_fpca,mediana,equicolas,4. E_max peor de la ventana,test,linf_max,1.1688348861685922,4.609159542275985,2.084219474211795,10
+representacion_fpca,medoide,equicolas,1. MAE  (L^1),train,mae_f,0.24413127798475331,0.5479003639919796,0.36708427818755024,10
+representacion_fpca,medoide,equicolas,1. MAE  (L^1),test,mae_f,0.2679817266310945,0.5274214631117011,0.35391815423458095,10
+representacion_fpca,medoide,equicolas,2. RMSE (L^2),train,rmse_f,0.31883083707681703,0.7558476240031707,0.49968596224887835,10
+representacion_fpca,medoide,equicolas,2. RMSE (L^2),test,rmse_f,0.3437868650779632,0.7458359632013908,0.4739532316063889,10
+representacion_fpca,medoide,equicolas,3. E_max promedio por curva,train,linf_medio,0.6366120548257246,1.5179518503197482,0.9668153180455431,10
+representacion_fpca,medoide,equicolas,3. E_max promedio por curva,test,linf_medio,0.7282503994022024,1.3105749789104548,0.9292288045587195,10
+representacion_fpca,medoide,equicolas,4. E_max peor de la ventana,train,linf_max,1.1906094268836795,4.272571127469077,2.3230790510464905,10
+representacion_fpca,medoide,equicolas,4. E_max peor de la ventana,test,linf_max,1.2728558869687432,4.263535639891215,2.157658861899594,10
+representacion_fpca,modal,equicolas,1. MAE  (L^1),train,mae_f,0.22053210020324673,0.5505184201011347,0.35866144642105247,10
+representacion_fpca,modal,equicolas,1. MAE  (L^1),test,mae_f,0.24484649259702823,0.5422649093887191,0.3492516090873283,10
+representacion_fpca,modal,equicolas,2. RMSE (L^2),train,rmse_f,0.2944938637967949,0.7371909007586399,0.4970502637330329,10
+representacion_fpca,modal,equicolas,2. RMSE (L^2),test,rmse_f,0.3258792382927495,0.765312273712823,0.47518582734117604,10
+representacion_fpca,modal,equicolas,3. E_max promedio por curva,train,linf_medio,0.566171221250313,1.4987448170168514,0.9355098525649924,10
+representacion_fpca,modal,equicolas,3. E_max promedio por curva,test,linf_medio,0.662035782793786,1.3324689607174618,0.9085376767806205,10
+representacion_fpca,modal,equicolas,4. E_max peor de la ventana,train,linf_max,1.139415857968265,4.381186537719582,2.3086382699024885,10
+representacion_fpca,modal,equicolas,4. E_max peor de la ventana,test,linf_max,1.219615218034615,4.607600170225831,2.1896897194856484,10
