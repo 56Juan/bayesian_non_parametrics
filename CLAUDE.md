@@ -223,7 +223,7 @@ de la 20x con `00_copiar_200.py`; `_01`, MATLAB y `_03` no se ejecutan.
   (300: más cambios de régimen; 301: máximo de `h_t` agregada en tercera posición; 302: más
   orígenes con `K ≥ 2` en la ley verdadera; reales: calendario) y escribe en
   `112_ventana_detalle.json`, que `_05` y `_06` leen. Con 10 orígenes las cifras son cuentas.
-- **`_06_opciones`** (2026-10-11; en 300–302, 101 y 102; sin ejecutar): los comportamientos como
+- **`_06_opciones`** (2026-10-11; en 300–302, 101 y 102, ejecutado en los cinco): los comportamientos como
   opciones de pronóstico. Lee draws, comportamientos y banda del `_04`, reajusta FAR y RF como el
   `_05` y, por comportamiento, calcula curva típica, mediana puntual y medoide del grupo. Dos
   filas de modelo por opción: **más probable** (el pronóstico por comportamiento de docs
@@ -526,7 +526,7 @@ medoide empeora con `M` alto y el modal es el peor; el RF gana el Bloque A en la
 se parte en la 300 y ahí le gana el Winkler a la equi-colas; la simultánea es la única calibrada
 en PICPB y pierde el Winkler; las tres le ganan al FAR desde `M = 4`. Comportamientos: `K ≥ 2` en
 30 % del test de la 300 (ley verdadera 9 %), 0.3 % en la 301 y 0 % en la 302 (la multimodalidad
-de C-3 no llega a la marginal). **Pendiente**: reejecutar `_05` (§10 sobre todo el test) y correr `_06` en las tres.
+de C-3 no llega a la marginal). **Pendiente**: reejecutar `_05` (§10 sobre todo el test) en las tres.
 
 El generador común (`pipelines/sim_scores_comun.py`) arma la salida a partir de un
 simulador de `z`, calcula `mu_theta`, `theta` y el control de calidad
@@ -608,8 +608,8 @@ ventana 2015-07-01..2018-09-30, 70/30):
 |---|---|---|---|---|
 | `31_real_trafico_m10` | `trafico_m10` | `{1}` | entrenada | evaluada con el pipeline 200; histórica |
 | `32_real_trafico_l17` | `trafico_l17` | `{1, 7}` | entrenada (2026-10-11) | `_04` y `_05` ejecutados; origen de la 102 |
-| `101_real_trafico` | `trafico_101` | `{1}` | copia de la 31 (`00_copiar_31.py`) | `_04`/`_05` ejecutados con el pipeline 30x; falta reejecutar `_05` y correr `_06` |
-| `102_real_trafico_l17` | `trafico_102` | `{1, 7}` | copia de la 32 | `_04` **por copia** de las salidas de la 32 (2026-10-12; mismo notebook, otro ID); falta `_05` y `_06` |
+| `101_real_trafico` | `trafico_101` | `{1}` | copia de la 31 (`00_copiar_31.py`) | `_04`, `_05` (§10 sobre todo el test) y `_06` ejecutados con el pipeline 30x (2026-10-12) |
+| `102_real_trafico_l17` | `trafico_102` | `{1, 7}` | copia de la 32 | `_04` **por copia** de las salidas de la 32 (2026-10-12; mismo notebook, otro ID); `_05` (reproduce la 32) y `_06` ejecutados (2026-10-12) |
 
 Rezagos no contiguos (32/102): el manifest lleva `lags = [1, 7]` y `n_lags = max(lags) = 7`
 (desplazamiento, `t_offset` y orden del FAR completo); `verificar_contrato` acepta `lags`; el
@@ -619,6 +619,25 @@ oráculo: `BURN_EVAL = 1000`, ventana de detalle por calendario (los 10 días de
 días no laborables, columna `holiday` del CSV) y §12.4 cruza `K` con el día de la semana y los
 feriados (`65_comportamientos_calendario.csv`, `104_*`). `32_06` existe y no se usa (lo reemplaza
 el `102_06`).
+
+**SA1 y PM2.5 con el pipeline 30x — 103 y 104** (2026-10-12; `_04`, `_05` y `_06` ejecutados; la
+esperanza, la equi-colas, el FAR y el RF reproducen la 27 y la 28 a precisión de máquina):
+
+| Carpeta | `SERIE_ID` | origen | `M_FPCA_LIST` | ventana de detalle (§3.2) |
+|---|---|---|---|---|
+| `103_real_sa_precio` | `sa1_103` | la 27 (`real_sa1_precio_v02`; 3 cadenas, `atau = 0.5`, G = 288) | `(1, …, 10)` | más días con pico (RRP máximo del día > 300 AUD/MWh): t = 1227..1236, 2025-05-11..20 |
+| `104_real_pm25` | `pm25_104` | la 28 (`real_pm25_poh_v02`; 1 cadena, `atau = 2`) | `(1, …, 6)` (el `m10` de la 28 es de otra corrida: 2 cadenas, `atau = 0.5`; no entra) | más días sobre la norma diaria (promedio 24 h ≥ 50 µg/m³): t = 3474..3483, 2024-07-05..14 |
+
+Se construyen con `00_copiar_27.py` / `00_copiar_28.py --trazas-en-origen`: copian `raw`, `functional`
+y `artefact` **sin los `.mat`** y dejan `hyperparameters.json["trazas_en"]` apuntando a la 27/28 (sus
+trazas pesan 1.8 GB y 545 MB versionados; §8.2). `BURN_EVAL = None` (burn del `.mat`, como la 27/28 y
+las 30x). §12.4 cruza `K` con día de la semana, mes y el evento del día predicho y del anterior
+(`pico` / `episodio`). Lectura: en las dos series la predictiva es **unimodal** (K = 1 en 100 % del test
+de la SA1 y 99.7–100 % del PM2.5), los cuatro predictores quedan a ≤ 0.5 % de la esperanza y el `_06` no
+tiene orígenes con K ≥ 2; la HDR coincide con la equi-colas y sólo la simultánea calibra el PICPB (0.91 /
+0.87) perdiendo el Winkler. El FAR gana el Bloque A (SA1: MAE 0.345 contra 0.348 en M = 10; PM2.5:
+0.321 contra 0.321 en M = 6) y el PSBPM-FD le gana el Winkler por poco desde M = 6 en la SA1 (2.490 contra
+2.523, 61 % de ventanas) y desde M = 5 en el PM2.5 (2.466 contra 2.484, 54 %).
 
 ### Historia — no se edita ni se cita como estado actual
 

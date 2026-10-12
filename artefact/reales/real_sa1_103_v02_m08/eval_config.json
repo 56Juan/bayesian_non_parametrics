@@ -1,0 +1,42 @@
+{
+  "scheme": "holdout_temporal",
+  "T": 1461,
+  "T0": 1096,
+  "prop_train": 0.7501711156741958,
+  "horizons": [
+    1
+  ],
+  "n_lags": 1,
+  "m_fpca": 8,
+  "scores_scale": "raw_fpca_scores",
+  "fuente": "datos observados (AEMO NEM SA1, RRP a 5 min)",
+  "curva": "precio_asinh",
+  "variable": "asinh(RRP / 100)",
+  "objetivo_evaluacion": "curva_suavizada",
+  "objetivo_secundario": "representacion_fpca",
+  "modo_residuo": "ninguno",
+  "nivel_credibilidad": 0.95,
+  "ventana_movil": {
+    "w": [
+      20,
+      30,
+      40
+    ],
+    "paso": 1,
+    "solapadas": true
+  },
+  "metricas_bloque_A": [
+    "mae_f",
+    "rmse_f",
+    "linf_medio",
+    "linf_max"
+  ],
+  "metricas_bloque_B": [
+    "mpiw",
+    "picp",
+    "picp_simultaneo",
+    "winkler",
+    "winkler_max_medio",
+    "winkler_max_glob"
+  ]
+}

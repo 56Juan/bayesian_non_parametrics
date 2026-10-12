@@ -1,0 +1,267 @@
+{
+  "scores_scale": "raw_fpca_scores",
+  "n_components": 9,
+  "n_lags": 1,
+  "component_idx": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "cov_names": [
+    "fpc_1_lag1",
+    "fpc_2_lag1",
+    "fpc_3_lag1",
+    "fpc_4_lag1",
+    "fpc_5_lag1",
+    "fpc_6_lag1",
+    "fpc_7_lag1",
+    "fpc_8_lag1",
+    "fpc_9_lag1"
+  ],
+  "cov_por_componente": {
+    "0": [
+      "fpc_1_lag1",
+      "fpc_2_lag1",
+      "fpc_3_lag1",
+      "fpc_4_lag1",
+      "fpc_5_lag1",
+      "fpc_6_lag1",
+      "fpc_7_lag1",
+      "fpc_8_lag1",
+      "fpc_9_lag1"
+    ],
+    "1": [
+      "fpc_1_lag1",
+      "fpc_2_lag1",
+      "fpc_3_lag1",
+      "fpc_4_lag1",
+      "fpc_5_lag1",
+      "fpc_6_lag1",
+      "fpc_7_lag1",
+      "fpc_8_lag1",
+      "fpc_9_lag1"
+    ],
+    "2": [
+      "fpc_1_lag1",
+      "fpc_2_lag1",
+      "fpc_3_lag1",
+      "fpc_4_lag1",
+      "fpc_5_lag1",
+      "fpc_6_lag1",
+      "fpc_7_lag1",
+      "fpc_8_lag1",
+      "fpc_9_lag1"
+    ],
+    "3": [
+      "fpc_1_lag1",
+      "fpc_2_lag1",
+      "fpc_3_lag1",
+      "fpc_4_lag1",
+      "fpc_5_lag1",
+      "fpc_6_lag1",
+      "fpc_7_lag1",
+      "fpc_8_lag1",
+      "fpc_9_lag1"
+    ],
+    "4": [
+      "fpc_1_lag1",
+      "fpc_2_lag1",
+      "fpc_3_lag1",
+      "fpc_4_lag1",
+      "fpc_5_lag1",
+      "fpc_6_lag1",
+      "fpc_7_lag1",
+      "fpc_8_lag1",
+      "fpc_9_lag1"
+    ],
+    "5": [
+      "fpc_1_lag1",
+      "fpc_2_lag1",
+      "fpc_3_lag1",
+      "fpc_4_lag1",
+      "fpc_5_lag1",
+      "fpc_6_lag1",
+      "fpc_7_lag1",
+      "fpc_8_lag1",
+      "fpc_9_lag1"
+    ],
+    "6": [
+      "fpc_1_lag1",
+      "fpc_2_lag1",
+      "fpc_3_lag1",
+      "fpc_4_lag1",
+      "fpc_5_lag1",
+      "fpc_6_lag1",
+      "fpc_7_lag1",
+      "fpc_8_lag1",
+      "fpc_9_lag1"
+    ],
+    "7": [
+      "fpc_1_lag1",
+      "fpc_2_lag1",
+      "fpc_3_lag1",
+      "fpc_4_lag1",
+      "fpc_5_lag1",
+      "fpc_6_lag1",
+      "fpc_7_lag1",
+      "fpc_8_lag1",
+      "fpc_9_lag1"
+    ],
+    "8": [
+      "fpc_1_lag1",
+      "fpc_2_lag1",
+      "fpc_3_lag1",
+      "fpc_4_lag1",
+      "fpc_5_lag1",
+      "fpc_6_lag1",
+      "fpc_7_lag1",
+      "fpc_8_lag1",
+      "fpc_9_lag1"
+    ]
+  },
+  "covariables": "todos_los_rezagos",
+  "T": 1461,
+  "T0": 1096,
+  "prop_train": 0.7501711156741958,
+  "n_train_eff": 1095,
+  "n_test_eff": 365,
+  "ajuste_en": "train",
+  "datasets": {
+    "train": {
+      "dataset_fpc_1_train.csv": {
+        "response": "fpc_1",
+        "shape": [
+          1095,
+          10
+        ]
+      },
+      "dataset_fpc_2_train.csv": {
+        "response": "fpc_2",
+        "shape": [
+          1095,
+          10
+        ]
+      },
+      "dataset_fpc_3_train.csv": {
+        "response": "fpc_3",
+        "shape": [
+          1095,
+          10
+        ]
+      },
+      "dataset_fpc_4_train.csv": {
+        "response": "fpc_4",
+        "shape": [
+          1095,
+          10
+        ]
+      },
+      "dataset_fpc_5_train.csv": {
+        "response": "fpc_5",
+        "shape": [
+          1095,
+          10
+        ]
+      },
+      "dataset_fpc_6_train.csv": {
+        "response": "fpc_6",
+        "shape": [
+          1095,
+          10
+        ]
+      },
+      "dataset_fpc_7_train.csv": {
+        "response": "fpc_7",
+        "shape": [
+          1095,
+          10
+        ]
+      },
+      "dataset_fpc_8_train.csv": {
+        "response": "fpc_8",
+        "shape": [
+          1095,
+          10
+        ]
+      },
+      "dataset_fpc_9_train.csv": {
+        "response": "fpc_9",
+        "shape": [
+          1095,
+          10
+        ]
+      }
+    },
+    "test": {
+      "dataset_fpc_1_test.csv": {
+        "response": "fpc_1",
+        "shape": [
+          365,
+          10
+        ]
+      },
+      "dataset_fpc_2_test.csv": {
+        "response": "fpc_2",
+        "shape": [
+          365,
+          10
+        ]
+      },
+      "dataset_fpc_3_test.csv": {
+        "response": "fpc_3",
+        "shape": [
+          365,
+          10
+        ]
+      },
+      "dataset_fpc_4_test.csv": {
+        "response": "fpc_4",
+        "shape": [
+          365,
+          10
+        ]
+      },
+      "dataset_fpc_5_test.csv": {
+        "response": "fpc_5",
+        "shape": [
+          365,
+          10
+        ]
+      },
+      "dataset_fpc_6_test.csv": {
+        "response": "fpc_6",
+        "shape": [
+          365,
+          10
+        ]
+      },
+      "dataset_fpc_7_test.csv": {
+        "response": "fpc_7",
+        "shape": [
+          365,
+          10
+        ]
+      },
+      "dataset_fpc_8_test.csv": {
+        "response": "fpc_8",
+        "shape": [
+          365,
+          10
+        ]
+      },
+      "dataset_fpc_9_test.csv": {
+        "response": "fpc_9",
+        "shape": [
+          365,
+          10
+        ]
+      }
+    }
+  }
+}

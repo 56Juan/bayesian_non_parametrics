@@ -1,0 +1,433 @@
+objetivo,predictor,intervalo,metrica,bloque,columna,minimo,maximo,promedio,M
+curva_suavizada,esperanza,equicolas,5. MPIW,train,mpiw,1.3162044486453819,1.8695151931466796,1.4936566262816842,1
+curva_suavizada,esperanza,equicolas,5. MPIW,test,mpiw,1.3288611470448617,1.7050694544814455,1.47537917198238,1
+curva_suavizada,esperanza,equicolas,6. PICP puntual,train,picp,0.6944444444444444,0.9986111111111111,0.8810843130474874,1
+curva_suavizada,esperanza,equicolas,6. PICP puntual,test,picp,0.6791666666666667,0.975,0.8712342497136312,1
+curva_suavizada,esperanza,equicolas,7. PICPB curva completa,train,picp_simultaneo,0.03333333333333333,0.9666666666666667,0.48450899031811895,1
+curva_suavizada,esperanza,equicolas,7. PICPB curva completa,test,picp_simultaneo,0.16666666666666666,0.8333333333333334,0.48934707903780067,1
+curva_suavizada,esperanza,equicolas,8. Winkler,train,winkler,1.3463039769670244,7.816341696174715,2.8151382592848777,1
+curva_suavizada,esperanza,equicolas,8. Winkler,test,winkler,1.4291775011821615,7.4402926989796745,3.1697666835549554,1
+curva_suavizada,esperanza,equicolas,9. Winkler max promedio,train,winkler_max_medio,1.611197303889818,23.635242984063233,8.990101010488583,1
+curva_suavizada,esperanza,equicolas,9. Winkler max promedio,test,winkler_max_medio,2.5573814015163046,24.20316853928444,10.301159211092768,1
+curva_suavizada,esperanza,equicolas,10. Winkler max peor ventana,train,winkler_max_glob,3.0828318305976907,118.58067377348873,43.84837565225411,1
+curva_suavizada,esperanza,equicolas,10. Winkler max peor ventana,test,winkler_max_glob,10.205992395540342,88.49206758721931,50.368940996779635,1
+curva_suavizada,esperanza,simultanea,5. MPIW,train,mpiw,1.3257475137762087,1.8288661556928003,1.4852665420674904,1
+curva_suavizada,esperanza,simultanea,5. MPIW,test,mpiw,1.353591989700429,1.6690232939807197,1.4835876560130794,1
+curva_suavizada,esperanza,simultanea,6. PICP puntual,train,picp,0.6666666666666666,0.9972222222222222,0.8972169394498233,1
+curva_suavizada,esperanza,simultanea,6. PICP puntual,test,picp,0.7111111111111111,0.9875,0.8886051233989378,1
+curva_suavizada,esperanza,simultanea,7. PICPB curva completa,train,picp_simultaneo,0.13333333333333333,0.9666666666666667,0.5587252189949286,1
+curva_suavizada,esperanza,simultanea,7. PICPB curva completa,test,picp_simultaneo,0.3,0.9,0.5511715089034676,1
+curva_suavizada,esperanza,simultanea,8. Winkler,train,winkler,1.3660654799840133,8.773548670932621,2.814277311653343,1
+curva_suavizada,esperanza,simultanea,8. Winkler,test,winkler,1.4064595418165962,8.210913506909069,3.1175675392976063,1
+curva_suavizada,esperanza,simultanea,9. Winkler max promedio,train,winkler_max_medio,1.6338556398628319,24.06569412949973,8.432951423516213,1
+curva_suavizada,esperanza,simultanea,9. Winkler max promedio,test,winkler_max_medio,1.9638600922747298,24.928565533846246,9.561976771547334,1
+curva_suavizada,esperanza,simultanea,10. Winkler max peor ventana,train,winkler_max_glob,2.964076030948831,123.09483100199856,46.26540678110971,1
+curva_suavizada,esperanza,simultanea,10. Winkler max peor ventana,test,winkler_max_glob,7.6804521092565095,93.6694634825215,50.666234412036246,1
+curva_suavizada,esperanza,hdr,5. MPIW,train,mpiw,1.3148707150229688,1.5747173385710462,1.4352787516735073,1
+curva_suavizada,esperanza,hdr,5. MPIW,test,mpiw,1.3277676826621398,1.5487490075616706,1.434594888513618,1
+curva_suavizada,esperanza,hdr,6. PICP puntual,train,picp,0.6708333333333333,0.9986111111111111,0.8866110534808667,1
+curva_suavizada,esperanza,hdr,6. PICP puntual,test,picp,0.6986111111111111,0.9847222222222223,0.8804501197542435,1
+curva_suavizada,esperanza,hdr,7. PICPB curva completa,train,picp_simultaneo,0.1,0.9666666666666667,0.5110650069156293,1
+curva_suavizada,esperanza,hdr,7. PICPB curva completa,test,picp_simultaneo,0.23333333333333334,0.8333333333333334,0.5224617307091535,1
+curva_suavizada,esperanza,hdr,8. Winkler,train,winkler,1.3470396997622562,8.503709372929906,2.794535027982029,1
+curva_suavizada,esperanza,hdr,8. Winkler,test,winkler,1.392583007028181,7.765231068629262,3.1272144360992904,1
+curva_suavizada,esperanza,hdr,9. Winkler max promedio,train,winkler_max_medio,1.5867081471367865,23.058548041831553,8.758035815669269,1
+curva_suavizada,esperanza,hdr,9. Winkler max promedio,test,winkler_max_medio,2.182126724204576,24.871515244364232,10.030898071065986,1
+curva_suavizada,esperanza,hdr,10. Winkler max peor ventana,train,winkler_max_glob,2.308606273713801,120.77012222750102,46.22228989682925,1
+curva_suavizada,esperanza,hdr,10. Winkler max peor ventana,test,winkler_max_glob,8.339119947252499,91.30831611220259,51.58639895100824,1
+representacion_fpca,esperanza,equicolas,5. MPIW,train,mpiw,1.3162044486453819,1.8695151931466796,1.4936566262816842,1
+representacion_fpca,esperanza,equicolas,5. MPIW,test,mpiw,1.3288611470448617,1.7050694544814455,1.47537917198238,1
+representacion_fpca,esperanza,equicolas,6. PICP puntual,train,picp,0.7666666666666667,1.0,0.9498616874135546,1
+representacion_fpca,esperanza,equicolas,6. PICP puntual,test,picp,0.7666666666666667,1.0,0.9372071227741333,1
+representacion_fpca,esperanza,equicolas,7. PICPB curva completa,train,picp_simultaneo,0.7666666666666667,1.0,0.9498616874135546,1
+representacion_fpca,esperanza,equicolas,7. PICPB curva completa,test,picp_simultaneo,0.7666666666666667,1.0,0.9372071227741333,1
+representacion_fpca,esperanza,equicolas,8. Winkler,train,winkler,1.3089735704150631,5.848027259480707,1.8522445003995471,1
+representacion_fpca,esperanza,equicolas,8. Winkler,test,winkler,1.3215607362696415,4.387932615123777,2.050257288033613,1
+representacion_fpca,esperanza,equicolas,9. Winkler max promedio,train,winkler_max_medio,1.5154743782881661,6.7705992508798705,2.1444505421072764,1
+representacion_fpca,esperanza,equicolas,9. Winkler max promedio,test,winkler_max_medio,1.5300472679010784,5.080163268511594,2.3737013940841343,1
+representacion_fpca,esperanza,equicolas,10. Winkler max peor ventana,train,winkler_max_glob,1.6650305500751963,64.55998011188288,9.821703557570466,1
+representacion_fpca,esperanza,equicolas,10. Winkler max peor ventana,test,winkler_max_glob,1.6452218197276067,36.168525103393286,14.404599634062716,1
+representacion_fpca,esperanza,simultanea,5. MPIW,train,mpiw,1.3257475137762087,1.8288661556928003,1.4852665420674904,1
+representacion_fpca,esperanza,simultanea,5. MPIW,test,mpiw,1.353591989700429,1.6690232939807197,1.4835876560130794,1
+representacion_fpca,esperanza,simultanea,6. PICP puntual,train,picp,0.7,1.0,0.9512217611802675,1
+representacion_fpca,esperanza,simultanea,6. PICP puntual,test,picp,0.7,1.0,0.943767572633552,1
+representacion_fpca,esperanza,simultanea,7. PICPB curva completa,train,picp_simultaneo,0.7,1.0,0.9512217611802675,1
+representacion_fpca,esperanza,simultanea,7. PICPB curva completa,test,picp_simultaneo,0.7,1.0,0.943767572633552,1
+representacion_fpca,esperanza,simultanea,8. Winkler,train,winkler,1.318464208476542,7.715301728651411,1.9880558022770782,1
+representacion_fpca,esperanza,simultanea,8. Winkler,test,winkler,1.3461557142333977,5.567097062834465,2.135141281841657,1
+representacion_fpca,esperanza,simultanea,9. Winkler max promedio,train,winkler_max_medio,1.526462238655139,8.932450856762586,2.3016871379631385,1
+representacion_fpca,esperanza,simultanea,9. Winkler max promedio,test,winkler_max_medio,1.5585222958016156,6.445350120777239,2.471976501122447,1
+representacion_fpca,esperanza,simultanea,10. Winkler max peor ventana,train,winkler_max_glob,1.6708854797059285,62.43240012709552,12.093446319233259,1
+representacion_fpca,esperanza,simultanea,10. Winkler max peor ventana,test,winkler_max_glob,1.7205214466277097,53.69709400500457,14.856037499131313,1
+representacion_fpca,esperanza,hdr,5. MPIW,train,mpiw,1.3148707150229688,1.5747173385710462,1.4352787516735073,1
+representacion_fpca,esperanza,hdr,5. MPIW,test,mpiw,1.3277676826621398,1.5487490075616706,1.434594888513618,1
+representacion_fpca,esperanza,hdr,6. PICP puntual,train,picp,0.7,1.0,0.9507261410788381,1
+representacion_fpca,esperanza,hdr,6. PICP puntual,test,picp,0.7333333333333333,1.0,0.9372071227741331,1
+representacion_fpca,esperanza,hdr,7. PICPB curva completa,train,picp_simultaneo,0.7,1.0,0.9507261410788381,1
+representacion_fpca,esperanza,hdr,7. PICPB curva completa,test,picp_simultaneo,0.7333333333333333,1.0,0.9372071227741331,1
+representacion_fpca,esperanza,hdr,8. Winkler,train,winkler,1.307647163971513,7.010951725559719,1.8968667918078146,1
+representacion_fpca,esperanza,hdr,8. Winkler,test,winkler,1.3204732790902907,4.860896535266597,2.0628980800154566,1
+representacion_fpca,esperanza,hdr,9. Winkler max promedio,train,winkler_max_medio,1.5139387208648014,8.116984137526858,2.1961123486235796,1
+representacion_fpca,esperanza,hdr,9. Winkler max promedio,test,winkler_max_medio,1.5287882558552743,5.627740942370884,2.3883363697648723,1
+representacion_fpca,esperanza,hdr,10. Winkler max peor ventana,train,winkler_max_glob,1.654687869271049,60.77186477194675,11.578042056780808,1
+representacion_fpca,esperanza,hdr,10. Winkler max peor ventana,test,winkler_max_glob,1.6562183683775653,42.71878903856023,14.71631924673504,1
+curva_suavizada,esperanza,equicolas,5. MPIW,train,mpiw,1.2622543398723105,2.021089238725285,1.5392320557770571,2
+curva_suavizada,esperanza,equicolas,5. MPIW,test,mpiw,1.2665916708922906,1.9093537208107287,1.5105212129629535,2
+curva_suavizada,esperanza,equicolas,6. PICP puntual,train,picp,0.7444444444444445,0.9972222222222222,0.9103667204548948,2
+curva_suavizada,esperanza,equicolas,6. PICP puntual,test,picp,0.7805555555555556,0.9833333333333333,0.9029652192023326,2
+curva_suavizada,esperanza,equicolas,7. PICPB curva completa,train,picp_simultaneo,0.2,0.9666666666666667,0.556085753803596,2
+curva_suavizada,esperanza,equicolas,7. PICPB curva completa,test,picp_simultaneo,0.26666666666666666,0.8333333333333334,0.547922524211184,2
+curva_suavizada,esperanza,equicolas,8. Winkler,train,winkler,1.2963172909607488,6.413098001777625,2.4889318112959726,2
+curva_suavizada,esperanza,equicolas,8. Winkler,test,winkler,1.3590200525136724,5.877233037309441,2.7443911297796566,2
+curva_suavizada,esperanza,equicolas,9. Winkler max promedio,train,winkler_max_medio,1.5691329094297755,19.170051667003964,7.468764181956587,2
+curva_suavizada,esperanza,equicolas,9. Winkler max promedio,test,winkler_max_medio,2.4514531687733454,19.147441090807856,8.604391863255987,2
+curva_suavizada,esperanza,equicolas,10. Winkler max peor ventana,train,winkler_max_glob,1.8438794902875513,115.72788562958765,41.115761483742794,2
+curva_suavizada,esperanza,equicolas,10. Winkler max peor ventana,test,winkler_max_glob,8.645009691242393,97.03955496605792,47.19631851535486,2
+curva_suavizada,esperanza,simultanea,5. MPIW,train,mpiw,1.5629759349098309,2.3870684541354104,1.875981371580228,2
+curva_suavizada,esperanza,simultanea,5. MPIW,test,mpiw,1.56703275706132,2.3098464209895733,1.8471118550626322,2
+curva_suavizada,esperanza,simultanea,6. PICP puntual,train,picp,0.7958333333333333,1.0,0.9532023205778393,2
+curva_suavizada,esperanza,simultanea,6. PICP puntual,test,picp,0.8388888888888889,0.9972222222222222,0.9428225554514214,2
+curva_suavizada,esperanza,simultanea,7. PICPB curva completa,train,picp_simultaneo,0.36666666666666664,1.0,0.7499769479022591,2
+curva_suavizada,esperanza,simultanea,7. PICPB curva completa,test,picp_simultaneo,0.43333333333333335,0.9666666666666667,0.7165885660731021,2
+curva_suavizada,esperanza,simultanea,8. Winkler,train,winkler,1.5583177874767002,6.237591099593703,2.4626710635859856,2
+curva_suavizada,esperanza,simultanea,8. Winkler,test,winkler,1.5886438148374595,5.90479016751257,2.656274841175137,2
+curva_suavizada,esperanza,simultanea,9. Winkler max promedio,train,winkler_max_medio,1.9532962776460019,17.21063992242905,5.708301851319819,2
+curva_suavizada,esperanza,simultanea,9. Winkler max promedio,test,winkler_max_medio,2.038453868511054,15.673403740705124,6.742974222781396,2
+curva_suavizada,esperanza,simultanea,10. Winkler max peor ventana,train,winkler_max_glob,2.3601934679654044,107.02510182329802,36.65753856592464,2
+curva_suavizada,esperanza,simultanea,10. Winkler max peor ventana,test,winkler_max_glob,3.7546120620945627,90.41191748049275,42.209895913153034,2
+curva_suavizada,esperanza,hdr,5. MPIW,train,mpiw,1.2654403693143652,1.8587734824338125,1.5068968606248228,2
+curva_suavizada,esperanza,hdr,5. MPIW,test,mpiw,1.2715241977006961,1.8133497935394003,1.4871182190482664,2
+curva_suavizada,esperanza,hdr,6. PICP puntual,train,picp,0.7263888888888889,0.9986111111111111,0.9133971108037497,2
+curva_suavizada,esperanza,hdr,6. PICP puntual,test,picp,0.7694444444444445,0.9916666666666667,0.9032060293658232,2
+curva_suavizada,esperanza,hdr,7. PICPB curva completa,train,picp_simultaneo,0.2,0.9666666666666667,0.5757376671277086,2
+curva_suavizada,esperanza,hdr,7. PICPB curva completa,test,picp_simultaneo,0.26666666666666666,0.9,0.5598562949078412,2
+curva_suavizada,esperanza,hdr,8. Winkler,train,winkler,1.3026393189480021,7.2908082263910865,2.504178958821477,2
+curva_suavizada,esperanza,hdr,8. Winkler,test,winkler,1.3451879372103581,6.26430759005047,2.7621476162998713,2
+curva_suavizada,esperanza,hdr,9. Winkler max promedio,train,winkler_max_medio,1.6236556402294628,21.405342165594412,7.4421935287838155,2
+curva_suavizada,esperanza,hdr,9. Winkler max promedio,test,winkler_max_medio,2.285319936072405,19.686953248242613,8.646828803044057,2
+curva_suavizada,esperanza,hdr,10. Winkler max peor ventana,train,winkler_max_glob,2.8916647600995615,113.7226192388782,43.01461040508334,2
+curva_suavizada,esperanza,hdr,10. Winkler max peor ventana,test,winkler_max_glob,7.818578145548832,97.5931577640476,48.845222424631594,2
+representacion_fpca,esperanza,equicolas,5. MPIW,train,mpiw,1.2622543398723105,2.021089238725285,1.5392320557770571,2
+representacion_fpca,esperanza,equicolas,5. MPIW,test,mpiw,1.2665916708922906,1.9093537208107287,1.5105212129629535,2
+representacion_fpca,esperanza,equicolas,6. PICP puntual,train,picp,0.7597222222222222,1.0,0.9493353311818041,2
+representacion_fpca,esperanza,equicolas,6. PICP puntual,test,picp,0.7888888888888889,1.0,0.9400838279704258,2
+representacion_fpca,esperanza,equicolas,7. PICPB curva completa,train,picp_simultaneo,0.5333333333333333,1.0,0.8899608114338405,2
+representacion_fpca,esperanza,equicolas,7. PICPB curva completa,test,picp_simultaneo,0.6666666666666666,1.0,0.8746641674476727,2
+representacion_fpca,esperanza,equicolas,8. Winkler,train,winkler,1.2561196424830738,4.857061254243698,2.003851846796881,2
+representacion_fpca,esperanza,equicolas,8. Winkler,test,winkler,1.2579738633286128,4.718058979629461,2.148845771293106,2
+representacion_fpca,esperanza,equicolas,9. Winkler max promedio,train,winkler_max_medio,1.5340771905415242,9.085392693114771,3.0297664245307607,2
+representacion_fpca,esperanza,equicolas,9. Winkler max promedio,test,winkler_max_medio,1.5322658314164639,7.497427365121153,3.319992850341387,2
+representacion_fpca,esperanza,equicolas,10. Winkler max peor ventana,train,winkler_max_glob,1.7112935991950642,110.86745135071845,19.451393171551338,2
+representacion_fpca,esperanza,equicolas,10. Winkler max peor ventana,test,winkler_max_glob,1.7151305065022842,77.5616629819321,22.600777357242343,2
+representacion_fpca,esperanza,simultanea,5. MPIW,train,mpiw,1.5629759349098309,2.3870684541354104,1.875981371580228,2
+representacion_fpca,esperanza,simultanea,5. MPIW,test,mpiw,1.56703275706132,2.3098464209895733,1.8471118550626322,2
+representacion_fpca,esperanza,simultanea,6. PICP puntual,train,picp,0.8388888888888889,1.0,0.9753587482710927,2
+representacion_fpca,esperanza,simultanea,6. PICP puntual,test,picp,0.8583333333333333,1.0,0.9650734145579507,2
+representacion_fpca,esperanza,simultanea,7. PICPB curva completa,train,picp_simultaneo,0.6666666666666666,1.0,0.9453895804518211,2
+representacion_fpca,esperanza,simultanea,7. PICPB curva completa,test,picp_simultaneo,0.7333333333333333,1.0,0.9282724148703531,2
+representacion_fpca,esperanza,simultanea,8. Winkler,train,winkler,1.5519031482087593,4.734380307609813,2.1559884326251075,2
+representacion_fpca,esperanza,simultanea,8. Winkler,test,winkler,1.555985369802785,4.901839371610373,2.235547383769026,2
+representacion_fpca,esperanza,simultanea,9. Winkler max promedio,train,winkler_max_medio,1.9112868329316253,8.076538693489448,2.9864988556972705,2
+representacion_fpca,esperanza,simultanea,9. Winkler max promedio,test,winkler_max_medio,1.9147264689265961,7.505423821207404,3.170413733225402,2
+representacion_fpca,esperanza,simultanea,10. Winkler max peor ventana,train,winkler_max_glob,2.102296860980979,101.64080208082473,15.252489354651944,2
+representacion_fpca,esperanza,simultanea,10. Winkler max peor ventana,test,winkler_max_glob,2.13481104383731,74.848206669286,17.621029101180554,2
+representacion_fpca,esperanza,hdr,5. MPIW,train,mpiw,1.2654403693143652,1.8587734824338125,1.5068968606248228,2
+representacion_fpca,esperanza,hdr,5. MPIW,test,mpiw,1.2715241977006961,1.8133497935394003,1.4871182190482664,2
+representacion_fpca,esperanza,hdr,6. PICP puntual,train,picp,0.7527777777777778,1.0,0.9511502036268633,2
+representacion_fpca,esperanza,hdr,6. PICP puntual,test,picp,0.7972222222222223,1.0,0.9390789336665625,2
+representacion_fpca,esperanza,hdr,7. PICPB curva completa,train,picp_simultaneo,0.5666666666666667,1.0,0.8979137851544493,2
+representacion_fpca,esperanza,hdr,7. PICPB curva completa,test,picp_simultaneo,0.6666666666666666,1.0,0.8801624492346143,2
+representacion_fpca,esperanza,hdr,8. Winkler,train,winkler,1.2567907886676954,5.426488780520616,2.023361291302591,2
+representacion_fpca,esperanza,hdr,8. Winkler,test,winkler,1.2629996520017255,5.204913260674052,2.1713719066894286,2
+representacion_fpca,esperanza,hdr,9. Winkler max promedio,train,winkler_max_medio,1.5334757587589025,10.435515658572463,3.071837792535993,2
+representacion_fpca,esperanza,hdr,9. Winkler max promedio,test,winkler_max_medio,1.5404208345294608,8.099132765178627,3.3904412252407203,2
+representacion_fpca,esperanza,hdr,10. Winkler max peor ventana,train,winkler_max_glob,1.7172903256183605,109.35047071018226,20.750840607915556,2
+representacion_fpca,esperanza,hdr,10. Winkler max peor ventana,test,winkler_max_glob,1.693088791264315,82.4694229562649,23.103699692048096,2
+curva_suavizada,esperanza,equicolas,5. MPIW,train,mpiw,1.2180162310279847,2.0118819097218053,1.5654121298603605,3
+curva_suavizada,esperanza,equicolas,5. MPIW,test,mpiw,1.2664688127747024,1.9193878855907334,1.5468600521645053,3
+curva_suavizada,esperanza,equicolas,6. PICP puntual,train,picp,0.8,0.9972222222222222,0.9298755186721991,3
+curva_suavizada,esperanza,equicolas,6. PICP puntual,test,picp,0.8152777777777778,0.9875,0.9213149536603146,3
+curva_suavizada,esperanza,equicolas,7. PICPB curva completa,train,picp_simultaneo,0.26666666666666666,0.9666666666666667,0.6315928999538958,3
+curva_suavizada,esperanza,equicolas,7. PICPB curva completa,test,picp_simultaneo,0.3,0.9,0.6058419243986255,3
+curva_suavizada,esperanza,equicolas,8. Winkler,train,winkler,1.2307711625233613,5.2772914052037345,2.274975435513788,3
+curva_suavizada,esperanza,equicolas,8. Winkler,test,winkler,1.3511772775026565,5.097749637926592,2.5607694242937353,3
+curva_suavizada,esperanza,equicolas,9. Winkler max promedio,train,winkler_max_medio,1.701735470037407,15.734099994164572,6.246377131644158,3
+curva_suavizada,esperanza,equicolas,9. Winkler max promedio,test,winkler_max_medio,2.2148884447549135,17.268015167978458,7.647902414427861,3
+curva_suavizada,esperanza,equicolas,10. Winkler max peor ventana,train,winkler_max_glob,4.772103042252251,119.19649019638426,37.72348996973455,3
+curva_suavizada,esperanza,equicolas,10. Winkler max peor ventana,test,winkler_max_glob,5.580886591430815,96.09973013136634,45.61315672872665,3
+curva_suavizada,esperanza,simultanea,5. MPIW,train,mpiw,1.6255920089646902,2.5836569323375977,2.043188958677758,3
+curva_suavizada,esperanza,simultanea,5. MPIW,test,mpiw,1.679046267880712,2.46459964569209,2.022795510651687,3
+curva_suavizada,esperanza,simultanea,6. PICP puntual,train,picp,0.8708333333333333,1.0,0.9722457545719994,3
+curva_suavizada,esperanza,simultanea,6. PICP puntual,test,picp,0.8888888888888888,1.0,0.961454753722795,3
+curva_suavizada,esperanza,simultanea,7. PICPB curva completa,train,picp_simultaneo,0.5333333333333333,1.0,0.8427270631627479,3
+curva_suavizada,esperanza,simultanea,7. PICPB curva completa,test,picp_simultaneo,0.5666666666666667,1.0,0.8017182130584193,3
+curva_suavizada,esperanza,simultanea,8. Winkler,train,winkler,1.6159792919610139,5.023490491481097,2.3895986662559667,3
+curva_suavizada,esperanza,simultanea,8. Winkler,test,winkler,1.7086322332346573,4.278820585031645,2.5621862928854515,3
+curva_suavizada,esperanza,simultanea,9. Winkler max promedio,train,winkler_max_medio,2.100545108564805,13.42972455074746,4.728753498795586,3
+curva_suavizada,esperanza,simultanea,9. Winkler max promedio,test,winkler_max_medio,2.243763505027378,12.719150847949205,5.786466404607611,3
+curva_suavizada,esperanza,simultanea,10. Winkler max peor ventana,train,winkler_max_glob,2.409536172870661,108.73483948058828,30.485549119405274,3
+curva_suavizada,esperanza,simultanea,10. Winkler max peor ventana,test,winkler_max_glob,2.726083378248573,89.79566195652974,37.617094767601614,3
+curva_suavizada,esperanza,hdr,5. MPIW,train,mpiw,1.2198350912291192,1.9469134177567178,1.5505310098283251,3
+curva_suavizada,esperanza,hdr,5. MPIW,test,mpiw,1.2701549294098586,1.875286866585018,1.5365208327318454,3
+curva_suavizada,esperanza,hdr,6. PICP puntual,train,picp,0.7944444444444444,0.9972222222222222,0.9312581642846165,3
+curva_suavizada,esperanza,hdr,6. PICP puntual,test,picp,0.8236111111111111,0.9930555555555556,0.9206550036446944,3
+curva_suavizada,esperanza,hdr,7. PICPB curva completa,train,picp_simultaneo,0.23333333333333334,0.9666666666666667,0.6409405255878284,3
+curva_suavizada,esperanza,hdr,7. PICPB curva completa,test,picp_simultaneo,0.3333333333333333,0.9,0.606529209621993,3
+curva_suavizada,esperanza,hdr,8. Winkler,train,winkler,1.2309541329773908,5.815879131888304,2.294758833596817,3
+curva_suavizada,esperanza,hdr,8. Winkler,test,winkler,1.3554344661333808,5.026589898548414,2.595689206563571,3
+curva_suavizada,esperanza,hdr,9. Winkler max promedio,train,winkler_max_medio,1.692927609527434,17.150157441469567,6.256010973388024,3
+curva_suavizada,esperanza,hdr,9. Winkler max promedio,test,winkler_max_medio,2.1659583260577957,17.502305843319466,7.770925975782082,3
+curva_suavizada,esperanza,hdr,10. Winkler max peor ventana,train,winkler_max_glob,2.4594990984375813,118.48667825312063,39.00380360727014,3
+curva_suavizada,esperanza,hdr,10. Winkler max peor ventana,test,winkler_max_glob,4.973978807217515,98.2246132007389,46.74873318670819,3
+representacion_fpca,esperanza,equicolas,5. MPIW,train,mpiw,1.2180162310279847,2.0118819097218053,1.5654121298603605,3
+representacion_fpca,esperanza,equicolas,5. MPIW,test,mpiw,1.2664688127747024,1.9193878855907334,1.5468600521645053,3
+representacion_fpca,esperanza,equicolas,6. PICP puntual,train,picp,0.8166666666666667,1.0,0.9526284193944983,3
+representacion_fpca,esperanza,equicolas,6. PICP puntual,test,picp,0.8027777777777778,1.0,0.9444119025304593,3
+representacion_fpca,esperanza,equicolas,7. PICPB curva completa,train,picp_simultaneo,0.5666666666666667,1.0,0.8522706316274783,3
+representacion_fpca,esperanza,equicolas,7. PICPB curva completa,test,picp_simultaneo,0.5,1.0,0.8423305217119651,3
+representacion_fpca,esperanza,equicolas,8. Winkler,train,winkler,1.209623741428598,4.636972903267396,2.011149926894046,3
+representacion_fpca,esperanza,equicolas,8. Winkler,test,winkler,1.2592725654404868,4.256377787230826,2.206562646503216,3
+representacion_fpca,esperanza,equicolas,9. Winkler max promedio,train,winkler_max_medio,1.5793401345582474,10.009375735309307,3.468297401379438,3
+representacion_fpca,esperanza,equicolas,9. Winkler max promedio,test,winkler_max_medio,1.6255537067630195,9.408186053293559,3.9775157088610262,3
+representacion_fpca,esperanza,equicolas,10. Winkler max peor ventana,train,winkler_max_glob,1.7784813723338433,106.80740748866508,22.56749509551214,3
+representacion_fpca,esperanza,equicolas,10. Winkler max peor ventana,test,winkler_max_glob,1.981057298095768,60.11083317510274,26.791256956945677,3
+representacion_fpca,esperanza,simultanea,5. MPIW,train,mpiw,1.6255920089646902,2.5836569323375977,2.043188958677758,3
+representacion_fpca,esperanza,simultanea,5. MPIW,test,mpiw,1.679046267880712,2.46459964569209,2.022795510651687,3
+representacion_fpca,esperanza,simultanea,6. PICP puntual,train,picp,0.8875,1.0,0.9820404948516982,3
+representacion_fpca,esperanza,simultanea,6. PICP puntual,test,picp,0.9013888888888889,1.0,0.9724877642403416,3
+representacion_fpca,esperanza,simultanea,7. PICPB curva completa,train,picp_simultaneo,0.7,1.0,0.942704011065007,3
+representacion_fpca,esperanza,simultanea,7. PICPB curva completa,test,picp_simultaneo,0.7,1.0,0.9190877850671666,3
+representacion_fpca,esperanza,simultanea,8. Winkler,train,winkler,1.6113054291497353,4.516328639888621,2.2504351545382897,3
+representacion_fpca,esperanza,simultanea,8. Winkler,test,winkler,1.6645588840584191,3.8927836349184033,2.3391764149769587,3
+representacion_fpca,esperanza,simultanea,9. Winkler max promedio,train,winkler_max_medio,2.0947810652019383,8.8108424206244,3.33458453600568,3
+representacion_fpca,esperanza,simultanea,9. Winkler max promedio,test,winkler_max_medio,2.1782084967292623,7.066462350676755,3.6319987699013,3
+representacion_fpca,esperanza,simultanea,10. Winkler max peor ventana,train,winkler_max_glob,2.409536172870661,95.51878017707776,16.74364734709964,3
+representacion_fpca,esperanza,simultanea,10. Winkler max peor ventana,test,winkler_max_glob,2.6500955730358644,62.980104500289414,19.624095473567667,3
+representacion_fpca,esperanza,hdr,5. MPIW,train,mpiw,1.2198350912291192,1.9469134177567178,1.5505310098283251,3
+representacion_fpca,esperanza,hdr,5. MPIW,test,mpiw,1.2701549294098586,1.875286866585018,1.5365208327318454,3
+representacion_fpca,esperanza,hdr,6. PICP puntual,train,picp,0.8041666666666667,1.0,0.9536508759797142,3
+representacion_fpca,esperanza,hdr,6. PICP puntual,test,picp,0.8152777777777778,1.0,0.9431935332708528,3
+representacion_fpca,esperanza,hdr,7. PICPB curva completa,train,picp_simultaneo,0.5333333333333333,1.0,0.8591862609497465,3
+representacion_fpca,esperanza,hdr,7. PICPB curva completa,test,picp_simultaneo,0.5,1.0,0.8438300531084038,3
+representacion_fpca,esperanza,hdr,8. Winkler,train,winkler,1.211747712744385,5.168695967514604,2.03463787176531,3
+representacion_fpca,esperanza,hdr,8. Winkler,test,winkler,1.2626229019655064,4.218403913437568,2.2349335499356995,3
+representacion_fpca,esperanza,hdr,9. Winkler max promedio,train,winkler_max_medio,1.582150003833844,10.800290095810613,3.518638777773262,3
+representacion_fpca,esperanza,hdr,9. Winkler max promedio,test,winkler_max_medio,1.6291844443932992,9.352886241718519,4.048867986277701,3
+representacion_fpca,esperanza,hdr,10. Winkler max peor ventana,train,winkler_max_glob,1.797726529224242,105.61793905614454,24.011981456822152,3
+representacion_fpca,esperanza,hdr,10. Winkler max peor ventana,test,winkler_max_glob,2.0542845363330766,67.6969561364413,27.732572398698625,3
+curva_suavizada,esperanza,equicolas,5. MPIW,train,mpiw,1.31326929177603,2.103733412266392,1.618543048450769,4
+curva_suavizada,esperanza,equicolas,5. MPIW,test,mpiw,1.3291919251249265,2.0023593346568322,1.5946353965283186,4
+curva_suavizada,esperanza,equicolas,6. PICP puntual,train,picp,0.8194444444444444,0.9986111111111111,0.9390564968495466,4
+curva_suavizada,esperanza,equicolas,6. PICP puntual,test,picp,0.8333333333333334,0.9888888888888889,0.9294270019785484,4
+curva_suavizada,esperanza,equicolas,7. PICPB curva completa,train,picp_simultaneo,0.3,0.9666666666666667,0.6669778699861688,4
+curva_suavizada,esperanza,equicolas,7. PICPB curva completa,test,picp_simultaneo,0.36666666666666664,0.9,0.6371134020618556,4
+curva_suavizada,esperanza,equicolas,8. Winkler,train,winkler,1.3138244287803245,5.237927326264889,2.232202032563275,4
+curva_suavizada,esperanza,equicolas,8. Winkler,test,winkler,1.3792978447218411,4.674085610619894,2.4991334196035617,4
+curva_suavizada,esperanza,equicolas,9. Winkler max promedio,train,winkler_max_medio,1.6640283888216227,15.105610505226034,5.861457366927103,4
+curva_suavizada,esperanza,equicolas,9. Winkler max promedio,test,winkler_max_medio,2.1358337661276545,15.390568244301956,7.214100969196641,4
+curva_suavizada,esperanza,equicolas,10. Winkler max peor ventana,train,winkler_max_glob,2.024787579161467,117.30525942829631,36.50252771224916,4
+curva_suavizada,esperanza,equicolas,10. Winkler max peor ventana,test,winkler_max_glob,5.985568755201439,98.99391883549465,44.97151029145731,4
+curva_suavizada,esperanza,simultanea,5. MPIW,train,mpiw,1.8045861773280514,2.804197916685726,2.188046619883732,4
+curva_suavizada,esperanza,simultanea,5. MPIW,test,mpiw,1.824498293393988,2.6745658384979447,2.161776730108609,4
+curva_suavizada,esperanza,simultanea,6. PICP puntual,train,picp,0.8861111111111111,1.0,0.9790927078530812,4
+curva_suavizada,esperanza,simultanea,6. PICP puntual,test,picp,0.9027777777777778,1.0,0.9688482765802352,4
+curva_suavizada,esperanza,simultanea,7. PICPB curva completa,train,picp_simultaneo,0.5666666666666667,1.0,0.8764177040110651,4
+curva_suavizada,esperanza,simultanea,7. PICPB curva completa,test,picp_simultaneo,0.6,1.0,0.8376444860980944,4
+curva_suavizada,esperanza,simultanea,8. Winkler,train,winkler,1.789740651438141,4.755579515738929,2.4444570949952897,4
+curva_suavizada,esperanza,simultanea,8. Winkler,test,winkler,1.8179865009076386,4.229722537425935,2.586238355009167,4
+curva_suavizada,esperanza,simultanea,9. Winkler max promedio,train,winkler_max_medio,2.2528366083630362,12.345589444017405,4.432983118457257,4
+curva_suavizada,esperanza,simultanea,9. Winkler max promedio,test,winkler_max_medio,2.3292806923058715,11.209233527890595,5.30532940736684,4
+curva_suavizada,esperanza,simultanea,10. Winkler max peor ventana,train,winkler_max_glob,2.471565366817929,104.65701092420592,27.524702935642964,4
+curva_suavizada,esperanza,simultanea,10. Winkler max peor ventana,test,winkler_max_glob,2.9258774557262583,92.61008633040379,35.193964512184046,4
+curva_suavizada,esperanza,hdr,5. MPIW,train,mpiw,1.3168126986535789,2.0686197547247733,1.6093022798610843,4
+curva_suavizada,esperanza,hdr,5. MPIW,test,mpiw,1.3326328640919884,1.9797972141197784,1.589558583903351,4
+curva_suavizada,esperanza,hdr,6. PICP puntual,train,picp,0.8152777777777778,1.0,0.9401284193944982,4
+curva_suavizada,esperanza,hdr,6. PICP puntual,test,picp,0.825,0.9916666666666667,0.928228157867333,4
+curva_suavizada,esperanza,hdr,7. PICPB curva completa,train,picp_simultaneo,0.26666666666666666,1.0,0.6715421853388659,4
+curva_suavizada,esperanza,hdr,7. PICPB curva completa,test,picp_simultaneo,0.36666666666666664,0.9333333333333333,0.6417994376757263,4
+curva_suavizada,esperanza,hdr,8. Winkler,train,winkler,1.3196331413777207,5.603701515788587,2.2505506197097014,4
+curva_suavizada,esperanza,hdr,8. Winkler,test,winkler,1.3729767755966682,4.6938315736240055,2.5343629004538317,4
+curva_suavizada,esperanza,hdr,9. Winkler max promedio,train,winkler_max_medio,1.661529372988874,15.96704917541998,5.849916703144591,4
+curva_suavizada,esperanza,hdr,9. Winkler max promedio,test,winkler_max_medio,1.9862844373723918,15.641695382896469,7.271724270705568,4
+curva_suavizada,esperanza,hdr,10. Winkler max peor ventana,train,winkler_max_glob,1.9906144264096834,117.76566225646356,37.53754275246217,4
+curva_suavizada,esperanza,hdr,10. Winkler max peor ventana,test,winkler_max_glob,4.778764520701933,100.36444134735183,45.88423490717895,4
+representacion_fpca,esperanza,equicolas,5. MPIW,train,mpiw,1.31326929177603,2.103733412266392,1.618543048450769,4
+representacion_fpca,esperanza,equicolas,5. MPIW,test,mpiw,1.3291919251249265,2.0023593346568322,1.5946353965283186,4
+representacion_fpca,esperanza,equicolas,6. PICP puntual,train,picp,0.8111111111111111,1.0,0.9527355155985862,4
+representacion_fpca,esperanza,equicolas,6. PICP puntual,test,picp,0.8555555555555555,1.0,0.944946891596376,4
+representacion_fpca,esperanza,equicolas,7. PICPB curva completa,train,picp_simultaneo,0.5333333333333333,1.0,0.8225334255417244,4
+representacion_fpca,esperanza,equicolas,7. PICPB curva completa,test,picp_simultaneo,0.5333333333333333,1.0,0.8077475788815996,4
+representacion_fpca,esperanza,equicolas,8. Winkler,train,winkler,1.3029760198312172,4.876569948901898,2.075932133657999,4
+representacion_fpca,esperanza,equicolas,8. Winkler,test,winkler,1.3190709602030857,4.291880402994142,2.280609125970875,4
+representacion_fpca,esperanza,equicolas,9. Winkler max promedio,train,winkler_max_medio,1.6213046455179911,12.03147888809263,3.869636555826667,4
+representacion_fpca,esperanza,equicolas,9. Winkler max promedio,test,winkler_max_medio,1.6453287236204406,11.567827364402145,4.524146306972193,4
+representacion_fpca,esperanza,equicolas,10. Winkler max peor ventana,train,winkler_max_glob,1.794219701567448,109.60974277698304,25.645323231337265,4
+representacion_fpca,esperanza,equicolas,10. Winkler max peor ventana,test,winkler_max_glob,1.9224588349943295,70.47061890770605,31.821239179457585,4
+representacion_fpca,esperanza,simultanea,5. MPIW,train,mpiw,1.8045861773280514,2.804197916685726,2.188046619883732,4
+representacion_fpca,esperanza,simultanea,5. MPIW,test,mpiw,1.824498293393988,2.6745658384979447,2.161776730108609,4
+representacion_fpca,esperanza,simultanea,6. PICP puntual,train,picp,0.8875,1.0,0.9839831143384048,4
+representacion_fpca,esperanza,simultanea,6. PICP puntual,test,picp,0.9013888888888889,1.0,0.9759554305946059,4
+representacion_fpca,esperanza,simultanea,7. PICPB curva completa,train,picp_simultaneo,0.7,1.0,0.9374596588289535,4
+representacion_fpca,esperanza,simultanea,7. PICPB curva completa,test,picp_simultaneo,0.7,1.0,0.9107778819119026,4
+representacion_fpca,esperanza,simultanea,8. Winkler,train,winkler,1.789740651438141,4.508813623547952,2.370658119162109,4
+representacion_fpca,esperanza,simultanea,8. Winkler,test,winkler,1.8096464558312035,4.044071283993866,2.475271920141302,4
+representacion_fpca,esperanza,simultanea,9. Winkler max promedio,train,winkler_max_medio,2.2442052020999337,9.985145309051422,3.5529382505792935,4
+representacion_fpca,esperanza,simultanea,9. Winkler max promedio,test,winkler_max_medio,2.295119137468562,8.62433287689086,3.990441564072863,4
+representacion_fpca,esperanza,simultanea,10. Winkler max peor ventana,train,winkler_max_glob,2.471565366817929,95.73510984827462,18.170559352317564,4
+representacion_fpca,esperanza,simultanea,10. Winkler max peor ventana,test,winkler_max_glob,2.6195611213211034,64.08678640261519,23.50218143423622,4
+representacion_fpca,esperanza,hdr,5. MPIW,train,mpiw,1.3168126986535789,2.0686197547247733,1.6093022798610843,4
+representacion_fpca,esperanza,hdr,5. MPIW,test,mpiw,1.3326328640919884,1.9797972141197784,1.589558583903351,4
+representacion_fpca,esperanza,hdr,6. PICP puntual,train,picp,0.8041666666666667,1.0,0.9538770746887968,4
+representacion_fpca,esperanza,hdr,6. PICP puntual,test,picp,0.8458333333333333,1.0,0.9435280641466208,4
+representacion_fpca,esperanza,hdr,7. PICPB curva completa,train,picp_simultaneo,0.5,1.0,0.8304863992623329,4
+representacion_fpca,esperanza,hdr,7. PICPB curva completa,test,picp_simultaneo,0.5,1.0,0.8114964073726961,4
+representacion_fpca,esperanza,hdr,8. Winkler,train,winkler,1.3064466278668292,5.247938691514455,2.094102066000176,4
+representacion_fpca,esperanza,hdr,8. Winkler,test,winkler,1.3243427088730304,4.389892066797896,2.3204653658452656,4
+representacion_fpca,esperanza,hdr,9. Winkler max promedio,train,winkler_max_medio,1.6275381094106975,12.77102160902231,3.8969976167539633,4
+representacion_fpca,esperanza,hdr,9. Winkler max promedio,test,winkler_max_medio,1.652244447048893,11.506020343872766,4.6266143370564,4
+representacion_fpca,esperanza,hdr,10. Winkler max peor ventana,train,winkler_max_glob,1.829240567284321,109.10538443281786,26.774866552956123,4
+representacion_fpca,esperanza,hdr,10. Winkler max peor ventana,test,winkler_max_glob,1.9620355068610895,71.84114141956321,32.22107115476218,4
+curva_suavizada,esperanza,equicolas,5. MPIW,train,mpiw,1.3319325199092507,2.1868091369450036,1.654729521063855,5
+curva_suavizada,esperanza,equicolas,5. MPIW,test,mpiw,1.363346235916614,2.0374337870483314,1.6322696906919947,5
+curva_suavizada,esperanza,equicolas,6. PICP puntual,train,picp,0.8097222222222222,1.0,0.9449237359766406,5
+curva_suavizada,esperanza,equicolas,6. PICP puntual,test,picp,0.8458333333333333,0.9916666666666667,0.933217484119546,5
+curva_suavizada,esperanza,equicolas,7. PICPB curva completa,train,picp_simultaneo,0.36666666666666664,1.0,0.6960350391885661,5
+curva_suavizada,esperanza,equicolas,7. PICPB curva completa,test,picp_simultaneo,0.4,0.9333333333333333,0.649047172758513,5
+curva_suavizada,esperanza,equicolas,8. Winkler,train,winkler,1.3301619431719414,5.254371150358454,2.2245828967416132,5
+curva_suavizada,esperanza,equicolas,8. Winkler,test,winkler,1.4052252213036112,4.57837466547824,2.4801329391591547,5
+curva_suavizada,esperanza,equicolas,9. Winkler max promedio,train,winkler_max_medio,1.6322900050036153,15.268422606388151,5.606539243058617,5
+curva_suavizada,esperanza,equicolas,9. Winkler max promedio,test,winkler_max_medio,2.1566294430236597,15.016011415813361,6.95796089630741,5
+curva_suavizada,esperanza,equicolas,10. Winkler max peor ventana,train,winkler_max_glob,1.8456738960100205,113.13941482582896,35.52152218202918,5
+curva_suavizada,esperanza,equicolas,10. Winkler max peor ventana,test,winkler_max_glob,3.620176648785979,103.43494789159269,44.43036176851526,5
+curva_suavizada,esperanza,simultanea,5. MPIW,train,mpiw,1.899148938748168,2.955783358839809,2.2875308822949596,5
+curva_suavizada,esperanza,simultanea,5. MPIW,test,mpiw,1.927067039911417,2.785252265811625,2.261202441194157,5
+curva_suavizada,esperanza,simultanea,6. PICP puntual,train,picp,0.8944444444444445,1.0,0.982428058244967,5
+curva_suavizada,esperanza,simultanea,6. PICP puntual,test,picp,0.9125,1.0,0.9735941893158386,5
+curva_suavizada,esperanza,simultanea,7. PICPB curva completa,train,picp_simultaneo,0.6,1.0,0.8956777316735823,5
+curva_suavizada,esperanza,simultanea,7. PICPB curva completa,test,picp_simultaneo,0.6333333333333333,1.0,0.8573570759137769,5
+curva_suavizada,esperanza,simultanea,8. Winkler,train,winkler,1.8844690389278544,4.543133759652409,2.4996380614936524,5
+curva_suavizada,esperanza,simultanea,8. Winkler,test,winkler,1.9125370715883288,4.178355655582961,2.621518506589081,5
+curva_suavizada,esperanza,simultanea,9. Winkler max promedio,train,winkler_max_medio,2.3369329903120692,11.702253482393466,4.274698059264838,5
+curva_suavizada,esperanza,simultanea,9. Winkler max promedio,test,winkler_max_medio,2.392325189998827,10.599301772806994,5.091278597859962,5
+curva_suavizada,esperanza,simultanea,10. Winkler max peor ventana,train,winkler_max_glob,2.61544995358512,100.24379498126738,25.57207301871135,5
+curva_suavizada,esperanza,simultanea,10. Winkler max peor ventana,test,winkler_max_glob,2.7624548695741318,89.81505857131623,33.4114067476401,5
+curva_suavizada,esperanza,hdr,5. MPIW,train,mpiw,1.3357318549403712,2.126263072659615,1.64771325707637,5
+curva_suavizada,esperanza,hdr,5. MPIW,test,mpiw,1.3684576845016247,2.0126355058307097,1.6295574684013305,5
+curva_suavizada,esperanza,hdr,6. PICP puntual,train,picp,0.8125,1.0,0.944971280928231,5
+curva_suavizada,esperanza,hdr,6. PICP puntual,test,picp,0.8361111111111111,0.9958333333333333,0.9329675622201397,5
+curva_suavizada,esperanza,hdr,7. PICPB curva completa,train,picp_simultaneo,0.3333333333333333,1.0,0.705025357307515,5
+curva_suavizada,esperanza,hdr,7. PICPB curva completa,test,picp_simultaneo,0.43333333333333335,0.9333333333333333,0.6579506404248672,5
+curva_suavizada,esperanza,hdr,8. Winkler,train,winkler,1.334322353132203,5.482023553484773,2.239190254853093,5
+curva_suavizada,esperanza,hdr,8. Winkler,test,winkler,1.4102554850257245,4.5970146027097405,2.5056934111196583,5
+curva_suavizada,esperanza,hdr,9. Winkler max promedio,train,winkler_max_medio,1.641451411170988,15.587735505294324,5.627693855211676,5
+curva_suavizada,esperanza,hdr,9. Winkler max promedio,test,winkler_max_medio,2.0220519075054626,15.435426136261537,7.00811416876266,5
+curva_suavizada,esperanza,hdr,10. Winkler max peor ventana,train,winkler_max_glob,1.8870085902727993,113.90254882293496,36.4639916859159,5
+curva_suavizada,esperanza,hdr,10. Winkler max peor ventana,test,winkler_max_glob,6.482833108593372,103.6309599254611,44.94217991274508,5
+representacion_fpca,esperanza,equicolas,5. MPIW,train,mpiw,1.3319325199092507,2.1868091369450036,1.654729521063855,5
+representacion_fpca,esperanza,equicolas,5. MPIW,test,mpiw,1.363346235916614,2.0374337870483314,1.6322696906919947,5
+representacion_fpca,esperanza,equicolas,6. PICP puntual,train,picp,0.8277777777777777,1.0,0.9535706738896574,5
+representacion_fpca,esperanza,equicolas,6. PICP puntual,test,picp,0.8458333333333333,0.9972222222222222,0.9431779131521401,5
+representacion_fpca,esperanza,equicolas,7. PICPB curva completa,train,picp_simultaneo,0.5,1.0,0.8084255417242969,5
+representacion_fpca,esperanza,equicolas,7. PICPB curva completa,test,picp_simultaneo,0.4666666666666667,0.9666666666666667,0.7840049984379882,5
+representacion_fpca,esperanza,equicolas,8. Winkler,train,winkler,1.3217863877579858,4.980455869010061,2.1211917749995264,5
+representacion_fpca,esperanza,equicolas,8. Winkler,test,winkler,1.3621156283894293,4.409122899598812,2.343226378374732,5
+representacion_fpca,esperanza,equicolas,9. Winkler max promedio,train,winkler_max_medio,1.6322900050036153,12.682250201874231,4.082406608018089,5
+representacion_fpca,esperanza,equicolas,9. Winkler max promedio,test,winkler_max_medio,1.7778536176013418,12.308522766340383,4.908928812129119,5
+representacion_fpca,esperanza,equicolas,10. Winkler max peor ventana,train,winkler_max_glob,1.8095736022218873,101.47235319641807,26.873883751158925,5
+representacion_fpca,esperanza,equicolas,10. Winkler max peor ventana,test,winkler_max_glob,3.6451135294697474,87.35934114135632,33.1663313946156,5
+representacion_fpca,esperanza,simultanea,5. MPIW,train,mpiw,1.899148938748168,2.955783358839809,2.2875308822949596,5
+representacion_fpca,esperanza,simultanea,5. MPIW,test,mpiw,1.927067039911417,2.785252265811625,2.261202441194157,5
+representacion_fpca,esperanza,simultanea,6. PICP puntual,train,picp,0.9,1.0,0.9853230175195943,5
+representacion_fpca,esperanza,simultanea,6. PICP puntual,test,picp,0.9111111111111111,1.0,0.9772440903884203,5
+representacion_fpca,esperanza,simultanea,7. PICPB curva completa,train,picp_simultaneo,0.7333333333333333,1.0,0.9370908252650992,5
+representacion_fpca,esperanza,simultanea,7. PICPB curva completa,test,picp_simultaneo,0.6666666666666666,1.0,0.9095282724148703,5
+representacion_fpca,esperanza,simultanea,8. Winkler,train,winkler,1.8844690389278544,4.422652379147348,2.4555710744079593,5
+representacion_fpca,esperanza,simultanea,8. Winkler,test,winkler,1.9125370715883288,3.9893220746263705,2.5622088071812525,5
+representacion_fpca,esperanza,simultanea,9. Winkler max promedio,train,winkler_max_medio,2.3369329903120692,10.276012128845311,3.654038711738242,5
+representacion_fpca,esperanza,simultanea,9. Winkler max promedio,test,winkler_max_medio,2.392325189998827,9.290222815221314,4.189854882137303,5
+representacion_fpca,esperanza,simultanea,10. Winkler max peor ventana,train,winkler_max_glob,2.61544995358512,90.58761494911516,18.34566102745246,5
+representacion_fpca,esperanza,simultanea,10. Winkler max peor ventana,test,winkler_max_glob,2.7624548695741318,73.73945182107985,24.03355412195814,5
+representacion_fpca,esperanza,hdr,5. MPIW,train,mpiw,1.3357318549403712,2.126263072659615,1.64771325707637,5
+representacion_fpca,esperanza,hdr,5. MPIW,test,mpiw,1.3684576845016247,2.0126355058307097,1.6295574684013305,5
+representacion_fpca,esperanza,hdr,6. PICP puntual,train,picp,0.8236111111111111,1.0,0.9540662939910867,5
+representacion_fpca,esperanza,hdr,6. PICP puntual,test,picp,0.8444444444444444,0.9986111111111111,0.9429084661043424,5
+representacion_fpca,esperanza,hdr,7. PICPB curva completa,train,picp_simultaneo,0.5333333333333333,1.0,0.8163785154449055,5
+representacion_fpca,esperanza,hdr,7. PICPB curva completa,test,picp_simultaneo,0.5,0.9666666666666667,0.7886910340518589,5
+representacion_fpca,esperanza,hdr,8. Winkler,train,winkler,1.325490136596157,5.208783780060852,2.1381328733580687,5
+representacion_fpca,esperanza,hdr,8. Winkler,test,winkler,1.3667028457421646,4.424115307518451,2.371848962841863,5
+representacion_fpca,esperanza,hdr,9. Winkler max promedio,train,winkler_max_medio,1.641451411170988,13.053561955913768,4.116882646786665,5
+representacion_fpca,esperanza,hdr,9. Winkler max promedio,test,winkler_max_medio,1.756045007998641,12.289545406465217,4.986405845732634,5
+representacion_fpca,esperanza,hdr,10. Winkler max peor ventana,train,winkler_max_glob,1.8063755796819034,102.0122375388744,27.88750354537564,5
+representacion_fpca,esperanza,hdr,10. Winkler max peor ventana,test,winkler_max_glob,2.9019937027929172,87.55535317522474,33.566909873683734,5
+curva_suavizada,esperanza,equicolas,5. MPIW,train,mpiw,1.3507721164949973,2.1662893481098777,1.6680314153837963,6
+curva_suavizada,esperanza,equicolas,5. MPIW,test,mpiw,1.3881743638640587,2.07123585755291,1.653994900666242,6
+curva_suavizada,esperanza,equicolas,6. PICP puntual,train,picp,0.8333333333333334,1.0,0.9473490087597972,6
+curva_suavizada,esperanza,equicolas,6. PICP puntual,test,picp,0.8361111111111111,0.9944444444444445,0.9356854628761846,6
+curva_suavizada,esperanza,equicolas,7. PICPB curva completa,train,picp_simultaneo,0.43333333333333335,1.0,0.7089787920700784,6
+curva_suavizada,esperanza,equicolas,7. PICPB curva completa,test,picp_simultaneo,0.4,0.9333333333333333,0.6612308653545766,6
+curva_suavizada,esperanza,equicolas,8. Winkler,train,winkler,1.3508447832367878,4.722015884979565,2.211808045589974,6
+curva_suavizada,esperanza,equicolas,8. Winkler,test,winkler,1.4196371225168605,4.371786436344883,2.4654695808015012,6
+curva_suavizada,esperanza,equicolas,9. Winkler max promedio,train,winkler_max_medio,1.6911014805137377,13.865141485539983,5.521488502505501,6
+curva_suavizada,esperanza,equicolas,9. Winkler max promedio,test,winkler_max_medio,2.026074178548215,15.072079304768106,6.803707691472185,6
+curva_suavizada,esperanza,equicolas,10. Winkler max peor ventana,train,winkler_max_glob,1.8642753132619738,118.44969779248312,35.16246821769365,6
+curva_suavizada,esperanza,equicolas,10. Winkler max peor ventana,test,winkler_max_glob,4.040986109329933,103.87503181014637,43.95250020766856,6
+curva_suavizada,esperanza,simultanea,5. MPIW,train,mpiw,1.9530563976604483,3.0231306057921326,2.3373697529725743,6
+curva_suavizada,esperanza,simultanea,5. MPIW,test,mpiw,1.9913030591397558,2.8427740044660084,2.3240021942419653,6
+curva_suavizada,esperanza,simultanea,6. PICP puntual,train,picp,0.9125,1.0,0.9843658752113107,6
+curva_suavizada,esperanza,simultanea,6. PICP puntual,test,picp,0.9152777777777777,1.0,0.976262626262626,6
+curva_suavizada,esperanza,simultanea,7. PICPB curva completa,train,picp_simultaneo,0.6333333333333333,1.0,0.9071922544951592,6
+curva_suavizada,esperanza,simultanea,7. PICPB curva completa,test,picp_simultaneo,0.6333333333333333,1.0,0.8686035613870666,6
+curva_suavizada,esperanza,simultanea,8. Winkler,train,winkler,1.943813009100382,4.274429948770554,2.521249304692558,6
+curva_suavizada,esperanza,simultanea,8. Winkler,test,winkler,1.97464213665037,4.126139582681747,2.6437337901639038,6
+curva_suavizada,esperanza,simultanea,9. Winkler max promedio,train,winkler_max_medio,2.446290847338269,10.790219789209813,4.199624148961754,6
+curva_suavizada,esperanza,simultanea,9. Winkler max promedio,test,winkler_max_medio,2.4864400314238586,10.55801557208036,4.980613031790957,6
+curva_suavizada,esperanza,simultanea,10. Winkler max peor ventana,train,winkler_max_glob,2.8093065717709216,101.98679549205173,23.841301107777838,6
+curva_suavizada,esperanza,simultanea,10. Winkler max peor ventana,test,winkler_max_glob,2.851560595335542,86.6082136888397,32.358884829424085,6
+curva_suavizada,esperanza,hdr,5. MPIW,train,mpiw,1.3551611524103417,2.1310098629927623,1.6610042619207726,6
+curva_suavizada,esperanza,hdr,5. MPIW,test,mpiw,1.3934511972749988,2.048406659559512,1.6498843444351858,6
+curva_suavizada,esperanza,hdr,6. PICP puntual,train,picp,0.8208333333333333,1.0,0.9478119717227601,6
+curva_suavizada,esperanza,hdr,6. PICP puntual,test,picp,0.8361111111111111,0.9972222222222222,0.9350840883057376,6
+curva_suavizada,esperanza,hdr,7. PICPB curva completa,train,picp_simultaneo,0.43333333333333335,1.0,0.7207814661134163,6
+curva_suavizada,esperanza,hdr,7. PICPB curva completa,test,picp_simultaneo,0.4,0.9666666666666667,0.670602936582318,6
+curva_suavizada,esperanza,hdr,8. Winkler,train,winkler,1.3600118712481482,5.125615029175858,2.231848703394049,6
+curva_suavizada,esperanza,hdr,8. Winkler,test,winkler,1.427705313259764,4.5279677691869855,2.494183565777101,6
+curva_suavizada,esperanza,hdr,9. Winkler max promedio,train,winkler_max_medio,1.696954416374247,14.744444134269974,5.557433363591299,6
+curva_suavizada,esperanza,hdr,9. Winkler max promedio,test,winkler_max_medio,2.0111288480977025,15.259295511850874,6.882548722521032,6
+curva_suavizada,esperanza,hdr,10. Winkler max peor ventana,train,winkler_max_glob,1.8768649521535512,118.40161356753553,36.27800728369584,6
+curva_suavizada,esperanza,hdr,10. Winkler max peor ventana,test,winkler_max_glob,2.89828750420496,103.27426885570003,44.733897229031065,6
+representacion_fpca,esperanza,equicolas,5. MPIW,train,mpiw,1.3507721164949973,2.1662893481098777,1.6680314153837963,6
+representacion_fpca,esperanza,equicolas,5. MPIW,test,mpiw,1.3881743638640587,2.07123585755291,1.653994900666242,6
+representacion_fpca,esperanza,equicolas,6. PICP puntual,train,picp,0.8388888888888889,1.0,0.9529372214538189,6
+representacion_fpca,esperanza,equicolas,6. PICP puntual,test,picp,0.8527777777777777,0.9972222222222222,0.9428134437155056,6
+representacion_fpca,esperanza,equicolas,7. PICPB curva completa,train,picp_simultaneo,0.43333333333333335,1.0,0.7829644997694791,6
+representacion_fpca,esperanza,equicolas,7. PICPB curva completa,test,picp_simultaneo,0.4666666666666667,0.9666666666666667,0.7592627303967511,6
+representacion_fpca,esperanza,equicolas,8. Winkler,train,winkler,1.3446124149441312,4.590831875049783,2.1486848639435565,6
+representacion_fpca,esperanza,equicolas,8. Winkler,test,winkler,1.391263769301729,4.261067571639289,2.3741002564053013,6
+representacion_fpca,esperanza,equicolas,9. Winkler max promedio,train,winkler_max_medio,1.6774714173259413,12.863983392139891,4.470287875790396,6
+representacion_fpca,esperanza,equicolas,9. Winkler max promedio,test,winkler_max_medio,1.7519302591206631,13.878309775358456,5.334670947490398,6
+representacion_fpca,esperanza,equicolas,10. Winkler max peor ventana,train,winkler_max_glob,1.8642753132619738,108.527115445408,29.67173721247698,6
+representacion_fpca,esperanza,equicolas,10. Winkler max peor ventana,test,winkler_max_glob,2.1606444812031445,88.95968267504462,35.61711410696202,6
+representacion_fpca,esperanza,simultanea,5. MPIW,train,mpiw,1.9530563976604483,3.0231306057921326,2.3373697529725743,6
+representacion_fpca,esperanza,simultanea,5. MPIW,test,mpiw,1.9913030591397558,2.8427740044660084,2.3240021942419653,6
+representacion_fpca,esperanza,simultanea,6. PICP puntual,train,picp,0.9125,1.0,0.9860256262486553,6
+representacion_fpca,esperanza,simultanea,6. PICP puntual,test,picp,0.9180555555555555,1.0,0.9787592419035719,6
+representacion_fpca,esperanza,simultanea,7. PICPB curva completa,train,picp_simultaneo,0.7,1.0,0.9322498847395113,6
+representacion_fpca,esperanza,simultanea,7. PICPB curva completa,test,picp_simultaneo,0.6333333333333333,1.0,0.9098406747891284,6
+representacion_fpca,esperanza,simultanea,8. Winkler,train,winkler,1.9364322438455914,4.1867090962356155,2.4939676785489695,6
+representacion_fpca,esperanza,simultanea,8. Winkler,test,winkler,1.97464213665037,4.027670855092216,2.6061990624380065,6
+representacion_fpca,esperanza,simultanea,9. Winkler max promedio,train,winkler_max_medio,2.434270410769442,9.749096420492807,3.8110900277475666,6
+representacion_fpca,esperanza,simultanea,9. Winkler max promedio,test,winkler_max_medio,2.4864400314238586,10.353043415546315,4.342611628405826,6
+representacion_fpca,esperanza,simultanea,10. Winkler max peor ventana,train,winkler_max_glob,2.6894785905644802,94.00552672012095,19.57764998768223,6
+representacion_fpca,esperanza,simultanea,10. Winkler max peor ventana,test,winkler_max_glob,2.851560595335542,71.69286455373795,25.535282405942656,6
+representacion_fpca,esperanza,hdr,5. MPIW,train,mpiw,1.3551611524103417,2.1310098629927623,1.6610042619207726,6
+representacion_fpca,esperanza,hdr,5. MPIW,test,mpiw,1.3934511972749988,2.048406659559512,1.6498843444351858,6
+representacion_fpca,esperanza,hdr,6. PICP puntual,train,picp,0.8305555555555556,1.0,0.9536527969878591,6
+representacion_fpca,esperanza,hdr,6. PICP puntual,test,picp,0.8486111111111111,1.0,0.9418202645006769,6
+representacion_fpca,esperanza,hdr,7. PICPB curva completa,train,picp_simultaneo,0.4666666666666667,1.0,0.7958275703088983,6
+representacion_fpca,esperanza,hdr,7. PICPB curva completa,test,picp_simultaneo,0.4666666666666667,1.0,0.7641049671977508,6
+representacion_fpca,esperanza,hdr,8. Winkler,train,winkler,1.3487040383675617,4.993968091501263,2.171016373759329,6
+representacion_fpca,esperanza,hdr,8. Winkler,test,winkler,1.398384366358922,4.362758904222223,2.402514535500268,6
+representacion_fpca,esperanza,hdr,9. Winkler max promedio,train,winkler_max_medio,1.6823562353281714,13.708252178904873,4.5164916589917965,6
+representacion_fpca,esperanza,hdr,9. Winkler max promedio,test,winkler_max_medio,1.8376915189723264,13.937243665502498,5.429530478815648,6
+representacion_fpca,esperanza,hdr,10. Winkler max peor ventana,train,winkler_max_glob,1.8768649521535512,108.2061017160059,30.757715983470074,6
+representacion_fpca,esperanza,hdr,10. Winkler max peor ventana,test,winkler_max_glob,2.89828750420496,88.35891972059828,36.720656220942246,6

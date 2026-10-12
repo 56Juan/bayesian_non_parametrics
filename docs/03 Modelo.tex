@@ -651,14 +651,14 @@ C-3 & multimodalidad en la ley condicional  & Anexo~\ref{ane_00_02_03_alg_c3} & 
 \section{Resultados}
 \label{03_08_00_resultados}
 
-Los resultados se presentan en el orden del diseño: el error puntual, los intervalos, los comportamientos y el pronóstico por comportamiento. En cada bloque hay un cuadro en $M_{\mathrm{ref}}$ y $w_{\mathrm{ref}}$ del Cuadro~\ref{tab:dis_particion} sobre el bloque de prueba, un cuadro con la misma cifra para todos los $M$ del barrido, y las figuras con la trayectoria sobre la ventana móvil del bloque de prueba. Hay una realización por escenario, de modo que las cifras son descriptivas y una diferencia de pocos puntos porcentuales no se lee como superioridad.
+Los resultados se presentan en el orden del diseño: el error puntual, los intervalos, los comportamientos y el pronóstico por comportamiento. En cada bloque hay un cuadro en $M_{\mathrm{ref}}$ y $w_{\mathrm{ref}}$ del Cuadro~\ref{tab:dis_particion} sobre el bloque de prueba, un cuadro con la misma cifra para todos los $M$ del barrido, y las figuras con la trayectoria sobre la ventana móvil del bloque de prueba; $M_{\mathrm{ref}} = 10$ en C-1 y C-2 y $M_{\mathrm{ref}} = 6$ en C-3. Hay una realización por escenario, de modo que las cifras son descriptivas y una diferencia de pocos puntos porcentuales no se lee como superioridad.
 
 % ---------------------------------------------------------------------
 \subsection{Error puntual}
 \label{03_08_01_error_puntual}
 
 % Fuente: 98_resumen_bloqueA_min_max_prom.csv del _05 (test, promedio sobre las ventanas, todos los M).
-% Filas PSBPM-FD: "PSBPM-FD (esperanza)", "(mediana)", "(modal)"; FAR no depende de M; C-3 sólo M = 3..6.
+% C-1 = escenario_301, C-2 = escenario_300, C-3 = escenario_302.
 \begin{table}[H]
 \centering\small
 \setlength{\tabcolsep}{3.5pt}
@@ -669,42 +669,42 @@ Los resultados se presentan en el orden del diseño: el error puntual, los inter
  & \multicolumn{4}{c}{C-1} & \multicolumn{4}{c}{C-2} & \multicolumn{4}{c}{C-3} \\
 $M$ & esp. & med. & modal & RF & esp. & med. & modal & RF & esp. & med. & modal & RF \\
 \hline
-$1$ & XX & XX & XX & XX & XX & XX & XX & XX & --- & --- & --- & --- \\
-$2$ & XX & XX & XX & XX & XX & XX & XX & XX & --- & --- & --- & --- \\
-$3$ & XX & XX & XX & XX & XX & XX & XX & XX & XX & XX & XX & XX \\
-$4$ & XX & XX & XX & XX & XX & XX & XX & XX & XX & XX & XX & XX \\
-$5$ & XX & XX & XX & XX & XX & XX & XX & XX & XX & XX & XX & XX \\
-$6$ & XX & XX & XX & XX & XX & XX & XX & XX & XX & XX & XX & XX \\
-$7$ & XX & XX & XX & XX & XX & XX & XX & XX & --- & --- & --- & --- \\
-$8$ & XX & XX & XX & XX & XX & XX & XX & XX & --- & --- & --- & --- \\
-$9$ & XX & XX & XX & XX & XX & XX & XX & XX & --- & --- & --- & --- \\
-$10$ & XX & XX & XX & XX & XX & XX & XX & XX & --- & --- & --- & --- \\
+$1$  & 0.754 & 0.755 & 0.755 & 0.764 & 0.714 & 0.720 & 0.725 & 0.710 & --- & --- & --- & --- \\
+$2$  & 0.739 & 0.739 & 0.739 & 0.753 & 0.673 & 0.675 & 0.691 & 0.658 & --- & --- & --- & --- \\
+$3$  & 0.724 & 0.724 & 0.726 & 0.740 & 0.635 & 0.633 & 0.653 & 0.617 & 0.694 & 0.695 & 0.703 & 0.699 \\
+$4$  & 0.717 & 0.717 & 0.722 & 0.734 & 0.612 & 0.605 & 0.635 & 0.591 & 0.690 & 0.691 & 0.700 & 0.699 \\
+$5$  & 0.714 & 0.714 & 0.719 & 0.733 & 0.610 & 0.603 & 0.633 & 0.591 & 0.684 & 0.686 & 0.693 & 0.693 \\
+$6$  & 0.713 & 0.713 & 0.718 & 0.733 & 0.609 & 0.602 & 0.632 & 0.592 & \textbf{0.689} & 0.689 & 0.698 & 0.700 \\
+$7$  & 0.712 & 0.713 & 0.718 & 0.733 & 0.609 & 0.601 & 0.631 & 0.592 & --- & --- & --- & --- \\
+$8$  & 0.712 & 0.712 & 0.717 & 0.733 & 0.609 & 0.601 & 0.631 & 0.592 & --- & --- & --- & --- \\
+$9$  & 0.711 & 0.712 & 0.717 & 0.734 & 0.609 & 0.601 & 0.631 & 0.591 & --- & --- & --- & --- \\
+$10$ & \textbf{0.711} & 0.712 & 0.717 & 0.734 & 0.609 & 0.601 & 0.631 & \textbf{0.591} & --- & --- & --- & --- \\
 \hline
-FAR & \multicolumn{4}{c}{XX} & \multicolumn{4}{c}{XX} & \multicolumn{4}{c}{XX} \\
+FAR & \multicolumn{4}{c}{0.723} & \multicolumn{4}{c}{0.770} & \multicolumn{4}{c}{0.700} \\
 \hline
 \end{tabular}
 \end{table}
 
 % Lectura 1: qué predictor gana en cada escenario y por qué (fila M_ref). Fuente: 101_bloqueA_por_predictor.csv.
-En $M_{\mathrm{ref}}$, el mejor predictor bajo MAE en [C-k] es XX, con un XX\,\% menos que la esperanza, mientras que bajo RMSE la esperanza es la mejor en los tres escenarios (Anexo~\ref{aneB_00_01_metricas_por_M}), como corresponde al funcional que cada métrica elicita. En [C-k] y [C-k] los tres predictores quedan a menos de XX\,\% entre sí: la predictiva es unimodal y simétrica y la elección del predictor no cambia la lectura.
+En $M_{\mathrm{ref}}$, el mejor predictor del PSBPM-FD bajo MAE en C-2 es la mediana puntual, con un $1.3\,\%$ menos que la esperanza, mientras que bajo RMSE la esperanza es la mejor en los tres escenarios (Anexo~\ref{aneB_00_01_metricas_por_M}), como corresponde al funcional que cada métrica elicita. El átomo más probable es el peor en los tres ($+3.6\,\%$ de MAE respecto de la esperanza en C-2, $+0.7\,\%$ en C-1 y $+1.4\,\%$ en C-3): una sola extracción arrastra el ruido de los scores pasivos. En C-1 y C-3 la esperanza y la mediana quedan a menos de $0.1\,\%$ entre sí: la predictiva es unimodal y simétrica y la elección del predictor no cambia la lectura. En C-2 la diferencia entre ambas aparece desde $M = 3$, cuando el modelo ya observa los scores que cambian de régimen.
 
 % Lectura 2: PSBPM-FD contra FAR y RF en M_ref. Fuente: 96_razones_bloqueA.csv y 96_ganador_ventana_bloqueA.csv.
-Frente a los modelos de referencia, el PSBPM-FD con su mejor predictor supera al FAR en MAE en [C-k] (XX\,\% menos, gana XX\,\% de las ventanas) y en [C-k] (XX\,\%, XX\,\%), y no en [C-k], donde XX. El Random Forest, que comparte la especificación del PSBPM-FD, es XX en [C-k] y XX en [C-k]: la diferencia entre ambos aísla el mecanismo que liga covariables y respuesta.
+Frente a los modelos de referencia, el PSBPM-FD con su mejor predictor supera al FAR en MAE en C-2 ($22\,\%$ menos; el FAR no gana ninguna de las $271$ ventanas de prueba), en C-1 ($1.7\,\%$ menos; el FAR es el mejor en $11\,\%$ de las ventanas y alguno de los predictores del PSBPM-FD en $83\,\%$) y en C-3 ($1.5\,\%$ menos; el FAR gana $13\,\%$ de las ventanas y la esperanza $28\,\%$). En C-1 la media condicional es lineal y en C-3 es casi lineal, de modo que la ganancia sobre el FAR es la que cabía esperar: pequeña y sostenida. El Random Forest, que comparte la especificación del PSBPM-FD, es el mejor modelo en C-2 (MAE $0.591$, $1.5\,\%$ bajo la mediana del PSBPM-FD, y gana $64\,\%$ de las ventanas), y el peor en C-1 ($3\,\%$ sobre la esperanza) y queda a la par del FAR en C-3. La diferencia entre ambos aísla el mecanismo que liga covariables y respuesta: ante un umbral sobre el rezago propio, los cortes del árbol lo reproducen de forma directa, mientras que la mezcla lo aproxima con átomos cuyo peso varía de forma suave con la covariable; ante una media lineal con ruido heterocedástico el árbol sobreajusta y la mezcla no.
 
 % Lectura 3: cómo mejora con M y desde qué M supera al FAR.
-El error del PSBPM-FD baja con $M$ y se estabiliza desde $M = XX$, que es la primera dimensión que observa toda la dinámica activa; supera al FAR desde $M = XX$ en [C-k] y desde $M = XX$ en [C-k]. Con $M \le XX$ el truncamiento domina y el FAR, que usa los coeficientes completos, gana.
+El error del PSBPM-FD baja con $M$ y se estabiliza desde $M = 4$, que es la primera dimensión que observa toda la dinámica activa: en C-2 pasa de $0.714$ con $M = 1$ a $0.612$ con $M = 4$ y luego se mueve en la tercera cifra. Supera al FAR desde $M = 1$ en C-2, desde $M = 4$ en C-1 (con $M = 3$ empatan en $0.724$ contra $0.723$) y en todo el barrido de C-3, donde el mínimo está en $M = 5$ y $M = 6$ agrega un score pasivo que sólo suma ruido. Con $M \le 2$ en C-1 el truncamiento domina y el FAR, que usa los coeficientes completos, gana.
 
 % Figura 1: trayectoria del MAE sobre la ventana móvil de prueba, w_ref, M_ref; un panel por escenario.
-% Fuente: 72_ventana_modelos_w40.csv del _05 (por M).
+% Fuente: 72_ventana_modelos_w30.csv del _05 (por M). Figura compuesta en docs/IMG/03_08.
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{<fig/03_08_bloqueA_ventana_w40.pdf>}
-\caption{MAE sobre la ventana móvil del bloque de prueba ($w_{\mathrm{ref}}$, $M_{\mathrm{ref}}$) del mejor predictor del PSBPM-FD, el FAR y el Random Forest; un panel por escenario.}
+\includegraphics[width=\textwidth]{IMG/03_08/03_08_bloqueA_ventana_w30.png}
+\caption{MAE sobre la ventana móvil del bloque de prueba ($w_{\mathrm{ref}}$, $M_{\mathrm{ref}}$) de la esperanza y la mediana puntual del PSBPM-FD, el FAR y el Random Forest; un panel por escenario.}
 \label{fig:res_bloqueA_ventana}
 \end{figure}
 
 % Lectura 4: dónde gana a lo largo del test (tramos, no promedio).
-La Figura~\ref{fig:res_bloqueA_ventana} muestra que en [C-k] la ventaja del PSBPM-FD se concentra en XX, mientras que en XX los tres modelos se superponen. En [C-k] el FAR XX.
+La Figura~\ref{fig:res_bloqueA_ventana} muestra que en C-2 la ventaja del PSBPM-FD sobre el FAR es uniforme a lo largo del bloque de prueba, con una brecha de entre $0.15$ y $0.25$ en todas las ventanas, y que el PSBPM-FD y el Random Forest se superponen salvo en el tramo final ($t > 900$), donde el bosque queda por debajo. En C-1 los cuatro modelos siguen la misma trayectoria, gobernada por los episodios de volatilidad del generador: el PSBPM-FD queda apenas bajo el FAR en los tramos tranquilos ($t$ entre $750$ y $800$ y alrededor de $900$) y el Random Forest por encima de todos en el tramo final. En C-3 las curvas se superponen y el FAR sólo se despega hacia arriba en los máximos locales del error.
 
 % ---------------------------------------------------------------------
 \subsection{Intervalos de predicción}
@@ -713,35 +713,35 @@ La Figura~\ref{fig:res_bloqueA_ventana} muestra que en [C-k] la ventaja del PSBP
 % Fuente: 99_resumen_bloqueB_min_max_prom.csv (test, M_ref) y 111_bloqueB_intervalos_vs_FAR.csv (% ventanas).
 \begin{table}[H]
 \centering\small
-\caption{Bloque B en el bloque de prueba, $M_{\mathrm{ref}}$ y $w_{\mathrm{ref}}$: Winkler, MPIW y PICP de cada banda contra la curva ajustada, y fracción de ventanas en que la construcción tiene menor Winkler que el FAR.}
+\caption{Bloque B en el bloque de prueba, $M_{\mathrm{ref}}$ y $w_{\mathrm{ref}}$: Winkler, MPIW, PICP y PICPB de cada banda contra la curva ajustada, y fracción de ventanas en que la construcción tiene menor Winkler que el FAR.}
 \label{tab:res_bloqueB}
-\begin{tabular}{ll cccc}
+\begin{tabular}{ll ccccc}
 \hline
-Escenario & Banda & Winkler & MPIW & PICP & gana al FAR \\
+Escenario & Banda & Winkler & MPIW & PICP & PICPB & gana al FAR \\
 \hline
-C-1 & FAR, gaussiano            & XX & XX & XX & --- \\
-    & PSBPM-FD, equi-colas      & XX & XX & XX & XX\,\% \\
-    & PSBPM-FD, simultánea      & XX & XX & XX & XX\,\% \\
-    & PSBPM-FD, máxima densidad & XX & XX & XX & XX\,\% \\
+C-1 & FAR, gaussiano            & 4.35 & 3.42 & 0.940 & 0.62 & --- \\
+    & PSBPM-FD, equi-colas      & 4.23 & 3.49 & 0.947 & 0.65 & 81\,\% \\
+    & PSBPM-FD, simultánea      & 5.33 & 5.26 & 0.995 & 0.97 & 5\,\% \\
+    & PSBPM-FD, máxima densidad & 4.23 & 3.49 & 0.948 & 0.66 & 88\,\% \\
 \hline
-C-2 & FAR, gaussiano            & XX & XX & XX & --- \\
-    & PSBPM-FD, equi-colas      & XX & XX & XX & XX\,\% \\
-    & PSBPM-FD, simultánea      & XX & XX & XX & XX\,\% \\
-    & PSBPM-FD, máxima densidad & XX & XX & XX & XX\,\% \\
+C-2 & FAR, gaussiano            & 4.86 & 3.98 & 0.952 & 0.70 & --- \\
+    & PSBPM-FD, equi-colas      & 3.91 & 3.58 & 0.969 & 0.69 & 100\,\% \\
+    & PSBPM-FD, simultánea      & 6.36 & 6.35 & 0.999 & 0.99 & 0\,\% \\
+    & PSBPM-FD, máxima densidad & 3.79 & 3.49 & 0.975 & 0.77 & 100\,\% \\
 \hline
-C-3 & FAR, gaussiano            & XX & XX & XX & --- \\
-    & PSBPM-FD, equi-colas      & XX & XX & XX & XX\,\% \\
-    & PSBPM-FD, simultánea      & XX & XX & XX & XX\,\% \\
-    & PSBPM-FD, máxima densidad & XX & XX & XX & XX\,\% \\
+C-3 & FAR, gaussiano            & 4.23 & 3.28 & 0.937 & 0.56 & --- \\
+    & PSBPM-FD, equi-colas      & 4.11 & 3.33 & 0.944 & 0.58 & 81\,\% \\
+    & PSBPM-FD, simultánea      & 4.99 & 4.93 & 0.995 & 0.93 & 1\,\% \\
+    & PSBPM-FD, máxima densidad & 4.11 & 3.33 & 0.945 & 0.59 & 73\,\% \\
 \hline
 \end{tabular}
 \end{table}
 
 % Lectura 1: PSBPM-FD contra FAR en Winkler, descompuesto en ancho y cobertura.
-El intervalo equi-colas del PSBPM-FD tiene menor Winkler que el del FAR en [C-k] y [C-k] (XX contra XX; gana XX\,\% de las ventanas), con un MPIW XX y un PICP XX, es decir, XX. En [C-k] XX.
+El intervalo equi-colas del PSBPM-FD tiene menor Winkler que el del FAR en los tres escenarios. En C-2 la diferencia es grande ($3.91$ contra $4.86$, un $20\,\%$ menos; gana el $100\,\%$ de las ventanas) y viene de las dos componentes a la vez: la banda es más angosta (MPIW $3.58$ contra $3.98$) y cubre más (PICP $0.969$ contra $0.952$), porque su ancho sigue el régimen en que está cada score mientras que el del FAR es el mismo en todos los orígenes. En C-1 y C-3 la diferencia es pequeña ($2.7\,\%$ y $3.0\,\%$ menos; gana el $81\,\%$ de las ventanas en ambos) y tiene otra composición: la banda del PSBPM-FD es apenas más ancha ($+2\,\%$ y $+1\,\%$ de MPIW) y su PICP está más cerca del nominal ($0.947$ y $0.944$ contra $0.940$ y $0.937$), de modo que gana por calibración y no por ancho; en C-1 la banda gaussiana del FAR queda corta donde la varianza condicional sube.
 
 % Lectura 2: misma predictiva, distinta construcción.
-Las tres construcciones salen de las mismas extracciones y difieren en lo que prometen. La región de máxima densidad coincide con la equi-colas cuando la predictiva es unimodal ([C-k], [C-k]: un solo tramo en más del XX\,\% de los puntos) y solo se separa en [C-k], donde se parte en XX\,\% de los puntos y baja el Winkler en XX\,\%. La banda simultánea es XX veces más ancha y pierde el Winkler, que elicita el intervalo central, pero es la única calibrada para la curva completa.
+Las tres construcciones salen de las mismas extracciones y difieren en lo que prometen. La región de máxima densidad coincide con la equi-colas cuando la predictiva es unimodal: en C-1 y C-3 tiene un solo tramo en más del $99.9\,\%$ de los puntos $(t, \tau)$ del bloque de prueba y las dos filas del Cuadro~\ref{tab:res_bloqueB} son iguales a la segunda cifra. Sólo se separa en C-2, donde se parte en el $9.5\,\%$ de los puntos (en el $53\,\%$ de los orígenes hay algún $\tau$ con más de un tramo) y baja el Winkler en $2.9\,\%$ respecto de la equi-colas, ganándole en el $91\,\%$ de las ventanas: la masa que la equi-colas gasta en el valle entre modos se reasigna a los modos. La banda simultánea es $1.5$ veces más ancha en C-1 y C-3 y $1.8$ veces en C-2 y pierde el Winkler, que elicita el intervalo central de cada $\tau$, pero es la única calibrada para la curva completa: su PICPB es $0.97$, $0.99$ y $0.93$ contra $0.65$, $0.69$ y $0.58$ de la equi-colas y $0.62$, $0.70$ y $0.56$ del FAR, y reduce el peor Winkler de la ventana ($W^{\mathrm{glob}}_{\max}$) a menos de la mitad del de las otras dos construcciones.
 
 % Cuadro por M. Fuente: 99_resumen_bloqueB_min_max_prom.csv del _05 (test, promedio, todas las bandas y M).
 \begin{table}[H]
@@ -754,36 +754,36 @@ Las tres construcciones salen de las mismas extracciones y difieren en lo que pr
  & \multicolumn{3}{c}{C-1} & \multicolumn{3}{c}{C-2} & \multicolumn{3}{c}{C-3} \\
 $M$ & equi-colas & HDR & simult. & equi-colas & HDR & simult. & equi-colas & HDR & simult. \\
 \hline
-$1$  & XX & XX & XX & XX & XX & XX & --- & --- & --- \\
-$2$  & XX & XX & XX & XX & XX & XX & --- & --- & --- \\
-$3$  & XX & XX & XX & XX & XX & XX & XX & XX & XX \\
-$4$  & XX & XX & XX & XX & XX & XX & XX & XX & XX \\
-$5$  & XX & XX & XX & XX & XX & XX & XX & XX & XX \\
-$6$  & XX & XX & XX & XX & XX & XX & XX & XX & XX \\
-$7$  & XX & XX & XX & XX & XX & XX & --- & --- & --- \\
-$8$  & XX & XX & XX & XX & XX & XX & --- & --- & --- \\
-$9$  & XX & XX & XX & XX & XX & XX & --- & --- & --- \\
-$10$ & XX & XX & XX & XX & XX & XX & --- & --- & --- \\
+$1$  & 9.94 & 9.93 & 9.92 & 11.95 & 12.09 & 10.74 & --- & --- & --- \\
+$2$  & 4.98 & 4.94 & 4.44 & 5.69 & 5.29 & 6.54 & --- & --- & --- \\
+$3$  & 4.49 & 4.46 & 4.68 & 4.61 & 4.31 & 7.91 & 4.31 & 4.31 & 4.42 \\
+$4$  & 4.32 & 4.30 & 4.92 & 3.97 & 3.75 & 6.73 & 4.15 & 4.16 & 4.71 \\
+$5$  & 4.27 & 4.26 & 5.11 & 3.91 & 3.75 & 6.57 & 4.08 & 4.09 & 4.89 \\
+$6$  & 4.24 & 4.24 & 5.19 & 3.90 & 3.76 & 6.32 & 4.11 & 4.11 & 4.99 \\
+$7$  & 4.23 & 4.23 & 5.26 & 3.90 & 3.77 & 6.41 & --- & --- & --- \\
+$8$  & 4.23 & 4.23 & 5.30 & 3.91 & 3.78 & 6.36 & --- & --- & --- \\
+$9$  & 4.23 & 4.23 & 5.32 & 3.91 & 3.79 & 6.37 & --- & --- & --- \\
+$10$ & 4.23 & 4.23 & 5.33 & 3.91 & 3.79 & 6.36 & --- & --- & --- \\
 \hline
-FAR  & \multicolumn{3}{c}{XX} & \multicolumn{3}{c}{XX} & \multicolumn{3}{c}{XX} \\
+FAR  & \multicolumn{3}{c}{4.35} & \multicolumn{3}{c}{4.86} & \multicolumn{3}{c}{4.23} \\
 \hline
 \end{tabular}
 \end{table}
 
 % Lectura 3: desde qué M las bandas superan al FAR y qué pasa con el PICP.
-Las bandas del PSBPM-FD superan al FAR en Winkler desde $M = XX$ en [C-k] y $M = XX$ en [C-k]; con $M \le XX$ el truncamiento deja la banda demasiado angosta (PICP XX) y el FAR gana. El PICP de la equi-colas se acerca al nominal desde $M = XX$; el MPIW y el PICP por $M$ van en el Anexo~\ref{aneB_00_01_metricas_por_M}.
+Las bandas puntuales del PSBPM-FD superan al FAR en Winkler desde $M = 3$ en C-2 (la máxima densidad gana ahí el $84\,\%$ de las ventanas y desde $M = 4$ las dos ganan el $100\,\%$) y desde $M = 4$ en C-1 y C-3. Con $M = 1$ el truncamiento deja la banda demasiado angosta (MPIW $1.95$ y $1.76$ en C-1 y C-2, PICP $0.64$ y $0.54$) y el Winkler es más del doble del FAR; el PICP de la equi-colas se acerca al nominal desde $M = 4$ ($0.93$ en C-1 y C-3, $0.94$ en C-2) y se estabiliza desde $M = 6$. La banda simultánea es la mejor de las tres sólo con $M = 2$ en C-1 y $M = 1$ en C-2, donde las otras dos quedan cortas; con $M \ge 4$ su Winkler es siempre el mayor. El MPIW y el PICP por $M$ van en el Anexo~\ref{aneB_00_01_metricas_por_M}.
 
 % Figura 2: Winkler sobre la ventana móvil de prueba, w_ref, M_ref: FAR y las tres construcciones; un panel por escenario.
-% Fuente: 81_ventana_bloqueB_w40.csv del _05 (tras la reejecución con W_REF = 40).
+% Fuente: 81_ventana_bloqueB_w30.csv del _05. Figura compuesta en docs/IMG/03_08.
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{<fig/03_08_bloqueB_ventana_w40.pdf>}
+\includegraphics[width=\textwidth]{IMG/03_08/03_08_bloqueB_ventana_w30.png}
 \caption{Winkler sobre la ventana móvil del bloque de prueba ($w_{\mathrm{ref}}$, $M_{\mathrm{ref}}$) del FAR y de las tres construcciones del PSBPM-FD; un panel por escenario.}
 \label{fig:res_bloqueB_ventana}
 \end{figure}
 
 % Lectura 4: el ancho del FAR no depende del origen; el del PSBPM-FD sí.
-El Winkler del FAR es casi constante a lo largo del bloque de prueba porque su banda hereda una varianza residual fija, mientras que el del PSBPM-FD XX: en [C-k] acompaña los episodios de XX y en [C-k] XX.
+El ancho de la banda del FAR es el mismo en todos los orígenes, porque hereda una varianza residual fija, de modo que su Winkler sólo se mueve por la penalización de los puntos no cubiertos: en C-2 oscila entre $4.1$ y $5.9$ según la ventana contenga o no episodios del régimen volátil, mientras que el del PSBPM-FD se mantiene entre $3.5$ y $4.5$ y queda debajo en todas las ventanas (Figura~\ref{fig:res_bloqueB_ventana}). En C-1 las tres curvas suben juntas en el episodio de volatilidad del tramo final (alrededor de $t = 930$, donde la varianza condicional del generador alcanza su máximo de prueba): ahí la banda del PSBPM-FD se ensancha y acompaña al proceso, y su ventaja sobre el FAR está en los tramos tranquilos, donde la banda gaussiana es más ancha de lo necesario. En C-3 las curvas se superponen y el FAR se despega hacia arriba en las ventanas de $t$ entre $760$ y $830$, con los peores errores.
 
 % ---------------------------------------------------------------------
 \subsection{Comportamientos predictivos}
@@ -796,11 +796,11 @@ El Winkler del FAR es casi constante a lo largo del bloque de prueba porque su b
 \label{tab:res_K}
 \begin{tabular}{l ccc}
 \hline
- & $K_t = 1$ & $K_t = 2$ & $K_t = 3$ \\
+ & $K_t = 1$ & $K_t = 2$ & $K_t \ge 3$ \\
 \hline
-C-1 & XX\,\% & XX\,\% & XX\,\% \\
-C-2 & XX\,\% & XX\,\% & XX\,\% \\
-C-3 & XX\,\% & XX\,\% & XX\,\% \\
+C-1 & 99.7\,\% & 0.3\,\% & 0.0\,\% \\
+C-2 & 70.0\,\% & 16.7\,\% & 13.3\,\% \\
+C-3 & 100.0\,\% & 0.0\,\% & 0.0\,\% \\
 \hline
 \end{tabular}
 \qquad
@@ -808,49 +808,49 @@ C-3 & XX\,\% & XX\,\% & XX\,\% \\
 \hline
 $M$ & C-1 & C-2 & C-3 \\
 \hline
-$1$  & XX\,\% & XX\,\% & --- \\
-$2$  & XX\,\% & XX\,\% & --- \\
-$3$  & XX\,\% & XX\,\% & XX\,\% \\
-$4$  & XX\,\% & XX\,\% & XX\,\% \\
-$5$  & XX\,\% & XX\,\% & XX\,\% \\
-$6$  & XX\,\% & XX\,\% & XX\,\% \\
-$7$  & XX\,\% & XX\,\% & --- \\
-$8$  & XX\,\% & XX\,\% & --- \\
-$9$  & XX\,\% & XX\,\% & --- \\
-$10$ & XX\,\% & XX\,\% & --- \\
+$1$  & 0.0\,\% & 31.3\,\% & --- \\
+$2$  & 0.3\,\% & 30.0\,\% & --- \\
+$3$  & 0.3\,\% & 30.3\,\% & 0.0\,\% \\
+$4$  & 0.3\,\% & 30.7\,\% & 0.0\,\% \\
+$5$  & 0.3\,\% & 30.3\,\% & 0.0\,\% \\
+$6$  & 0.3\,\% & 29.7\,\% & 0.0\,\% \\
+$7$  & 0.3\,\% & 30.3\,\% & --- \\
+$8$  & 0.3\,\% & 30.3\,\% & --- \\
+$9$  & 0.3\,\% & 30.0\,\% & --- \\
+$10$ & 0.3\,\% & 30.0\,\% & --- \\
 \hline
 \end{tabular}
 \end{table}
 
 % Lectura 1: dónde aparecen comportamientos, desde qué M, y qué dice la ley verdadera.
-El modelo declara más de un comportamiento en XX\,\% de los orígenes de [C-2] desde $M = XX$, y prácticamente en ninguno de [C-1] y [C-3] en ningún $M$. En [C-3] la ley condicional verdadera tiene más de un modo solo en XX\,\% de los orígenes y únicamente en la ley conjunta: la multimodalidad del escenario no llega a la marginal de cada punto de la curva, y el $K_t = 1$ del modelo es correcto, no una omisión.
+El modelo declara más de un comportamiento en el $30\,\%$ de los orígenes de prueba de C-2, desde $M = 1$ y sin cambio con $M$: con $M = 1$ sólo hay $K_t = 2$ y desde $M = 2$ aparece $K_t = 3$, porque los comportamientos los fijan los dos primeros scores, que son los de mayor varianza y los que más cambian de régimen. La ley condicional verdadera de C-2 tiene más de un modo en un $9\,\%$ de los orígenes: el modelo declara tres veces más, porque el \emph{gating} deja cerca de un $10\,\%$ de masa en un átomo del régimen volátil en orígenes en que la probabilidad verdadera de ese régimen es casi nula. Donde la ley sí es bimodal, el modelo lo detecta. En C-1 hay un único origen con $K_t = 2$ ($t = 933$, el máximo de la varianza condicional en el bloque de prueba, con masas $0.60$ y $0.40$ para una curva de reversión y una persistente más ancha) y en C-3 ninguno, en ningún $M$. En C-3 la ley condicional verdadera tiene más de un modo en el $3\,\%$ de los orígenes y únicamente en la ley conjunta de los scores: la multimodalidad del escenario no llega a la marginal de cada punto de la curva, y el $K_t = 1$ del modelo es correcto, no una omisión.
 
 % Fuente: 105_validacion_comportamientos_por_M.csv (subconjunto = detalle) y 104_validacion_regimen_por_M.csv (ventana de detalle, M_ref).
 \begin{table}[H]
 \centering\small
-\caption{Ventana de detalle de cada escenario ($N_{\mathrm{det}} = 10$ orígenes de prueba, $M_{\mathrm{ref}}$): orígenes de la ventana, orígenes con $K_t \ge 2$, en cuántos la curva observada cae en el comportamiento más probable y en cuántos $K_t$ coincide con el de la ley condicional verdadera.}
+\caption{Ventana de detalle de cada escenario ($N_{\mathrm{det}} = 10$ orígenes de prueba, $M_{\mathrm{ref}}$): orígenes de la ventana, orígenes con $K_t \ge 2$ en el modelo y en la ley condicional verdadera, en cuántos la curva observada cae en el comportamiento más probable y en cuántos $K_t$ coincide con el de la ley verdadera. En C-1 el criterio de la ventana es la varianza condicional y no hay régimen que contrastar.}
 \label{tab:res_detalle}
-\begin{tabular}{l l c c c}
+\begin{tabular}{l l c c c c}
 \hline
-Escenario & orígenes $t$ & $K_t \ge 2$ & cae en el más probable & $K_t$ coincide \\
+Escenario & orígenes $t$ & $K_t \ge 2$ (modelo) & $K_t \ge 2$ (verdad) & cae en el más probable & $K_t$ coincide \\
 \hline
-C-1 & XX--XX & XX de 10 & XX de 10 & --- \\
-C-2 & XX--XX & XX de 10 & XX de 10 & XX de 10 \\
-C-3 & XX--XX & XX de 10 & XX de 10 & XX de 10 \\
+C-1 & 931--940 & 1 de 10 & --- & 10 de 10 & --- \\
+C-2 & 807--816 & 6 de 10 & 2 de 10 & 7 de 10 & 6 de 10 \\
+C-3 & 776--785 & 0 de 10 & 3 de 10 & 10 de 10 & 7 de 10 \\
 \hline
 \end{tabular}
 \end{table}
 
-% Figura 3: ventana de detalle, un panel por escenario (63_detalle_t<t>.png del _04 o la grilla 63_comportamientos_ejemplos.png).
+% Figura 3: un origen de la ventana de detalle por escenario (63_detalle_t<t>.png del _04; compuesta en docs/IMG/03_08).
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{<fig/03_08_ventana_detalle.pdf>}
-\caption{Ventana de detalle de cada escenario: curva observada, predictores puntuales, las tres bandas y las curvas típicas de los comportamientos con su probabilidad.}
+\includegraphics[width=0.92\textwidth]{IMG/03_08/03_08_ventana_detalle.png}
+\caption{Un origen de la ventana de detalle de cada escenario ($M_{\mathrm{ref}}$): curva observada, los cuatro predictores puntuales, las tres bandas (la región de máxima densidad como tramos verticales) y las curvas típicas de los comportamientos con su probabilidad. Arriba C-1, $t = 933$ (máximo de la varianza condicional, $K_t = 2$); al centro C-2, $t = 814$ (tres scores activos en el régimen volátil, $K_t = 3$); abajo C-3, $t = 784$ (origen con más de un modo en la ley conjunta verdadera, $K_t = 1$).}
 \label{fig:res_ventana_detalle}
 \end{figure}
 
 % Lectura 2: qué se ve origen a origen.
-En la ventana de [C-2] (orígenes $t = XX$ a $XX$, la de más cambios de régimen) se ve XX; en la de [C-1] (alrededor del máximo de la varianza condicional) la banda XX; en la de [C-3] XX.
+En la ventana de C-2 (orígenes $t = 807$ a $816$, la de más cambios de régimen verdadero en los scores activos: $14$ en diez pasos) el modelo declara $K_t \ge 2$ en seis orígenes y la ley verdadera en dos; en los tres orígenes con $K_t = 3$ ($807$, $814$ y $816$) la región de máxima densidad se parte en hasta tres tramos. En $t = 814$, con tres de los cuatro scores activos en el régimen volátil, la curva observada tiene amplitud cuatro y sale de la equi-colas (cobertura puntual $0.79$) pero queda dentro de la simultánea (Figura~\ref{fig:res_ventana_detalle}); el comportamiento más probable ($p = 0.58$) tiene la forma de la curva observada y la esperanza, que promedia los tres, no. Sobre los diez orígenes la simultánea cubre la curva entera en los diez, la equi-colas y la máxima densidad en ocho y el FAR en cuatro, y la banda condicional al comportamiento realizado tiene un MPIW de $3.17$ contra $3.99$ de la marginal: cuando se conoce el comportamiento, el intervalo se angosta un $21\,\%$ sin perder cobertura. En la ventana de C-1 (orígenes $931$ a $940$, con el máximo de la varianza condicional del generador en $t = 933$, de $2.34$ contra una mediana de $0.70$ en el bloque de prueba) el ancho de la equi-colas sigue a la varianza verdadera, de $3.8$ en $t = 931$ a $5.8$ en $t = 933$ y de vuelta a $3.4$ al final de la ventana, con una correlación de Spearman de $0.83$ entre ambas sobre los diez orígenes; el peor origen es $t = 932$, el anterior al pico, donde la volatilidad todavía no se ha manifestado en los rezagos y la curva sale de todas las bandas (cobertura $0.49$ de la equi-colas, $0.40$ del FAR, $0.75$ de la simultánea). En la ventana de C-3 (orígenes $776$ a $785$, la de más orígenes con más de un modo en la ley conjunta verdadera: $782$, $784$ y $785$) el modelo da $K_t = 1$ en los diez y su región de máxima densidad no se parte en ningún $(t, \tau)$, mientras que la de la ley verdadera lo hace en el $4\,\%$ de ellos; la banda unimodal del modelo cubre el $0.956$ de la masa verdadera, contra $0.951$ de la banda verdadera al mismo nivel, siendo un $10\,\%$ más ancha. La ventaja del PSBPM-FD en el Bloque B de C-3 no viene de la multimodalidad, que no alcanza a verse en la marginal, sino de una banda bien calibrada.
 
 % ---------------------------------------------------------------------
 \subsection{Pronóstico por comportamiento}
@@ -867,18 +867,18 @@ En la ventana de [C-2] (orígenes $t = XX$ a $XX$, la de más cambios de régime
  & & & \multicolumn{5}{c}{MAE} & \multicolumn{2}{c}{pronóstico gana a} & \\
 Escenario & orígenes & $n$ & pronóstico & cota & esperanza & FAR & RF & FAR & RF & acierto \\
 \hline
-C-1 & todos     & XX & XX & XX & XX & XX & XX & XX\,\% & XX\,\% & XX\,\% \\
-    & $K_t\ge2$ & XX & XX & XX & XX & XX & XX & XX\,\% & XX\,\% & XX\,\% \\
-C-2 & todos     & XX & XX & XX & XX & XX & XX & XX\,\% & XX\,\% & XX\,\% \\
-    & $K_t\ge2$ & XX & XX & XX & XX & XX & XX & XX\,\% & XX\,\% & XX\,\% \\
-C-3 & todos     & XX & XX & XX & XX & XX & XX & XX\,\% & XX\,\% & XX\,\% \\
-    & $K_t\ge2$ & XX & XX & XX & XX & XX & XX & XX\,\% & XX\,\% & XX\,\% \\
+C-1 & todos     & 300 & 0.728 & 0.728 & 0.727 & 0.738 & 0.749 & 56\,\% & 56\,\% & 100\,\% \\
+    & $K_t\ge2$ & 1   & 0.885 & 0.885 & 0.704 & 0.624 & 0.746 & 0\,\% & 0\,\% & 100\,\% \\
+C-2 & todos     & 300 & 0.607 & 0.565 & 0.602 & 0.769 & 0.584 & 84\,\% & 44\,\% & 93\,\% \\
+    & $K_t\ge2$ & 90  & 0.619 & 0.478 & 0.602 & 0.749 & 0.559 & 83\,\% & 44\,\% & 78\,\% \\
+C-3 & todos     & 300 & 0.687 & 0.687 & 0.687 & 0.697 & 0.696 & 58\,\% & 53\,\% & 100\,\% \\
+    & $K_t\ge2$ & 0   & --- & --- & --- & --- & --- & --- & --- & --- \\
 \hline
 \end{tabular}
 \end{table}
 
 % Lectura 1: el pronóstico (algoritmo) contra FAR y RF; la cota dice cuánto más habría.
-En los orígenes de [C-2] con más de un comportamiento, el pronóstico por comportamiento tiene un MAE de XX, XX\,\% menor que la esperanza y XX\,\% menor que el FAR, y le gana al FAR en XX\,\% de esos orígenes y al Random Forest en XX\,\%. La cota baja a XX: alguna de las opciones describe la curva observada mucho mejor que cualquier referencia, y la distancia entre cota y pronóstico, XX, es lo que se pierde por elegir con la probabilidad. En [C-1] y [C-3] no hay orígenes con $K_t \ge 2$ y las cifras coinciden con las de la esperanza.
+En los $90$ orígenes de C-2 con más de un comportamiento, el pronóstico por comportamiento tiene un MAE de $0.619$, un $17\,\%$ menor que el FAR, al que le gana en el $83\,\%$ de esos orígenes, pero un $3\,\%$ mayor que la esperanza y un $11\,\%$ mayor que el Random Forest, al que le gana en el $44\,\%$. Comprometerse con el comportamiento más probable no mejora la esperanza en promedio: en el $78\,\%$ de los orígenes el elegido es el mejor y el error baja, y en el $22\,\%$ restante el error sube más de lo que se ganó. La cota baja a $0.478$, un $21\,\%$ bajo la esperanza, un $14\,\%$ bajo el Random Forest y un $36\,\%$ bajo el FAR, y le gana al FAR en el $96\,\%$ de esos orígenes y al Random Forest en el $61\,\%$: alguna de las opciones describe la curva observada mejor que cualquier referencia, y la distancia entre cota y pronóstico, $0.14$, es lo que se pierde por elegir con la probabilidad. Sobre todo el bloque de prueba la cota es, en C-2, el mejor predictor puntual del estudio ($0.565$ contra $0.584$ del Random Forest). En C-1 el único origen con $K_t \ge 2$ es $t = 933$, donde el comportamiento elegido es el de reversión y la curva observada persiste, y en C-3 no hay ninguno: en ambos las cifras coinciden con las de la esperanza.
 
 % Fuente: 116_resumen_bloqueA_opciones.csv (test, todos los M).
 \begin{table}[H]
@@ -890,56 +890,56 @@ En los orígenes de [C-2] con más de un comportamiento, el pronóstico por comp
  & \multicolumn{2}{c}{C-1} & \multicolumn{2}{c}{C-2} & \multicolumn{2}{c}{C-3} \\
 $M$ & pronóstico & cota & pronóstico & cota & pronóstico & cota \\
 \hline
-$1$  & XX & XX & XX & XX & --- & --- \\
-$2$  & XX & XX & XX & XX & --- & --- \\
-$3$  & XX & XX & XX & XX & XX & XX \\
-$4$  & XX & XX & XX & XX & XX & XX \\
-$5$  & XX & XX & XX & XX & XX & XX \\
-$6$  & XX & XX & XX & XX & XX & XX \\
-$7$  & XX & XX & XX & XX & --- & --- \\
-$8$  & XX & XX & XX & XX & --- & --- \\
-$9$  & XX & XX & XX & XX & --- & --- \\
-$10$ & XX & XX & XX & XX & --- & --- \\
+$1$  & 0.754 & 0.754 & 0.713 & 0.693 & --- & --- \\
+$2$  & 0.740 & 0.740 & 0.676 & 0.641 & --- & --- \\
+$3$  & 0.725 & 0.725 & 0.637 & 0.601 & 0.694 & 0.694 \\
+$4$  & 0.717 & 0.717 & 0.617 & 0.574 & 0.690 & 0.690 \\
+$5$  & 0.714 & 0.714 & 0.615 & 0.572 & 0.684 & 0.684 \\
+$6$  & 0.714 & 0.714 & 0.613 & 0.572 & 0.689 & 0.689 \\
+$7$  & 0.713 & 0.713 & 0.613 & 0.570 & --- & --- \\
+$8$  & 0.712 & 0.712 & 0.613 & 0.570 & --- & --- \\
+$9$  & 0.712 & 0.712 & 0.613 & 0.570 & --- & --- \\
+$10$ & 0.712 & 0.712 & 0.612 & 0.570 & --- & --- \\
 \hline
 \end{tabular}
 \end{table}
 
+% Lectura 2: dónde se separan pronóstico y cota a lo largo del test.
+Sobre la ventana móvil la cota de C-2 queda un $6\,\%$ bajo la esperanza y un $4\,\%$ bajo el Random Forest en $M_{\mathrm{ref}}$, y la brecha con el pronóstico se abre ya con $M = 1$ y crece hasta $M = 4$, como el resto del Bloque A. La Figura~\ref{fig:res_pronostico_ventana} muestra que en C-2 la cota se separa del pronóstico a lo largo de todo el bloque de prueba, porque los orígenes con $K_t \ge 2$ están repartidos en él, y que la separación es mayor en el tramo de $t$ entre $800$ y $880$, el de más cambios de régimen (la ventana de detalle está en él), donde además el pronóstico queda por encima de la esperanza. En C-1 y C-3 las curvas del pronóstico, la cota y la esperanza se superponen en todo el bloque de prueba.
+
 % Figura 4: dos trayectorias sobre la ventana móvil de prueba, w_ref, M_ref: arriba el pronóstico contra FAR y RF,
-% abajo la cota contra FAR y RF; un panel por escenario. Fuente: 114_ventana_{mas_probable,mejor}_w40.png del _06.
+% abajo la cota contra FAR y RF; un panel por escenario. Fuente: 115_ventana_modelos_w30.csv del _06 (compuesta en docs/IMG/03_08).
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{<fig/03_08_pronostico_ventana_w40.pdf>}
+\includegraphics[width=\textwidth]{IMG/03_08/03_08_pronostico_ventana_w30.png}
 \caption{MAE sobre la ventana móvil del bloque de prueba ($w_{\mathrm{ref}}$, $M_{\mathrm{ref}}$). Arriba, el pronóstico por comportamiento contra el FAR y el Random Forest; abajo, la cota del mejor comportamiento contra los mismos; la esperanza como referencia. Un panel por escenario.}
 \label{fig:res_pronostico_ventana}
 \end{figure}
 
-% Lectura 2: dónde se separan pronóstico y cota a lo largo del test.
-En [C-2] la cota se separa del pronóstico en XX, que son los tramos con cambios de régimen; fuera de ellos ambos coinciden con la esperanza. En [C-1] y [C-3] las curvas se superponen en todo el bloque de prueba.
-
-% Fuente: 119_acierto_por_p1.csv del _06 (test, K >= 2, M_ref).
+% Fuente: 119_acierto_por_p1.csv del _06 (test, K >= 2, M_ref). 83 de los 90 orígenes tienen p >= 0.5; los 7 restantes tienen K = 3 con el más probable bajo 0.5.
 \begin{table}[H]
 \centering\small
-\caption{Acierto de la elección por probabilidad en [C-2] (bloque de prueba, $K_t \ge 2$, $M_{\mathrm{ref}}$): por tramo de la probabilidad $p_{t,c^{*}}$ del comportamiento elegido, número de orígenes, fracción en que el mejor comportamiento es el más probable y MAE perdido respecto de la cota.}
+\caption{Acierto de la elección por probabilidad en C-2 (bloque de prueba, $K_t \ge 2$, $M_{\mathrm{ref}}$): por tramo de la probabilidad $p_{t,c^{*}}$ del comportamiento elegido, número de orígenes, fracción en que el mejor comportamiento es el más probable y MAE perdido respecto de la cota. Los $7$ orígenes con $p_{t,c^{*}} < 0.5$ (tres comportamientos sin ninguno dominante) no se tabulan.}
 \label{tab:res_acierto_p1}
 \begin{tabular}{l c c c}
 \hline
 $p_{t,c^{*}}$ & orígenes & acierto & MAE perdido \\
 \hline
-$[0.5, 0.6)$ & XX & XX\,\% & XX \\
-$[0.6, 0.7)$ & XX & XX\,\% & XX \\
-$[0.7, 0.8)$ & XX & XX\,\% & XX \\
-$[0.8, 0.9)$ & XX & XX\,\% & XX \\
-$[0.9, 1]$   & XX & XX\,\% & XX \\
+$[0.5, 0.6)$ & 5  & 20\,\%  & 0.61 \\
+$[0.6, 0.7)$ & 11 & 36\,\%  & 0.28 \\
+$[0.7, 0.8)$ & 31 & 87\,\%  & 0.11 \\
+$[0.8, 0.9)$ & 28 & 93\,\%  & 0.06 \\
+$[0.9, 1]$   & 8  & 100\,\% & 0.00 \\
 \hline
 \end{tabular}
 \end{table}
 
 % Lectura 3: con 90/10 se acierta, con 60/40 no.
-Con $p_{t,c^{*}} \ge 0.8$ el comportamiento más probable es el mejor en XX\,\% de los orígenes y el pronóstico casi alcanza la cota; con masas cercanas a $0.5$ el acierto cae a XX\,\%, que es lo esperable de dos opciones casi equiprobables, y ahí se concentra la pérdida. XX\,\% de los orígenes con $K_t \ge 2$ están en el primer caso.
+Con $p_{t,c^{*}} \ge 0.8$ el comportamiento más probable es el mejor en el $94\,\%$ de los orígenes y el pronóstico queda a $0.05$ de la cota; con $p_{t,c^{*}} \ge 0.7$ el acierto es del $90\,\%$. Con masas por debajo de $0.7$ el acierto cae al $31\,\%$, que es lo esperable de dos o tres opciones casi equiprobables, y ahí se concentra la pérdida: entre $0.28$ y $0.61$ de MAE por origen. El $74\,\%$ de los orígenes con $K_t \ge 2$ están en el primer caso; el $22\,\%$ de desaciertos del Cuadro~\ref{tab:res_pronostico} viene casi por completo de los $16$ orígenes con $p_{t,c^{*}}$ entre $0.5$ y $0.7$. La probabilidad del comportamiento elegido es, por tanto, un indicador de cuándo conviene comprometerse con él y cuándo conviene reportar las opciones.
 
 % ---------------------------------------------------------------------
 \subsection{Síntesis}
 \label{03_08_05_sintesis}
 
 % Cuatro frases, una por pregunta del diseño más el pronóstico.
-El PSBPM-FD supera a la referencia lineal en el error puntual en [C-k] y [C-k] desde $M = XX$, y en los intervalos en [C-k] y [C-k], con una banda cuyo ancho sigue el estado del proceso. Elegir el predictor cambia el resultado solo donde la predictiva es multimodal o asimétrica ([C-2]), donde la mediana puntual mejora el MAE en XX\,\%. Los comportamientos aparecen en [C-2] y no en [C-1] ni [C-3]. Donde aparecen, el pronóstico por comportamiento reduce el MAE frente a la esperanza en XX\,\% y frente al FAR en XX\,\%, y la cota muestra que acertar el comportamiento lo reduciría en XX\,\%: el modelo produce opciones de las que alguna es la buena, y elige bien cuando la probabilidad del comportamiento elegido supera XX.
+El PSBPM-FD supera a la referencia lineal en el error puntual en los tres escenarios desde $M = 4$ (desde $M = 1$ en C-2, con una brecha del $22\,\%$; del orden del $2\,\%$ en C-1 y C-3, donde la media condicional es lineal o casi lineal), y el Random Forest con la misma especificación le gana en C-2 y pierde en C-1. En los intervalos supera al FAR en los tres escenarios desde $M = 3$ o $4$: en C-2 con una banda un $10\,\%$ más angosta y mejor cubierta, y en C-1 y C-3 por calibración, con un ancho que sigue el estado del proceso. Elegir el predictor cambia el resultado sólo donde la predictiva es multimodal (C-2), donde la mediana puntual mejora el MAE en $1.3\,\%$ y la región de máxima densidad el Winkler en $2.9\,\%$; en C-1 y C-3 las tres construcciones puntuales y los tres predictores coinciden, y la banda simultánea es en todos la única calibrada para la curva completa. Los comportamientos aparecen en el $30\,\%$ de los orígenes de C-2 y no en C-1 ni en C-3, en acuerdo con la ley verdadera de cada escenario aunque con exceso en C-2. Donde aparecen, el pronóstico por comportamiento reduce el MAE frente al FAR en $17\,\%$ pero no frente a la esperanza, y la cota muestra que acertar el comportamiento lo reduciría en $21\,\%$ frente a la esperanza y en $14\,\%$ frente al Random Forest: el modelo produce opciones de las que alguna es la buena, y elige bien cuando la probabilidad del comportamiento elegido supera $0.7$.
