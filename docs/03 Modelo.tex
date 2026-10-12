@@ -1,3 +1,6 @@
+% Punto decimal también en modo matemático (babel-spanish lo vuelve coma); vale desde aquí hasta el final.
+\ifdefined\decimalpoint\decimalpoint\else\mathcode`\.="013A \fi
+
 \chapter{Mezclas DDP para Series de Tiempo Funcionales}
 \label{03_00_00_mezclas_ddp_series_tiempo_funcionales}
  
@@ -7,11 +10,11 @@
  
 Al igual que en el contexto escalar y multivariado, donde la dependencia temporal se captura mediante la distribución condicional de $X_t$ dado su historia $\{X_{t-1}, X_{t-2}, \ldots\}$, en las series de tiempo funcionales el objetivo es análogo, es decir, caracterizar la ley condicional de la curva $X_t(\tau)$ dado el conjunto de curvas pasadas $\{X_{t-1}(\tau), X_{t-2}(\tau), \ldots\}$. Así como en el caso clásico existen múltiples metodologías para modelar dicha dependencia, en el contexto funcional el abanico de estrategias se amplía aún más, precisamente porque cada observación ya no es un escalar o un vector de dimensión finita sino una curva que vive en un espacio funcional de dimensión infinita.\\
  
-La estrategia más común consiste en extender los modelos clásicos de series de tiempo al contexto funcional, es decir, utilizar los modelos funcionales FAR, FMA y FARMA, los cuales postulan una dinámica lineal gobernada por un operador acotado sobre el espacio de funciones, \cite{02_02_bosq2000linear}. Otra estrategia recurre a esquemas de reducción de dimensión, en los cuales se proyectan las curvas sobre una base de componentes principales funcionales y se modelan por separado las series de scores resultantes mediante técnicas clásicas univariadas, \cite{03_00_hyndman2007robust,03_00_hyndman2009forecasting}, o bien mediante un modelo vectorial autorregresivo sobre el vector de scores, \cite{02_02_aue2015prediction}. Ambos enfoques incorporan explícitamente la dependencia temporal entre observaciones funcionales y permiten cuantificar la incertidumbre predictiva; sin embargo, heredan limitaciones estructurales. En primer lugar, la dinámica se restringe a un operador lineal actuando sobre la curva (o el vector de scores) rezagado, de modo que la distribución condicional de $X_t$ dado su pasado queda completamente determinada por una única ley de innovación homogénea en el tiempo, es decir, el modelo podria no admitir multimodalidad condicional, asimetrías dependientes del estado ni regímenes dinámicos cambiantes. En segundo lugar, la teoría de estimación y predicción descansa en supuestos de estacionariedad, \cite{03_00_hormann2010weakly,02_02_aue2015prediction} cuya violación ha sido documentada empíricamente en aplicaciones prácticas como las curvas de precios intradiarios, \citet{03_00_horvath2014testing}, y las curvas de temperatura, \citet{03_00_aue2018detecting}, donde la hipótesis de estacionariedad resulta rechazada y motiva por tanto el estudio de otras metodologías.\\
+La estrategia más común consiste en extender los modelos clásicos de series de tiempo al contexto funcional, es decir, utilizar los modelos funcionales FAR, FMA y FARMA, los cuales postulan una dinámica lineal gobernada por un operador acotado sobre el espacio de funciones, \cite{02_02_bosq2000linear}. Otra estrategia recurre a esquemas de reducción de dimensión, en los cuales se proyectan las curvas sobre una base de componentes principales funcionales y se modelan por separado las series de scores resultantes mediante técnicas clásicas univariadas, \cite{03_00_hyndman2007robust,03_00_hyndman2009forecasting}, o bien mediante un modelo vectorial autorregresivo sobre el vector de scores, \cite{02_02_aue2015prediction}. Ambos enfoques incorporan explícitamente la dependencia temporal entre observaciones funcionales y permiten cuantificar la incertidumbre predictiva; sin embargo, heredan limitaciones estructurales. En primer lugar, la dinámica se restringe a un operador lineal actuando sobre la curva (o el vector de scores) rezagado, de modo que la distribución condicional de $X_t$ dado su pasado queda completamente determinada por una única ley de innovación homogénea en el tiempo, es decir, el modelo podría no admitir multimodalidad condicional, asimetrías dependientes del estado, una dispersión que cambie con la historia reciente ni regímenes dinámicos cambiantes. En segundo lugar, la teoría de estimación y predicción descansa en supuestos de estacionariedad, \cite{03_00_hormann2010weakly,02_02_aue2015prediction} cuya violación ha sido documentada empíricamente en aplicaciones prácticas como las curvas de precios intradiarios, \citet{03_00_horvath2014testing}, y las curvas de temperatura, \citet{03_00_aue2018detecting}, donde la hipótesis de estacionariedad resulta rechazada y motiva por tanto el estudio de otras metodologías.\\
  
-Paralelamente, los avances en aprendizaje automático han dado lugar a modelos altamente flexibles, como redes neuronales, Random Forest y máquinas de soporte vectorial, con aplicaciones directas al pronóstico de series de tiempo funcionales, típicamente operando sobre los scores de una descomposición en componentes principales funcionales, \cite{03_00_forecast4010022}. Estos métodos relajan la restricción de linealidad en la media condicional y exhiben, en general, un elevado poder predictivo puntual.No obstante, sus limitaciones para el problema que aquí interesa son de naturaleza distribucional. En primer lugar, estos métodos producen pronósticos puntuales sin medida de incertidumbre asociada, de modo que su cuantificación debe añadirse externamente al modelo, como ocurre con los intervalos de predicción construidos mediante remuestreo bootstrap de residuos, \cite{03_00_forecast4010022}. Ese remuestreo no impone una forma a la distribución del error, pero suma a cada predicción la misma población de residuos con independencia del estado del proceso, de manera que la forma y la amplitud del intervalo no pueden cambiar con la historia reciente, que es precisamente lo que una ley condicional heterogénea exige. En segundo lugar, los intentos de dotar a estas arquitecturas de un marco probabilístico, como las redes neuronales bayesianas, los deep ensembles y los procesos neuronales, enfrentan dificultades como inferencia exacta intratable, especificación problemática de distribuciones a priori sobre los pesos, subestimación sistemática de la incertidumbre y costos computacionales elevados, \cite{03_00_kamarthi2021doubt}. El esfuerzo más reciente en esta dirección, específico para series de tiempo funcionales, es la red neuronal probabilística de \citet{03_00_wang2025profnet}, que confirma el diagnóstico anterior pero lo resuelve dentro de una verosimilitud gaussiana paramétrica, la cual produce nuevamente una distribución predictiva unimodal y de forma fija, incapaz de representar heterogeneidad distribucional en la ley condicional de la curva.\\
+Paralelamente, los avances en aprendizaje automático han dado lugar a modelos altamente flexibles, como redes neuronales, Random Forest y máquinas de soporte vectorial, con aplicaciones directas al pronóstico de series de tiempo funcionales, típicamente operando sobre los scores de una descomposición en componentes principales funcionales, \cite{03_00_forecast4010022}. Estos métodos relajan la restricción de linealidad en la media condicional y exhiben, en general, un elevado poder predictivo puntual. No obstante, sus limitaciones para el problema que aquí interesa son de naturaleza distribucional. En primer lugar, estos métodos producen pronósticos puntuales sin medida de incertidumbre asociada, de modo que su cuantificación debe añadirse externamente al modelo, como ocurre con los intervalos de predicción construidos mediante remuestreo bootstrap de residuos, \cite{03_00_forecast4010022}. Ese remuestreo no impone una forma a la distribución del error, pero suma a cada predicción la misma población de residuos con independencia del estado del proceso, de manera que la forma y la amplitud del intervalo no pueden cambiar con la historia reciente, que es precisamente lo que una ley condicional heterogénea exige. En segundo lugar, los intentos de dotar a estas arquitecturas de un marco probabilístico, como las redes neuronales bayesianas, los deep ensembles y los procesos neuronales, enfrentan dificultades como inferencia exacta intratable, especificación problemática de distribuciones a priori sobre los pesos, subestimación sistemática de la incertidumbre y costos computacionales elevados, \cite{03_00_kamarthi2021doubt}. El esfuerzo más reciente en esta dirección, específico para series de tiempo funcionales, es la red neuronal probabilística de \citet{03_00_wang2025profnet}, que confirma el diagnóstico anterior pero lo resuelve dentro de una verosimilitud gaussiana paramétrica, la cual produce nuevamente una distribución predictiva unimodal y de forma fija, incapaz de representar heterogeneidad distribucional en la ley condicional de la curva.\\
  
-Se configura así una disyuntiva entre dos familias de métodos que excede la simple oposición entre rigor y flexibilidad. Los enfoques funcionales de base estadística ofrecen un marco probabilístico coherente al precio de supuestos estructurales que la evidencia empírica contradice en los dominios de alta frecuencia que motivan esta tesis; los enfoques de aprendizaje automático flexibilizan la media condicional, pero su cuantificación de incertidumbre es ad hoc, en el sentido de ser externa al modelo, paramétrica de forma fija bajo verosimilitudes gaussianas, o mal calibrada por efecto de la inferencia variacional sobre pesos de redes. En ninguna de las dos familias el objeto de modelamiento es la distribución condicional completa de la observación funcional dada su historia, ambas la reducen a una media condicional más una ley de error rígida. 
+Se configura así una disyuntiva entre dos familias de métodos que excede la simple oposición entre rigor y flexibilidad. Los enfoques funcionales de base estadística ofrecen un marco probabilístico coherente al precio de supuestos estructurales que la evidencia empírica contradice en los dominios de alta frecuencia que motivan esta tesis; los enfoques de aprendizaje automático flexibilizan la media condicional, pero su cuantificación de incertidumbre es ad hoc, en el sentido de ser externa al modelo, paramétrica de forma fija bajo verosimilitudes gaussianas, o mal calibrada por efecto de la inferencia variacional sobre pesos de redes. En ninguna de las dos familias el objeto de modelamiento es la distribución condicional completa de la observación funcional dada su historia, ambas la reducen a una media condicional más una ley de error rígida. Disponer de la distribución condicional completa plantea además un problema propio, el de cómo resumirla: cuando es una mezcla, una sola curva y un intervalo central no distinguen entre una predictiva unimodal y una que reparte su masa entre trayectorias distintas.
  
 \section{Estado del Arte}
 \label{03_02_00_estado_arte}
@@ -20,7 +23,7 @@ La aplicación de métodos bayesianos no paramétricos al modelamiento de series
  
 Una primera línea introduce la dependencia temporal en los átomos de la mezcla, manteniendo los pesos fijos. \citet{03_01_rodriguez2008dynamic} definen la distribución en cada instante como una mezcla de gaussianas cuyos átomos evolucionan según un modelo dinámico lineal, lo que permite capturar colas pesadas, multimodalidad y clusters de volatilidad en fenómenos financieros con la maquinaria computacional de un DPM estándar, precisamente porque los pesos no requieren actualización. \citet{03_01_dilucca2013simple} dan un paso conceptual decisivo al indexar el DDP no por el tiempo sino por la covariable rezagada $y_{t-1}$, con átomos afines de la forma $\theta_h(y)=\beta_h+\gamma_h y$, demostrando que un DDP puede operar directamente como motor de un modelo autorregresivo de regresión de densidad. Estos trabajos aportan la plantilla de ``mezcla condicionada al estado del proceso'', pero con dos restricciones compartidas. Primero la covariable es escalar y la segunda es que la dependencia recae únicamente en los átomos, de modo que los pesos de mezcla permanecen constantes y no responden al estado rezagado.\\
  
-Una segunda línea introduce la dependencia temporal en los pesos, de modo que lo que cambia en el tiempo no es la ubicación de los componentes sino cuánta probabilidad recibe cada uno. \citet{03_01_griffin2011stick} lo consiguen mediante una recursión estocástica sobre las fracciones stick-breaking que preserva, en cada instante. En la representación de particiones, donde los pesos quedan integrados y solo se modela la regla de asignación a grupos, se han propuesto urnas de Pólya variantes en el tiempo \cite{03_01_caron2007urna} y, en el caso multivariado, \citet{03_01_saad2018temporally} reponderan la asignación de un proceso de restaurante chino según la recencia de las observaciones de cada grupo, logrando pronosticar, imputar y agrupar simultáneamente cientos de series heterogéneas y no estacionarias. Frente al problema de esta tesis, estos mecanismos presentan dos limitaciones. Ninguno ha sido aplicado a datos funcionales  y la recursión sobre fracciones no admite generalización natural a covariables en $\mathbb{R}^M$. Son de hecho notablemente escasos los trabajos que transitan del caso escalar al vectorial dentro de la familia DDP.\\
+Una segunda línea introduce la dependencia temporal en los pesos, de modo que lo que cambia en el tiempo no es la ubicación de los componentes sino cuánta probabilidad recibe cada uno. \citet{03_01_griffin2011stick} lo consiguen mediante una recursión estocástica sobre las fracciones stick-breaking que preserva, en cada instante, la distribución marginal del proceso stick-breaking. En la representación de particiones, donde los pesos quedan integrados y solo se modela la regla de asignación a grupos, se han propuesto urnas de Pólya variantes en el tiempo \cite{03_01_caron2007urna} y, en el caso multivariado, \citet{03_01_saad2018temporally} reponderan la asignación de un proceso de restaurante chino según la recencia de las observaciones de cada grupo, logrando pronosticar, imputar y agrupar simultáneamente cientos de series heterogéneas y no estacionarias. Frente al problema de esta tesis, estos mecanismos presentan dos limitaciones. Ninguno ha sido aplicado a datos funcionales y la recursión sobre fracciones no admite generalización natural a covariables en $\mathbb{R}^M$. Son de hecho notablemente escasos los trabajos que transitan del caso escalar al vectorial dentro de la familia DDP.\\
  
 En el frente de los datos funcionales, la literatura bayesiana no paramétrica ha producido construcciones dependientes genuinas, pero con la dependencia orientada a ejes distintos del temporal. \citet{03_01_petrone2009hybrid} formalizan los priors Dirichlet híbridos, en los que cada curva se recombina localmente a partir de unas pocas curvas mediante un proceso de etiquetas oculto gobernado por una cópula gaussiana sobre el propio dominio funcional; el aporte es un mecanismo de heterogeneidad local dentro de la curva, pero no existe estructura temporal entre curvas sucesivas. \citet{03_01_rodriguez2009functional} estiman colecciones de curvas compartiendo información mediante mezclas DDP de gaussianas; la dependencia, sin embargo, es entre curvas de una muestra y no una estructura autorregresiva sobre la ley de mezcla. \citet{03_01_scarpa2014enriched} enriquecen el stick-breaking funcional con una jerarquía de dos niveles que agrupa las curvas primero por atributos globales conocidos y luego por características finas, mecanismo valioso para incorporar información previa sobre regímenes pero atemporal por construcción. Más cerca del objetivo de esta tesis, \citet{03_01_gamasaee2017mining} combinan un DDP con mezclas de regresión por tramos para clustering dinámico, segmentación y pronóstico de funciones, con clusters que nacen, persisten y transitan en el tiempo; no obstante, su representación por tramos no se articula con expansiones FPCA ni con una covariable de scores rezagados. El balance de esta literatura funcional es claro: existen mezclas dependientes para curvas, pero en ninguna de ellas la distribución de la curva presente está indexada por el estado funcional rezagado de la serie.\\
  
@@ -32,9 +35,10 @@ La revisión anterior muestra que un modelo para el problema de esta tesis neces
 
 La mezcla probit stick-breaking permite construir un modelo cuyos pesos dependen de covariables construidas con los rezagos del proceso, mientras que la parte funcional se puede ajustar con $M$ modelos univariados para los scores obtenidos de un análisis de componentes principales funcionales.\\
 
-Por tanto, la brecha de investigación que este trabajo busca cubrir consiste en desarrollar un modelo bayesiano no paramétrico que combine modelos univariados para los scores con pesos de stick-breaking dependientes del estado funcional rezagado, y que permita predecir los scores para, a partir de ellos, reconstruir la curva $X_t(\tau)$.
+Por tanto, la brecha de investigación que este trabajo busca cubrir consiste en desarrollar un modelo bayesiano no paramétrico que combine modelos univariados para los scores con pesos de stick-breaking dependientes del estado funcional rezagado, y que permita predecir los scores para, a partir de ellos, reconstruir la curva $X_t(\tau)$.\\
 
- 
+Como la predictiva de este modelo es una mezcla, la brecha incluye también resumirla de manera consistente con su forma, mediante predictores puntuales e intervalos de credibilidad apropiados y mediante los comportamientos que la mezcla distingue, con la probabilidad de cada uno.
+
 \section{Probit Stick-Breaking Process Mixture}
 \label{03_03_00_psbp}
 Esta sección presenta el Probit Stick-Breaking Process (PSBP) y el modelo de mezcla construido sobre él, el PSBP Mixture (PSBPM), desarrollado por \citet{03_02_chung2009nonparametric}. Salvo indicación en contrario, las definiciones, resultados y el esquema de inferencia expuestos en esta secciónprovienen de dicho trabajo.\\
@@ -614,7 +618,7 @@ Las métricas de la Sección~\ref{02_02_03_criterios_evaluacion} se calculan sob
 
 Las referencias son el FAR, con orden fijo igual al número de rezagos del escenario e intervalo gaussiano, y el Random Forest con la misma especificación que el PSBPM-FD. Se reportan el MAE y el RMSE de los tres predictores puntuales, del pronóstico por comportamiento (Sección~\ref{03_06_03_descripcion}) y de su cota, el mejor comportamiento, que usa la curva observada, estos dos sólo en C-2, cada uno contra el FAR y el Random Forest; y el Winkler, el MPIW y el PICP de las tres construcciones de intervalo contra el FAR.\\
 
-Los comportamientos predictivos y el pronóstico que se construye con ellos se evalúan sólo en C-2, el escenario cuya ley condicional reparte su masa entre regímenes separados. En C-1 la media condicional es única y en C-3 la multimodalidad queda en la ley conjunta de los scores y no llega a la marginal de la curva, de modo que en ambos la predictiva tiene un solo comportamiento y el pronóstico por comportamiento coincide con la esperanza. En C-2 los comportamientos se resumen por la distribución de $K_t$ en el bloque de prueba y, origen a origen, en una ventana de detalle de $N_{\mathrm{det}} = 10$ orígenes consecutivos, la de más cambios de régimen verdadero, elegida con lo que el generador registra y nunca con lo predicho. Hay una realización por escenario, de modo que las cifras son descriptivas. La configuración completa está en el Anexo~\ref{ane_00_03_configuracion} y las métricas restantes y los otros anchos de ventana, en el Anexo~\ref{aneB_00_00_resultados_simulacion}.
+Los comportamientos predictivos y el pronóstico que se construye con ellos se evalúan sólo en C-2, el escenario cuya ley condicional reparte su masa entre regímenes separados. En C-1 la media condicional es única y en C-3 la multimodalidad queda en la ley conjunta de los scores y no llega a la marginal de la curva, de modo que en ambos la predictiva tiene un solo comportamiento y el pronóstico por comportamiento coincide con la esperanza. En C-2 los comportamientos se resumen por la distribución de $K_t$ en el bloque de prueba y, origen a origen, en una ventana de detalle de $N_{\mathrm{det}} = 10$ orígenes consecutivos, la de más cambios de régimen verdadero, elegida con lo que el generador registra y nunca con lo predicho.  La configuración completa está en el Anexo~\ref{ane_00_03_configuracion} y las métricas restantes y los otros anchos de ventana, en el Anexo~\ref{aneB_00_00_resultados_simulacion}.
 
 \subsection{Escenarios}
 \label{03_07_02_escenarios}
@@ -631,9 +635,9 @@ El régimen o mecanismo que sortea el generador se registra pero no se entrega a
 \hline
  & Rasgo & Algoritmo & $p$ & Covariables & $M$ \\
 \hline
-C-1 & heterocedasticidad condicional        & Anexo~\ref{ane_00_02_01_alg_c1} & $4$ & rezagos propios                       & $1,\ldots,10$ \\
-C-2 & cambio de régimen por umbral          & Anexo~\ref{ane_00_02_02_alg_c2} & $4$ & rezagos propios                       & $1,\ldots,10$ \\
-C-3 & multimodalidad en la ley condicional  & Anexo~\ref{ane_00_02_03_alg_c3} & $2$ & rezagos de todas las componentes      & $3,\ldots,6$ \\
+C-1 & Heterocedasticidad condicional        & Anexo~\ref{ane_00_02_01_alg_c1} & $4$ & Rezagos propios                       & $1,\ldots,10$ \\
+C-2 & Cambio de régimen por umbral          & Anexo~\ref{ane_00_02_02_alg_c2} & $4$ & Rezagos propios                       & $1,\ldots,10$ \\
+C-3 & Multimodalidad en la ley condicional  & Anexo~\ref{ane_00_02_03_alg_c3} & $2$ & Rezagos de todas las componentes      & $3,\ldots,6$ \\
 \hline
 \end{tabular}
 \end{table}
@@ -665,7 +669,7 @@ Los Cuadros~\ref{tab:res_bloqueA} y~\ref{tab:res_bloqueA_rmse} resumen el MAE y 
 \begin{tabular}{c cccc cccc cccc}
 \hline
  & \multicolumn{4}{c}{C-1} & \multicolumn{4}{c}{C-2} & \multicolumn{4}{c}{C-3} \\
-$M$ & esp. & med. & modal & RF & esp. & med. & modal & RF & esp. & med. & modal & RF \\
+$M$ & Esp. & Med. & Modal & RF & Esp. & Med. & Modal & RF & Esp. & Med. & Modal & RF \\
 \hline
 $1$  & 0.754 & 0.755 & 0.755 & 0.764 & 0.714 & 0.720 & 0.725 & 0.710 & --- & --- & --- & --- \\
 $2$  & 0.739 & 0.739 & 0.739 & 0.753 & 0.673 & 0.675 & 0.691 & 0.658 & --- & --- & --- & --- \\
@@ -692,7 +696,7 @@ FAR & \multicolumn{4}{c}{0.723} & \multicolumn{4}{c}{0.770} & \multicolumn{4}{c}
 \begin{tabular}{c cccc cccc cccc}
 \hline
  & \multicolumn{4}{c}{C-1} & \multicolumn{4}{c}{C-2} & \multicolumn{4}{c}{C-3} \\
-$M$ & esp. & med. & modal & RF & esp. & med. & modal & RF & esp. & med. & modal & RF \\
+$M$ & Esp. & Med. & Modal & RF & Esp. & Med. & Modal & RF & Esp. & Med. & Modal & RF \\
 \hline
 $1$  & 0.951 & 0.953 & 0.953 & 0.967 & 0.907 & 0.920 & 0.927 & 0.906 & --- & --- & --- & --- \\
 $2$  & 0.923 & 0.924 & 0.925 & 0.943 & 0.854 & 0.865 & 0.889 & 0.843 & --- & --- & --- & --- \\
@@ -822,7 +826,7 @@ Los Cuadros~\ref{tab:res_bloqueB_por_M} a~\ref{tab:res_bloqueB_picp_por_M} resum
 \begin{tabular}{c ccc ccc ccc}
 \hline
  & \multicolumn{3}{c}{C-1} & \multicolumn{3}{c}{C-2} & \multicolumn{3}{c}{C-3} \\
-$M$ & equi-colas & HDR & simult. & equi-colas & HDR & simult. & equi-colas & HDR & simult. \\
+$M$ & Equi-colas & HDR & Simult. & Equi-colas & HDR & Simult. & Equi-colas & HDR & Simult. \\
 \hline
 $1$ & 9.94 & 9.93 & 9.92 & 11.95 & 12.09 & 10.74 & --- & --- & --- \\
 $2$ & 4.98 & 4.94 & 4.44 & 5.69 & 5.29 & 6.54 & --- & --- & --- \\
@@ -848,7 +852,7 @@ FAR & \multicolumn{3}{c}{4.35} & \multicolumn{3}{c}{4.86} & \multicolumn{3}{c}{4
 \begin{tabular}{c ccc ccc ccc}
 \hline
  & \multicolumn{3}{c}{C-1} & \multicolumn{3}{c}{C-2} & \multicolumn{3}{c}{C-3} \\
-$M$ & equi-colas & HDR & simult. & equi-colas & HDR & simult. & equi-colas & HDR & simult. \\
+$M$ & Equi-colas & HDR & Simult. & Equi-colas & HDR & Simult. & Equi-colas & HDR & Simult. \\
 \hline
 $1$ & 1.95 & 1.95 & 1.96 & 1.76 & 1.46 & 2.01 & --- & --- & --- \\
 $2$ & 2.82 & 2.82 & 3.70 & 2.79 & 2.56 & 6.08 & --- & --- & --- \\
@@ -874,7 +878,7 @@ FAR & \multicolumn{3}{c}{3.42} & \multicolumn{3}{c}{3.98} & \multicolumn{3}{c}{3
 \begin{tabular}{c ccc ccc ccc}
 \hline
  & \multicolumn{3}{c}{C-1} & \multicolumn{3}{c}{C-2} & \multicolumn{3}{c}{C-3} \\
-$M$ & equi-colas & HDR & simult. & equi-colas & HDR & simult. & equi-colas & HDR & simult. \\
+$M$ & Equi-colas & HDR & Simult. & Equi-colas & HDR & Simult. & Equi-colas & HDR & Simult. \\
 \hline
 $1$ & 0.640 & 0.640 & 0.641 & 0.541 & 0.493 & 0.604 & --- & --- & --- \\
 $2$ & 0.869 & 0.872 & 0.953 & 0.817 & 0.813 & 0.968 & --- & --- & --- \\
@@ -926,17 +930,17 @@ En las Figuras~\ref{fig:res_bloqueB_vs_M_C1} a~\ref{fig:res_bloqueB_vs_M_C3} las
 \hline
 Escenario & Banda & Winkler & MPIW & PICP \\
 \hline
-C-1 & equi-colas & $-2.7\%$ & $+1.9\%$ & $+0.7\%$ \\
- & máxima densidad & $-2.8\%$ & $+2.1\%$ & $+0.9\%$ \\
- & simultánea & $+22.4\%$ & $+53.7\%$ & $+5.9\%$ \\
+C-1 & Equi-colas & $-2.7\%$ & $+1.9\%$ & $+0.7\%$ \\
+ & Máxima densidad & $-2.8\%$ & $+2.1\%$ & $+0.9\%$ \\
+ & Simultánea & $+22.4\%$ & $+53.7\%$ & $+5.9\%$ \\
 \hline
-C-2 & equi-colas & $-19.7\%$ & $-10.1\%$ & $+1.8\%$ \\
- & máxima densidad & $-22.0\%$ & $-12.2\%$ & $+2.4\%$ \\
- & simultánea & $+30.8\%$ & $+59.7\%$ & $+5.0\%$ \\
+C-2 & Equi-colas & $-19.7\%$ & $-10.1\%$ & $+1.8\%$ \\
+ & Máxima densidad & $-22.0\%$ & $-12.2\%$ & $+2.4\%$ \\
+ & Simultánea & $+30.8\%$ & $+59.7\%$ & $+5.0\%$ \\
 \hline
-C-3 & equi-colas & $-3.0\%$ & $+1.3\%$ & $+0.8\%$ \\
- & máxima densidad & $-2.8\%$ & $+1.5\%$ & $+0.8\%$ \\
- & simultánea & $+18.0\%$ & $+50.0\%$ & $+6.2\%$ \\
+C-3 & Equi-colas & $-3.0\%$ & $+1.3\%$ & $+0.8\%$ \\
+ & Máxima densidad & $-2.8\%$ & $+1.5\%$ & $+0.8\%$ \\
+ & Simultánea & $+18.0\%$ & $+50.0\%$ & $+6.2\%$ \\
 \hline
 \end{tabular}
 \end{table}
@@ -954,13 +958,13 @@ El Cuadro~\ref{tab:res_bloqueB_ganancia} dice cuánto se gana respecto del FAR c
  & C-1 & C-2 & C-3 \\
 \hline
 FAR & 11\% & 0\% & 18\% \\
-equi-colas & 35\% & 9\% & 46\% \\
-máxima densidad & 54\% & 91\% & 36\% \\
-simultánea & 0\% & 0\% & 0\% \\
+Equi-colas & 35\% & 9\% & 46\% \\
+Máxima densidad & 54\% & 91\% & 36\% \\
+Simultánea & 0\% & 0\% & 0\% \\
 \hline
-equi-colas gana al FAR & 81\% & 100\% & 81\% \\
-máxima densidad gana al FAR & 88\% & 100\% & 73\% \\
-simultánea gana al FAR & 5\% & 0\% & 1\% \\
+Equi-colas gana al FAR & 81\% & 100\% & 81\% \\
+Máxima densidad gana al FAR & 88\% & 100\% & 73\% \\
+Simultánea gana al FAR & 5\% & 0\% & 1\% \\
 \hline
 \end{tabular}
 \end{table}
@@ -1018,7 +1022,7 @@ Las Figuras~\ref{fig:res_bloqueB_ventana_C1} a~\ref{fig:res_bloqueB_ventana_C3} 
 \subsection{Comportamientos predictivos}
 \label{03_08_03_comportamientos}
 
-Esta subsección y la siguiente se restringen a C-2. En C-1 y C-3 el modelo declara un solo comportamiento en el $99.7\%$ y el $100\%$ de los orígenes de prueba, de modo que no hay comportamientos que contrastar y el pronóstico por comportamiento es la esperanza. El Cuadro~\ref{tab:res_K} resume cuántos comportamientos declara el modelo en el bloque de prueba de C-2 para cada $M$ del barrido. El Cuadro~\ref{tab:res_detalle} y la Figura~\ref{fig:res_ventana_detalle_C2} los contrastan origen a origen, en la ventana de detalle, con el régimen que registra el generador y con la curva observada.
+Esta subsección y la siguiente se restringen a C-2. En C-1 y C-3 el modelo declara un solo comportamiento en el $99.7\%$ y el $100\%$ de los orígenes de prueba, de modo que no hay comportamientos que contrastar y el pronóstico por comportamiento es la esperanza. En C-2 se reporta primero cuántos comportamientos declara el modelo en el bloque de prueba completo para cada $M$ del barrido (Cuadro~\ref{tab:res_K}) y cómo se compara con los que tiene la ley verdadera. Luego se examinan de cerca diez orígenes consecutivos para mostrar qué es un comportamiento y qué ofrece frente a la esperanza (Figura~\ref{fig:res_ventana_detalle_C2}).
 
 % Fuente: 102_K_por_M.csv de la 300 (bloque test).
 \begin{table}[H]
@@ -1044,22 +1048,11 @@ $10$ & 70.0\% & 16.7\% & 13.3\% \\
 \end{table}
 
 % Lectura K: los comportamientos aparecen donde la ley condicional reparte masa entre átomos separados.
-Los comportamientos aparecen donde la ley condicional reparte su masa entre átomos separados. En C-2 los dos primeros scores, los de mayor varianza, cambian de régimen por un umbral sobre su propio rezago, y cerca del umbral los dos regímenes son posibles a la vez. Por eso el modelo declara más de un comportamiento en casi un tercio de los orígenes ya con $M = 1$ y la fracción no cambia con $M$, porque los scores que entran después no agregan regímenes nuevos. Con $M = 1$ sólo hay dos comportamientos y desde $M = 2$ aparece el tercero, porque con un solo score hay dos regímenes posibles y con dos scores hay combinaciones de régimen que la mezcla separa. La ley verdadera tiene más de un modo en cerca de un $9\%$ de los orígenes, de modo que el modelo declara tres veces más de los que hay. La razón es que la transición probit del \emph{gating} es suave y deja algo de masa en el átomo del régimen volátil también lejos del umbral, donde la probabilidad verdadera de ese régimen es casi nula. Donde la ley sí es bimodal, el modelo lo detecta.
+Los comportamientos aparecen donde la ley condicional reparte su masa entre átomos separados, y en C-2 eso lo producen los scores que cambian de régimen. Cerca del umbral los dos regímenes de un score son posibles a la vez y la mezcla pone un átomo en cada uno, de modo que el número de comportamientos lo fijan los scores con cambio de régimen y no cuántos scores entran al modelo. El Cuadro~\ref{tab:res_K} lo muestra en el barrido. Con $M = 1$ hay a lo más dos comportamientos, los dos regímenes del primer score. Con $M = 2$ aparece el tercero, porque el segundo score puede estar en un régimen distinto del primero y la mezcla separa esa combinación. Desde ahí la distribución no cambia con $M$, y los seis scores pasivos son autorregresivos sin regímenes, así que no abren comportamientos nuevos por más que se agreguen. Es lo que corresponde a la simulación, en que la dinámica de régimen vive en los primeros scores y el resto sólo agrega variabilidad.\\
 
-% Fuente: 105_validacion_comportamientos_por_M.csv (subconjunto = detalle) y 104_validacion_regimen_por_M.csv (ventana de detalle, M_ref).
-\begin{table}[H]
-\centering\small
-\caption{Ventana de detalle de C-2 ($M_{\mathrm{ref}}$), cuentas sobre los diez orígenes.}
-\label{tab:res_detalle}
-\begin{tabular}{l c c c c}
-\hline
-orígenes $t$ & $K_t \ge 2$ (modelo) & $K_t \ge 2$ (verdad) & cae en el más probable & $K_t$ coincide \\
-\hline
-807--816 & 6 de 10 & 2 de 10 & 7 de 10 & 6 de 10 \\
-\hline
-\end{tabular}
-\end{table}
+La ley verdadera tiene más de un modo en cerca de un $9\%$ de los orígenes de prueba, de modo que el modelo declara tres veces más de los que hay. La razón es que los pesos de la mezcla dependen de los rezagos a través de una transformación probit suave, que deja algo de masa en el átomo del régimen volátil también lejos del umbral, donde la probabilidad verdadera de ese régimen es casi nula. Donde la ley sí es bimodal, el modelo lo detecta.\\
 
+Las cifras anteriores resumen el bloque de prueba completo, pero no muestran qué es un comportamiento. Para eso se examinan de cerca $N_{\mathrm{det}} = 10$ orígenes consecutivos ($t = 807, \dots, 816$), el tramo del bloque de prueba con más cambios de régimen verdadero. 
 % Figura: tres orígenes de la ventana de detalle de C-2. Fuente: comportamientos_psbp.npz y banda_funcional_psbp.npz del _04
 % (curvas típicas, bandas condicionales, esperanza) y las curvas del generador.
 \begin{figure}[H]
@@ -1070,59 +1063,67 @@ orígenes $t$ & $K_t \ge 2$ (modelo) & $K_t \ge 2$ (verdad) & cae en el más pro
 \end{figure}
 
 % Lectura detalle: para qué sirven los comportamientos y por qué el modelo acierta o falla en cada origen.
-La ventana de detalle es la de más cambios de régimen verdadero y es donde se ve para qué sirven los comportamientos. El modelo declara más de uno en seis de los diez orígenes y la ley verdadera en dos, por el exceso del \emph{gating} ya comentado, pero el Cuadro~\ref{tab:res_detalle} muestra que la curva observada cae en el comportamiento más probable en siete de los diez. En $t = 808$ el régimen cambió sin que el rezago lo anunciara y la curva observada sigue al comportamiento minoritario, cuya banda la cubre entera, mientras que la esperanza, que promedia los dos, queda en una curva que no ocurre. Es el caso en que una predictiva multimodal ofrece una opción que el promedio no tiene. En $t = 810$ acierta el más probable y el segundo es la masa que el \emph{gating} deja en el régimen volátil. En $t = 814$ tres de los cuatro scores activos están en el régimen volátil, hay tres comportamientos y la curva observada se parece al segundo, pero sale de las bandas puntuales al final del dominio y sólo la simultánea la contiene. Sobre los diez orígenes la banda condicional al comportamiento realizado es un quinto más angosta que la marginal sin perder cobertura, que es lo que vale conocer el comportamiento.
-
-% ---------------------------------------------------------------------
-\subsection{Pronóstico por comportamiento}
+En los orígenes $807$ a $816$ el modelo declara más de un comportamiento en seis y la ley verdadera tiene más de un modo en dos, por la masa que los pesos probit dejan lejos del umbral, y aun así la curva observada cae en el comportamiento más probable en siete de los diez. En $t = 808$ el régimen cambió sin que el rezago lo anunciara y la curva observada sigue al comportamiento minoritario, cuya banda la cubre entera, mientras que la esperanza, que promedia los dos, queda en una curva que no ocurre. Es el caso en que una predictiva multimodal ofrece una opción que el promedio no tiene. En $t = 810$ acierta el más probable y el segundo es la masa que los pesos dejan en el régimen volátil. En $t = 814$ tres de los cuatro scores activos están en el régimen volátil, hay tres comportamientos y la curva observada se parece al segundo, pero sale de las bandas puntuales al final del dominio y sólo la simultánea la contiene. Con qué frecuencia el comportamiento realizado es el más probable, y cuánto cuesta elegir mal, es lo que cuantifica la Sección~\ref{03_08_04_pronostico} sobre todo el bloque de prueba.
+\subsection{Predicción por comportamiento}
 \label{03_08_04_pronostico}
 
-El Cuadro~\ref{tab:res_pronostico} resume, en $M_{\mathrm{ref}}$ de C-2, el error del pronóstico por comportamiento y de su cota frente a la esperanza y a las referencias, sobre todos los orígenes de prueba y sobre los que tienen más de un comportamiento. El Cuadro~\ref{tab:res_pronostico_por_M} y la Figura~\ref{fig:res_pronostico_ventana_C2} muestran lo mismo contra $M$ y sobre la ventana móvil, y el Cuadro~\ref{tab:res_acierto_p1} cuándo la elección por probabilidad acierta.
+El Cuadro~\ref{tab:res_pronostico} resume, en $M_{\mathrm{ref}}$ de C-2, el error del pronóstico por comportamiento y de su cota frente a la esperanza y a las referencias, sobre todos los orígenes de prueba y sobre los que tienen más de un comportamiento. El Cuadro~\ref{tab:res_pronostico_por_M} y las Figuras~\ref{fig:res_pronostico_ventana_C2} y~\ref{fig:res_pronostico_ventana_rmse_C2} muestran lo mismo contra $M$ y sobre la ventana móvil, y el Cuadro~\ref{tab:res_acierto_p1} cuándo la elección por probabilidad acierta. Los dos cuadros promedian sobre los orígenes de prueba y no sobre las ventanas, porque el subconjunto con más de un comportamiento no es contiguo, y por eso sus cifras difieren en la tercera decimal de las del Bloque A.
 
-% Fuente: 119_resumen_opciones_por_M.csv del _06 (test, M_ref, opción "tipica"), subconjuntos todos / K>=2.
+% Fuente: 113_opciones_por_origen.csv del _06 (m10, test, opción "tipica"); MAE = media por origen, RMSE = raíz de la media de los cuadrados por origen. Coincide con 119_resumen_opciones_por_M.csv.
 \begin{table}[H]
 \centering\small
-\caption{Pronóstico por comportamiento en el bloque de prueba de C-2 ($M_{\mathrm{ref}}$). MAE medio por origen, fracción de orígenes en que el pronóstico gana a cada referencia y acierto, la fracción en que el mejor comportamiento es el más probable.}
+\caption{Pronóstico por comportamiento en el bloque de prueba de C-2 ($M_{\mathrm{ref}}$), sobre todos los orígenes y sobre los que tienen más de un comportamiento.}
 \label{tab:res_pronostico}
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{l c ccccc cc c}
+\begin{tabular}{l cc cc}
 \hline
- & & \multicolumn{5}{c}{MAE} & \multicolumn{2}{c}{pronóstico gana a} & \\
- & orígenes & $n$ & pronóstico & cota & esperanza & FAR & RF & FAR & RF & acierto \\
+ & \multicolumn{2}{c}{Todos los orígenes ($n = 300$)} & \multicolumn{2}{c}{$K_t \ge 2$ ($n = 90$)} \\
+ & MAE & RMSE & MAE & RMSE \\
 \hline
-todos     & 300 & 0.607 & 0.565 & 0.602 & 0.769 & 0.584 & 84\% & 44\% & 93\% \\
-$K_t\ge2$ & 90  & 0.619 & 0.478 & 0.602 & 0.749 & 0.559 & 83\% & 44\% & 78\% \\
+Pronóstico por comportamiento  & 0.607 & 0.793 & 0.619 & 0.847 \\
+Cota (mejor comportamiento)    & 0.565 & 0.727 & 0.478 & 0.618 \\
+Esperanza                      & 0.602 & 0.771 & 0.602 & 0.776 \\
+FAR                            & 0.769 & 0.981 & 0.748 & 0.971 \\
+Random Forest                  & 0.584 & 0.760 & 0.559 & 0.737 \\
+\hline
+\multicolumn{5}{l}{Fracción de orígenes} \\
+El pronóstico gana al FAR            & \multicolumn{2}{c}{84\%} & \multicolumn{2}{c}{83\%} \\
+El pronóstico gana al Random Forest  & \multicolumn{2}{c}{44\%} & \multicolumn{2}{c}{44\%} \\
+La cota gana al FAR                  & \multicolumn{2}{c}{88\%} & \multicolumn{2}{c}{96\%} \\
+La cota gana al Random Forest        & \multicolumn{2}{c}{49\%} & \multicolumn{2}{c}{61\%} \\
 \hline
 \end{tabular}
 \end{table}
 
 % Lectura pronóstico: elegir es una apuesta. Gana al FAR, no a la esperanza en promedio, y la cota dice cuánto hay en juego.
-Elegir el comportamiento más probable es una apuesta, y el Cuadro~\ref{tab:res_pronostico} muestra sus dos caras en los orígenes de C-2 con más de un comportamiento. Frente al FAR gana con holgura, porque cualquiera de los comportamientos es la curva de un régimen y el operador lineal no puede dar ninguna de ellas. Frente a la esperanza no gana en promedio. Cuando acierta el error baja, pero cuando el elegido no es el mejor el error sube más de lo que se ganó, porque la curva típica elegida queda lejos de la observada, mientras que la esperanza, al promediar, nunca queda tan lejos. Es el mismo motivo por el que el RMSE prefiere la esperanza. La cota dice cuánto hay en juego. El mejor comportamiento, elegido con la curva observada, baja el error un quinto respecto de la esperanza y le gana al Random Forest, que es el mejor predictor puntual de C-2, de modo que entre las opciones que entrega el modelo casi siempre está la buena y lo que se pierde es por elegirla con la probabilidad.
+Elegir el comportamiento más probable es una apuesta. Sobre todos los orígenes el pronóstico empata con la esperanza en MAE (0.607 frente a 0.602), porque en siete de cada diez coincide con ella, y es algo peor en RMSE. Las diferencias aparecen en los orígenes con más de un comportamiento, que muestra el Cuadro~\ref{tab:res_pronostico}. Frente al FAR gana con holgura, en el 83\% de ellos, porque cualquiera de los comportamientos es la curva de un régimen y el operador lineal no puede dar ninguna de ellas. Frente a la esperanza gana en el 59\% de esos orígenes y aun así pierde en promedio: cuando acierta el error baja, pero cuando el elegido no es el mejor el error sube más de lo que se ganó, porque la curva típica elegida queda lejos de la observada, mientras que la esperanza, al promediar, nunca queda tan lejos. Es el mismo motivo por el que el RMSE prefiere la esperanza. La cota dice cuánto hay en juego. En los orígenes con más de un comportamiento el mejor comportamiento, elegido con la curva observada, baja el error un quinto respecto de la esperanza y queda bajo el Random Forest, que es el mejor predictor puntual de C-2, de modo que entre las opciones que entrega el modelo casi siempre está la buena y lo que se pierde es por elegirla con la probabilidad, que acierta en el 78\% de esos orígenes. Sobre todos los orígenes, donde en siete de cada diez no hay nada que elegir, la ventaja de la cota es de un 6\% sobre la esperanza.
 
-% Fuente: 116_resumen_bloqueA_opciones.csv (test, todos los M).
+% Fuente: 113_opciones_por_origen.csv de cada M del _06 (test, opción "tipica"), medias por origen como en tab:res_pronostico.
 \begin{table}[H]
 \centering\small
-\caption{MAE en el bloque de prueba de C-2 por $M$ del pronóstico por comportamiento y de la cota. El FAR y el Random Forest son los del Cuadro~\ref{tab:res_bloqueA}.}
+\setlength{\tabcolsep}{4pt}
+\caption{MAE y RMSE en el bloque de prueba de C-2 por $M$ del pronóstico por comportamiento, de la cota, de la esperanza, del FAR y del Random Forest.}
 \label{tab:res_pronostico_por_M}
-\begin{tabular}{c cc}
+\begin{tabular}{c ccccc ccccc}
 \hline
-$M$ & pronóstico & cota \\
+ & \multicolumn{5}{c}{MAE} & \multicolumn{5}{c}{RMSE} \\
+$M$ & Pronóstico & Cota & Esperanza & FAR & RF & Pronóstico & Cota & Esperanza & FAR & RF \\
 \hline
-$1$ & 0.713 & 0.693 \\
-$2$ & 0.676 & 0.641 \\
-$3$ & 0.637 & 0.601 \\
-$4$ & 0.617 & 0.574 \\
-$5$ & 0.615 & 0.572 \\
-$6$ & 0.613 & 0.572 \\
-$7$ & 0.613 & 0.570 \\
-$8$ & 0.613 & 0.570 \\
-$9$ & 0.613 & 0.570 \\
-$10$ & 0.612 & 0.570 \\
+$1$ & 0.711 & 0.693 & 0.711 & 0.769 & 0.707 & 0.912 & 0.882 & 0.905 & 0.981 & 0.904 \\
+$2$ & 0.670 & 0.636 & 0.666 & 0.769 & 0.651 & 0.862 & 0.811 & 0.849 & 0.981 & 0.838 \\
+$3$ & 0.632 & 0.596 & 0.628 & 0.769 & 0.610 & 0.816 & 0.763 & 0.802 & 0.981 & 0.789 \\
+$4$ & 0.612 & 0.570 & 0.605 & 0.769 & 0.584 & 0.799 & 0.733 & 0.777 & 0.981 & 0.762 \\
+$5$ & 0.610 & 0.567 & 0.604 & 0.769 & 0.584 & 0.797 & 0.730 & 0.775 & 0.981 & 0.761 \\
+$6$ & 0.608 & 0.568 & 0.603 & 0.769 & 0.585 & 0.795 & 0.730 & 0.773 & 0.981 & 0.761 \\
+$7$ & 0.608 & 0.566 & 0.603 & 0.769 & 0.584 & 0.794 & 0.728 & 0.772 & 0.981 & 0.761 \\
+$8$ & 0.608 & 0.565 & 0.603 & 0.769 & 0.584 & 0.793 & 0.727 & 0.772 & 0.981 & 0.761 \\
+$9$ & 0.608 & 0.565 & 0.602 & 0.769 & 0.584 & 0.793 & 0.727 & 0.772 & 0.981 & 0.761 \\
+$10$ & 0.607 & 0.565 & 0.602 & 0.769 & 0.584 & 0.793 & 0.727 & 0.771 & 0.981 & 0.760 \\
 \hline
 \end{tabular}
 \end{table}
 
-% Lectura M y trayectoria: la brecha entre cota y pronóstico la fijan los dos primeros scores y está repartida en todo el test.
-La brecha entre la cota y el pronóstico en C-2 se abre ya con $M = 1$ y crece hasta $M = 4$, como el resto del Bloque A, porque los comportamientos los fijan los dos primeros scores. La Figura~\ref{fig:res_pronostico_ventana_C2} muestra que la cota queda bajo el pronóstico a lo largo de todo el bloque de prueba, porque los orígenes con más de un comportamiento están repartidos en él, y que la separación es mayor en el tramo de más cambios de régimen, donde el pronóstico queda incluso por encima de la esperanza, porque ahí es donde más veces se elige mal.
+% Lectura trayectoria: la brecha entre cota y pronóstico está repartida en todo el test (contra M, 113 de cada M, no se tabula).
+El Cuadro~\ref{tab:res_pronostico_por_M} muestra que la brecha entre la cota y el pronóstico se abre ya con $M = 1$ y deja de crecer en $M = 4$, como el resto del Bloque A, porque los comportamientos los fijan los primeros scores. Las Figuras~\ref{fig:res_pronostico_ventana_C2} y~\ref{fig:res_pronostico_ventana_rmse_C2} muestran que la cota queda bajo la esperanza en todas las ventanas del bloque de prueba y bajo el pronóstico en el 87\% de ellas, porque los orígenes con más de un comportamiento están repartidos en él. La separación es mayor en el tramo de más cambios de régimen, donde el pronóstico queda por encima de la esperanza en todas las ventanas, porque ahí es donde más veces se elige mal.
 
 % Figura: pronóstico y cota sobre la ventana móvil de prueba, w_ref, M_ref, contra FAR, RF y esperanza. Fuente: 115_ventana_modelos_w30.csv del _06.
 \begin{figure}[H]
@@ -1132,14 +1133,21 @@ La brecha entre la cota y el pronóstico en C-2 se abre ya con $M = 1$ y crece h
 \label{fig:res_pronostico_ventana_C2}
 \end{figure}
 
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{IMG/03_08/03_08_pronostico_ventana_rmse_w30_C2.png}
+\caption{C-2. RMSE del pronóstico por comportamiento y de la cota sobre la ventana móvil del bloque de prueba ($M_{\mathrm{ref}}$).}
+\label{fig:res_pronostico_ventana_rmse_C2}
+\end{figure}
+
 % Fuente: 119_acierto_por_p1.csv del _06 (test, K >= 2, M_ref). 83 de los 90 orígenes tienen p >= 0.5; los 7 restantes tienen K = 3 sin comportamiento dominante.
 \begin{table}[H]
 \centering\small
-\caption{Acierto del pronóstico por comportamiento en C-2 ($K_t \ge 2$, $M_{\mathrm{ref}}$) por tramo de la probabilidad del comportamiento elegido. Los siete orígenes sin comportamiento dominante no se tabulan.}
+\caption{Acierto del pronóstico por comportamiento en C-2 ($K_t \ge 2$, $M_{\mathrm{ref}}$) por tramo de la probabilidad del comportamiento elegido. La última columna es el MAE que se pierde por elegir con la probabilidad en vez del mejor comportamiento, en promedio sobre los orígenes del tramo. Los siete orígenes sin comportamiento dominante no se tabulan.}
 \label{tab:res_acierto_p1}
 \begin{tabular}{l c c c}
 \hline
-$p_{t,c^{*}}$ & orígenes & acierto & MAE perdido \\
+$p_{t,c^{*}}$ & Orígenes & Acierto & MAE pronóstico $-$ MAE cota \\
 \hline
 $[0.5, 0.6)$ & 5  & 20\%  & 0.61 \\
 $[0.6, 0.7)$ & 11 & 36\%  & 0.28 \\
@@ -1150,12 +1158,13 @@ $[0.9, 1]$   & 8  & 100\% & 0.00 \\
 \end{tabular}
 \end{table}
 
-% Lectura acierto: la probabilidad dice cuándo apostar. Con p cerca de 0.5 el propio generador sortea el régimen.
-La probabilidad del comportamiento elegido dice cuándo conviene apostar. Con una probabilidad alta el elegido es el mejor casi siempre y el pronóstico queda a un paso de la cota, y con masas cercanas a un medio el acierto cae a lo que da una moneda, que es donde se concentra la pérdida. Eso no es un defecto del modelo sino del origen. Son los rezagos que caen sobre el umbral, donde el propio generador sortea el régimen con probabilidad cercana a un medio y ninguna información del pasado lo resuelve. Tres de cada cuatro orígenes con más de un comportamiento están en el primer caso, y los desaciertos del Cuadro~\ref{tab:res_pronostico} vienen casi por completo de los pocos con probabilidad entre un medio y $0.7$. Con una probabilidad alta se pronostica con el comportamiento, con una baja se reportan las opciones.
+% Lectura acierto: la probabilidad dice cuándo apostar. Entre 0.5 y 0.7 el acierto queda bajo una moneda y concentra cerca de la mitad de la pérdida.
+La probabilidad del comportamiento elegido dice cuándo conviene apostar, como muestra el Cuadro~\ref{tab:res_acierto_p1}. Con una probabilidad alta el elegido es el mejor casi siempre y el pronóstico queda a un paso de la cota. Con masas entre un medio y $0.7$ el acierto cae por debajo de lo que daría una moneda, 5 de 16 orígenes en conjunto, y ahí se concentra cerca de la mitad de la pérdida. Eso no es un defecto del modelo sino del origen, ya que son rezagos que caen sobre el umbral, donde el propio generador sortea el régimen con probabilidad cercana a un medio y ninguna información del pasado lo resuelve. Tres de cada cuatro orígenes con más de un comportamiento tienen $p_{t,c^{*}} \ge 0.7$, y ahí el pronóstico queda cerca de la cota. Con una probabilidad alta se pronostica con el comportamiento, con una baja se reportan las opciones.
 
-% ---------------------------------------------------------------------
-\subsection{Síntesis}
-\label{03_08_05_sintesis}
+\section{Resumen}
+\label{03_09}
 
-% Cuatro frases, una por pregunta del diseño más el pronóstico.
-El PSBPM-FD supera a la referencia lineal en el error puntual en los tres escenarios desde $M = 4$ (desde $M = 1$ en C-2, con una brecha del $22\%$; del orden del $2\%$ en C-1 y C-3, donde la media condicional es lineal o casi lineal), y el Random Forest con la misma especificación le gana en C-2 y pierde en C-1. En los intervalos supera al FAR en los tres escenarios desde $M = 3$ o $4$: en C-2 con una banda un $10\%$ más angosta y mejor cubierta, y en C-1 y C-3 por calibración, con un ancho que sigue el estado del proceso. Elegir el predictor cambia el resultado sólo donde la predictiva es multimodal (C-2), donde la mediana puntual mejora el MAE en $1.3\%$ y la región de máxima densidad el Winkler en $2.9\%$; en C-1 y C-3 las tres construcciones puntuales y los tres predictores coinciden, y la banda simultánea es en todos la única calibrada para la curva completa. Los comportamientos aparecen en el $30\%$ de los orígenes de C-2 y no en C-1 ni en C-3, en acuerdo con la ley verdadera de cada escenario aunque con exceso en C-2. Donde aparecen, el pronóstico por comportamiento reduce el MAE frente al FAR en $17\%$ pero no frente a la esperanza, y la cota muestra que acertar el comportamiento lo reduciría en $21\%$ frente a la esperanza y en $14\%$ frente al Random Forest: el modelo produce opciones de las que alguna es la buena, y elige bien cuando la probabilidad del comportamiento elegido supera $0.7$.
+
+
+
+

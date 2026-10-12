@@ -1,3 +1,6 @@
+% Los apéndices se llaman "Anexo" en el texto: lo mismo en títulos y encabezados.
+\renewcommand{\appendixname}{Anexo}
+
 \chapter{Algoritmos de Simulación}
 \label{ane_00_00_anexo}
 Este anexo presenta los algoritmos empleados para generar los datos del estudio de simulación del Capítulo~\ref{03_00_00_mezclas_ddp_series_tiempo_funcionales}. Cada algoritmo especifica su mecanismo generador, el rol de sus parámetros y los valores numéricos con que se emplea, los cuales se recogen en un cuadro al cierre de cada uno.\\
@@ -47,14 +50,14 @@ donde $z_{tj}$ es una serie de varianza marginal unitaria cuyo mecanismo generad
 \hline
 Símbolo & Descripción & Valor \\
 \hline
-$L$          & número de puntos de la grilla                             & $75$ \\
-$T$          & número de curvas retenidas                                & $1000$ \\
-$B$          & curvas de calentamiento                                   & $300$ \\
-$J$          & número de scores                                          & $10$ \\
-$J_a$        & número de scores activos                                  & $4$ \\
-$\lambda_1$  & varianza del primer score                                 & $0.5$ \\
-$\rho$       & razón de decaimiento del espectro                         & $0.55$ \\
-$\phi_p$     & coeficiente autorregresivo de los scores pasivos          & $0.3$ \\
+$L$          & Número de puntos de la grilla                             & $75$ \\
+$T$          & Número de curvas retenidas                                & $1000$ \\
+$B$          & Curvas de calentamiento                                   & $300$ \\
+$J$          & Número de scores                                          & $10$ \\
+$J_a$        & Número de scores activos                                  & $4$ \\
+$\lambda_1$  & Varianza del primer score                                 & $0.5$ \\
+$\rho$       & Razón de decaimiento del espectro                         & $0.55$ \\
+$\phi_p$     & Coeficiente autorregresivo de los scores pasivos          & $0.3$ \\
 \hline
 \end{tabular}
 \end{table}
@@ -107,10 +110,10 @@ La generación procede en los pasos que siguen.
 \hline
 Símbolo & Descripción & Valor \\
 \hline
-$\phi$          & coeficiente autorregresivo                          & $0.5$ \\
-$\alpha_1$      & sensibilidad a la innovación reciente               & $0.25$ \\
-$\beta_1$       & persistencia de la varianza condicional pasada      & $0.60$ \\
-$\sigma_a^{2}$  & varianza incondicional de la innovación             & $1.0$ \\
+$\phi$          & Coeficiente autorregresivo                          & $0.5$ \\
+$\alpha_1$      & Sensibilidad a la innovación reciente               & $0.25$ \\
+$\beta_1$       & Persistencia de la varianza condicional pasada      & $0.60$ \\
+$\sigma_a^{2}$  & Varianza incondicional de la innovación             & $1.0$ \\
 \hline
 \end{tabular}
 \end{table}
@@ -170,11 +173,11 @@ La generación procede en los pasos que siguen.
 \hline
 Símbolo & Descripción & Valor \\
 \hline
-$K$                       & número de regímenes                                    & $2$ \\
-$c_j$                     & umbral sobre el rezago propio                          & $0$ \\
-$h_j$                     & ancho de la transición probit                          & Cuadro~\ref{tab:ane_algC2_scores} \\
-$\mu_{kj},\ \phi_{kj},\ s_{kj}$ & nivel, coeficiente autorregresivo y escala del régimen $k$ & Cuadro~\ref{tab:ane_algC2_scores} \\
-$(m_j,d_j)$               & media y desviación poblacionales de $u_{tj}$           & simulación larga \\
+$K$                       & Número de regímenes                                    & $2$ \\
+$c_j$                     & Umbral sobre el rezago propio                          & $0$ \\
+$h_j$                     & Ancho de la transición probit                          & Cuadro~\ref{tab:ane_algC2_scores} \\
+$\mu_{kj},\ \phi_{kj},\ s_{kj}$ & Nivel, coeficiente autorregresivo y escala del régimen $k$ & Cuadro~\ref{tab:ane_algC2_scores} \\
+$(m_j,d_j)$               & Media y desviación poblacionales de $u_{tj}$           & Simulación larga \\
 \hline
 \end{tabular}
 \end{table}
@@ -282,12 +285,12 @@ La generación procede en los pasos que siguen.
 \hline
 Símbolo & Descripción & Valor \\
 \hline
-$K$                  & número de mecanismos                                   & $3$ \\
-$L$                  & número de rezagos utilizados                           & $2$ \\
-$\tilde\mu_{k1}$     & localización del primer score, $k=1,2,3$               & $0,\ +1,\ -1$ \\
-$\tilde q_k$         & funciones de asignación                                & \eqref{eq:ane_algC3_q} \\
-$\tilde A_{k,\ell}$  & matrices de dependencia                                & Cuadro~\ref{tab:ane_algC3_mecanismos} \\
-$\tilde\sigma_j$     & desviación de la innovación, $j=1,\ldots,4$            & $0.45,\ 0.75,\ 0.80,\ 0.80$ \\
+$K$                  & Número de mecanismos                                   & $3$ \\
+$L$                  & Número de rezagos utilizados                           & $2$ \\
+$\tilde\mu_{k1}$     & Localización del primer score, $k=1,2,3$               & $0,\ +1,\ -1$ \\
+$\tilde q_k$         & Funciones de asignación                                & \eqref{eq:ane_algC3_q} \\
+$\tilde A_{k,\ell}$  & Matrices de dependencia                                & Cuadro~\ref{tab:ane_algC3_mecanismos} \\
+$\tilde\sigma_j$     & Desviación de la innovación, $j=1,\ldots,4$            & $0.45,\ 0.75,\ 0.80,\ 0.80$ \\
 \hline
 \end{tabular}
 \end{table}
@@ -300,11 +303,11 @@ $\tilde\sigma_j$     & desviación de la innovación, $j=1,\ldots,4$            
 \begin{tabular}{clrrrrrrrr}
 \hline
  & & \multicolumn{6}{c}{$\ell=1$} & \multicolumn{2}{c}{$\ell=2$} \\
-$k$ & mecanismo & $(1,1)$ & $(2,2)$ & $(3,3)$ & $(4,4)$ & $(2,1)$ & $(3,2)$ & $(1,1)$ & $(4,3)$ \\
+$k$ & Mecanismo & $(1,1)$ & $(2,2)$ & $(3,3)$ & $(4,4)$ & $(2,1)$ & $(3,2)$ & $(1,1)$ & $(4,3)$ \\
 \hline
-$1$ & centro      & $0.2$ & $0.3$ & $0.3$ & $0.3$ & $0.2$  & $0.8$  & $-0.1$ & $-0.6$ \\
-$2$ & nivel alto  & $0.2$ & $0.4$ & $0.2$ & $0.2$ & $0.5$  & $-0.3$ & $0.1$  & $0.3$ \\
-$3$ & nivel bajo  & $0.2$ & $0.4$ & $0.2$ & $0.2$ & $-0.5$ & $-0.3$ & $0.1$  & $0.3$ \\
+$1$ & Centro      & $0.2$ & $0.3$ & $0.3$ & $0.3$ & $0.2$  & $0.8$  & $-0.1$ & $-0.6$ \\
+$2$ & Nivel alto  & $0.2$ & $0.4$ & $0.2$ & $0.2$ & $0.5$  & $-0.3$ & $0.1$  & $0.3$ \\
+$3$ & Nivel bajo  & $0.2$ & $0.4$ & $0.2$ & $0.2$ & $-0.5$ & $-0.3$ & $0.1$  & $0.3$ \\
 \hline
 \end{tabular}
 \end{table}
@@ -324,13 +327,13 @@ Partiendo por Cuadro~\ref{tab:dis_particion} el cual presenta la partición temp
 \hline
 Símbolo & Descripción & Valor \\
 \hline
-$T_0$              & corte entrenamiento / prueba ($70\%$ de las $T = 1000$ curvas del Cuadro~\ref{tab:ane_comun}) & $700$ \\
-$h$                & horizonte de predicción                         & $1$ \\
-$w$                & anchos de la ventana móvil                      & $\{20, 30, 40\}$ \\
-$w_{\mathrm{ref}}$ & ancho reportado en el capítulo                  & $30$ \\
-paso               & desplazamiento entre ventanas                   & $1$ \\
-$M_{\mathrm{ref}}$ & dimensión del estado en los cuadros, la mayor del barrido de cada escenario (Cuadro~\ref{tab:dis_escenarios}) & $10$ ($6$ en C-3) \\
-$1-\zeta$          & nivel de los intervalos de credibilidad         & $0.95$ \\
+$T_0$              & Corte entrenamiento / prueba ($70\%$ de las $T = 1000$ curvas del Cuadro~\ref{tab:ane_comun}) & $700$ \\
+$h$                & Horizonte de predicción                         & $1$ \\
+$w$                & Anchos de la ventana móvil                      & $\{20, 30, 40\}$ \\
+$w_{\mathrm{ref}}$ & Ancho reportado en el capítulo                  & $30$ \\
+Paso               & Desplazamiento entre ventanas                   & $1$ \\
+$M_{\mathrm{ref}}$ & Dimensión del estado en los cuadros, la mayor del barrido de cada escenario (Cuadro~\ref{tab:dis_escenarios}) & $10$ ($6$ en C-3) \\
+$1-\zeta$          & Nivel de los intervalos de credibilidad         & $0.95$ \\
 \hline
 \end{tabular}
 \end{table}
@@ -345,15 +348,15 @@ El Cuadro~\ref{tab:dis_mcmc} recoge la configuración del muestreador (Sección~
 \hline
 Símbolo & Descripción & Valor \\
 \hline
-$N$                   & truncamiento del stick-breaking                         & $30$ \\
-$L_j$                 & puntos de la grilla de localización por predictor       & $50$ \\
-iteraciones           & por cadena / descartadas                                & $2500$ / $500$ \\
-cadenas               & cadenas independientes por score                        & $3$ \\
-$a_\nu, a_g, b_g$     & forma de las precisiones y de la contracción            & $0.5$ \\
-$b_\nu$               & escala de la precisión del átomo                        & $0.5\,\mathrm{sd}^2(\xi_m)$ \\
-$\nu_{\rho_j}$        & precisión a priori de los coeficientes de decaimiento $\rho_{hj}$ & $10\,\mathrm{sd}^2(z_j)$ \\
-$(a_{\kappa_j}, b_{\kappa_j})$ & inclusión, rezago propio de orden uno / resto      & $(0.5, 0.5)$ / $(0.5, 5)$ \\
-$S$                   & extracciones de la predictiva por origen                & $1000$ \\
+$N$                   & Truncamiento del stick-breaking                         & $30$ \\
+$L_j$                 & Puntos de la grilla de localización por predictor       & $50$ \\
+Iteraciones           & Por cadena / descartadas                                & $2500$ / $500$ \\
+Cadenas               & Cadenas independientes por score                        & $3$ \\
+$a_\nu, a_g, b_g$     & Forma de las precisiones y de la contracción            & $0.5$ \\
+$b_\nu$               & Escala de la precisión del átomo                        & $0.5\,\mathrm{sd}^2(\xi_m)$ \\
+$\nu_{\rho_j}$        & Precisión a priori de los coeficientes de decaimiento $\rho_{hj}$ & $10\,\mathrm{sd}^2(z_j)$ \\
+$(a_{\kappa_j}, b_{\kappa_j})$ & Inclusión, rezago propio de orden uno / resto      & $(0.5, 0.5)$ / $(0.5, 5)$ \\
+$S$                   & Extracciones de la predictiva por origen                & $1000$ \\
 \hline
 \end{tabular}
 \end{table}
@@ -368,12 +371,12 @@ Los modelos de referencia siguen el Cuadro~\ref{tab:dis_referencia}. El FAR se e
 \hline
 Modelo & Elemento & Valor \\
 \hline
-FAR($p$) & orden $p$                       & número de rezagos del escenario, fijo \\
-         & dimensión del subespacio $k_n$  & por predicción a un paso, tope $K$ \\
-         & tramo de selección              & último $20\%$ del entrenamiento \\
-         & intervalo                       & gaussiano, residuos de entrenamiento, $\sigma(\tau)$ \\
-Random Forest & árboles / hojas mínimas / covariables por corte & $500$ / $5$ / $\sqrt{p}$ \\
-         & orden de rezago                 & por error absoluto en ventanas de entrenamiento \\
+FAR($p$) & Orden $p$                       & Número de rezagos del escenario, fijo \\
+         & Dimensión del subespacio $k_n$  & Por predicción a un paso, tope $K$ \\
+         & Tramo de selección              & Último $20\%$ del entrenamiento \\
+         & Intervalo                       & Gaussiano, residuos de entrenamiento, $\sigma(\tau)$ \\
+Random Forest & Árboles / hojas mínimas / covariables por corte & $500$ / $5$ / $\sqrt{p}$ \\
+         & Orden de rezago                 & Por error absoluto en ventanas de entrenamiento \\
 \hline
 \end{tabular}
 \end{table}
@@ -388,11 +391,11 @@ El Cuadro~\ref{tab:dis_resumen_metrica} indica, para cada métrica, sobre qué r
 \hline
 Métrica (Sección~\ref{02_02_03_criterios_evaluacion}) & Resumen del PSBPM-FD & Modelos comparados \\
 \hline
-RMSE, MAE & esperanza, mediana puntual, átomo más probable & FAR, Random Forest \\
-RMSE, MAE (sólo C-2) & pronóstico por comportamiento (Sección~\ref{03_06_03_descripcion}) y mejor comportamiento (cota) & FAR, Random Forest, por separado \\
-$\overline{\mathrm{E}}_{\max}$, $\mathrm{E}_{\max}^{\mathrm{glob}}$ (anexo) & los mismos predictores & FAR, Random Forest \\
-Winkler, MPIW, PICP & intervalo equi-colas, banda simultánea, región de máxima densidad & FAR \\
-$\overline{W}_{\max}$, $W_{\max}^{\mathrm{glob}}$, PICPB (anexo) & los mismos intervalos & FAR \\
+RMSE, MAE & Esperanza, mediana puntual, átomo más probable & FAR, Random Forest \\
+RMSE, MAE (sólo C-2) & Pronóstico por comportamiento (Sección~\ref{03_06_03_descripcion}) y mejor comportamiento (cota) & FAR, Random Forest, por separado \\
+$\overline{\mathrm{E}}_{\max}$, $\mathrm{E}_{\max}^{\mathrm{glob}}$ (anexo) & Los mismos predictores & FAR, Random Forest \\
+Winkler, MPIW, PICP & Intervalo equi-colas, banda simultánea, región de máxima densidad & FAR \\
+$\overline{W}_{\max}$, $W_{\max}^{\mathrm{glob}}$, PICPB (anexo) & Los mismos intervalos & FAR \\
 \hline
 \end{tabular}
 \end{table}
@@ -407,13 +410,13 @@ El Cuadro~\ref{tab:dis_comportamientos} fija las constantes del análisis de com
 \hline
 Elemento & Descripción & Valor \\
 \hline
-$S$               & extracciones del vector de scores por origen       & $1000$ \\
-inicios           & inicios aleatorios de $k$-medias                   & $10$ \\
-cociente de valle & umbral de \eqref{eq:valle} para declarar dos modos & $0.5$ \\
-núcleo            & estimador de densidad sobre la proyección          & gaussiano, ancho de Scott \\
-$\zeta$           & masa mínima de un comportamiento                   & $0.05$ \\
-recorte           & cuantiles de recorte cuando $a_\nu \leq 1$         & $0.5\%$ y $99.5\%$ \\
-$N_{\mathrm{det}}$ & orígenes de la ventana de detalle                 & $10$ \\
+$S$               & Extracciones del vector de scores por origen       & $1000$ \\
+Inicios           & Inicios aleatorios de $k$-medias                   & $10$ \\
+Cociente de valle & Umbral de \eqref{eq:valle} para declarar dos modos & $0.5$ \\
+Núcleo            & Estimador de densidad sobre la proyección          & Gaussiano, ancho de Scott \\
+$\zeta$           & Masa mínima de un comportamiento                   & $0.05$ \\
+Recorte           & Cuantiles de recorte cuando $a_\nu \leq 1$         & $0.5\%$ y $99.5\%$ \\
+$N_{\mathrm{det}}$ & Orígenes de la ventana de detalle                 & $10$ \\
 \hline
 \end{tabular}
 \end{table}

@@ -1,38 +1,106 @@
 \chapter{Aplicación a Datos Reales}
 \label{04_00_00_aplicacion}
 
-% Esqueleto (2026-10-12). Misma estructura que los resultados de simulación (§03_08); las corridas son
-% 101 (rezago 1) y 102 (rezagos {1, 7}) de notebooks/reales/, con las mismas salidas que las 30x.
+% Esqueleto (2026-10-12, segunda versión). Sin prosa: cada sección lleva como comentario su contenido y su fuente.
+% Siete series, un mismo pipeline (el de las 30x, sin oráculo): notebooks/reales/101..107, salidas en
+% reports/reales/<serie>_barrido_M/ (prefijos 98, 99, 102, 104, 111, 112, 116-119) y <serie>_m<M>/.
+% Estado al 2026-10-12: 101-105 con _04, _05 y _06 ejecutados; 106 hasta _03 (faltan _04-_06); 107 sólo _01 (falta MATLAB y _03-_06).
+% Las filas de 106 y 107 quedan como pendientes en los cuadros transversales hasta que se ejecuten.
+% El orden sigue el rasgo que decide el resultado (predictiva multimodal o no), no el número de la corrida.
 
 \section{Datos}
 \label{04_01_00_datos}
-% Tráfico I-94 (Metro Interstate Traffic Volume): curvas diarias, ventana 2015-07-01..2018-09-30, 70/30.
-% Representación B-spline 10/3, FPCA en train, M = 10. Fuente: 101_01 §2–§3.
+% Introducción general: cada día es una curva; qué rasgo de la ley condicional se espera en cada serie.
+% Cuadro tab:apl_series, una fila por serie (fuentes: 01 de cada corrida, §2-§3):
+%   101/102 Tráfico I-94 (Metro Interstate Traffic Volume), volumen horario, 2015-07-01..2018-09-30.
+%   103 Precio SA1 (AEMO), RRP por intervalo, con huecos tratados como la 28_01.
+%   104 PM2.5 Parque O'Higgins (SINCA), horario; trazas de la 28 (real_pm25_poh_v02_m01..m06).
+%   105 PM2.5 Beijing (PRSA, promedio de las 12 estaciones), log(1 + x), 2013-03..2017-02, T = 1461.
+%   106 Factor de planta eólico onshore DE (SMARD), 96 por día, 2015-01..2026-10, T = 4299.
+%   107 ½ log RV horaria de BTCUSDT (velas de 5 min), 2020-01..2026-08, T = 2435.
+% Columnas: serie, fuente, G (puntos por curva), T, T0, M_ref, rezagos, criterio de la ventana de detalle.
+% Figura: una curva típica y la serie de scores xi_1 por serie (fuente: 01_* de cada corrida).
 
 \section{Diseño}
 \label{04_02_00_diseno}
-% Lo que difiere del estudio de simulación: dos especificaciones (rezago 1; rezagos {1, 7} = día anterior y
-% mismo día de la semana anterior), FAR(7) completo, RF con subconjuntos {1} y {1, 7}, atau = 2, 1 cadena,
-% ventana de detalle por calendario (10 días de prueba con más no laborables). Cuadro con la configuración.
+% Lo común con el estudio de simulación (§03_07): representación B-spline 10/3 (K = 10), FPCA estimada sólo en train,
+% scores crudos, partición 70/30, ventana móvil w = 30, las diez métricas, mismos competidores (FAR, RF),
+% hiperparámetros chungEscG, atau = 2, 1 cadena, MCMC 2500/500/30/50 (101/102: ver el .json de cada una).
+% Lo que difiere: sin oráculo ni régimen verdadero; el calendario es la etiqueta externa (§04_03_03);
+% atau = 2 (en simulación 0.5) y 1 cadena, de modo que no hay R-hat.
+% Cuadro tab:apl_dis: rezagos por serie (101 {1}; 102 {1, 7}; 103-107 cruzados con un rezago), M_ref (10; 104: 6),
+% orden del FAR (7 en la 102), subconjuntos del RF ({1} y {1, 7} en la 102), duración de la ventana de detalle.
+% Ventana de detalle por calendario o evento, nunca por lo predicho (112_ventana_detalle.json):
+%   tráfico: 10 días de prueba con más no laborables; 103: más días con pico (RRP máximo > 300 AUD/MWh);
+%   104: más días sobre la norma (promedio 24 h >= 50 ug/m3); 105: más días con promedio >= 150 ug/m3;
+%   106: más días con factor medio >= 0.5; 107: más días con log RV diaria > cuantil 0.9 de train.
 
-\section{Resultados}
-\label{04_03_00_resultados}
+\section{Resultados transversales}
+\label{04_03_00_transversales}
+% Una fila por serie, en M_ref. Fuentes: 98_*, 99_*, 111_*, 102_K_por_M.csv del barrido de cada una.
 
 \subsection{Error puntual}
 \label{04_03_01_error_puntual}
-% Cuadro: MAE de los tres predictores, FAR y RF para las dos especificaciones (M = 10). Fuente: 98_* de 101_05 y 102_05.
+% Cuadro: MAE y RMSE de esperanza, mediana puntual, átomo modal, FAR y RF por serie.
+% Fuente: 98_resumen_bloqueA_min_max_prom.csv (columna promedio, bloque test) y 101_bloqueA_por_predictor.csv.
+% Figura: MAE contra M en 104 (única con barrido M = 1..6); 119_resumen_opciones_por_M.csv para las opciones.
 
 \subsection{Intervalos de predicción}
 \label{04_03_02_intervalos}
-% Cuadro: Winkler, MPIW, PICP de las tres construcciones y del FAR; % de ventanas que gana al FAR. Fuente: 99_*, 111_*.
+% Cuadro: Winkler, MPIW, PICP y PICPB de equi-colas, simultánea, HDR y FAR; % de ventanas que gana al FAR.
+% Fuente: 99_resumen_bloqueB_min_max_prom.csv, 111_bloqueB_intervalos_vs_FAR.csv, 110_tabla_intervalos.csv.
 
-\subsection{Comportamientos predictivos}
-\label{04_03_03_comportamientos}
-% Distribución de K en test; K contra día de la semana y feriados (65_*, 104_*); ventana de detalle (112_*).
+\subsection{Multimodalidad de la predictiva}
+\label{04_03_03_multimodalidad}
+% Cuadro: fracción de orígenes de test con K = 1, 2, >= 3 por serie. Fuente: 102_K_por_M.csv; 100_multimodalidad_por_M.csv.
+% Es el eje que ordena las dos secciones siguientes.
+
+\section{Tráfico: una predictiva con más de un comportamiento}
+\label{04_04_00_trafico}
+% Corridas 101 (rezago {1}) y 102 (rezagos {1, 7}); mismo conjunto de días, par con/sin rezago 7.
+
+\subsection{Error puntual e intervalos}
+\label{04_04_01_trafico_puntual}
+% Cuadro por especificación: predictores, FAR, RF; Winkler y PICPB de las tres construcciones.
+% Fuente: 98_*, 99_* de 101_05 y 102_05. Efecto del rezago 7 sobre el FAR y sobre el PSBPM-FD.
+
+\subsection{Comportamientos y calendario}
+\label{04_04_02_trafico_comportamientos}
+% Distribución de K en train y test; K contra día de la semana y feriados (104_comportamientos_calendario_por_M.csv,
+% 65_comportamientos_calendario.csv por M); ventana de detalle (112_ventana_detalle_por_origen.csv, 63_detalle_t<t>.png).
 
 \subsection{Pronóstico por comportamiento}
-\label{04_03_04_pronostico}
-% Cuadro del _06 (119_*): pronóstico, cota, esperanza, FAR, RF; todos / K >= 2; acierto por tramos de p_1.
+\label{04_04_03_trafico_pronostico}
+% Cuadro del _06: más probable, mejor comportamiento (cota), esperanza, FAR, RF; todos / K >= 2.
+% Fuente: 119_resumen_opciones_por_M.csv. Acierto por tramos de p_1: 119_acierto_por_p1.csv.
+% Ventana móvil de las opciones: 114_ventana_{mas_probable,mejor}_w30.png, 115_ventana_modelos_w30.csv.
+
+\section{Series con predictiva unimodal}
+\label{04_05_00_unimodales}
+% Corridas 103, 104, 105 y, cuando se ejecuten, 106 y 107. Resultado negativo acotado: K = 1 en casi todo el test,
+% los predictores coinciden, el _06 no tiene orígenes con K >= 2. Un cuadro por serie sólo si cambia la lectura.
+
+\subsection{Precio de electricidad (SA1)}
+\label{04_05_01_sa1}
+% 103: Winkler contra FAR; ventana de detalle de días con pico; K contra calendario y pico (104_*).
+
+\subsection{PM2.5: Parque O'Higgins y Beijing}
+\label{04_05_02_pm25}
+% 104 (barrido M = 1..6, desde qué M gana el Winkler) y 105 (M = 10). Días sobre la norma / sobre 150 ug/m3.
+% Comparar las dos: misma variable, distinta ciudad y distinta ventana de detalle.
+
+\subsection{Generación eólica (SMARD)}
+\label{04_05_03_eolica}
+% 106: pendiente (_04-_06). Fuente cuando exista: 106_barrido_M/ y 106_m10/.
+
+\subsection{Volatilidad de BTCUSDT}
+\label{04_05_04_btc}
+% 107: pendiente (MATLAB, _03-_06). Fuente cuando exista: 107_barrido_M/ y 107_m10/.
 
 \section{Discusión}
-\label{04_04_00_discusion}
+\label{04_06_00_discusion}
+% Cuándo gana el PSBPM-FD: con predictiva multimodal (tráfico), en puntual con la mediana y en intervalo;
+% sin ella, sólo por poco en el Winkler. Relación con C-2 (tráfico) y con C-1 (resto, sin heterocedasticidad detectable).
+% Qué predice la ventaja: fracción de K >= 2 contra diferencia de Winkler y de MAE respecto del FAR (cuadro transversal).
+% Limitaciones: una realización por serie, 1 cadena, etiquetas de átomos no convergen, M_ref distinto en la 104,
+% ventanas de detalle de 10 orígenes (cuentas, no estadística).
