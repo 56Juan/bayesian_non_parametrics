@@ -1,0 +1,42 @@
+{
+  "scheme": "holdout_temporal",
+  "T": 2435,
+  "T0": 1704,
+  "prop_train": 0.7,
+  "horizons": [
+    1
+  ],
+  "n_lags": 1,
+  "m_fpca": 10,
+  "scores_scale": "raw_fpca_scores",
+  "fuente": "datos observados (Binance spot BTCUSDT 5m (UTC); log volatilidad realizada horaria)",
+  "curva": "log_vol_horaria",
+  "variable": "0.5 log RV horaria (retornos log de 5 min)",
+  "objetivo_evaluacion": "curva_suavizada",
+  "objetivo_secundario": "representacion_fpca",
+  "modo_residuo": "ninguno",
+  "nivel_credibilidad": 0.95,
+  "ventana_movil": {
+    "w": [
+      20,
+      30,
+      40
+    ],
+    "paso": 1,
+    "solapadas": true
+  },
+  "metricas_bloque_A": [
+    "mae_f",
+    "rmse_f",
+    "linf_medio",
+    "linf_max"
+  ],
+  "metricas_bloque_B": [
+    "mpiw",
+    "picp",
+    "picp_simultaneo",
+    "winkler",
+    "winkler_max_medio",
+    "winkler_max_glob"
+  ]
+}

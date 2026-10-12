@@ -389,7 +389,7 @@ El Cuadro~\ref{tab:dis_resumen_metrica} indica, para cada métrica, sobre qué r
 Métrica (Sección~\ref{02_02_03_criterios_evaluacion}) & Resumen del PSBPM-FD & Modelos comparados \\
 \hline
 RMSE, MAE & esperanza, mediana puntual, átomo más probable & FAR, Random Forest \\
-RMSE, MAE & pronóstico por comportamiento (Sección~\ref{03_06_03_descripcion}) y mejor comportamiento (cota) & FAR, Random Forest, por separado \\
+RMSE, MAE (sólo C-2) & pronóstico por comportamiento (Sección~\ref{03_06_03_descripcion}) y mejor comportamiento (cota) & FAR, Random Forest, por separado \\
 $\overline{\mathrm{E}}_{\max}$, $\mathrm{E}_{\max}^{\mathrm{glob}}$ (anexo) & los mismos predictores & FAR, Random Forest \\
 Winkler, MPIW, PICP & intervalo equi-colas, banda simultánea, región de máxima densidad & FAR \\
 $\overline{W}_{\max}$, $W_{\max}^{\mathrm{glob}}$, PICPB (anexo) & los mismos intervalos & FAR \\
@@ -397,7 +397,7 @@ $\overline{W}_{\max}$, $W_{\max}^{\mathrm{glob}}$, PICPB (anexo) & los mismos in
 \end{tabular}
 \end{table}
 
-El Cuadro~\ref{tab:dis_comportamientos} fija las constantes del análisis de comportamientos. La ventana de detalle de $N_{\mathrm{det}}$ orígenes consecutivos de prueba se elige con un criterio propio de cada escenario, calculado sobre lo que el generador registra y nunca sobre lo predicho: la que contiene el máximo de la varianza condicional verdadera en C-1, la de más cambios de régimen en C-2 y la de más orígenes con ley condicional multimodal en C-3. El pronóstico por comportamiento y su cota se comparan con el FAR y el Random Forest en figuras separadas, sobre todos los orígenes de prueba y sobre los de $K_t \geq 2$, y el acierto de la elección se lee por tramos de $p_{t,c^{*}}$.
+El Cuadro~\ref{tab:dis_comportamientos} fija las constantes del análisis de comportamientos, que se evalúan sólo en C-2. La ventana de detalle de $N_{\mathrm{det}}$ orígenes consecutivos de prueba es la de más cambios de régimen verdadero, calculado sobre lo que el generador registra y nunca sobre lo predicho. El pronóstico por comportamiento y su cota se comparan con el FAR y el Random Forest en figuras separadas, sobre todos los orígenes de prueba y sobre los de $K_t \geq 2$, y el acierto de la elección se lee por tramos de $p_{t,c^{*}}$.
 
 \begin{table}[H]
 \centering\small

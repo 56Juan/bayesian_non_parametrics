@@ -52,7 +52,7 @@
   "mercado": "AEMO NEM, region SA1, precio spot RRP a 5 min, hora del NEM (UTC+10)",
   "curva": "precio_asinh",
   "variable": "asinh(RRP / 100)",
-  "serie_id": "sa1_precio",
+  "serie_id": "sa1_103",
   "ventana_id": 2,
   "fecha_inicio_pedida": "2022-01-01",
   "fecha_fin_pedida": "2025-12-31",
@@ -89,17 +89,8 @@
   "experiment_id": "real_sa1_103_v02_m10",
   "m_fpca": 10,
   "m_fpca_list": [
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8,
-    9,
     10
   ],
   "seed": 41232,
-  "procesado": "2026-10-05 20:26:05"
+  "procesado": "2026-10-12 10:11:17"
 }

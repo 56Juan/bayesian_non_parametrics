@@ -1,6 +1,4 @@
-% [COPIA 103] Copia de la 27 con SERIE_ID = "sa1_103". NO se ejecuta: las trazas de la 103
-% son las de la 27 (hyperparameters.json["trazas_en"] apunta a real_sa1_precio_v02_mNN; 00_copiar_27.py).
-% psbp_fd_iteracion.m — Datos reales, corrida 27 (Australia del Sur SA1, 5 min, precio spot)
+% psbp_fd_iteracion.m — Datos reales, corrida 103 (SA1 precio spot)
 %
 % Paso 2 del ciclo Python -> MATLAB -> Python. Lee el contrato que escribio
 % 103_01_datos.ipynb, arma una lista plana de jobs y la reparte con
@@ -12,7 +10,7 @@
 %     (M) x (cadena) x (componente FPCA)
 %
 % de modo que un solo parfor cubre todo el barrido. Cada M es un EXPERIMENT_ID
-% distinto -real_sa1_103_v02_m01 ... _m10- con sus propios datos, contrato y
+% distinto -real_sa1_103_v02_m10- con sus propios datos, contrato y
 % trazas, asi que los jobs de distintos M no comparten nada mas que el pool: no
 % hay riesgo de que uno pise los artefactos del otro.
 %
@@ -46,7 +44,7 @@ VENTANA_ID   = 2;            % 1 = 2022-2025 (70/30), 2 = entrena 2022-2024 y pr
 % asi que se entrena CADA M (cada punto lee sus propias trazas; hyperparameters.json
 %["trazas_en"] apunta a si mismo). DEBE coincidir con M_FPCA_LIST de 103_01 y estar
 % procesado antes de correr esto.
-M_FPCA_LIST  = [1 2 3 4 5 6 7 8 9 10];
+M_FPCA_LIST  = [10];
 
 % Con true, un M sin artefactos de 103_01 se SALTA con aviso en vez de abortar
 % todo el barrido. Con false, la falta de artefactos es un error.

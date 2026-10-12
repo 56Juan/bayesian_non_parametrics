@@ -590,8 +590,12 @@ Dos generaciones. `21_real_nivel/` a `25_real_cripto/` siguen **la arquitectura
 anterior** (base B-spline por GCV, FPCA estimada, escalera de hiperparámetros):
 nivel diario del RÍO MAPOCHO EN LOS ALMENDROS (21–24, 48 mediciones por día) y
 BTCUSDT de Binance en velas de 5 min (25, 288 barras por día UTC). `24` y `25`
-son las vivas de esa generación (rezago propio `N_LAGS = 7`, `MCMC_CONFIG =
+eran las vivas de esa generación (rezago propio `N_LAGS = 7`, `MCMC_CONFIG =
 {5000, 2000, 40, 60}`, `N_CHAINS = 2`); 21–23 **no son comparables** con la 24.
+**Desde el 2026-10-12 sus artefactos, datos procesados y reportes se borraron del disco** (`real_nivel_v01`–`v05`,
+`real_btcusdt_v01`, `real_btcusdt_cierre_v01`, `datos_caudal_1`–`3`, `datos_nivel_3`); sólo quedan los
+notebooks 21–26 y `01 Antiguos primera tanda` con sus salidas embebidas, y los datos crudos
+(`Tabla_de_Mediciones…xlsx`, `cripto_binance`).
 
 `26`–`31` llevan el pipeline de la 200 portado a reales (B-spline 10/3 elegida por el analista,
 FPCA en train, scores crudos, `chungEscG`, `atau = 2`, covariables cruzadas con un rezago salvo
@@ -620,17 +624,29 @@ días no laborables, columna `holiday` del CSV) y §12.4 cruza `K` con el día d
 feriados (`65_comportamientos_calendario.csv`, `104_*`). `32_06` existe y no se usa (lo reemplaza
 el `102_06`).
 
+**Construcciones nuevas 105–107** (2026-10-12; construidas, **sin ejecutar**: falta `_01`, MATLAB, `_03`–`_06`).
+Desde cero, no por copia: `_01` = el `28_01` con las celdas de datos de cada serie (huecos como la 28), B-spline
+**10/3** (K = 10), cruzadas con un rezago, `M_FPCA_LIST = (10,)`, 1 cadena, `chungEscG`, `atau = 2`,
+`psbp_train.m` vigente (md5 `e8c38259`); `_03` de la 28; `_04`/`_05`/`_06` de los 101 con `BURN_EVAL = None`.
+
+| Carpeta | `SERIE_ID` | serie | ventana de detalle (§3.2) |
+|---|---|---|---|
+| `105_real_beijing_pm25` | `beijing_105` | PM2.5 horario de Beijing, promedio de las 12 estaciones PRSA, log(1 + x), 2013-03..2017-02, T = 1461 | más días con promedio ≥ 150 µg/m³ |
+| `106_real_eolica_smard` | `eolica_106` | factor de planta eólico onshore DE (SMARD), 96 por día, 2015-01..2026-10, T = 4299; insumo recuperado de git en `data/reales/raw/smard_eolica/` | más días con factor medio ≥ 0.5 |
+| `107_real_btc_vol` | `btc_107` | ½ log RV horaria de BTCUSDT (5 min), 2020-01..2026-08, T = 2435 | más días con log RV diaria > cuantil 0.9 de train |
+
 **SA1 y PM2.5 con el pipeline 30x — 103 y 104** (2026-10-12; `_04`, `_05` y `_06` ejecutados; la
 esperanza, la equi-colas, el FAR y el RF reproducen la 27 y la 28 a precisión de máquina):
 
 | Carpeta | `SERIE_ID` | origen | `M_FPCA_LIST` | ventana de detalle (§3.2) |
 |---|---|---|---|---|
-| `103_real_sa_precio` | `sa1_103` | la 27 (`real_sa1_precio_v02`; 3 cadenas, `atau = 0.5`, G = 288) | `(1, …, 10)` | más días con pico (RRP máximo del día > 300 AUD/MWh): t = 1227..1236, 2025-05-11..20 |
+| `103_real_sa_precio` | `sa1_103` | **reconstruida desde cero (2026-10-12, sin commit; MATLAB entrenando, 8 de 10 `.mat` a las 11:16; faltan `_03`–`_06`)**: base 10/3 (K = 10), cruzadas con un rezago, 1 cadena, `atau = 2`, MCMC 2500/500/30/50; ya no copia de la 27 (`00_copiar_27.py` borrado) y su `hyperparameters.json` tiene `trazas_en` a sí misma. Las cifras de abajo son de la versión anterior sobre la 27 (base 29/3, 3 cadenas, `atau = 0.5`) | `(10,)` | más días con pico (RRP máximo del día > 300 AUD/MWh): t = 1227..1236, 2025-05-11..20 |
 | `104_real_pm25` | `pm25_104` | la 28 (`real_pm25_poh_v02`; 1 cadena, `atau = 2`) | `(1, …, 6)` (el `m10` de la 28 es de otra corrida: 2 cadenas, `atau = 0.5`; no entra) | más días sobre la norma diaria (promedio 24 h ≥ 50 µg/m³): t = 3474..3483, 2024-07-05..14 |
 
-Se construyen con `00_copiar_27.py` / `00_copiar_28.py --trazas-en-origen`: copian `raw`, `functional`
-y `artefact` **sin los `.mat`** y dejan `hyperparameters.json["trazas_en"]` apuntando a la 27/28 (sus
-trazas pesan 1.8 GB y 545 MB versionados; §8.2). `BURN_EVAL = None` (burn del `.mat`, como la 27/28 y
+La 104 se construye con `00_copiar_28.py --trazas-en-origen` (la 103 se hizo así con `00_copiar_27.py`
+hasta la reconstrucción): copia `raw`, `functional` y `artefact` **sin los `.mat`** y deja
+`hyperparameters.json["trazas_en"]` apuntando a la 28 (`real_pm25_poh_v02_m01..m06`: **esas seis son
+las trazas de la 104, no borrarlas**; §8.2, §7 "Disco y dependencias"). `BURN_EVAL = None` (burn del `.mat`, como la 27/28 y
 las 30x). §12.4 cruza `K` con día de la semana, mes y el evento del día predicho y del anterior
 (`pico` / `episodio`). Lectura: en las dos series la predictiva es **unimodal** (K = 1 en 100 % del test
 de la SA1 y 99.7–100 % del PM2.5), los cuatro predictores quedan a ≤ 0.5 % de la esperanza y el `_06` no
@@ -638,6 +654,30 @@ tiene orígenes con K ≥ 2; la HDR coincide con la equi-colas y sólo la simult
 0.87) perdiendo el Winkler. El FAR gana el Bloque A (SA1: MAE 0.345 contra 0.348 en M = 10; PM2.5:
 0.321 contra 0.321 en M = 6) y el PSBPM-FD le gana el Winkler por poco desde M = 6 en la SA1 (2.490 contra
 2.523, 61 % de ventanas) y desde M = 5 en el PM2.5 (2.466 contra 2.484, 54 %).
+
+### Disco y dependencias (inventario 2026-10-12)
+
+**Trazas (`.mat`) y quién las lee** — antes de borrar nada, `hyperparameters.json["trazas_en"]` manda:
+
+- 200 y 201: los 30 `.mat` están sólo en `m10`; `m01`–`m09` apuntan ahí. 202: cada `M` tiene los suyos.
+- 300–302: copia propia, **blob-idéntica** a la de su 20x (en `.git` se deduplica; en disco son ~900 MB).
+- 101 y 102: 10 `.mat` propios. **104: sin `.mat` propios; lee `real_pm25_poh_v02_m01..m06` (la 28).**
+- 103: trazas propias en entrenamiento (8 de 10 `.mat` a las 11:16 del 2026-10-12). 105, 106, 107: 0 `.mat`
+  hasta que se entrenen (`trazas_en` apunta a sí mismas).
+
+**Sin dependientes vivos** (candidatas a limpieza; no se borran sin que se pida): 31 y 32 (duplicados
+en disco de 101 y 102), 30, 29, `avance_tesis_1`, `real_sa1_precio_v02` (27, 2.3 GB; una vez que la 103
+entrene) y, de la 28, `m10` (otra corrida) y `m07`–`m09`. **Ya borradas (2026-10-12):** 21–26 y
+`datos_caudal_*` / `datos_nivel_3` (§ "Datos reales").
+
+- Quitar `real_pm25_poh_v02_m10` (28) no afecta a la 104; sí afectaría quitar `m01`–`m06`.
+- `draws_scores_psbp.npy` (ignorado por git): ~1.35 GB en 300 y en 301, 447 MB en 302, 704 MB en 104.
+  Son entrada de `_05`/`_06`; regenerarlos es re-ejecutar `_04`.
+- `.git` pesa ~23 GB (HEAD rastreado ~14.5 GB): borrar archivos **no** lo reduce, haría falta reescribir
+  historia. `.claude/worktrees/agent-*` son dos worktrees git registrados (~1.5 GB).
+- `tests/test_intervalos_predictiva.py` lee `reports/simulaciones/escenario_201_chungEscG_1_r01_m05/
+  57_ventana_funcional_w30.csv` si existe (con guarda).
+- `reports/simulaciones/exploracion_bases` lo escribe `notebooks/auxiliar/explorar_bases_101_109.py`.
 
 ### Historia — no se edita ni se cita como estado actual
 
@@ -649,7 +689,10 @@ tiene orígenes con K ≥ 2; la HDR coincide con la equi-colas y sólo la simult
   Usaban base B-spline por GCV, ruido de medición `sigma_obs = 0.25`, scores
   estandarizados o escalera de hiperparámetros, y `N_LAGS`/`MCMC` distintos: **sus
   cifras no son comparables una a una** con las de 200–202.
-- Las corridas `30`–`34` y `50`–`53`: datos, reportes y artefactos siguen en disco.
+- Las corridas `30`–`34`, `50`–`53`, `61`–`73` y `101`–`113` **ya no tienen artefactos ni reportes en
+  disco** (inventario 2026-10-12): sólo quedan sus notebooks con las salidas embebidas y, de
+  `101`–`114`, `data/simulaciones/raw/escenario_1xx_*` (~0.2 GB; vacíos: `105_1`, `106_1`,
+  `113_chungEscN20`). La `114` conserva además `functional` y `predict`.
 - `model_psbp_fd/pipelines/deprecated/` — generadores de esas corridas; siguen
   importables desde ahí, **no** desde `pipelines` directamente. Incluye ahora
   `sim_escenario_A1/A2/A3` y `C2/C3`. Siguen en `pipelines` `B1/B2/B3` y `C`, sin
@@ -666,7 +709,10 @@ tiene orígenes con K ≥ 2; la HDR coincide con la equi-colas y sólo la simult
 1. **Capítulo de aplicación**: `docs/04 Aplicacion.tex` es un esqueleto (2026-10-12) con las
    secciones de §03_08 y comentarios con la fuente de cada cuadro; sin prosa.
 2. **Trazas duplicadas**: las 30x copian los `.mat` de su 20x (~220 MB en la 300) y 101/102 los
-   de 31/32; todo se versiona. Se deja así salvo que el repo pese demasiado.
+   de 31/32; todo se versiona. Se deja así salvo que el repo pese demasiado. Verificado
+   (2026-10-12): los `.mat` 20x/30x son blob-idénticos, así que en `.git` ya están deduplicados y el
+   costo es sólo de disco; apuntar el `trazas_en` de las 30x a su 20x (como hace la 104 con la 28) los
+   eliminaría sin regenerar nada.
 
 **Hechos — no reabrir (decididos el 2026-10-10/12):**
 

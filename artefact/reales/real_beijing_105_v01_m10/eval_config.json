@@ -1,0 +1,42 @@
+{
+  "scheme": "holdout_temporal",
+  "T": 1461,
+  "T0": 1022,
+  "prop_train": 0.7,
+  "horizons": [
+    1
+  ],
+  "n_lags": 1,
+  "m_fpca": 10,
+  "scores_scale": "raw_fpca_scores",
+  "fuente": "datos observados (UCI Beijing Multi-Site Air-Quality (PRSA), 12 estaciones, PM2.5 horario; promedio entre estaciones)",
+  "curva": "pm25_log",
+  "variable": "log(1 + PM2.5 promedio de 12 estaciones)",
+  "objetivo_evaluacion": "curva_suavizada",
+  "objetivo_secundario": "representacion_fpca",
+  "modo_residuo": "ninguno",
+  "nivel_credibilidad": 0.95,
+  "ventana_movil": {
+    "w": [
+      20,
+      30,
+      40
+    ],
+    "paso": 1,
+    "solapadas": true
+  },
+  "metricas_bloque_A": [
+    "mae_f",
+    "rmse_f",
+    "linf_medio",
+    "linf_max"
+  ],
+  "metricas_bloque_B": [
+    "mpiw",
+    "picp",
+    "picp_simultaneo",
+    "winkler",
+    "winkler_max_medio",
+    "winkler_max_glob"
+  ]
+}
