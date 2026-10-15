@@ -1,0 +1,49 @@
+M,metrica,columna,bloque,banda,n_ventanas,pct_ventanas_ganadas,criterio
+10,5. MPIW,mpiw,train,FAR (IC del modelo AR),2979,0.6075864384021483,menor es mejor
+10,5. MPIW,mpiw,train,PSBPM-FD (predictiva bayesiana),2979,0.0,menor es mejor
+10,5. MPIW,mpiw,train,PSBPM-FD (banda simultánea),2979,0.0,menor es mejor
+10,5. MPIW,mpiw,train,PSBPM-FD (región de máxima densidad),2979,0.3924135615978516,menor es mejor
+10,5. MPIW,mpiw,test,FAR (IC del modelo AR),1261,0.626486915146709,menor es mejor
+10,5. MPIW,mpiw,test,PSBPM-FD (predictiva bayesiana),1261,0.0,menor es mejor
+10,5. MPIW,mpiw,test,PSBPM-FD (banda simultánea),1261,0.0,menor es mejor
+10,5. MPIW,mpiw,test,PSBPM-FD (región de máxima densidad),1261,0.37351308485329104,menor es mejor
+10,6. PICP puntual,picp,train,FAR (IC del modelo AR),2979,0.2846592816381336,|valor - nominal|
+10,6. PICP puntual,picp,train,PSBPM-FD (predictiva bayesiana),2979,0.30949983215844246,|valor - nominal|
+10,6. PICP puntual,picp,train,PSBPM-FD (banda simultánea),2979,0.1510574018126888,|valor - nominal|
+10,6. PICP puntual,picp,train,PSBPM-FD (región de máxima densidad),2979,0.25478348439073517,|valor - nominal|
+10,6. PICP puntual,picp,test,FAR (IC del modelo AR),1261,0.2854877081681205,|valor - nominal|
+10,6. PICP puntual,picp,test,PSBPM-FD (predictiva bayesiana),1261,0.3671689135606661,|valor - nominal|
+10,6. PICP puntual,picp,test,PSBPM-FD (banda simultánea),1261,0.1586042823156225,|valor - nominal|
+10,6. PICP puntual,picp,test,PSBPM-FD (región de máxima densidad),1261,0.1887390959555908,|valor - nominal|
+10,7. PICPB curva completa,picp_simultaneo,train,FAR (IC del modelo AR),2979,0.1342732460557234,|valor - nominal|
+10,7. PICPB curva completa,picp_simultaneo,train,PSBPM-FD (predictiva bayesiana),2979,0.09432695535414569,|valor - nominal|
+10,7. PICPB curva completa,picp_simultaneo,train,PSBPM-FD (banda simultánea),2979,0.7351460221550856,|valor - nominal|
+10,7. PICPB curva completa,picp_simultaneo,train,PSBPM-FD (región de máxima densidad),2979,0.03625377643504532,|valor - nominal|
+10,7. PICPB curva completa,picp_simultaneo,test,FAR (IC del modelo AR),1261,0.13402061855670103,|valor - nominal|
+10,7. PICPB curva completa,picp_simultaneo,test,PSBPM-FD (predictiva bayesiana),1261,0.07692307692307693,|valor - nominal|
+10,7. PICPB curva completa,picp_simultaneo,test,PSBPM-FD (banda simultánea),1261,0.7264076130055511,|valor - nominal|
+10,7. PICPB curva completa,picp_simultaneo,test,PSBPM-FD (región de máxima densidad),1261,0.0626486915146709,|valor - nominal|
+10,8. Winkler,winkler,train,FAR (IC del modelo AR),2979,0.482040953340047,menor es mejor
+10,8. Winkler,winkler,train,PSBPM-FD (predictiva bayesiana),2979,0.3551527358173884,menor es mejor
+10,8. Winkler,winkler,train,PSBPM-FD (banda simultánea),2979,0.00671366230278617,menor es mejor
+10,8. Winkler,winkler,train,PSBPM-FD (región de máxima densidad),2979,0.15609264853977844,menor es mejor
+10,8. Winkler,winkler,test,FAR (IC del modelo AR),1261,0.6375892149088025,menor es mejor
+10,8. Winkler,winkler,test,PSBPM-FD (predictiva bayesiana),1261,0.19746233148295003,menor es mejor
+10,8. Winkler,winkler,test,PSBPM-FD (banda simultánea),1261,0.00951625693893735,menor es mejor
+10,8. Winkler,winkler,test,PSBPM-FD (región de máxima densidad),1261,0.15543219666931007,menor es mejor
+10,9. Winkler max promedio,winkler_max_medio,train,FAR (IC del modelo AR),2979,0.1346089291708627,menor es mejor
+10,9. Winkler max promedio,winkler_max_medio,train,PSBPM-FD (predictiva bayesiana),2979,0.2651896609600537,menor es mejor
+10,9. Winkler max promedio,winkler_max_medio,train,PSBPM-FD (banda simultánea),2979,0.467942262504196,menor es mejor
+10,9. Winkler max promedio,winkler_max_medio,train,PSBPM-FD (región de máxima densidad),2979,0.13225914736488756,menor es mejor
+10,9. Winkler max promedio,winkler_max_medio,test,FAR (IC del modelo AR),1261,0.21015067406819984,menor es mejor
+10,9. Winkler max promedio,winkler_max_medio,test,PSBPM-FD (predictiva bayesiana),1261,0.26090404440919907,menor es mejor
+10,9. Winkler max promedio,winkler_max_medio,test,PSBPM-FD (banda simultánea),1261,0.3980967486122125,menor es mejor
+10,9. Winkler max promedio,winkler_max_medio,test,PSBPM-FD (región de máxima densidad),1261,0.1308485329103886,menor es mejor
+10,10. Winkler max peor ventana,winkler_max_glob,train,FAR (IC del modelo AR),2979,0.30278616985565626,menor es mejor
+10,10. Winkler max peor ventana,winkler_max_glob,train,PSBPM-FD (predictiva bayesiana),2979,0.07082913729439409,menor es mejor
+10,10. Winkler max peor ventana,winkler_max_glob,train,PSBPM-FD (banda simultánea),2979,0.6059080228264518,menor es mejor
+10,10. Winkler max peor ventana,winkler_max_glob,train,PSBPM-FD (región de máxima densidad),2979,0.020476670023497817,menor es mejor
+10,10. Winkler max peor ventana,winkler_max_glob,test,FAR (IC del modelo AR),1261,0.31879460745440125,menor es mejor
+10,10. Winkler max peor ventana,winkler_max_glob,test,PSBPM-FD (predictiva bayesiana),1261,0.0015860428231562252,menor es mejor
+10,10. Winkler max peor ventana,winkler_max_glob,test,PSBPM-FD (banda simultánea),1261,0.655035685963521,menor es mejor
+10,10. Winkler max peor ventana,winkler_max_glob,test,PSBPM-FD (región de máxima densidad),1261,0.02458366375892149,menor es mejor

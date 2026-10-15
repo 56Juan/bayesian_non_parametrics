@@ -1,6 +1,4 @@
-% [COPIA 104] Copia de la 28 con SERIE_ID = "pm25_104". NO se ejecuta: las trazas de la 104
-% son las de la 28 (hyperparameters.json["trazas_en"] apunta a real_pm25_poh_v02_mNN; 00_copiar_28.py).
-% psbp_fd_iteracion.m — Datos reales, corrida 28 (Santiago, Parque O'Higgins, PM2.5 horario)
+% psbp_fd_iteracion.m — Datos reales, corrida 104 (Santiago, Parque O'Higgins, PM2.5 horario; M = 10)
 %
 % Paso 2 del ciclo Python -> MATLAB -> Python. Lee el contrato que escribio
 % 104_01_datos.ipynb, arma una lista plana de jobs y la reparte con
@@ -46,7 +44,7 @@ VENTANA_ID   = 2;            % 1 = 2015-2025 (70/30), 2 = entrena 2015-2022 y pr
 % asi que se entrena CADA M (cada punto lee sus propias trazas; hyperparameters.json
 %["trazas_en"] apunta a si mismo). DEBE coincidir con M_FPCA_LIST de 104_01 y estar
 % procesado antes de correr esto.
-M_FPCA_LIST  = [1 2 3 4 5 6];
+M_FPCA_LIST  = [10];
 
 % Con true, un M sin artefactos de 104_01 se SALTA con aviso en vez de abortar
 % todo el barrido. Con false, la falta de artefactos es un error.

@@ -1,0 +1,33 @@
+M,metrica,columna,bloque,predictor,n_ventanas,pct_ventanas_ganadas,criterio
+10,1. MAE  (L^1),mae_f,train,esperanza,1674,0.45997610513739545,menor es mejor
+10,1. MAE  (L^1),mae_f,train,mediana,1674,0.45459976105137395,menor es mejor
+10,1. MAE  (L^1),mae_f,train,medoide,1674,0.007168458781362007,menor es mejor
+10,1. MAE  (L^1),mae_f,train,modal,1674,0.07825567502986858,menor es mejor
+10,1. MAE  (L^1),mae_f,test,esperanza,702,0.7977207977207977,menor es mejor
+10,1. MAE  (L^1),mae_f,test,mediana,702,0.16809116809116809,menor es mejor
+10,1. MAE  (L^1),mae_f,test,medoide,702,0.008547008547008548,menor es mejor
+10,1. MAE  (L^1),mae_f,test,modal,702,0.02564102564102564,menor es mejor
+10,2. RMSE (L^2),rmse_f,train,esperanza,1674,0.5519713261648745,menor es mejor
+10,2. RMSE (L^2),rmse_f,train,mediana,1674,0.39366786140979687,menor es mejor
+10,2. RMSE (L^2),rmse_f,train,medoide,1674,0.0023894862604540022,menor es mejor
+10,2. RMSE (L^2),rmse_f,train,modal,1674,0.05197132616487455,menor es mejor
+10,2. RMSE (L^2),rmse_f,test,esperanza,702,0.8105413105413105,menor es mejor
+10,2. RMSE (L^2),rmse_f,test,mediana,702,0.17663817663817663,menor es mejor
+10,2. RMSE (L^2),rmse_f,test,medoide,702,0.007122507122507123,menor es mejor
+10,2. RMSE (L^2),rmse_f,test,modal,702,0.005698005698005698,menor es mejor
+10,3. E_max promedio por curva,linf_medio,train,esperanza,1674,0.4390681003584229,menor es mejor
+10,3. E_max promedio por curva,linf_medio,train,mediana,1674,0.4008363201911589,menor es mejor
+10,3. E_max promedio por curva,linf_medio,train,medoide,1674,0.006571087216248507,menor es mejor
+10,3. E_max promedio por curva,linf_medio,train,modal,1674,0.15352449223416964,menor es mejor
+10,3. E_max promedio por curva,linf_medio,test,esperanza,702,0.4415954415954416,menor es mejor
+10,3. E_max promedio por curva,linf_medio,test,mediana,702,0.3575498575498576,menor es mejor
+10,3. E_max promedio por curva,linf_medio,test,medoide,702,0.011396011396011397,menor es mejor
+10,3. E_max promedio por curva,linf_medio,test,modal,702,0.18945868945868946,menor es mejor
+10,4. E_max peor de la ventana,linf_max,train,esperanza,1674,0.32437275985663083,menor es mejor
+10,4. E_max peor de la ventana,linf_max,train,mediana,1674,0.1965352449223417,menor es mejor
+10,4. E_max peor de la ventana,linf_max,train,medoide,1674,0.2216248506571087,menor es mejor
+10,4. E_max peor de la ventana,linf_max,train,modal,1674,0.2574671445639188,menor es mejor
+10,4. E_max peor de la ventana,linf_max,test,esperanza,702,0.29772079772079774,menor es mejor
+10,4. E_max peor de la ventana,linf_max,test,mediana,702,0.2022792022792023,menor es mejor
+10,4. E_max peor de la ventana,linf_max,test,medoide,702,0.27635327635327633,menor es mejor
+10,4. E_max peor de la ventana,linf_max,test,modal,702,0.22364672364672364,menor es mejor

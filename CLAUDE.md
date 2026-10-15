@@ -624,7 +624,9 @@ días no laborables, columna `holiday` del CSV) y §12.4 cruza `K` con el día d
 feriados (`65_comportamientos_calendario.csv`, `104_*`). `32_06` existe y no se usa (lo reemplaza
 el `102_06`).
 
-**Construcciones nuevas 105–107** (2026-10-12; construidas, **sin ejecutar**: falta `_01`, MATLAB, `_03`–`_06`).
+**Construcciones nuevas 103–107** (2026-10-12/13; **ejecutadas completas**: `_01`, MATLAB, `_03`–`_06`, sin commit).
+La 103 se reconstruyó igual desde la 27 (generador `parte_103`); la 104 (2026-10-13) es la 28 con `M_FPCA_LIST = (10,)`
+entrenada en su carpeta (`00_copiar_28.py` quitado con `git rm`; los puntos viejos `real_pm25_104_v02_m01..m06` quedan en disco sin uso).
 Desde cero, no por copia: `_01` = el `28_01` con las celdas de datos de cada serie (huecos como la 28), B-spline
 **10/3** (K = 10), cruzadas con un rezago, `M_FPCA_LIST = (10,)`, 1 cadena, `chungEscG`, `atau = 2`,
 `psbp_train.m` vigente (md5 `e8c38259`); `_03` de la 28; `_04`/`_05`/`_06` de los 101 con `BURN_EVAL = None`.
@@ -635,18 +637,32 @@ Desde cero, no por copia: `_01` = el `28_01` con las celdas de datos de cada ser
 | `106_real_eolica_smard` | `eolica_106` | factor de planta eólico onshore DE (SMARD), 96 por día, 2015-01..2026-10, T = 4299; insumo recuperado de git en `data/reales/raw/smard_eolica/` | más días con factor medio ≥ 0.5 |
 | `107_real_btc_vol` | `btc_107` | ½ log RV horaria de BTCUSDT (5 min), 2020-01..2026-08, T = 2435 | más días con log RV diaria > cuantil 0.9 de train |
 
+Resultados (test, `w = 30`, `M = 10`; MAE / RMSE; Winkler; PICPB). En las cuatro la predictiva es **unimodal**
+(K = 1 en 99.7–100 % del test; el `_06` tiene 0–1 orígenes con K ≥ 2) y el `_03` no pasa (ocupación en el
+truncamiento N = 30, ESS mínimo 6–18; mismo patrón que la 31):
+
+| | FAR | esperanza | mediana | RF | Winkler FAR / equi-colas / HDR / simultánea | equi-colas gana al FAR | PICPB FAR / equi / simult. |
+|---|---|---|---|---|---|---|---|
+| 104 PM2.5 POH | 0.3214 / 0.4347 | **0.3166 / 0.4300** | 0.3168 | 0.3281 | 2.484 / **2.421** / 2.441 / 2.696 | 61 % | 0.68 / 0.69 / 0.90 |
+| 103 SA1 | 0.3280 / 0.4418 | 0.3279 / 0.4417 | 0.3286 | 0.3415 | 2.374 / 2.354 / 2.361 / 2.977 | 60 % | 0.72 / 0.70 / 0.95 |
+| 105 Beijing | 0.551 / 0.739 | 0.566 / 0.745 | 0.552 | 0.596 | 3.88 / 3.52 / 3.72 / 4.17 | 80 % | 0.79 / 0.76 / 0.93 |
+| 106 eólica | 0.0857 / 0.1197 | 0.0859 / 0.1191 | 0.0853 | 0.0961 | 0.581 / 0.605 / 0.622 / 0.730 | 34 % | 0.78 / 0.81 / 0.94 |
+| 107 BTC | 0.3242 / 0.4184 | 0.3288 / 0.4229 | 0.3303 | 0.3292 | 2.075 / 2.076 / 2.075 / 2.608 | 44 % | 0.63 / 0.67 / 0.95 |
+
+Lectura: Bloque A empatado o del FAR salvo la 104, donde la esperanza gana (−1.5 % MAE, 31 % de ventanas contra 22 % del FAR;
+con M = 6 empataba: 0.3209); Bloque B claro para el PSBPM-FD en Beijing y la 104 (−2.5 % Winkler, 61 %), empate en SA1
+y BTC, FAR en la eólica. 104: K ≥ 2 en 0.5 % del test (5 orígenes), `_03` 63 de 200 marcadas, ESS mín 7.
+
 **SA1 y PM2.5 con el pipeline 30x — 103 y 104** (2026-10-12; `_04`, `_05` y `_06` ejecutados; la
 esperanza, la equi-colas, el FAR y el RF reproducen la 27 y la 28 a precisión de máquina):
 
 | Carpeta | `SERIE_ID` | origen | `M_FPCA_LIST` | ventana de detalle (§3.2) |
 |---|---|---|---|---|
-| `103_real_sa_precio` | `sa1_103` | **reconstruida desde cero (2026-10-12, sin commit; MATLAB entrenando, 8 de 10 `.mat` a las 11:16; faltan `_03`–`_06`)**: base 10/3 (K = 10), cruzadas con un rezago, 1 cadena, `atau = 2`, MCMC 2500/500/30/50; ya no copia de la 27 (`00_copiar_27.py` borrado) y su `hyperparameters.json` tiene `trazas_en` a sí misma. Las cifras de abajo son de la versión anterior sobre la 27 (base 29/3, 3 cadenas, `atau = 0.5`) | `(10,)` | más días con pico (RRP máximo del día > 300 AUD/MWh): t = 1227..1236, 2025-05-11..20 |
-| `104_real_pm25` | `pm25_104` | la 28 (`real_pm25_poh_v02`; 1 cadena, `atau = 2`) | `(1, …, 6)` (el `m10` de la 28 es de otra corrida: 2 cadenas, `atau = 0.5`; no entra) | más días sobre la norma diaria (promedio 24 h ≥ 50 µg/m³): t = 3474..3483, 2024-07-05..14 |
+| `103_real_sa_precio` | `sa1_103` | **reconstruida desde cero y ejecutada completa (2026-10-12, sin commit)**: base 10/3 (K = 10), cruzadas con un rezago, 1 cadena, `atau = 2`, MCMC 2500/500/30/50; ya no copia de la 27 (`00_copiar_27.py` borrado) y su `hyperparameters.json` tiene `trazas_en` a sí misma. Las cifras de la SA1 en el párrafo de abajo son de la versión anterior sobre la 27 (base 29/3, 3 cadenas, `atau = 0.5`); las vigentes, en la tabla de resultados de 103 y 105–107 | `(10,)` | más días con pico (RRP máximo del día > 300 AUD/MWh): t = 1227..1236, 2025-05-11..20 |
+| `104_real_pm25` | `pm25_104` | **reconstruida 2026-10-13**: la 28 con M = 10, trazas propias (antes copia de la 28 con M = 1..6; las cifras del párrafo de abajo son de esa versión) | `(10,)` | más días sobre la norma diaria (promedio 24 h ≥ 50 µg/m³): t = 3474..3483, 2024-07-05..14 |
 
-La 104 se construye con `00_copiar_28.py --trazas-en-origen` (la 103 se hizo así con `00_copiar_27.py`
-hasta la reconstrucción): copia `raw`, `functional` y `artefact` **sin los `.mat`** y deja
-`hyperparameters.json["trazas_en"]` apuntando a la 28 (`real_pm25_poh_v02_m01..m06`: **esas seis son
-las trazas de la 104, no borrarlas**; §8.2, §7 "Disco y dependencias"). `BURN_EVAL = None` (burn del `.mat`, como la 27/28 y
+Hasta la reconstrucción, 103 y 104 se copiaban de la 27/28 (`00_copiar_27.py` / `00_copiar_28.py --trazas-en-origen`,
+ambos quitados). `BURN_EVAL = None` (burn del `.mat`, como la 27/28 y
 las 30x). §12.4 cruza `K` con día de la semana, mes y el evento del día predicho y del anterior
 (`pico` / `episodio`). Lectura: en las dos series la predictiva es **unimodal** (K = 1 en 100 % del test
 de la SA1 y 99.7–100 % del PM2.5), los cuatro predictores quedan a ≤ 0.5 % de la esperanza y el `_06` no
@@ -661,17 +677,14 @@ tiene orígenes con K ≥ 2; la HDR coincide con la equi-colas y sólo la simult
 
 - 200 y 201: los 30 `.mat` están sólo en `m10`; `m01`–`m09` apuntan ahí. 202: cada `M` tiene los suyos.
 - 300–302: copia propia, **blob-idéntica** a la de su 20x (en `.git` se deduplica; en disco son ~900 MB).
-- 101 y 102: 10 `.mat` propios. **104: sin `.mat` propios; lee `real_pm25_poh_v02_m01..m06` (la 28).**
-- 103: trazas propias en entrenamiento (8 de 10 `.mat` a las 11:16 del 2026-10-12). 105, 106, 107: 0 `.mat`
-  hasta que se entrenen (`trazas_en` apunta a sí mismas).
+- 101 y 102: 10 `.mat` propios. 103–107: 10 `.mat` propios cada una (`trazas_en` apunta a sí mismas).
+- `real_pm25_104_v02_m01..m06`: puntos de la 104 vieja (copia de la 28, sin `.mat`, `trazas_en` → la 28); sin uso.
 
 **Sin dependientes vivos** (candidatas a limpieza; no se borran sin que se pida): 31 y 32 (duplicados
-en disco de 101 y 102), 30, 29, `avance_tesis_1`, `real_sa1_precio_v02` (27, 2.3 GB; una vez que la 103
-entrene) y, de la 28, `m10` (otra corrida) y `m07`–`m09`. **Ya borradas (2026-10-12):** 21–26 y
+en disco de 101 y 102), 30, 29, `avance_tesis_1`, `real_sa1_precio_v02` (27, 2.3 GB), la 28 entera (`real_pm25_poh_v02`, ya no la lee la 104) y `real_pm25_104_v02_m01..m06`. **Ya borradas (2026-10-12):** 21–26 y
 `datos_caudal_*` / `datos_nivel_3` (§ "Datos reales").
 
-- Quitar `real_pm25_poh_v02_m10` (28) no afecta a la 104; sí afectaría quitar `m01`–`m06`.
-- `draws_scores_psbp.npy` (ignorado por git): ~1.35 GB en 300 y en 301, 447 MB en 302, 704 MB en 104.
+- `draws_scores_psbp.npy` (ignorado por git): ~1.35 GB en 300 y en 301, 447 MB en 302, 704 MB en los `m01..m06` viejos de la 104.
   Son entrada de `_05`/`_06`; regenerarlos es re-ejecutar `_04`.
 - `.git` pesa ~23 GB (HEAD rastreado ~14.5 GB): borrar archivos **no** lo reduce, haría falta reescribir
   historia. `.claude/worktrees/agent-*` son dos worktrees git registrados (~1.5 GB).
