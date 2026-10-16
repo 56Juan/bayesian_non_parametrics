@@ -317,7 +317,7 @@ $3$ & Nivel bajo  & $0.2$ & $0.4$ & $0.2$ & $0.2$ & $-0.5$ & $-0.3$ & $0.1$  & $
 Esta sección recoge la configuración con que se corrió el estudio de simulación de la Sección~\ref{03_07_00_diseno_estudio_simulacion}: partición y ventana móvil, muestreador y predictiva, modelos de referencia, métricas por resumen y constantes de los comportamientos.\\
 
 
-Partiendo por Cuadro~\ref{tab:dis_particion} el cual presenta la partición temporal, la ventana móvil y las referencias de los cuadros del capítulo; las ventanas que cruzan $T_0$ se excluyen de todo agregado.
+El Cuadro~\ref{tab:dis_particion} presenta la partición temporal, la ventana móvil y las referencias de los cuadros del capítulo; las ventanas que cruzan $T_0$ se excluyen de todo agregado.
 
 \begin{table}[H]
 \centering\small
@@ -354,7 +354,7 @@ Iteraciones           & Por cadena / descartadas                                
 Cadenas               & Cadenas independientes por score                        & $3$ \\
 $a_\nu, a_g, b_g$     & Forma de las precisiones y de la contracción            & $0.5$ \\
 $b_\nu$               & Escala de la precisión del átomo                        & $0.5\,\mathrm{sd}^2(\xi_m)$ \\
-$\nu_{\rho_j}$        & Precisión a priori de los coeficientes de decaimiento $\rho_{hj}$ & $10\,\mathrm{sd}^2(z_j)$ \\
+$\nu_{\rho_j}$        & Precisión a priori de los coeficientes de decaimiento $\rho_{hj}$ & $10\,\mathrm{sd}^2$ del predictor $j$ \\
 $(a_{\kappa_j}, b_{\kappa_j})$ & Inclusión, rezago propio de orden uno / resto      & $(0.5, 0.5)$ / $(0.5, 5)$ \\
 $S$                   & Extracciones de la predictiva por origen                & $1000$ \\
 \hline
@@ -392,15 +392,15 @@ El Cuadro~\ref{tab:dis_resumen_metrica} indica, para cada métrica, sobre qué r
 Métrica (Sección~\ref{02_02_03_criterios_evaluacion}) & Resumen del PSBPM-FD & Modelos comparados \\
 \hline
 RMSE, MAE & Esperanza, mediana puntual, átomo más probable & FAR, Random Forest \\
-RMSE, MAE (sólo C-2) & Pronóstico por comportamiento (Sección~\ref{03_06_03_descripcion}) y mejor comportamiento (cota) & FAR, Random Forest, por separado \\
-$\overline{\mathrm{E}}_{\max}$, $\mathrm{E}_{\max}^{\mathrm{glob}}$ (anexo) & Los mismos predictores & FAR, Random Forest \\
+RMSE, MAE (solo C-2) & Pronóstico por comportamiento (Sección~\ref{03_06_03_descripcion}) y mejor comportamiento (cota) & FAR, Random Forest, por separado \\
+$\overline{\mathrm{E}}_{\max}$, $\mathrm{E}_{\max}^{\mathrm{glob}}$ (anexo) & Esperanza en los cuadros; los tres predictores en las figuras & FAR, Random Forest \\
 Winkler, MPIW, PICP & Intervalo equi-colas, banda simultánea, región de máxima densidad & FAR \\
 $\overline{W}_{\max}$, $W_{\max}^{\mathrm{glob}}$, PICPB (anexo) & Los mismos intervalos & FAR \\
 \hline
 \end{tabular}
 \end{table}
 
-El Cuadro~\ref{tab:dis_comportamientos} fija las constantes del análisis de comportamientos, que se evalúan sólo en C-2. La ventana de detalle de $N_{\mathrm{det}}$ orígenes consecutivos de prueba es la de más cambios de régimen verdadero, calculado sobre lo que el generador registra y nunca sobre lo predicho. El pronóstico por comportamiento y su cota se comparan con el FAR y el Random Forest en figuras separadas, sobre todos los orígenes de prueba y sobre los de $K_t \geq 2$, y el acierto de la elección se lee por tramos de $p_{t,c^{*}}$.
+El Cuadro~\ref{tab:dis_comportamientos} fija las constantes del análisis de comportamientos, que se evalúan solo en C-2. La ventana de detalle de $N_{\mathrm{det}}$ orígenes consecutivos de prueba es la de más cambios de régimen verdadero, calculado sobre lo que el generador registra y nunca sobre lo predicho. El pronóstico por comportamiento y su cota se comparan con la esperanza, el FAR y el Random Forest, sobre todos los orígenes de prueba y sobre los de $K_t \geq 2$, y el acierto de la elección se lee por tramos de $p_{t,c^{*}}$.
 
 \begin{table}[H]
 \centering\small

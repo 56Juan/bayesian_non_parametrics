@@ -6,7 +6,7 @@ Este anexo reúne los resultados del estudio de simulación que no se reportan e
 \section{Métricas completas por número de componentes}
 \label{aneB_00_01_metricas_por_M}
 
-Las diez métricas del Marco Teórico en el bloque de prueba para cada $M$ del barrido, como promedio sobre las ventanas de ancho $w = 30$: las cuatro del Bloque A para la esperanza del PSBPM-FD, el FAR y el Random Forest, y las seis del Bloque B para las tres construcciones de intervalo del PSBPM-FD y para el FAR.
+Las diez métricas del Marco Teórico en el bloque de prueba para cada $M$ del barrido, como promedio sobre las ventanas de ancho $w = 30$: las cuatro métricas de error para la esperanza del PSBPM-FD, el FAR y el Random Forest, y las seis métricas de intervalo para las tres construcciones de intervalo del PSBPM-FD y para el FAR.
 
 \subsection{Escenario C-1 (GARCH)}
 \label{aneB_00_01_02_metricas_garch}
@@ -14,7 +14,7 @@ Las diez métricas del Marco Teórico en el bloque de prueba para cada $M$ del b
 \begin{table}[H]
 \centering\footnotesize
 \setlength{\tabcolsep}{3pt}
-\caption{C-1 (GARCH). Métricas del Bloque A en el bloque de prueba por $M$ (promedio sobre las ventanas, $w = 30$).}
+\caption{C-1 (GARCH). Métricas de error en el bloque de prueba por $M$ (promedio sobre las ventanas, $w = 30$).}
 \label{tab:aneB_A_C1}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{c cccc cccc cccc}
@@ -38,7 +38,7 @@ $10$ & 0.711 & 0.890 & 1.579 & 2.854 & 0.723 & 0.906 & 1.615 & 2.942 & 0.734 & 0
 
 \begin{table}[H]
 \centering\footnotesize
-\caption{C-1 (GARCH). Métricas del Bloque B en el bloque de prueba por $M$ y construcción de intervalo (promedio sobre las ventanas, $w = 30$).}
+\caption{C-1 (GARCH). Métricas de intervalo en el bloque de prueba por $M$ y construcción de intervalo (promedio sobre las ventanas, $w = 30$).}
 \label{tab:aneB_B_C1}
 \begin{tabular}{l c cccccc}
 \hline
@@ -97,7 +97,7 @@ FAR & $10$ & 3.423 & 0.940 & 0.625 & 4.352 & 10.404 & 51.188 \\
 \begin{table}[H]
 \centering\footnotesize
 \setlength{\tabcolsep}{3pt}
-\caption{C-2 (TAR). Métricas del Bloque A en el bloque de prueba por $M$ (promedio sobre las ventanas, $w = 30$).}
+\caption{C-2 (TAR). Métricas de error en el bloque de prueba por $M$ (promedio sobre las ventanas, $w = 30$).}
 \label{tab:aneB_A_C2}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{c cccc cccc cccc}
@@ -121,7 +121,7 @@ $10$ & 0.609 & 0.777 & 1.393 & 2.750 & 0.770 & 0.980 & 1.737 & 3.343 & 0.591 & 0
 
 \begin{table}[H]
 \centering\footnotesize
-\caption{C-2 (TAR). Métricas del Bloque B en el bloque de prueba por $M$ y construcción de intervalo (promedio sobre las ventanas, $w = 30$).}
+\caption{C-2 (TAR). Métricas de intervalo en el bloque de prueba por $M$ y construcción de intervalo (promedio sobre las ventanas, $w = 30$).}
 \label{tab:aneB_B_C2}
 \begin{tabular}{l c cccccc}
 \hline
@@ -180,7 +180,7 @@ FAR & $10$ & 3.977 & 0.952 & 0.702 & 4.863 & 10.998 & 59.076 \\
 \begin{table}[H]
 \centering\footnotesize
 \setlength{\tabcolsep}{3pt}
-\caption{C-3 (multimodalidad). Métricas del Bloque A en el bloque de prueba por $M$ (promedio sobre las ventanas, $w = 30$).}
+\caption{C-3 (multimodalidad). Métricas de error en el bloque de prueba por $M$ (promedio sobre las ventanas, $w = 30$).}
 \label{tab:aneB_A_C3}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{c cccc cccc cccc}
@@ -198,7 +198,7 @@ $6$ & 0.689 & 0.866 & 1.598 & 2.968 & 0.700 & 0.880 & 1.635 & 2.951 & 0.700 & 0.
 
 \begin{table}[H]
 \centering\footnotesize
-\caption{C-3 (multimodalidad). Métricas del Bloque B en el bloque de prueba por $M$ y construcción de intervalo (promedio sobre las ventanas, $w = 30$).}
+\caption{C-3 (multimodalidad). Métricas de intervalo en el bloque de prueba por $M$ y construcción de intervalo (promedio sobre las ventanas, $w = 30$).}
 \label{tab:aneB_B_C3}
 \begin{tabular}{l c cccccc}
 \hline
@@ -230,13 +230,13 @@ FAR & $6$ & 3.283 & 0.937 & 0.563 & 4.230 & 11.835 & 54.523 \\
 \section{Sensibilidad al ancho de la ventana}
 \label{aneB_00_02_sensibilidad_ventana}
 
-Bloques A y B sobre la ventana móvil con $w = 20$ (izquierda) y $w = 40$ (derecha) para todos los $M$ del barrido. El cuerpo reporta $w = 30$.
+Métricas de error y de intervalo sobre la ventana móvil con $w = 20$ (izquierda) y $w = 40$ (derecha) para todos los $M$ del barrido. El cuerpo reporta $w = 30$.
 
 \begin{figure}[H]
 \centering
 \begin{minipage}{0.49\textwidth}\centering\includegraphics[width=\textwidth]{IMG/aneB_00/aneB_00_bloqueA_w20_C1.png}\end{minipage}\hfill
 \begin{minipage}{0.49\textwidth}\centering\includegraphics[width=\textwidth]{IMG/aneB_00/aneB_00_bloqueA_w40_C1.png}\end{minipage}
-\caption{C-1 (GARCH). Bloque A sobre la ventana móvil con $w = 20$ (izquierda) y $w = 40$ (derecha).}
+\caption{C-1 (GARCH). Métricas de error sobre la ventana móvil con $w = 20$ (izquierda) y $w = 40$ (derecha).}
 \label{fig:aneB_ancho_A_C1}
 \end{figure}
 
@@ -244,7 +244,7 @@ Bloques A y B sobre la ventana móvil con $w = 20$ (izquierda) y $w = 40$ (derec
 \centering
 \begin{minipage}{0.49\textwidth}\centering\includegraphics[width=\textwidth]{IMG/aneB_00/aneB_00_bloqueB_w20_C1.png}\end{minipage}\hfill
 \begin{minipage}{0.49\textwidth}\centering\includegraphics[width=\textwidth]{IMG/aneB_00/aneB_00_bloqueB_w40_C1.png}\end{minipage}
-\caption{C-1 (GARCH). Bloque B sobre la ventana móvil con $w = 20$ (izquierda) y $w = 40$ (derecha).}
+\caption{C-1 (GARCH). Métricas de intervalo sobre la ventana móvil con $w = 20$ (izquierda) y $w = 40$ (derecha).}
 \label{fig:aneB_ancho_B_C1}
 \end{figure}
 
@@ -252,7 +252,7 @@ Bloques A y B sobre la ventana móvil con $w = 20$ (izquierda) y $w = 40$ (derec
 \centering
 \begin{minipage}{0.49\textwidth}\centering\includegraphics[width=\textwidth]{IMG/aneB_00/aneB_00_bloqueA_w20_C2.png}\end{minipage}\hfill
 \begin{minipage}{0.49\textwidth}\centering\includegraphics[width=\textwidth]{IMG/aneB_00/aneB_00_bloqueA_w40_C2.png}\end{minipage}
-\caption{C-2 (TAR). Bloque A sobre la ventana móvil con $w = 20$ (izquierda) y $w = 40$ (derecha).}
+\caption{C-2 (TAR). Métricas de error sobre la ventana móvil con $w = 20$ (izquierda) y $w = 40$ (derecha).}
 \label{fig:aneB_ancho_A_C2}
 \end{figure}
 
@@ -260,7 +260,7 @@ Bloques A y B sobre la ventana móvil con $w = 20$ (izquierda) y $w = 40$ (derec
 \centering
 \begin{minipage}{0.49\textwidth}\centering\includegraphics[width=\textwidth]{IMG/aneB_00/aneB_00_bloqueB_w20_C2.png}\end{minipage}\hfill
 \begin{minipage}{0.49\textwidth}\centering\includegraphics[width=\textwidth]{IMG/aneB_00/aneB_00_bloqueB_w40_C2.png}\end{minipage}
-\caption{C-2 (TAR). Bloque B sobre la ventana móvil con $w = 20$ (izquierda) y $w = 40$ (derecha).}
+\caption{C-2 (TAR). Métricas de intervalo sobre la ventana móvil con $w = 20$ (izquierda) y $w = 40$ (derecha).}
 \label{fig:aneB_ancho_B_C2}
 \end{figure}
 
@@ -268,7 +268,7 @@ Bloques A y B sobre la ventana móvil con $w = 20$ (izquierda) y $w = 40$ (derec
 \centering
 \begin{minipage}{0.49\textwidth}\centering\includegraphics[width=\textwidth]{IMG/aneB_00/aneB_00_bloqueA_w20_C3.png}\end{minipage}\hfill
 \begin{minipage}{0.49\textwidth}\centering\includegraphics[width=\textwidth]{IMG/aneB_00/aneB_00_bloqueA_w40_C3.png}\end{minipage}
-\caption{C-3 (multimodalidad). Bloque A sobre la ventana móvil con $w = 20$ (izquierda) y $w = 40$ (derecha).}
+\caption{C-3 (multimodalidad). Métricas de error sobre la ventana móvil con $w = 20$ (izquierda) y $w = 40$ (derecha).}
 \label{fig:aneB_ancho_A_C3}
 \end{figure}
 
@@ -276,7 +276,7 @@ Bloques A y B sobre la ventana móvil con $w = 20$ (izquierda) y $w = 40$ (derec
 \centering
 \begin{minipage}{0.49\textwidth}\centering\includegraphics[width=\textwidth]{IMG/aneB_00/aneB_00_bloqueB_w20_C3.png}\end{minipage}\hfill
 \begin{minipage}{0.49\textwidth}\centering\includegraphics[width=\textwidth]{IMG/aneB_00/aneB_00_bloqueB_w40_C3.png}\end{minipage}
-\caption{C-3 (multimodalidad). Bloque B sobre la ventana móvil con $w = 20$ (izquierda) y $w = 40$ (derecha).}
+\caption{C-3 (multimodalidad). Métricas de intervalo sobre la ventana móvil con $w = 20$ (izquierda) y $w = 40$ (derecha).}
 \label{fig:aneB_ancho_B_C3}
 \end{figure}
 
@@ -343,42 +343,42 @@ Las métricas evaluadas contra la representación $X_t^{(M)}$ en lugar de la cur
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth,height=0.4\textheight,keepaspectratio]{IMG/aneB_00/aneB_00_bloqueA_vs_M_repr_C1.png}
-\caption{C-1 (GARCH). Bloque A contra la representación truncada, por $M$.}
+\caption{C-1 (GARCH). Métricas de error contra la representación truncada, por $M$.}
 \label{fig:aneB_reprA_C1}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth,height=0.4\textheight,keepaspectratio]{IMG/aneB_00/aneB_00_bloqueB_vs_M_repr_C1.png}
-\caption{C-1 (GARCH). Bloque B contra la representación truncada, por $M$.}
+\caption{C-1 (GARCH). Métricas de intervalo contra la representación truncada, por $M$.}
 \label{fig:aneB_reprB_C1}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth,height=0.4\textheight,keepaspectratio]{IMG/aneB_00/aneB_00_bloqueA_vs_M_repr_C2.png}
-\caption{C-2 (TAR). Bloque A contra la representación truncada, por $M$.}
+\caption{C-2 (TAR). Métricas de error contra la representación truncada, por $M$.}
 \label{fig:aneB_reprA_C2}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth,height=0.4\textheight,keepaspectratio]{IMG/aneB_00/aneB_00_bloqueB_vs_M_repr_C2.png}
-\caption{C-2 (TAR). Bloque B contra la representación truncada, por $M$.}
+\caption{C-2 (TAR). Métricas de intervalo contra la representación truncada, por $M$.}
 \label{fig:aneB_reprB_C2}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth,height=0.4\textheight,keepaspectratio]{IMG/aneB_00/aneB_00_bloqueA_vs_M_repr_C3.png}
-\caption{C-3 (multimodalidad). Bloque A contra la representación truncada, por $M$.}
+\caption{C-3 (multimodalidad). Métricas de error contra la representación truncada, por $M$.}
 \label{fig:aneB_reprA_C3}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth,height=0.4\textheight,keepaspectratio]{IMG/aneB_00/aneB_00_bloqueB_vs_M_repr_C3.png}
-\caption{C-3 (multimodalidad). Bloque B contra la representación truncada, por $M$.}
+\caption{C-3 (multimodalidad). Métricas de intervalo contra la representación truncada, por $M$.}
 \label{fig:aneB_reprB_C3}
 \end{figure}
 
