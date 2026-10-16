@@ -719,8 +719,11 @@ en disco de 101 y 102), 30, 29, `avance_tesis_1`, `real_sa1_precio_v02` (27, 2.3
 
 **Abiertas — preguntar antes de codificar contra ellas:**
 
-1. **Capítulo de aplicación**: `docs/04 Aplicacion.tex` es un esqueleto (2026-10-12) con las
-   secciones de §03_08 y comentarios con la fuente de cada cuadro; sin prosa.
+1. **Capítulo de aplicación** (2026-10-15): el capítulo 4 (`docs/04 Aplicacion.tex`) es sólo el
+   tráfico I-94 (101 y 102), con la estructura de §03_08, cifras reales y sin prosa. Los gráficos
+   extras del tráfico van en `docs/05 Anexo Aplicacion Trafico.tex` (`aneC_00`) y las series
+   103–107 en `docs/06 Anexo Aplicacion Otras Series.tex` (`aneD_00`); figuras copiadas de
+   `reports/reales/` a `docs/IMG/{04_03,aneC_00,aneD_00}/`. Pendiente: `04_bloqueB_ancho.png`.
 2. **Trazas duplicadas**: las 30x copian los `.mat` de su 20x (~220 MB en la 300) y 101/102 los
    de 31/32; todo se versiona. Se deja así salvo que el repo pese demasiado. Verificado
    (2026-10-12): los `.mat` 20x/30x son blob-idénticos, así que en `.git` ya están deduplicados y el

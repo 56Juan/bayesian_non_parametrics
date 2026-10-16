@@ -1,106 +1,440 @@
 \chapter{Aplicación a Datos Reales}
 \label{04_00_00_aplicacion}
 
-% Esqueleto (2026-10-12, segunda versión). Sin prosa: cada sección lleva como comentario su contenido y su fuente.
-% Siete series, un mismo pipeline (el de las 30x, sin oráculo): notebooks/reales/101..107, salidas en
-% reports/reales/<serie>_barrido_M/ (prefijos 98, 99, 102, 104, 111, 112, 116-119) y <serie>_m<M>/.
-% Estado al 2026-10-12: 101-105 con _04, _05 y _06 ejecutados; 106 hasta _03 (faltan _04-_06); 107 sólo _01 (falta MATLAB y _03-_06).
-% Las filas de 106 y 107 quedan como pendientes en los cuadros transversales hasta que se ejecuten.
-% El orden sigue el rasgo que decide el resultado (predictiva multimodal o no), no el número de la corrida.
+% Corridas 101 (rezago {1}) y 102 (rezagos {1, 7}) de notebooks/reales/. Cifras: test, w = 30, M = 10.
+% Fuente de los cuadros: reports/reales/real_trafico_10{1,2}_v01_m10/{65,72,81,113}_* y _barrido_M/{98,99,102,119}_*.
+% Figuras de §04_01 generadas sobre los datos de la 102 (scratchpad desc_trafico.py) en docs/IMG/04_01/.
+
+Este capítulo aplica el PSBPM-FD a una serie observada de curvas diarias, el volumen horario de vehículos en una autopista urbana, con el propósito aplicado de pronosticar con un día de anticipación el perfil completo de tráfico del día siguiente y cuantificar su incertidumbre. Un pronóstico de este tipo no se agota en una curva media, porque la pregunta operativa no es sólo cuántos vehículos circularán en promedio sino si el día siguiente tendrá las horas punta de un día laborable o el perfil plano de un fin de semana o un feriado, y con qué probabilidad.\\
+
+La serie se eligió porque reúne, en datos reales, el rasgo que en el estudio de simulación favorecía al modelo propuesto (escenario C-2, Sección~\ref{03_07_02_escenarios}): la ley de la curva siguiente depende de un estado del proceso, el tipo de día, que la curva anterior sólo revela en parte. Cuando ese estado no se observa, la distribución predictiva debería repartir su masa entre perfiles distintos, y cuando se observa, debería concentrarla en uno. Para estudiar ese efecto se ajustan dos especificaciones que difieren únicamente en la información que reciben las compuertas de la mezcla: la primera usa la curva del día anterior y la segunda agrega la del mismo día de la semana anterior. La comparación entre ambas muestra cómo la mezcla pasa de una predictiva con varios comportamientos a una unimodal a medida que las covariables contienen la información relevante sobre el estado.\\
+
+El capítulo describe primero los datos y la evidencia descriptiva que motiva el modelo, luego el diseño de la comparación y, por último, los resultados en el mismo orden que el estudio de simulación. Los gráficos complementarios de esta aplicación se reúnen en el Anexo~\ref{aneC_00_00_trafico} y los resultados de otras cinco series reales, en las que la predictiva resultó unimodal, en el Anexo~\ref{aneD_00_00_otras_series}.
+
+\providecommand{\figapl}[1]{\IfFileExists{#1}{\includegraphics[width=\textwidth]{#1}}%
+{\fbox{\parbox{0.9\textwidth}{\centering\small Figura pendiente: \detokenize{#1}}}}}
 
 \section{Datos}
 \label{04_01_00_datos}
-% Introducción general: cada día es una curva; qué rasgo de la ley condicional se espera en cada serie.
-% Cuadro tab:apl_series, una fila por serie (fuentes: 01 de cada corrida, §2-§3):
-%   101/102 Tráfico I-94 (Metro Interstate Traffic Volume), volumen horario, 2015-07-01..2018-09-30.
-%   103 Precio SA1 (AEMO), RRP por intervalo, con huecos tratados como la 28_01.
-%   104 PM2.5 Parque O'Higgins (SINCA), horario; trazas de la 28 (real_pm25_poh_v02_m01..m06).
-%   105 PM2.5 Beijing (PRSA, promedio de las 12 estaciones), log(1 + x), 2013-03..2017-02, T = 1461.
-%   106 Factor de planta eólico onshore DE (SMARD), 96 por día, 2015-01..2026-10, T = 4299.
-%   107 ½ log RV horaria de BTCUSDT (velas de 5 min), 2020-01..2026-08, T = 2435.
-% Columnas: serie, fuente, G (puntos por curva), T, T0, M_ref, rezagos, criterio de la ventana de detalle.
-% Figura: una curva típica y la serie de scores xi_1 por serie (fuente: 01_* de cada corrida).
+
+Los datos provienen del conjunto \emph{Metro Interstate Traffic Volume} del UCI Machine Learning Repository, que registra el volumen horario de vehículos en la estación ATR 301 del Departamento de Transporte de Minnesota, en la autopista I-94 en dirección oeste, entre Minneapolis y Saint Paul. % TODO: cita bibliográfica del repositorio.
+Se usa la ventana del 1 de julio de 2015 al 30 de septiembre de 2018, que da $T = 1188$ días. Cada día es una curva observada en $G = 24$ horas, con el volumen en miles de vehículos por hora.\\
+
+El registro tiene huecos, un $7\%$ de las horas de la ventana, repartidos en 301 días incompletos y tres días sin dato (24 a 26 de octubre de 2015). La representación los absorbe sin imputar horas. Cada día se representa en una base B-spline cúbica de $K = 10$ funciones ajustada sólo a las horas observadas, con una penalización débil hacia el perfil medio del bloque de entrenamiento en los días incompletos; los días sin dato o con más de doce horas ausentes reciben coeficientes interpolados linealmente en el tiempo. Sobre esa representación se estima la FPCA con el bloque de entrenamiento y se retienen $M = 10$ componentes, que reproducen la representación completa. Las tres primeras explican el $79.9\%$, el $12.4\%$ y el $3.7\%$ de la varianza, un $95.9\%$ en conjunto.\\
+
+La serie se parte en orden cronológico en un bloque de entrenamiento de 831 días (1 de julio de 2015 al 8 de octubre de 2017) y uno de prueba de 357 días (9 de octubre de 2017 al 30 de septiembre de 2018).
+
+\subsection{Análisis descriptivo}
+\label{04_01_01_descriptivo}
+
+La Figura~\ref{fig:apl_perfiles} muestra las curvas del bloque de entrenamiento separadas por tipo de día, con la mediana puntual y la banda entre los cuantiles $10\%$ y $90\%$. Los días laborables tienen dos horas punta, hacia las siete de la mañana y las cuatro de la tarde, con medianas por sobre seis mil vehículos por hora, mientras que los sábados, domingos y feriados tienen un solo máximo amplio al mediodía, más bajo y con un ascenso más tardío en la mañana. El nivel medio del día pasa de $3.61$ mil vehículos por hora en los laborables a $2.85$ en los sábados y $2.50$ en los domingos y feriados. La dispersión dentro de cada tipo es pequeña frente a la distancia entre tipos, de modo que la distribución marginal de la curva es, en buena medida, una mezcla de pocos perfiles bien separados.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth,height=0.4\textheight,keepaspectratio]{IMG/04_01/04_perfiles_tipo_dia.png}
+\caption{Curvas diarias del bloque de entrenamiento por tipo de día, con la mediana puntual y la banda entre los cuantiles $10\%$ y $90\%$.}
+\label{fig:apl_perfiles}
+\end{figure}
+
+La Figura~\ref{fig:apl_nivel} muestra el nivel medio de cada día a lo largo de la ventana. Los días laborables forman una franja separada de la de los fines de semana, en la que sábados y domingos quedan próximos entre sí, y ninguna de las franjas tiene tendencia marcada, salvo un nivel laborable algo más bajo en el segundo semestre de 2016. El bloque de prueba repite la estructura del de entrenamiento, de manera que lo que se aprende antes de $T_0$ sigue siendo válido después. Fuera de las franjas quedan días aislados con niveles muy bajos, propios de condiciones excepcionales, y algunos feriados con nivel de día laborable, que muestran que el calendario oficial no decide por sí solo el perfil.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth,height=0.3\textheight,keepaspectratio]{IMG/04_01/04_nivel_diario.png}
+\caption{Nivel medio diario del volumen de tráfico por tipo de día. La línea discontinua marca el inicio del bloque de prueba.}
+\label{fig:apl_nivel}
+\end{figure}
+
+La Figura~\ref{fig:apl_dependencia} relaciona el primer score, que distingue el perfil laborable del de fin de semana, con su valor un día y una semana antes. Frente al rezago de un día, los puntos se agrupan en nubes separadas según el tipo de día siguiente, y un mismo valor del rezago lleva a destinos distintos: tras un día laborable, el siguiente puede ser otro laborable o un sábado. El tercer panel lo muestra de forma directa, ya que condicionado a un rezago en el rango típico de un día laborable, la distribución del score siguiente es bimodal, con un $24\%$ de la masa en el perfil de fin de semana. Una relación lineal con el rezago de un día explica sólo el $16\%$ de la varianza del primer score (correlación $0.40$), porque promedia los dos destinos. Frente al rezago de una semana, en cambio, los puntos se alinean sobre la diagonal y la correlación sube a $0.83$; con ambos rezagos, la relación lineal explica el $70\%$. Quedan fuera de la diagonal los feriados, que el rezago semanal no anuncia.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth,height=0.4\textheight,keepaspectratio]{IMG/04_01/04_dependencia_score1.png}
+\caption{Primer score frente a su rezago de un día (izquierda) y de una semana (centro), por tipo de día predicho, y distribución del primer score condicionada a un rezago de un día en el rango típico de los días laborables (derecha). Bloque de entrenamiento.}
+\label{fig:apl_dependencia}
+\end{figure}
+
+La evidencia descriptiva justifica el modelo propuesto en dos sentidos. Primero, con la información del día anterior la ley de la curva siguiente es una mezcla de perfiles, que un predictor lineal resume en un promedio que no corresponde a ningún día real, mientras que una mezcla con pesos dependientes de las covariables puede asignar un átomo a cada perfil y una probabilidad a cada uno. Segundo, el estado que decide el perfil, el tipo de día, está contenido en buena parte en el rezago semanal, de modo que agregar ese rezago a las compuertas debería concentrar la masa en el perfil correcto. Ésa es la comparación que organiza el resto del capítulo.
 
 \section{Diseño}
 \label{04_02_00_diseno}
-% Lo común con el estudio de simulación (§03_07): representación B-spline 10/3 (K = 10), FPCA estimada sólo en train,
-% scores crudos, partición 70/30, ventana móvil w = 30, las diez métricas, mismos competidores (FAR, RF),
-% hiperparámetros chungEscG, atau = 2, 1 cadena, MCMC 2500/500/30/50 (101/102: ver el .json de cada una).
-% Lo que difiere: sin oráculo ni régimen verdadero; el calendario es la etiqueta externa (§04_03_03);
-% atau = 2 (en simulación 0.5) y 1 cadena, de modo que no hay R-hat.
-% Cuadro tab:apl_dis: rezagos por serie (101 {1}; 102 {1, 7}; 103-107 cruzados con un rezago), M_ref (10; 104: 6),
-% orden del FAR (7 en la 102), subconjuntos del RF ({1} y {1, 7} en la 102), duración de la ventana de detalle.
-% Ventana de detalle por calendario o evento, nunca por lo predicho (112_ventana_detalle.json):
-%   tráfico: 10 días de prueba con más no laborables; 103: más días con pico (RRP máximo > 300 AUD/MWh);
-%   104: más días sobre la norma (promedio 24 h >= 50 ug/m3); 105: más días con promedio >= 150 ug/m3;
-%   106: más días con factor medio >= 0.5; 107: más días con log RV diaria > cuantil 0.9 de train.
 
-\section{Resultados transversales}
-\label{04_03_00_transversales}
-% Una fila por serie, en M_ref. Fuentes: 98_*, 99_*, 111_*, 102_K_por_M.csv del barrido de cada una.
+El diseño sigue al del estudio de simulación (Sección~\ref{03_07_00_diseno_estudio_simulacion}), con las diferencias que impone trabajar con una sola serie observada. Todo lo que se estima con datos, la base, la FPCA, los hiperparámetros del modelo propuesto y los modelos de referencia, se estima sólo con el bloque de entrenamiento. Sobre el bloque de prueba se calculan predicciones a un paso con los rezagos observados, sin reestimar ningún modelo, y el calendario no entra a ningún método: se usa sólo para leer los resultados.\\
+
+Se ajustan dos especificaciones del PSBPM-FD que difieren en las covariables. En la primera, el score $m$ del día $t$ depende de los diez scores del día $t-1$; en la segunda, de los diez scores de los días $t-1$ y $t-7$, veinte covariables en total. En ambas, cada score tiene su propia mezcla y las compuertas dependen de todas las covariables, de modo que la información del rezago semanal puede cambiar los pesos de los átomos sin cambiar su forma. El modelo se ajusta con los hiperparámetros de \citet{03_02_chung2009nonparametric} llevados a la escala de cada score, con $a_\nu = 2$, que a diferencia del valor $0.5$ del estudio de simulación garantiza que la varianza predictiva exista, y con un truncamiento de 30 átomos. El muestreador corre una cadena de 2500 iteraciones, de las que se descartan las primeras 1000 como calentamiento; con una sola cadena no se calcula $\widehat{R}$, y los diagnósticos se hacen sobre cantidades invariantes a la permutación de las etiquetas de los átomos.\\
+
+Las referencias son las del estudio de simulación. El FAR se ajusta sobre los coeficientes de la base con orden igual al mayor rezago de cada especificación, uno en la primera y siete en la segunda, y su intervalo es la banda gaussiana de su residuo. El Random Forest ajusta un bosque por score con las mismas covariables que el PSBPM-FD y elige el conjunto de rezagos con el bloque de entrenamiento. Sólo el FAR y el PSBPM-FD entregan intervalos.\\
+
+Los resultados se presentan como en la Sección~\ref{03_08_00_resultados}. Las métricas de la Sección~\ref{02_02_03_criterios_evaluacion} se calculan sobre la ventana móvil de ancho $w = 30$ que recorre el bloque de prueba, contra la curva ajustada por la representación (Sección~\ref{03_05_00_reconstruccion_funcional}), y los cuadros reportan su promedio sobre las ventanas y la fracción de ventanas que gana cada modelo. Del PSBPM-FD se reportan los tres predictores puntuales de la Sección~\ref{03_05_04_predictores_puntuales}, con la regla de consistencia según la cual el MAE corresponde a la mediana puntual y el RMSE a la esperanza, y las tres construcciones de intervalo de la Sección~\ref{03_05_05_intervalos_predictivos}. Los comportamientos predictivos (Sección~\ref{03_06_00_comportamientos}) se resumen por la distribución de $K_t$ en el bloque de prueba y se contrastan con el calendario, que aquí cumple el papel que el régimen verdadero cumplía en la simulación. Para mostrar qué es un comportamiento se examina una ventana de detalle de diez días consecutivos de prueba, elegida por tener la mayor cantidad de días no laborables: del 23 de diciembre de 2017 al 1 de enero de 2018, con dos fines de semana, Navidad y Año Nuevo. Por último, se evalúa el pronóstico por comportamiento de la Sección~\ref{03_06_03_descripcion} y su cota, el mejor comportamiento, que usa la curva observada. La configuración completa está en el Anexo~\ref{ane_00_03_configuracion}.
+
+\section{Resultados}
+\label{04_03_00_resultados}
+
+Los resultados siguen el orden del estudio de simulación: primero el error puntual, luego los intervalos de predicción, después los comportamientos predictivos y por último el pronóstico que se construye con ellos. En cada apartado se contrastan las dos especificaciones, porque la diferencia entre ellas es la que muestra el efecto de la información sobre las compuertas.
 
 \subsection{Error puntual}
 \label{04_03_01_error_puntual}
-% Cuadro: MAE y RMSE de esperanza, mediana puntual, átomo modal, FAR y RF por serie.
-% Fuente: 98_resumen_bloqueA_min_max_prom.csv (columna promedio, bloque test) y 101_bloqueA_por_predictor.csv.
-% Figura: MAE contra M en 104 (única con barrido M = 1..6); 119_resumen_opciones_por_M.csv para las opciones.
+
+Los Cuadros~\ref{tab:apl_bloqueA} y~\ref{tab:apl_bloqueA_ganancia} resumen el MAE y el RMSE promedio sobre las ventanas de prueba de los tres predictores del PSBPM-FD y de las dos referencias, y el cambio relativo respecto del FAR.
+
+% Fuente: 98_resumen_bloqueA_min_max_prom.csv del _05 (test, promedio sobre ventanas).
+\begin{table}[H]
+\centering\small
+\setlength{\tabcolsep}{3.5pt}
+\caption{MAE y RMSE en el bloque de prueba del tráfico ($M = 10$, $w = 30$). En negrita el menor de cada fila.}
+\label{tab:apl_bloqueA}
+\begin{tabular}{l ccccc ccccc}
+\hline
+Rezagos & \multicolumn{5}{c}{MAE} & \multicolumn{5}{c}{RMSE} \\
+ & Esp. & Med. & Modal & RF & FAR & Esp. & Med. & Modal & RF & FAR \\
+\hline
+$\{1\}$ & 0.413 & 0.376 & 0.397 & \textbf{0.361} & 0.398 & 0.646 & 0.658 & 0.729 & \textbf{0.562} & 0.621 \\
+$\{1,7\}$ & 0.315 & \textbf{0.302} & 0.317 & 0.314 & 0.314 & 0.522 & 0.528 & 0.556 & 0.499 & \textbf{0.495} \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering\small
+\setlength{\tabcolsep}{3.5pt}
+\caption{Cambio relativo del MAE y del RMSE respecto del FAR por predictor. Negativo es mejor que el FAR.}
+\label{tab:apl_bloqueA_ganancia}
+\begin{tabular}{l cc cc cc cc}
+\hline
+Rezagos & \multicolumn{2}{c}{Esperanza} & \multicolumn{2}{c}{Mediana} & \multicolumn{2}{c}{Modal} & \multicolumn{2}{c}{RF} \\
+ & MAE & RMSE & MAE & RMSE & MAE & RMSE & MAE & RMSE \\
+\hline
+$\{1\}$ & $+3.8\%$ & $+4.1\%$ & $-5.4\%$ & $+5.9\%$ & $-0.1\%$ & $+17.4\%$ & $-9.3\%$ & $-9.6\%$ \\
+$\{1,7\}$ & $+0.1\%$ & $+5.6\%$ & $-3.7\%$ & $+6.6\%$ & $+1.0\%$ & $+12.3\%$ & $0.0\%$ & $+0.8\%$ \\
+\hline
+\end{tabular}
+\end{table}
+
+La primera lectura es que la información pesa más que el método. Al agregar el rezago semanal, el MAE de todos los modelos baja entre un $13\%$ y un $24\%$, y el FAR con ambos rezagos ($0.314$) queda por debajo de cualquier modelo con sólo el rezago de un día, incluido el Random Forest ($0.361$). La segunda es que la comparación entre los predictores del PSBPM-FD reproduce lo que anticipa la forma de la predictiva. Con el rezago de un día, donde la predictiva tiene dos comportamientos en la mayoría de los orígenes (Sección~\ref{04_03_03_comportamientos}), la esperanza queda entre el perfil laborable y el de fin de semana, en una curva que no ocurre, y pierde frente al FAR en las dos métricas. La mediana puntual se inclina hacia el comportamiento dominante y baja el MAE del FAR en un $5.4\%$, pero cuando el comportamiento dominante no es el que ocurre su error es grande y su RMSE sube, que es el reparto que corresponde a lo que mide cada métrica. El átomo más probable es el peor en RMSE en las dos especificaciones. Con ambos rezagos, la mediana sigue siendo la mejor en MAE ($-3.7\%$) y la esperanza, el FAR y el Random Forest quedan a menos de un $1\%$ entre sí, mientras que en RMSE el FAR es el mejor.\\
+
+El Random Forest es el mejor modelo con el rezago de un día, por un margen de un $9\%$ sobre el FAR en las dos métricas, y su ventaja desaparece con el rezago semanal. Con una sola covariable diaria, la partición por umbrales del bosque separa los destinos posibles de un día laborable mejor que un promedio, y cuando el rezago semanal resuelve el tipo de día la parte lineal de la dinámica basta y las diferencias entre métodos se borran.
+
+% Fuente: 72_ventana_modelos_w30.csv del _05 (test, w = 30, sin el medoide).
+\begin{table}[H]
+\centering\small
+\setlength{\tabcolsep}{3.5pt}
+\caption{Ventanas de prueba ganadas por modelo, por MAE y por RMSE.}
+\label{tab:apl_bloqueA_ventanas}
+\begin{tabular}{l ccccc ccccc}
+\hline
+Rezagos & \multicolumn{5}{c}{MAE} & \multicolumn{5}{c}{RMSE} \\
+ & FAR & RF & Esp. & Med. & Modal & FAR & RF & Esp. & Med. & Modal \\
+\hline
+$\{1\}$ & 7\% & 54\% & 0\% & 25\% & 14\% & 11\% & 78\% & 0\% & 9\% & 1\% \\
+$\{1,7\}$ & 18\% & 19\% & 1\% & 59\% & 3\% & 43\% & 37\% & 1\% & 19\% & 0\% \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering\small
+\setlength{\tabcolsep}{3.5pt}
+\caption{Fracción de ventanas en que el predictor consistente del PSBPM-FD supera a cada referencia (mediana en MAE, esperanza en RMSE).}
+\label{tab:apl_bloqueA_gana}
+\begin{tabular}{l cc cc}
+\hline
+Rezagos & \multicolumn{2}{c}{MAE (mediana)} & \multicolumn{2}{c}{RMSE (esperanza)} \\
+ & vs FAR & vs RF & vs FAR & vs RF \\
+\hline
+$\{1\}$ & 70\% & 42\% & 27\% & 1\% \\
+$\{1,7\}$ & 80\% & 73\% & 21\% & 30\% \\
+\hline
+\end{tabular}
+\end{table}
+
+Los Cuadros~\ref{tab:apl_bloqueA_ventanas} y~\ref{tab:apl_bloqueA_gana} muestran que los promedios se sostienen a lo largo del bloque de prueba. Bajo MAE, la mediana puntual supera al FAR en siete de cada diez ventanas con el rezago de un día y en ocho de cada diez con ambos rezagos, y con ambos rezagos es el mejor modelo en el $59\%$ de las ventanas y supera al Random Forest en el $73\%$. Bajo RMSE la ventaja es de las referencias: la esperanza supera al FAR en menos de un tercio de las ventanas en las dos especificaciones, y con el rezago de un día el Random Forest gana el $78\%$ de ellas.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth,height=0.75\textheight,keepaspectratio]{IMG/04_03/04_bloqueA_ventana_w30_101.png}
+\caption{Error puntual sobre la ventana móvil, tráfico con rezago $\{1\}$ ($M = 10$, $w = 30$). La línea discontinua marca $T_0$.}
+\label{fig:apl_bloqueA_ventana_101}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth,height=0.75\textheight,keepaspectratio]{IMG/04_03/04_bloqueA_ventana_w30_102.png}
+\caption{Error puntual sobre la ventana móvil, tráfico con rezagos $\{1,7\}$ ($M = 10$, $w = 30$). La línea discontinua marca $T_0$.}
+\label{fig:apl_bloqueA_ventana_102}
+\end{figure}
+
+Las Figuras~\ref{fig:apl_bloqueA_ventana_101} y~\ref{fig:apl_bloqueA_ventana_102} muestran el error a lo largo de toda la serie. A la izquierda de $T_0$ el error es dentro de muestra y el Random Forest queda muy por debajo del resto, lo que refleja su capacidad de ajustar el bloque de entrenamiento y no su desempeño predictivo; a la derecha, en el bloque de prueba, su ventaja se reduce a la de los Cuadros. En el bloque de prueba todos los modelos suben y bajan juntos, y el máximo se alcanza en las ventanas que contienen el período de fiestas de fin de año, donde se concentran los feriados que ningún rezago anuncia.
 
 \subsection{Intervalos de predicción}
 \label{04_03_02_intervalos}
-% Cuadro: Winkler, MPIW, PICP y PICPB de equi-colas, simultánea, HDR y FAR; % de ventanas que gana al FAR.
-% Fuente: 99_resumen_bloqueB_min_max_prom.csv, 111_bloqueB_intervalos_vs_FAR.csv, 110_tabla_intervalos.csv.
 
-\subsection{Multimodalidad de la predictiva}
-\label{04_03_03_multimodalidad}
-% Cuadro: fracción de orígenes de test con K = 1, 2, >= 3 por serie. Fuente: 102_K_por_M.csv; 100_multimodalidad_por_M.csv.
-% Es el eje que ordena las dos secciones siguientes.
+Los Cuadros~\ref{tab:apl_bloqueB_winkler} y~\ref{tab:apl_bloqueB_picp} resumen el Winkler, el MPIW, el PICP y el PICPB de las tres construcciones del PSBPM-FD y de la banda gaussiana del FAR, al nivel nominal de $95\%$.
 
-\section{Tráfico: una predictiva con más de un comportamiento}
-\label{04_04_00_trafico}
-% Corridas 101 (rezago {1}) y 102 (rezagos {1, 7}); mismo conjunto de días, par con/sin rezago 7.
+% Fuente: 99_resumen_bloqueB_min_max_prom.csv y 81_ventana_bloqueB_w30.csv del _05.
+\begin{table}[H]
+\centering\small
+\setlength{\tabcolsep}{3.5pt}
+\caption{Winkler y MPIW en el bloque de prueba del tráfico ($M = 10$). En negrita el menor Winkler de cada fila.}
+\label{tab:apl_bloqueB_winkler}
+\begin{tabular}{l cccc cccc}
+\hline
+Rezagos & \multicolumn{4}{c}{Winkler} & \multicolumn{4}{c}{MPIW} \\
+ & FAR & Equi. & HDR & Simult. & FAR & Equi. & HDR & Simult. \\
+\hline
+$\{1\}$ & 3.073 & 2.734 & \textbf{2.669} & 4.493 & 2.159 & 2.124 & 1.995 & 4.242 \\
+$\{1,7\}$ & 3.052 & \textbf{2.707} & 2.714 & 3.549 & 1.602 & 1.752 & 1.689 & 3.011 \\
+\hline
+\end{tabular}
+\end{table}
 
-\subsection{Error puntual e intervalos}
-\label{04_04_01_trafico_puntual}
-% Cuadro por especificación: predictores, FAR, RF; Winkler y PICPB de las tres construcciones.
-% Fuente: 98_*, 99_* de 101_05 y 102_05. Efecto del rezago 7 sobre el FAR y sobre el PSBPM-FD.
+\begin{table}[H]
+\centering\small
+\setlength{\tabcolsep}{3.5pt}
+\caption{PICP y PICPB en el bloque de prueba del tráfico ($M = 10$). Nominal $0.95$.}
+\label{tab:apl_bloqueB_picp}
+\begin{tabular}{l cccc cccc}
+\hline
+Rezagos & \multicolumn{4}{c}{PICP} & \multicolumn{4}{c}{PICPB} \\
+ & FAR & Equi. & HDR & Simult. & FAR & Equi. & HDR & Simult. \\
+\hline
+$\{1\}$ & 0.950 & 0.961 & 0.960 & 0.991 & 0.721 & 0.731 & 0.742 & 0.942 \\
+$\{1,7\}$ & 0.930 & 0.956 & 0.955 & 0.983 & 0.675 & 0.754 & 0.746 & 0.917 \\
+\hline
+\end{tabular}
+\end{table}
 
-\subsection{Comportamientos y calendario}
-\label{04_04_02_trafico_comportamientos}
-% Distribución de K en train y test; K contra día de la semana y feriados (104_comportamientos_calendario_por_M.csv,
-% 65_comportamientos_calendario.csv por M); ventana de detalle (112_ventana_detalle_por_origen.csv, 63_detalle_t<t>.png).
+En los intervalos el PSBPM-FD supera al FAR en las dos especificaciones. Las bandas puntuales, equi-colas y de máxima densidad, bajan el Winkler del FAR en un $11\%$ a $13\%$ y cubren el $96\%$ del dominio, por sobre el $93\%$ a $95\%$ del FAR. La ganancia no depende del rezago semanal, a diferencia del error puntual: aun cuando la información resuelve el tipo de día, la incertidumbre alrededor del perfil sigue cambiando de un origen a otro, y una banda de ancho fijo no puede seguirla. Ninguna banda puntual cubre la curva completa con la frecuencia nominal, porque su PICPB queda entre $0.68$ y $0.75$; la simultánea, la única construida para esa cobertura, la alcanza casi ($0.92$ a $0.94$) al precio de casi duplicar el ancho, y por eso pierde el Winkler.
 
-\subsection{Pronóstico por comportamiento}
-\label{04_04_03_trafico_pronostico}
-% Cuadro del _06: más probable, mejor comportamiento (cota), esperanza, FAR, RF; todos / K >= 2.
-% Fuente: 119_resumen_opciones_por_M.csv. Acierto por tramos de p_1: 119_acierto_por_p1.csv.
-% Ventana móvil de las opciones: 114_ventana_{mas_probable,mejor}_w30.png, 115_ventana_modelos_w30.csv.
+\begin{table}[H]
+\centering\small
+\setlength{\tabcolsep}{3pt}
+\caption{Cambio relativo del Winkler y del MPIW respecto del FAR por construcción. Negativo es mejor que el FAR.}
+\label{tab:apl_bloqueB_ganancia}
+\begin{tabular}{l cc cc cc}
+\hline
+Rezagos & \multicolumn{2}{c}{Equi-colas} & \multicolumn{2}{c}{Máxima densidad} & \multicolumn{2}{c}{Simultánea} \\
+ & Winkler & MPIW & Winkler & MPIW & Winkler & MPIW \\
+\hline
+$\{1\}$ & $-11.0\%$ & $-1.6\%$ & $-13.2\%$ & $-7.6\%$ & $+46.2\%$ & $+96.5\%$ \\
+$\{1,7\}$ & $-11.3\%$ & $+9.4\%$ & $-11.1\%$ & $+5.4\%$ & $+16.3\%$ & $+88.0\%$ \\
+\hline
+\end{tabular}
+\end{table}
 
-\section{Series con predictiva unimodal}
-\label{04_05_00_unimodales}
-% Corridas 103, 104, 105 y, cuando se ejecuten, 106 y 107. Resultado negativo acotado: K = 1 en casi todo el test,
-% los predictores coinciden, el _06 no tiene orígenes con K >= 2. Un cuadro por serie sólo si cambia la lectura.
+El Cuadro~\ref{tab:apl_bloqueB_ganancia} muestra que la composición de la ganancia cambia con la información. Con el rezago de un día las bandas del PSBPM-FD son más angostas que la del FAR y además cubren más, y la de máxima densidad es la más angosta de todas ($-7.6\%$), porque cuando la predictiva tiene dos comportamientos reparte su masa entre ellos en lugar de gastarla en el valle intermedio, como hace la equi-colas. Con ambos rezagos las bandas son un $5\%$ a $9\%$ más anchas que la del FAR y ganan por cobertura: la del FAR, al estrecharse con la mejor información, queda corta ($0.93$ de PICP) en los días que el rezago semanal no anuncia. La máxima densidad coincide entonces con la equi-colas, como en los escenarios unimodales de la simulación.
 
-\subsection{Precio de electricidad (SA1)}
-\label{04_05_01_sa1}
-% 103: Winkler contra FAR; ventana de detalle de días con pico; K contra calendario y pico (104_*).
+% Fuente: 81_ventana_bloqueB_w30.csv (test, w = 30).
+\begin{table}[H]
+\centering\small
+\setlength{\tabcolsep}{3.5pt}
+\caption{Ventanas de prueba ganadas por Winkler.}
+\label{tab:apl_bloqueB_ventanas}
+\begin{tabular}{l cccc ccc}
+\hline
+Rezagos & \multicolumn{4}{c}{La mejor banda} & \multicolumn{3}{c}{Gana al FAR} \\
+ & FAR & Equi. & HDR & Simult. & Equi. & HDR & Simult. \\
+\hline
+$\{1\}$ & 3\% & 21\% & 76\% & 0\% & 93\% & 93\% & 4\% \\
+$\{1,7\}$ & 22\% & 26\% & 52\% & 0\% & 76\% & 75\% & 12\% \\
+\hline
+\end{tabular}
+\end{table}
 
-\subsection{PM2.5: Parque O'Higgins y Beijing}
-\label{04_05_02_pm25}
-% 104 (barrido M = 1..6, desde qué M gana el Winkler) y 105 (M = 10). Días sobre la norma / sobre 150 ug/m3.
-% Comparar las dos: misma variable, distinta ciudad y distinta ventana de detalle.
+Las bandas puntuales superan al FAR en el $93\%$ de las ventanas con el rezago de un día y en tres de cada cuatro con ambos rezagos (Cuadro~\ref{tab:apl_bloqueB_ventanas}), y la de máxima densidad es la mejor de todas en el $76\%$ y el $52\%$ de ellas. La simultánea no es la mejor en ninguna ventana.
 
-\subsection{Generación eólica (SMARD)}
-\label{04_05_03_eolica}
-% 106: pendiente (_04-_06). Fuente cuando exista: 106_barrido_M/ y 106_m10/.
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth,height=0.75\textheight,keepaspectratio]{IMG/04_03/04_bloqueB_ventana_w30_101.png}
+\caption{Métricas de intervalo sobre la ventana móvil, tráfico con rezago $\{1\}$ ($M = 10$, $w = 30$).}
+\label{fig:apl_bloqueB_ventana_101}
+\end{figure}
 
-\subsection{Volatilidad de BTCUSDT}
-\label{04_05_04_btc}
-% 107: pendiente (MATLAB, _03-_06). Fuente cuando exista: 107_barrido_M/ y 107_m10/.
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth,height=0.75\textheight,keepaspectratio]{IMG/04_03/04_bloqueB_ventana_w30_102.png}
+\caption{Métricas de intervalo sobre la ventana móvil, tráfico con rezagos $\{1,7\}$ ($M = 10$, $w = 30$).}
+\label{fig:apl_bloqueB_ventana_102}
+\end{figure}
+
+Las Figuras~\ref{fig:apl_bloqueB_ventana_101} y~\ref{fig:apl_bloqueB_ventana_102} muestran de dónde sale la diferencia, igual que en la simulación. El ancho de la banda del FAR es una línea horizontal, mientras que el del PSBPM-FD se mueve con el estado del proceso y se ensancha en las ventanas con más días atípicos, en particular en el período de fiestas de fin de año, donde el Winkler del FAR sube por los días que su banda deja fuera. Con ambos rezagos ese ensanchamiento es más marcado, porque el resto del tiempo la banda es angosta y sólo se abre donde el rezago semanal deja de ser informativo.
+
+% Figura: ancho medio por origen de prueba (equivalente a 03_08_bloqueB_ancho). Pendiente de generar;
+% fuente: banda_funcional_psbp.npz del _04 (li, ls, hdr_L, hdr_U, li/ls_simultanea) y MPIW del FAR de 81_*.
+\begin{figure}[H]
+\centering
+\figapl{IMG/04_03/04_bloqueB_ancho.png}
+\caption{Ancho medio de la banda en cada origen de prueba, de las tres construcciones del PSBPM-FD y ancho fijo del FAR.}
+\label{fig:apl_bloqueB_ancho}
+\end{figure}
+
+\subsection{Comportamientos predictivos}
+\label{04_03_03_comportamientos}
+
+El Cuadro~\ref{tab:apl_K} resume cuántos comportamientos declara el modelo en el bloque de prueba con cada especificación.
+
+% Fuente: 102_K_por_M.csv del barrido (bloque test, M = 10).
+\begin{table}[H]
+\centering\small
+\setlength{\tabcolsep}{3.5pt}
+\caption{Distribución de $K_t$ en el bloque de prueba del tráfico ($M = 10$).}
+\label{tab:apl_K}
+\begin{tabular}{l c ccc}
+\hline
+Rezagos & Orígenes & $K_t = 1$ & $K_t = 2$ & $K_t \ge 3$ \\
+\hline
+$\{1\}$ & 357 & 28.3\% & 71.7\% & 0.0\% \\
+$\{1,7\}$ & 357 & 64.1\% & 35.0\% & 0.8\% \\
+\hline
+\end{tabular}
+\end{table}
+
+Con el rezago de un día el modelo declara dos comportamientos en el $72\%$ de los orígenes de prueba, y con ambos rezagos esa fracción baja a la mitad. A diferencia de la simulación, aquí no hay un régimen verdadero con el que contrastar los comportamientos, pero el calendario cumple ese papel, porque el tipo de día es el estado que decide el perfil y no entra al modelo. El Cuadro~\ref{tab:apl_K_calendario} cruza la presencia de más de un comportamiento con el día predicho.
+
+% Fuente: 65_comportamientos_calendario.csv de 101 y 102 (test, 357 orígenes; 51 por día de la semana).
+\begin{table}[H]
+\centering\small
+\caption{Fracción de orígenes de prueba con más de un comportamiento ($K_t \ge 2$) según el día predicho, con y sin el rezago de una semana ($M = 10$).}
+\label{tab:apl_K_calendario}
+\begin{tabular}{l c cc}
+\hline
+Día predicho & Orígenes & $\{1\}$ & $\{1,7\}$ \\
+\hline
+Lunes     & 51  & 100\% & 49\% \\
+Martes    & 51  & 41\%  & 12\% \\
+Miércoles & 51  & 57\%  & 4\%  \\
+Jueves    & 51  & 49\%  & 6\%  \\
+Viernes   & 51  & 75\%  & 8\%  \\
+Sábado    & 51  & 94\%  & 90\% \\
+Domingo   & 51  & 86\%  & 82\% \\
+\hline
+Laborables    & 244 & 64\% & 14\% \\
+No laborables (fin de semana y feriados) & 113 & 89\% & 82\% \\
+\hline
+\end{tabular}
+\end{table}
+
+El cuadro muestra el efecto de la información sobre las compuertas. Con el rezago de un día hay más de un comportamiento en todos los días de la semana, y sobre todo los lunes y los sábados, los días en que el perfil cambia respecto del anterior: la curva del domingo no distingue un lunes laborable de un lunes feriado, y la del viernes no anuncia el cambio al fin de semana con la nitidez suficiente para que la mezcla descarte el perfil laborable. Con ambos rezagos los comportamientos desaparecen de martes a viernes, donde quedan entre un $4\%$ y un $12\%$ de los orígenes, porque la curva de la semana anterior fija el perfil, y la predictiva se vuelve unimodal. Se mantienen en los días no laborables y la mitad de los lunes, que son los días en que el rezago semanal no basta: los feriados caen en días que la semana anterior fueron laborables, y los fines de semana tienen una variabilidad propia, de salidas y eventos, que ningún rezago resuelve. De los 256 orígenes con más de un comportamiento en la primera especificación, 139 pasan a tener uno solo en la segunda, mientras que sólo 11 hacen el camino inverso. La mezcla no fabrica comportamientos donde la información alcanza para decidir el perfil, y los conserva donde no alcanza, que es lo que se espera de compuertas que dependen de las covariables.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth,height=0.75\textheight,keepaspectratio]{IMG/04_03/04_comportamientos_ejemplos_101.png}
+\caption{Ventana de detalle, del 23 de diciembre de 2017 ($t = 907$) al 1 de enero de 2018 ($t = 916$), tráfico con rezago $\{1\}$ ($M = 10$): curva observada, esperanza y, por comportamiento, curva típica, banda condicional y probabilidad.}
+\label{fig:apl_ejemplos_101}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth,height=0.75\textheight,keepaspectratio]{IMG/04_03/04_comportamientos_ejemplos_102.png}
+\caption{Ventana de detalle, del 23 de diciembre de 2017 al 1 de enero de 2018, tráfico con rezagos $\{1,7\}$ ($M = 10$).}
+\label{fig:apl_ejemplos_102}
+\end{figure}
+
+Las Figuras~\ref{fig:apl_ejemplos_101} y~\ref{fig:apl_ejemplos_102} muestran qué es un comportamiento en la ventana de detalle. En los orígenes con dos comportamientos, uno tiene la forma del día laborable, con sus dos horas punta, y el otro la del fin de semana, con un solo máximo al mediodía, y la esperanza queda entre ambos, en una curva con horas punta atenuadas que no corresponde a ningún día. En el fin de semana del 23 y 24 de diciembre y en Navidad el comportamiento más probable es el de día no laborable y la curva observada lo sigue. El 31 de diciembre y el 1 de enero, con el rezago de un día, el más probable es el laborable y la curva observada sigue al comportamiento minoritario, que el modelo mantiene con una probabilidad cercana a un cuarto y cuya banda la contiene: es el caso en que una predictiva con más de un comportamiento ofrece una opción que el promedio no tiene. Los orígenes de la ventana se muestran uno a uno en el Anexo~\ref{aneC_00_00_trafico}.
+
+\subsection{Predicción por comportamiento}
+\label{04_03_04_pronostico}
+
+Los Cuadros~\ref{tab:apl_pronostico_101} y~\ref{tab:apl_pronostico_102} resumen el error del pronóstico por comportamiento y de su cota frente a la esperanza y a las referencias, sobre todos los orígenes de prueba y sobre los que tienen más de un comportamiento. Como en la simulación, se promedia sobre los orígenes y no sobre las ventanas, porque el subconjunto con más de un comportamiento no es contiguo, y por eso las cifras difieren en la tercera decimal de las del error puntual.
+
+% Fuente: 113_opciones_por_origen.csv (m10, test, opción "tipica") y 119_resumen_opciones_por_M.csv;
+% MAE = media por origen, RMSE = raíz de la media de cuadrados por origen.
+\begin{table}[H]
+\centering\small
+\setlength{\tabcolsep}{4pt}
+\caption{Pronóstico por comportamiento en el bloque de prueba del tráfico con rezago $\{1\}$ ($M = 10$), sobre todos los orígenes y sobre los que tienen más de un comportamiento.}
+\label{tab:apl_pronostico_101}
+\begin{tabular}{l cc cc}
+\hline
+& \multicolumn{2}{c}{Todos ($n = 357$)} & \multicolumn{2}{c}{$K_t \ge 2$ ($n = 256$)} \\
+ & MAE & RMSE & MAE & RMSE \\
+\hline
+Pronóstico por comportamiento & 0.386 & 0.719 & 0.417 & 0.779 \\
+Cota (mejor comportamiento) & 0.269 & 0.432 & 0.254 & 0.382 \\
+Esperanza & 0.409 & 0.650 & 0.449 & 0.688 \\
+FAR & 0.390 & 0.620 & 0.431 & 0.654 \\
+Random Forest & 0.357 & 0.568 & 0.384 & 0.590 \\
+\hline
+El pronóstico gana al FAR & \multicolumn{2}{c}{56\%} & \multicolumn{2}{c}{66\%} \\
+El pronóstico gana al Random Forest & \multicolumn{2}{c}{51\%} & \multicolumn{2}{c}{58\%} \\
+La cota gana al FAR & \multicolumn{2}{c}{70\%} & \multicolumn{2}{c}{85\%} \\
+La cota gana al Random Forest & \multicolumn{2}{c}{64\%} & \multicolumn{2}{c}{75\%} \\
+Acierto (el mejor es el más probable) & \multicolumn{2}{c}{85\%} & \multicolumn{2}{c}{79\%} \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering\small
+\setlength{\tabcolsep}{4pt}
+\caption{Pronóstico por comportamiento en el bloque de prueba del tráfico con rezagos $\{1,7\}$ ($M = 10$), sobre todos los orígenes y sobre los que tienen más de un comportamiento.}
+\label{tab:apl_pronostico_102}
+\begin{tabular}{l cc cc}
+\hline
+& \multicolumn{2}{c}{Todos ($n = 357$)} & \multicolumn{2}{c}{$K_t \ge 2$ ($n = 128$)} \\
+ & MAE & RMSE & MAE & RMSE \\
+\hline
+Pronóstico por comportamiento & 0.300 & 0.550 & 0.413 & 0.718 \\
+Cota (mejor comportamiento) & 0.259 & 0.435 & 0.299 & 0.445 \\
+Esperanza & 0.306 & 0.528 & 0.431 & 0.669 \\
+FAR & 0.306 & 0.499 & 0.380 & 0.587 \\
+Random Forest & 0.307 & 0.504 & 0.410 & 0.619 \\
+\hline
+El pronóstico gana al FAR & \multicolumn{2}{c}{61\%} & \multicolumn{2}{c}{56\%} \\
+El pronóstico gana al Random Forest & \multicolumn{2}{c}{63\%} & \multicolumn{2}{c}{66\%} \\
+La cota gana al FAR & \multicolumn{2}{c}{65\%} & \multicolumn{2}{c}{66\%} \\
+La cota gana al Random Forest & \multicolumn{2}{c}{68\%} & \multicolumn{2}{c}{79\%} \\
+Acierto (el mejor es el más probable) & \multicolumn{2}{c}{95\%} & \multicolumn{2}{c}{86\%} \\
+\hline
+\end{tabular}
+\end{table}
+
+El pronóstico por comportamiento es, como en la simulación, una apuesta. Con el rezago de un día baja el MAE de la esperanza en un $6\%$ sobre todos los orígenes y en un $7\%$ sobre los que tienen más de un comportamiento, queda a la par del FAR y supera al FAR y al Random Forest en la mayoría de los orígenes con más de un comportamiento, pero es peor en RMSE que todas las alternativas: cuando acierta, su error es menor que el de la esperanza, y cuando elige el perfil equivocado, el error es el de un día laborable predicho como fin de semana, o al revés, y el promedio cuadrático lo castiga. Con ambos rezagos la mayoría de los orígenes tiene un solo comportamiento, el pronóstico coincide con la esperanza en ellos y sobre todos los orígenes es el mejor en MAE ($0.300$); en los orígenes que conservan más de un comportamiento, que son sobre todo fines de semana y feriados, el FAR queda por debajo.\\
+
+La cota dice cuánto hay en juego. Con el rezago de un día, en los orígenes con más de un comportamiento, el mejor comportamiento baja el MAE de la esperanza en un $43\%$ y queda bajo el Random Forest en tres de cada cuatro orígenes, de modo que entre las opciones que entrega el modelo casi siempre está la buena, y lo que se pierde se pierde al elegirla con la probabilidad. Con ambos rezagos la distancia entre el pronóstico y la cota se reduce, porque la información que antes repartía la masa entre dos opciones ahora decide por una de ellas.
+
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.49\textwidth}\centering\includegraphics[width=\textwidth,height=0.45\textheight,keepaspectratio]{IMG/04_03/04_pronostico_mas_probable_w30_101.png}\end{minipage}\hfill
+\begin{minipage}{0.49\textwidth}\centering\includegraphics[width=\textwidth,height=0.45\textheight,keepaspectratio]{IMG/04_03/04_pronostico_mejor_w30_101.png}\end{minipage}
+\caption{Pronóstico por comportamiento (izquierda) y cota, el mejor comportamiento (derecha), sobre la ventana móvil del bloque de prueba, tráfico con rezago $\{1\}$ ($M = 10$).}
+\label{fig:apl_pronostico_101}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.49\textwidth}\centering\includegraphics[width=\textwidth,height=0.45\textheight,keepaspectratio]{IMG/04_03/04_pronostico_mas_probable_w30_102.png}\end{minipage}\hfill
+\begin{minipage}{0.49\textwidth}\centering\includegraphics[width=\textwidth,height=0.45\textheight,keepaspectratio]{IMG/04_03/04_pronostico_mejor_w30_102.png}\end{minipage}
+\caption{Pronóstico por comportamiento (izquierda) y cota, el mejor comportamiento (derecha), sobre la ventana móvil del bloque de prueba, tráfico con rezagos $\{1,7\}$ ($M = 10$).}
+\label{fig:apl_pronostico_102}
+\end{figure}
+
+% Fuente: 119_acierto_por_p1.csv (test, K >= 2, M = 10).
+\begin{table}[H]
+\centering\small
+\setlength{\tabcolsep}{3.5pt}
+\caption{Acierto del pronóstico por comportamiento ($K_t \ge 2$, $M = 10$) por tramo de la probabilidad del comportamiento elegido y MAE que se pierde por no elegir el mejor, en promedio sobre los orígenes del tramo.}
+\label{tab:apl_acierto_p1}
+\begin{tabular}{l ccc ccc}
+\hline
+ & \multicolumn{3}{c}{Rezago $\{1\}$} & \multicolumn{3}{c}{Rezagos $\{1,7\}$} \\
+$p_{t,c^{*}}$ & Orígenes & Acierto & Pérdida & Orígenes & Acierto & Pérdida \\
+\hline
+$[0.5, 0.6)$ & 38 & 47\% & 0.45 & 3 & 67\% & 0.18 \\
+$[0.6, 0.7)$ & 41 & 66\% & 0.24 & 9 & 78\% & 0.27 \\
+$[0.7, 0.8)$ & 59 & 75\% & 0.20 & 22 & 64\% & 0.22 \\
+$[0.8, 0.9)$ & 71 & 93\% & 0.04 & 52 & 88\% & 0.11 \\
+$[0.9, 1]$ & 47 & 98\% & 0.01 & 42 & 98\% & 0.03 \\
+\hline
+\end{tabular}
+\end{table}
+
+El Cuadro~\ref{tab:apl_acierto_p1} muestra que la probabilidad del comportamiento elegido dice cuándo conviene apostar. Con el rezago de un día el acierto sube de forma monótona con la probabilidad, de un $47\%$ entre $0.5$ y $0.6$, donde elegir equivale a lanzar una moneda, a un $98\%$ sobre $0.9$, y la pérdida respecto de la cota cae de $0.45$ a $0.01$. Con ambos rezagos la masa se desplaza hacia las probabilidades altas, porque la información decide el perfil: el $73\%$ de los orígenes con más de un comportamiento tiene una probabilidad del elegido sobre $0.8$, frente al $46\%$ con el rezago de un día. La lectura práctica es la misma que en la simulación: con una probabilidad alta se pronostica con el comportamiento más probable, y con una baja se reportan las opciones y sus probabilidades.
 
 \section{Discusión}
-\label{04_06_00_discusion}
-% Cuándo gana el PSBPM-FD: con predictiva multimodal (tráfico), en puntual con la mediana y en intervalo;
-% sin ella, sólo por poco en el Winkler. Relación con C-2 (tráfico) y con C-1 (resto, sin heterocedasticidad detectable).
-% Qué predice la ventaja: fracción de K >= 2 contra diferencia de Winkler y de MAE respecto del FAR (cuadro transversal).
-% Limitaciones: una realización por serie, 1 cadena, etiquetas de átomos no convergen, M_ref distinto en la 104,
-% ventanas de detalle de 10 orígenes (cuentas, no estadística).
+\label{04_04_00_discusion}
+
+La aplicación al tráfico confirma en datos reales lo que el estudio de simulación mostraba en el escenario C-2. Cuando la ley de la curva siguiente depende de un estado que las covariables sólo revelan en parte, la predictiva del PSBPM-FD reparte su masa entre comportamientos que corresponden a estados reconocibles del proceso, aquí el perfil laborable y el de fin de semana, y esa estructura se traduce en intervalos mejores que los de un modelo lineal con banda de ancho fijo: el Winkler baja un $11\%$ frente al FAR y la ventaja se repite en tres de cada cuatro ventanas o más. En el error puntual la ventaja depende del resumen: la mediana puntual supera al FAR bajo MAE, mientras que bajo RMSE la esperanza no lo hace y el Random Forest es el mejor predictor puntual cuando sólo se dispone del día anterior.\\
+
+La comparación entre las dos especificaciones muestra el efecto de la información sobre las compuertas. Al agregar el rezago semanal, la mezcla concentra la masa en un solo comportamiento en los días en que esa información decide el perfil, de martes a viernes, y conserva varios comportamientos donde no lo decide, en fines de semana, feriados y lunes. El modelo no impone la multimodalidad: la produce cuando la información disponible no basta para elegir entre estados y la abandona cuando basta. Esa misma información mejora a todos los métodos y borra las diferencias entre ellos en el error puntual, pero no en los intervalos, donde el PSBPM-FD mantiene su ventaja porque su ancho sigue al estado del proceso.\\
+
+Los resultados tienen las limitaciones de una sola realización observada. Se ajusta una cadena por especificación, las etiquetas de los átomos no convergen aunque la predictiva sea invariante a ellas, la ventana de detalle tiene diez orígenes y debe leerse como ilustración, y la comparación entre especificaciones no es un experimento controlado sobre la información sino dos ajustes sobre los mismos días. Las otras cinco series del Anexo~\ref{aneD_00_00_otras_series}, sin un estado oculto que separe perfiles, tienen predictivas unimodales y en ellas el PSBPM-FD empata con el FAR o lo supera por poco, lo que delimita el alcance de la ventaja a series cuya ley condicional tiene más de un comportamiento.

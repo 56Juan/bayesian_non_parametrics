@@ -31,11 +31,11 @@ donde $\xi_{tj}$ es el score de la $j$-ésima componente en el período $t$. Se 
 \end{equation}
 con $k=1,\ldots,J/2$, $J=10$, y $\mu(\tau)=\sin(2\pi\tau)$, que pertenece al espacio generado por la base.\\
 
-La estructura temporal se especifica en el espacio de los scores y las curvas se obtienen luego mediante \eqref{eq:ane_coef_curva}. Las curvas se evalúan sobre la grilla regular $\tau_l = (l-1)/(L-1)$, $l = 1, \dots, L$, común a todos los períodos. Como la base es ortonormal y $\mu$ está en su espacio, la representación es exacta.\\
+La estructura temporal se especifica en el espacio de los scores y las curvas se obtienen luego mediante \eqref{eq:ane_coef_curva}. Las curvas se evalúan sobre la grilla regular $\tau_g = (g-1)/(G-1)$, $g = 1, \dots, G$, común a todos los períodos. Como la base es ortonormal y $\mu$ está en su espacio, la representación es exacta.\\
 
 Cada algoritmo genera además un período de calentamiento de $B$ curvas que se descartan antes de retener las $T$ curvas del estudio, de modo que las condiciones iniciales no influyan en los datos.\\
 
-La escala de los scores sigue un espectro decreciente, $\mathrm{Var}(\xi_{tj})=\lambda_j=\lambda_1\rho^{\,j-1}$ con $\lambda_1>0$ y $\rho\in(0,1)$, de modo que
+La escala de los scores sigue un espectro decreciente, $\mathrm{Var}(\xi_{tj})=\lambda_j=\lambda_1 r^{\,j-1}$ con $\lambda_1>0$ y $r\in(0,1)$, de modo que
 \begin{equation}
 \label{eq:ane_escala}
 \xi_{tj} = \sqrt{\lambda_j}\; z_{tj},
@@ -50,13 +50,13 @@ donde $z_{tj}$ es una serie de varianza marginal unitaria cuyo mecanismo generad
 \hline
 Símbolo & Descripción & Valor \\
 \hline
-$L$          & Número de puntos de la grilla                             & $75$ \\
+$G$          & Número de puntos de la grilla                             & $75$ \\
 $T$          & Número de curvas retenidas                                & $1000$ \\
 $B$          & Curvas de calentamiento                                   & $300$ \\
 $J$          & Número de scores                                          & $10$ \\
 $J_a$        & Número de scores activos                                  & $4$ \\
 $\lambda_1$  & Varianza del primer score                                 & $0.5$ \\
-$\rho$       & Razón de decaimiento del espectro                         & $0.55$ \\
+$r$          & Razón de decaimiento del espectro                        & $0.55$ \\
 $\phi_p$     & Coeficiente autorregresivo de los scores pasivos          & $0.3$ \\
 \hline
 \end{tabular}
@@ -128,12 +128,12 @@ Cada score activo $j\le J_a$ evoluciona en una coordenada cruda $u_{tj}$ con dos
 \end{equation}
 de modo que los regímenes difieren en nivel $\mu_{kj}$, persistencia $\phi_{kj}$ y escala $s_{kj}$: el régimen $A$ es persistente y de escala pequeña, y el $B$ revierte y es más volátil.\\
 
-La asignación es un probit sobre el rezago propio. Con $\Phi$ la función de distribución normal estándar y $h_j>0$ el ancho de la transición,
+La asignación es un probit sobre el rezago propio. Con $\Phi$ la función de distribución normal estándar y $\omega_j>0$ el ancho de la transición,
 \begin{align}
-    P(R_{tj}=B\mid u_{t-1,j}) &= \Phi\!\left(\frac{u_{t-1,j}-c_j}{h_j}\right), \label{eq:ane_algC2_probs}\\
+    P(R_{tj}=B\mid u_{t-1,j}) &= \Phi\!\left(\frac{u_{t-1,j}-c_j}{\omega_j}\right), \label{eq:ane_algC2_probs}\\
     P(R_{tj}=A\mid u_{t-1,j}) &= 1-P(R_{tj}=B\mid u_{t-1,j}). \nonumber
 \end{align}
-Con $h_j\to0$ la asignación se vuelve determinista y el escenario es un SETAR clásico, mientras que un $h_j$ positivo hace la transición suave.\\
+Con $\omega_j\to0$ la asignación se vuelve determinista y el escenario es un SETAR clásico, mientras que un $\omega_j$ positivo hace la transición suave.\\
 
 La media condicional es exacta,
 \begin{align}
@@ -154,7 +154,7 @@ La estandarización pertenece al generador, que fija la escala del escenario, y 
 
 La generación procede en los pasos que siguen.
 \begin{enumerate}
-    \item Se fijan, para cada score activo, el umbral $c_j$, el ancho $h_j$ y los parámetros $(\mu_{kj},\phi_{kj},s_{kj})$ de los dos regímenes.
+    \item Se fijan, para cada score activo, el umbral $c_j$, el ancho $\omega_j$ y los parámetros $(\mu_{kj},\phi_{kj},s_{kj})$ de los dos regímenes.
 
     \item Para cada período se calcula la probabilidad \eqref{eq:ane_algC2_probs} a partir de $u_{t-1,j}$ y se sortea $R_{tj}$. La secuencia de regímenes no se entrega a los métodos.
 
@@ -175,7 +175,7 @@ Símbolo & Descripción & Valor \\
 \hline
 $K$                       & Número de regímenes                                    & $2$ \\
 $c_j$                     & Umbral sobre el rezago propio                          & $0$ \\
-$h_j$                     & Ancho de la transición probit                          & Cuadro~\ref{tab:ane_algC2_scores} \\
+$\omega_j$                     & Ancho de la transición probit                          & Cuadro~\ref{tab:ane_algC2_scores} \\
 $\mu_{kj},\ \phi_{kj},\ s_{kj}$ & Nivel, coeficiente autorregresivo y escala del régimen $k$ & Cuadro~\ref{tab:ane_algC2_scores} \\
 $(m_j,d_j)$               & Media y desviación poblacionales de $u_{tj}$           & Simulación larga \\
 \hline
@@ -189,7 +189,7 @@ $(m_j,d_j)$               & Media y desviación poblacionales de $u_{tj}$       
 \small\setlength{\tabcolsep}{5pt}
 \begin{tabular}{lcccccccc}
 \hline
-$j$ & $h_j$ & $\mu_{Aj}$ & $\phi_{Aj}$ & $s_{Aj}$ & $\mu_{Bj}$ & $\phi_{Bj}$ & $s_{Bj}$ & $c_j$ \\
+$j$ & $\omega_j$ & $\mu_{Aj}$ & $\phi_{Aj}$ & $s_{Aj}$ & $\mu_{Bj}$ & $\phi_{Bj}$ & $s_{Bj}$ & $c_j$ \\
 \hline
 $1$ & $0.10$ & $0$ & $0.8$ & $0.25$ & $2.5$ & $-0.9$ & $1.0$ & $0$ \\
 $2$ & $0.10$ & $0$ & $0.6$ & $0.25$ & $2.0$ & $-0.9$ & $1.0$ & $0$ \\
@@ -338,7 +338,7 @@ $1-\zeta$          & Nivel de los intervalos de credibilidad         & $0.95$ \\
 \end{tabular}
 \end{table}
 
-El Cuadro~\ref{tab:dis_mcmc} recoge la configuración del muestreador (Sección~\ref{03_04_00_modelo_propuesto_psbpm_fd}) y de la predictiva; con $a_\nu = 0.5$ la varianza predictiva de la Sección~\ref{03_05_02_varianza} no existe y no se reporta.
+El Cuadro~\ref{tab:dis_mcmc} recoge la configuración del muestreador (Sección~\ref{03_04_00_modelo_propuesto_psbpm_fd}) y de la predictiva; con $a_\nu = 0.5$ la varianza predictiva no existe (Sección~\ref{03_05_05_intervalos_predictivos}) y no se reporta.
 
 \begin{table}[H]
 \centering\small
