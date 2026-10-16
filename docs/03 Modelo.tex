@@ -490,10 +490,12 @@ El puntaje de Winkler se extiende a una región de este tipo sumando las longitu
 
 \section{Comportamientos predictivos}
 \label{03_06_00_comportamientos}
+En cada iteración, la predictiva conjunta de los scores es una mezcla sobre configuraciones de átomos $(h_1, \dots, h_M)$ con pesos $\prod_m \pi_{h_m m}^{(s)}$, y la forma que toma depende de cuánto informa el estado rezagado $\mathbf{z}_t$ sobre el régimen. Si lo determina, los pesos concentran la masa en átomos de un mismo régimen y la predictiva tiene un solo modo, si no lo determina, la masa se reparte entre átomos de regímenes distintos, y por tanto la predictiva tiene un modo por cada uno. A cada uno de esos modos se le llama comportamiento predictivo.\\
 
-Cada vez que se predice la curva de un origen $t$, la Sección~\ref{03_05_03_extracciones} produce $S$ extracciones del vector de scores $\boldsymbol{\xi}_t^{(s)}$ a partir del estado rezagado $\mathbf{z}_t$, las mismas con las que se construyen la banda y los predictores puntuales. El análisis de esta sección se aplica a esa muestra, origen por origen, y forma parte de la predicción de cada curva y no de un análisis posterior sobre el conjunto de los datos. Su objeto es que la predictiva conjunta del vector de scores es, en cada iteración, una mezcla sobre configuraciones de átomos $(h_1, \dots, h_M)$ con pesos $\prod_m \pi_{h_m m}^{(s)}$, y sus modos son los comportamientos que el modelo considera posibles para la curva siguiente. Describir la predictiva de cada origen por esos comportamientos, con la probabilidad de cada uno, su curva típica y su dispersión condicional, es la lectura natural de un modelo de mezcla y una que los modelos de referencia, de ley unimodal, no pueden ofrecer.\\
+Los comportamientos se identifican origen por origen, como parte de la predicción de cada curva, y de cada uno se obtienen su probabilidad, su curva típica y su dispersión. Así pueden contrastarse con los regímenes del proceso cuando se conocen, o con una variable que los represente cuando no. Los modelos de referencia, cuya predictiva es unimodal, no admiten esta descomposición.\\
 
 Los comportamientos no pueden leerse de los parámetros, ya que los átomos de componentes distintas no se corresponden entre sí, un mismo régimen puede repartirse en varios átomos equivalentes y el peso de una configuración completa, al ser un producto de $M$ pesos, no se interpreta como la probabilidad de un comportamiento. Lo único que vincula a las $M$ mezclas es $\mathbf{z}_t$, de modo que los comportamientos se identifican sobre las extracciones, que son extracciones de la predictiva conjunta en ese $\mathbf{z}_t$. 
+ 
 \subsection{Agrupamiento de las extracciones}
 \label{03_06_01_agrupamiento}
 
@@ -525,7 +527,7 @@ condición equivalente a que la varianza explicada por comportamiento no disminu
 
 La tercera regla exige que cada comportamiento reúna una masa de al menos $\zeta$, el nivel de la banda de credibilidad, de manera que un comportamiento sea un grupo de extracciones que la banda al nivel $1-\zeta$ tendría que cubrir; un grupo de masa menor es una cola y no un comportamiento, y la partición que lo produce se descarta. Las tres reglas dependen de dos constantes, el cociente de valle y $\zeta$.
 
-\subsection{Comportamientos como opciones de estimación}
+\subsection{Probabilidad, curva típica y pronóstico por comportamiento}
 \label{03_06_03_descripcion}
 
 El resultado por origen es un conjunto de $K_t$ comportamientos. Cada uno tiene probabilidad $p_{t,c} = \lvert C_c \rvert / S$, igual a la fracción de extracciones del grupo, curva típica $\widehat{X}_{t,c}$ igual al centroide $\mathbf{c}_{t,c}$ transportado por \eqref{eq:reconstruccion_fpca}, que por linealidad del mapa es la esperanza predictiva condicional a ese comportamiento, e intervalo condicional dado por los cuantiles equi-colas \eqref{eq:intervalo_puntual} calculados solo sobre las extracciones del grupo. La mezcla de las curvas típicas ponderada por sus probabilidades es la media de las extracciones recortadas, que aproxima a la esperanza predictiva de la Sección~\ref{03_05_01_esperanza},
@@ -541,16 +543,16 @@ Los comportamientos permiten un predictor puntual distinto de los de la Sección
     \qquad
     c_t^{*} = \arg\max_{c = 1, \ldots, K_t} p_{t,c}.
 \end{equation}
-Con $K_t = 1$ se toma la esperanza predictiva de la Sección~\ref{03_05_01_esperanza}, de modo que el predictor solo se aparta de ella en los orígenes en que la predictiva tiene más de un modo, y ahí lo hace comprometiéndose con uno de ellos en lugar de promediarlos. La curva típica puede reemplazarse por la mediana puntual calculada solo sobre las extracciones del comportamiento elegido (y, con $K_t = 1$, por la marginal), que es la variante del mismo predictor para una condicional asimétrica.
+Con $K_t = 1$ se toma la esperanza predictiva de la Sección~\ref{03_05_01_esperanza}, de modo que el predictor solo se aparta de ella en los orígenes en que la predictiva tiene más de un modo, y ahí lo hace comprometiéndose con uno de ellos en lugar de promediarlos. Del mismo modo, es natural extender a cada comportamiento los otros dos predictores de la Sección~\ref{03_05_04_predictores_puntuales}, la mediana puntual y el átomo más probable, calculados solo sobre las extracciones del comportamiento elegido (y, con $K_t = 1$, sobre la predictiva completa); la mediana puntual es la variante del mismo predictor para una condicional asimétrica.
 
 \section{Diseño del Estudio de Simulación}
 \label{03_07_00_diseno_estudio_simulacion}
 
-El estudio aborda tres preguntas de evaluación para cada uno de los tres escenarios: ¿en cuáles la predicción puntual del PSBPM-FD supera a la de los modelos de referencia?, ¿en cuáles sus intervalos de credibilidad ofrecen un mejor desempeño? y ¿en qué medida su distribución predictiva reproduce los comportamientos característicos de cada escenario y permite generar pronósticos a partir de ellos? La evaluación se realiza mediante las métricas definidas en la Sección~\ref{02_02_03_criterios_evaluacion}.\\
+El estudio aborda tres preguntas de evaluación: ¿en cuáles de los tres escenarios la predicción puntual del PSBPM-FD supera a la de los modelos de referencia?, ¿en cuáles sus intervalos de credibilidad ofrecen un mejor desempeño? y, en el escenario con cambio de régimen, ¿en qué medida los comportamientos de su distribución predictiva reproducen los regímenes del proceso y permiten generar pronósticos a partir de ellos? La evaluación se realiza mediante las métricas definidas en la Sección~\ref{02_02_03_criterios_evaluacion}.\\
 
 En los tres escenarios el procedimiento es el mismo, las curvas se generan con el esquema común del Anexo~\ref{ane_00_01_esquema_comun} y se parten en orden cronológico en un bloque de entrenamiento ($70\%$) y uno de prueba. Las predicciones a un paso sobre el segundo usan los rezagos observados, sin reestimar.\\
 
-Las métricas de la Sección~\ref{02_02_03_criterios_evaluacion} se calculan sobre la ventana móvil de ancho $w_{\mathrm{ref}} = 30$, contra la curva ajustada por la representación (Sección~\ref{03_05_00_reconstruccion_funcional}), para cada $M$ del barrido. El PSBPM-FD se ajusta con los hiperparámetros de \citet{03_02_chung2009nonparametric} llevados a la escala de cada score y, como $a_\nu = 0.5$, todo lo que se reporta se deriva de las $S$ extracciones de la predictiva.\\
+Las métricas de la Sección~\ref{02_02_03_criterios_evaluacion} se calculan sobre la ventana móvil de ancho $w_{\mathrm{ref}} = 30$, contra la curva ajustada por la representación (Sección~\ref{03_05_00_reconstruccion_funcional}), para cada $M$ del barrido. El PSBPM-FD se ajusta con los hiperparámetros de \citet{03_02_chung2009nonparametric} llevados a la escala de cada score.\\
 
 Las referencias son el FAR, con orden fijo igual al número de rezagos del escenario e intervalo gaussiano, y el Random Forest con la misma especificación que el PSBPM-FD. Se reportan el MAE y el RMSE de los tres predictores puntuales, del pronóstico por comportamiento (Sección~\ref{03_06_03_descripcion}) y de su cota, el mejor comportamiento, que usa la curva observada, estos dos solo en C-2, cada uno contra el FAR y el Random Forest; y el Winkler, el MPIW y el PICP de las tres construcciones de intervalo contra el FAR.\\
 
@@ -590,7 +592,7 @@ C-3 & Multimodalidad en la ley condicional  & Anexo~\ref{ane_00_02_03_alg_c3} & 
 \section{Resultados}
 \label{03_08_00_resultados}
 
-Los resultados se presentan en el orden del diseño, primero el error puntual, segundo los intervalos y por último la evaluación de los comportamientos y su predicción.
+Los resultados se presentan agrupados por error puntual, intervalos y por último la evaluación de los comportamientos y su predicción.
 
 \subsection{Error puntual}
 \label{03_08_01_error_puntual}
