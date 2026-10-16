@@ -1,10 +1,16 @@
 % Punto decimal también en modo matemático (babel-spanish lo vuelve coma); vale desde aquí hasta el final.
 \ifdefined\decimalpoint\decimalpoint\else\mathcode`\.="013A \fi
 
-\chapter{Mezclas DDP para Series de Tiempo Funcionales}
+
+ \chapter{Mezclas DDP para Series de Tiempo Funcionales}
 \label{03_00_00_mezclas_ddp_series_tiempo_funcionales}
- 
- 
+
+Este capítulo presenta el modelo de estudio, que estima la distribución condicional completa de la curva siguiente dado el pasado del proceso, de modo que no solo su nivel sino también su dispersión y su número de modos puedan cambiar con el estado reciente.\\
+
+Para ello, las curvas se representan mediante sus componentes principales funcionales y la dinámica de los scores se modela con el PSBPM-FD, una mezcla probit stick-breaking de regresiones normales, una por score, cuyos pesos dependen de los scores rezagados, de manera que la forma de la ley cambia cuando cambia el estado del proceso. Sobre este modelo se definen, a partir de su distribución predictiva, los resúmenes con que se pronostica la curva, tanto los predictores puntuales como los intervalos de credibilidad. Además, se presenta el análisis de los comportamientos predictivos, que distingue en cada origen los desenlaces posibles de la curva siguiente y la probabilidad de cada uno.\\
+
+El desempeño del modelo se analiza mediante un estudio de simulación, en el que se conoce el proceso que genera los datos y es posible contrastar lo estimado con lo verdadero. Los escenarios se construyen para que la ley condicional tenga rasgos que un modelo de media lineal no representa, y sobre ellos se evalúan el error puntual, los intervalos y los comportamientos.
+
 \section{Motivación}
 \label{03_01_00_motivacion}
  
@@ -1101,8 +1107,6 @@ La probabilidad del comportamiento elegido dice cuándo conviene apostar, como m
 
 \section{Resumen}
 \label{03_09}
-
-Este capítulo propuso el PSBPM-FD, una mezcla probit stick-breaking sobre los scores de la representación funcional cuyos pesos dependen del estado rezagado del proceso, y lo evaluó en tres escenarios en que la ley condicional de la curva cambia con el estado: por su varianza (C-1), por su régimen (C-2) y por su número de modos (C-3). Las conclusiones siguen las tres preguntas del diseño y valen para una réplica por escenario y para la calibración de cada uno, deliberadamente favorable a la separación de regímenes en C-2.\\
 
 En la predicción puntual, el PSBPM-FD supera al FAR en los tres escenarios, y lo hace de forma sostenida a lo largo del bloque de prueba y no solo en promedio. En C-2, donde la media condicional es no lineal, la esperanza reduce el MAE y el RMSE en torno a un $21\%$ y gana todas las ventanas de prueba. En C-1 y C-3, donde la media condicional es lineal o casi lineal y la referencia está casi bien especificada, la reducción promedio es cercana al $2\%$, pero se repite en cerca de nueve de cada diez ventanas, y alguno de los tres predictores del PSBPM-FD es el mejor modelo en el $82\%$ y el $74\%$ de ellas. Una diferencia pequeña en el promedio corresponde, por tanto, a una ventaja consistente y no a unos pocos tramos favorables. Entre los predictores, la esperanza es la mejor bajo RMSE y la mediana puntual bajo MAE donde la predictiva es multimodal, como corresponde a la pérdida que cada una minimiza, y el átomo más probable es el más débil. En los tres escenarios el error deja de bajar en $M = 4$, la dimensión en que se observa toda la dinámica, la cual es justamente como se simulo.\\
 
