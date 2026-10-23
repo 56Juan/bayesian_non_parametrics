@@ -1,20 +1,20 @@
 \chapter{Introducción}
 \label{01_00_00_introduccion}
 
-La presente tesis se organiza en cuatro capítulos. Este primer capítulo describe el contexto aplicado que motiva el problema de estudio desde la perspectiva de las aplicaciones, y formula los objetivos generales y específicos del trabajo.\\
+El contenido de esta tesis se distribuye en cuatro capítulos. Este primer capítulo describe el contexto aplicado que motiva el problema de estudio y formula el objetivo general y los objetivos específicos del trabajo.\\
 
-El Capítulo~\ref{02_00_00_fundamentos_teoricos_metodologicos} presenta los fundamentos teóricos y metodológicos sobre los que descansa el modelo propuesto. En él se desarrolla la representación de datos funcionales en bases de dimensión finita y el análisis de componentes principales funcional, el marco de las series de tiempo funcionales y sus criterios de evaluación, los fundamentos de la inferencia bayesiana y los métodos de simulación MCMC y, por último, la construcción de los Procesos de Dirichlet, sus modelos de mezcla y sus extensiones dependientes. \\
+El Capítulo~\ref{02_00_00_fundamentos_teoricos_metodologicos} presenta los fundamentos teóricos y metodológicos sobre los que descansa el modelo propuesto. En él se desarrollan la representación de datos funcionales en bases de dimensión finita y el análisis de componentes principales funcional, el marco de las series de tiempo funcionales y sus criterios de evaluación, los fundamentos de la inferencia bayesiana y los métodos MCMC y, por último, la construcción del Proceso de Dirichlet, sus modelos de mezcla y sus extensiones dependientes.\\
 
-El Capítulo~\ref{03_00_00_mezclas_ddp_series_tiempo_funcionales} constituye el aporte metodológico de la tesis. Se presenta el Probit Stick-Breaking Process de \citet{03_02_chung2009nonparametric} y se deriva de él el modelo propuesto, PSBPM-FD, con su esquema de inferencia y la reconstrucción funcional de su predictiva, de la que se obtienen la curva predicha, sus intervalos de credibilidad y los comportamientos que la mezcla distingue. El capítulo cierra con el estudio de simulación y sus resultados.\\
+El Capítulo~\ref{03_00_00_mezclas_ddp_series_tiempo_funcionales} constituye el aporte metodológico de la tesis, donde se presenta el Probit Stick-Breaking Process Mixture de \citet{03_02_chung2009nonparametric} y se deriva de él el modelo propuesto, PSBPM-FD, con su esquema de inferencia y la reconstrucción funcional de su predictiva, de la que se obtienen los predictores puntuales de la curva, sus intervalos de credibilidad y los comportamientos que la mezcla distingue. El capítulo cierra con el diseño del estudio de simulación y sus resultados.\\
 
-Finalmente, el Capítulo~\ref{04_00_00_aplicacion} aplica la metodología propuesta a datos reales de series de tiempo funcionales.
+Finalmente, el Capítulo~\ref{04_00_00_aplicacion} aplica la metodología propuesta al volumen horario de tráfico de una autopista urbana, con dos especificaciones que difieren en la información de la que dependen los pesos de la mezcla.
+
 
 \section{Contexto y motivación aplicada}
 \label{01_01_00_contexto_motivacion_aplicada}
-En diversos ámbitos aplicados, los procesos de interés se registran de forma intradiaria a intervalos regulares de una hora, treinta o quince minutos, e incluso a resoluciones mayores. Bajo una representación discreta tradicional, cada período queda descrito por un vector de dimensión elevada (por ejemplo, $24$, $48$ o $96$ componentes por día), y la predicción del período siguiente se convierte en un problema de series de tiempo multivariadas de alta dimensión. En este escenario, la especificación de modelos clásicos se complejiza de manera considerable el número de parámetros de un modelo vectorial autorregresivo crece cuadráticamente con la dimensión, la estimación se vuelve inestable con muestras de tamaño moderado y la estructura de dependencia entre los distintos instantes del día resulta difícil de imponer de manera parsimoniosa, 
-\cite{02_02_aue2015prediction,02_01_kokoszka2017introduction,02_02_bosq2000linear}.\\
+En diversos ámbitos aplicados, los procesos de interés se registran de forma intradiaria a intervalos regulares de una hora, treinta o quince minutos, e incluso a resoluciones más finas. Bajo una representación discreta tradicional, cada período queda descrito por un vector de dimensión elevada (por ejemplo, $24$, $48$ o $96$ componentes por día), y la predicción del período siguiente se convierte en un problema de series de tiempo multivariadas de alta dimensión. En este escenario la especificación de modelos clásicos se vuelve considerablemente más compleja, ya que el número de parámetros de un modelo vectorial autorregresivo crece cuadráticamente con la dimensión, la estimación se vuelve inestable con muestras de tamaño moderado y la estructura de dependencia entre los distintos instantes del día resulta difícil de imponer de manera parsimoniosa \citep{02_02_aue2015prediction,02_01_kokoszka2017introduction,02_02_bosq2000linear}.\\
 
-Una alternativa conceptualmente más adecuada consiste en reconocer que estas observaciones densamente muestreadas son, en esencia, discretizaciones de una curva subyacente, y tratarlas en consecuencia como datos funcionales, es decir, en lugar de un vector $\mathbf{X}_t \in \mathbb{R}^{p}$ correspondiente al día $t$, se dispone de una curva $X_t(\tau)$, $\tau \in [0,1]$, que resume la totalidad del registro intradía del período $t$. La Figura~\ref{fig:corte_funcional} ilustra esta idea: el panel superior muestra la serie completa a resolución de media hora durante $88$ días, mientras que el panel inferior segmenta los primeros cinco días en las curvas diarias $X_1(\tau), \ldots, X_5(\tau)$. Este corte funcional no constituye una abstracción, sino una simple reorganización de la información ya registrada, la cual en lugar de una sucesión de valores indexados en el tiempo, ahora dispone de una sucesión de curvas.
+Una alternativa conceptualmente más adecuada consiste en reconocer que estas observaciones densamente muestreadas son, en esencia, discretizaciones de una curva subyacente, y tratarlas en consecuencia como datos funcionales, es decir, en lugar de un vector $\mathbf{X}_t \in \mathbb{R}^{G}$ correspondiente al día $t$, se dispone de una curva $X_t(\tau)$, $\tau \in [0,1]$, que resume la totalidad del registro intradía del período $t$. La Figura~\ref{fig:corte_funcional} ilustra esta idea: el panel superior muestra la serie completa a resolución de media hora durante $88$ días, mientras que el panel inferior segmenta los primeros cinco días en las curvas diarias $X_1(\tau), \ldots, X_5(\tau)$. Este corte funcional no constituye una abstracción, sino una simple reorganización de la información ya registrada, la cual en lugar de una sucesión de valores indexados en el tiempo, ahora dispone de una sucesión de curvas.
 
 \begin{figure}[H]
     \centering
@@ -23,7 +23,7 @@ Una alternativa conceptualmente más adecuada consiste en reconocer que estas ob
     \label{fig:corte_funcional}
 \end{figure}
 
-El registro de la Figura~\ref{fig:corte_funcional} es solo un ejemplo de una situación mucho más general, fenómenos tan diversos como la demanda y el precio de electricidad estudiados en \cite{01_01_shang2013electricity,01_01_shah2020electricity}, los retornos y la volatilidad intradía de activos financieros \cite{01_01_shang2017intraday,01_01_wang2025crudeoil}, los caudales de un río \cite{01_01_beyaztas2021riverflow} o el volumen de tráfico vehicular \cite{01_01_wagnermuns2018traffic} que se registran de manera prácticamente continua y admiten esta misma lectura: las observaciones de cada período natural conforman una curva completa antes que una colección de valores aislados. Más aún, en todos estos casos la magnitud relevante para la toma de decisiones no es un resumen escalar, sino la forma de la trayectoria. Así, el horario en que se alcanza el caudal máximo condiciona las acciones de prevención ante un eventual desbordamiento; el perfil intradía de volatilidad determina las estrategias de cobertura y la medición del riesgo a lo largo de la jornada bursátil; y la hora punta de demanda gobierna el despacho de generación eléctrica, así como la identificación de los horarios de menor consumo para mitigar costos.\\
+El registro de la Figura~\ref{fig:corte_funcional} es solo un ejemplo de una situación mucho más general, pues fenómenos tan diversos como la demanda y el precio de electricidad \citep{01_01_shang2013electricity,01_01_shah2020electricity}, los retornos y la volatilidad intradía de activos financieros \citep{01_01_shang2017intraday,01_01_wang2025crudeoil}, los caudales de un río \citep{01_01_beyaztas2021riverflow} o el volumen de tráfico vehicular \citep{01_01_wagnermuns2018traffic} se registran de manera prácticamente continua, de modo que las observaciones de cada período natural conforman una curva completa antes que una colección de valores aislados. Más aún, en todos estos casos la magnitud relevante para la toma de decisiones no es un resumen escalar, sino la forma de la trayectoria. Así, el horario en que se alcanza el caudal máximo condiciona las acciones de prevención ante un eventual desbordamiento; el perfil intradía de volatilidad determina las estrategias de cobertura y la medición del riesgo a lo largo de la jornada bursátil; y la hora punta de demanda gobierna el despacho de generación eléctrica, así como la identificación de los horarios de menor consumo para mitigar costos.\\
  
 Pese a lo anterior, una estrategia ampliamente utilizada en la práctica consiste en resumir cada período mediante estadísticos agregados, tales como promedios, máximos o mínimos diarios o semanales. Si bien este procedimiento reduce la dimensionalidad del problema, conlleva una pérdida en la forma completa de las trayectorias, la variabilidad intradía, los patrones locales y la posible presencia de comportamientos atípicos quedan descartados. En consecuencia, cuando se emplea un estadístico agregado como la media para resumir la información, la predicción se concentra exclusivamente en dicho valor e ignora la estructura de la curva, precisamente aquella sobre la que descansan muchas de las decisiones operativas señaladas.\\
  
@@ -32,7 +32,7 @@ El enfoque de series de tiempo funcionales evita esta pérdida, al conservar la 
 \section{Objetivo General}
 \label{01_03_00_objetivo_general}
 
-Desarrollar un modelo bayesiano no paramétrico basado en Mezclas de Procesos de Dirichlet Dependientes para series de tiempo funcionales, que describa la distribución condicional completa de la curva dado su pasado y permita predecirla.
+Desarrollar un modelo bayesiano no paramétrico basado en mezclas de procesos de Dirichlet dependientes para series de tiempo funcionales, que estime la distribución condicional completa de la curva dado su pasado y permita predecirla.
 
 \subsection{Objetivos Específicos}
 \label{01_03_01_objetivos_especificos}
@@ -40,15 +40,15 @@ Desarrollar un modelo bayesiano no paramétrico basado en Mezclas de Procesos de
 \begin{itemize}
     \item Representar las trayectorias funcionales observadas en una base de funciones de dimensión finita.
 
-    \item Aplicar análisis de componentes principales funcional sobre las curvas representadas para obtener vectores de scores de dimensión reducida.
+    \item Aplicar análisis de componentes principales funcional sobre las curvas representadas para obtener vectores de scores.
 
-    \item Formular un modelo bayesiano no paramétrico para los scores mediante Mezclas de Procesos de Dirichlet Dependientes, en el que los pesos de la mezcla dependan del estado rezagado del proceso.
+    \item Formular un modelo bayesiano no paramétrico para los scores mediante mezclas de procesos de Dirichlet dependientes, en el que los pesos de la mezcla dependan del estado rezagado del proceso.
 
-    \item Adaptar un esquema de inferencia bayesiana basado en métodos MCMC que entregue extracciones de la distribución a posteriori y, a partir de ellas, la distribución predictiva de los scores y de la curva.
-
-    \item Identificar, a partir de las extracciones de la distribución predictiva, los comportamientos que la mezcla distingue en cada origen y la probabilidad de cada uno, y contrastarlos con los cambios de régimen del proceso.
+    \item Implementar un esquema de inferencia bayesiana basado en métodos MCMC que entregue extracciones de la distribución a posteriori y, a partir de ellas, la distribución predictiva de los scores y, por reconstrucción funcional, la de la curva.
 
     \item Estimar la curva futura y su incertidumbre a partir de la distribución predictiva mediante predictores puntuales e intervalos de credibilidad consistentes con la forma de dicha distribución.
 
-    \item Evaluar el desempeño predictivo del modelo frente a modelos de referencia mediante estudios de simulación y aplicaciones a datos reales de series de tiempo funcionales.
+    \item Identificar en cada origen los comportamientos que la distribución predictiva distingue y su probabilidad, contrastarlos con los regímenes del proceso y pronosticar a partir de ellos.
+
+    \item Evaluar el desempeño predictivo del modelo frente a modelos de referencia mediante un estudio de simulación y una aplicación a datos reales de series de tiempo funcionales.
 \end{itemize}
