@@ -148,13 +148,17 @@ Estudiante: Juan Francisco Ceballos González\\
 
 \end{titlepage}
 %%%%%%%%%%%%%%%%% FIN PORTADA %%%%%%%%%%%%%%%%%
+\frontmatter % páginas preliminares en numeración romana
 \addtocontents{toc}{\hspace{-7.5mm} \textbf{Secciones}}
 \addtocontents{toc}{\hfill \textbf{Página} \par}
 \addtocontents{toc}{\vspace{-1mm} \hspace{1mm}\par}
 
+\input{CAP/00_Antes}
+\input{CAP/00_Resumen}
+
 \tableofcontents\newpage
 
-\input{CAP/00_Antes}
+\mainmatter % los capítulos parten en la página 1
 \input{CAP/01 Introduccion}
 \input{CAP/02 Marco Teorico}
 \input{CAP/03 Modelo}
