@@ -32,9 +32,15 @@ Código, docstrings y nombres están en español; mantener ese idioma. Los
 docstrings de módulo son extensos a propósito: documentan *por qué* se tomó cada
 decisión numérica y suelen traer la respuesta antes que el código.
 
-- En `docs/` está el material de la tesis (`01 Anexo.tex`, `01 Introduccion.tex`,
-  `02 Marco Teorico.tex`, `03 Modelo.tex`). Es **referencia, de lo que se va a
-  hacer**: se puede modificar, y de ahí salen indicaciones, no obligaciones.
+- En `docs/` está la tesis completa, con la misma estructura que el proyecto de Overleaf
+  (2026-10-23): `main.tex`, `CAP/` (`00_Antes` agradecimientos, `00_Resumen`, `00_Simbologia`,
+  `01 Introduccion`, `02 Marco Teorico`, `03 Modelo`, `04 Aplicacion`, `05 Conclusiones`) y
+  `ANE/` (`01 Anexo` algoritmos y configuración, `02 Anexo Resultados`, `03 Anexo trafico`,
+  `04 Anexo otros`). Es **referencia, de lo que se va a hacer**: se puede modificar, y de ahí
+  salen indicaciones, no obligaciones. Convenciones del texto: prosa sin dos puntos ni listas,
+  un párrafo por idea cerrado con `\\`, citas `\citep` entre paréntesis y `\citet` cuando el
+  autor es sujeto (`biblatex` `authoryear`, `\cite` suelto imprime sin paréntesis). Compila en
+  Overleaf; esta máquina no tiene LaTeX.
 - **Todo el estudio de simulación se especifica sobre los scores** de la
   representación funcional. El anexo vigente tiene tres escenarios, cada uno
   asociado a un rasgo de la ley condicional del score que un modelo de media
@@ -719,11 +725,14 @@ en disco de 101 y 102), 30, 29, `avance_tesis_1`, `real_sa1_precio_v02` (27, 2.3
 
 **Abiertas — preguntar antes de codificar contra ellas:**
 
-1. **Capítulo de aplicación** (2026-10-15): el capítulo 4 (`docs/04 Aplicacion.tex`) es sólo el
-   tráfico I-94 (101 y 102), con la estructura de §03_08, cifras reales y sin prosa. Los gráficos
-   extras del tráfico van en `docs/05 Anexo Aplicacion Trafico.tex` (`aneC_00`) y las series
-   103–107 en `docs/06 Anexo Aplicacion Otras Series.tex` (`aneD_00`); figuras copiadas de
-   `reports/reales/` a `docs/IMG/{04_03,aneC_00,aneD_00}/`. Pendiente: `04_bloqueB_ancho.png`.
+1. **Capítulo de aplicación** (2026-10-15, redactado el 2026-10-23): el capítulo 4
+   (`docs/CAP/04 Aplicacion.tex`) es sólo el tráfico I-94 (101 y 102), con la estructura de
+   §03_08. Los gráficos extras del tráfico van en `docs/ANE/03 Anexo trafico.tex` (`aneC_00`) y
+   las series 103–107 en `docs/ANE/04 Anexo otros.tex` (`aneD_00`); figuras en
+   `docs/IMG/{04_03,aneC_00,aneD_00}/`, incluida `04_bloqueB_ancho.png`. El cuadro de
+   comportamientos contra tipo de día (`tab:apl_K_tipo`, acierto / masa en el correcto /
+   cercanía) se quitó el 2026-10-23 por decisión del autor; el cálculo sigue reproducible desde
+   `comportamientos_psbp.npz` y `65_comportamientos_calendario.csv` de 101 y 102.
 2. **Trazas duplicadas**: las 30x copian los `.mat` de su 20x (~220 MB en la 300) y 101/102 los
    de 31/32; todo se versiona. Se deja así salvo que el repo pese demasiado. Verificado
    (2026-10-12): los `.mat` 20x/30x son blob-idénticos, así que en `.git` ya están deduplicados y el
@@ -747,6 +756,16 @@ en disco de 101 y 102), 30, 29, `avance_tesis_1`, `real_sa1_precio_v02` (27, 2.3
   colineales nunca da `K = 3` (`tests/test_comportamientos.py`). No se cambia.
 - `pipelines/real_pipeline.py` (stub) se borró; el flujo real vive en `notebooks/reales/`.
 - `102_04` no se ejecuta: sus salidas son copia de la 32 (mismo notebook, otro ID).
+- Documento (2026-10-23): hay Resumen (antes del índice, con `\frontmatter`), Simbología y un
+  Capítulo 5 de conclusiones, limitaciones y trabajo futuro que cita los cuadros de los
+  capítulos 3 y 4 en vez de repetir cifras; cada capítulo empírico cierra con su propia
+  "Discusión" (§03_09 ya no se llama Resumen). La **cota** (mejor comportamiento) se lee primero
+  como diagnóstico de la predictiva (si es baja, la ley estimada contiene la curva que ocurre) y
+  sólo después como costo de elegir; va antes del pronóstico en §03_08_04 y §04_03_04. El exceso
+  de comportamientos en C-2 (30 % contra 9 %) **no** se llama sobredetección: es masa repartida
+  cerca del umbral por la transición probit suave, una opción de baja probabilidad, y la pagan
+  el pronóstico y no las bandas ni la cota. C-3 se describe como "multimodalidad en la ley
+  conjunta de los scores" que no llega a la marginal de la curva.
 - Documento: se reportan **tres** predictores (esperanza, mediana puntual, átomo modal); el
   medoide se calcula y no se reporta; la MBD se eliminó del código. El diseño del estudio (§03_07) es una introducción general más `tab:dis_escenarios` (rezago
   propio o cruzado por escenario, `M_ref = 10`, 6 en C-3); la configuración (partición, muestreador,
