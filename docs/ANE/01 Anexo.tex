@@ -12,7 +12,7 @@ Todos los algoritmos especifican la dinámica directamente sobre los scores de l
 
 Esta sección presenta los elementos comunes a los tres algoritmos, la representación de las curvas en una base ortonormal, la grilla de observación, el espectro de varianzas de los scores y la generación de los scores pasivos. Los algoritmos se distinguen únicamente por el mecanismo que gobierna la dinámica de los scores activos presentados posteriormente.\\
 
-Sea $\{\varphi_j\}_{j=1}^{J}$ un sistema ortonormal en $L^2([0,1])$ y sea $\mu(\tau)$ la función media. Cada curva se representa como
+Sea $\{\phi_j\}_{j=1}^{J}$ un sistema ortonormal en $L^2([0,1])$ y sea $\mu(\tau)$ la función media. Cada curva se representa como
 \begin{equation}
 \label{eq:ane_coef_curva}
 X_t(\tau)
@@ -20,27 +20,27 @@ X_t(\tau)
 \mu(\tau)
 +
 \sum_{j=1}^{J}
-\xi_{tj}\,\varphi_j(\tau),
+\xi_{tj}\,\phi_j(\tau),
 \end{equation}
 donde $\xi_{tj}$ es el score de la $j$-ésima componente en el período $t$. Se emplea la base de Fourier sin término constante,
 \begin{equation}
 \label{eq:ane_fourier}
-\varphi_{2k-1}(\tau)=\sqrt{2}\,\sin(2\pi k\tau),
+\phi_{2k-1}(\tau)=\sqrt{2}\,\sin(2\pi k\tau),
 \qquad
-\varphi_{2k}(\tau)=\sqrt{2}\,\cos(2\pi k\tau),
+\phi_{2k}(\tau)=\sqrt{2}\,\cos(2\pi k\tau),
 \end{equation}
 con $k=1,\ldots,J/2$, $J=10$, y $\mu(\tau)=\sin(2\pi\tau)$, que pertenece al espacio generado por la base.\\
 
 La estructura temporal se especifica en el espacio de los scores y las curvas se obtienen luego mediante \eqref{eq:ane_coef_curva}. Las curvas se evalúan sobre la grilla regular $\tau_g = (g-1)/(G-1)$, $g = 1, \dots, G$, común a todos los períodos. Como la base es ortonormal y $\mu$ está en su espacio, la representación es exacta.\\
 
-Cada algoritmo genera además un período de calentamiento de $B$ curvas que se descartan antes de retener las $T$ curvas del estudio, de modo que las condiciones iniciales no influyan en los datos.\\
+Cada algoritmo genera además un período de calentamiento de $T_{\mathrm{cal}}$ curvas que se descartan antes de retener las $T$ curvas del estudio, de modo que las condiciones iniciales no influyan en los datos.\\
 
-La escala de los scores sigue un espectro decreciente, $\mathrm{Var}(\xi_{tj})=\lambda_j=\lambda_1 r^{\,j-1}$ con $\lambda_1>0$ y $r\in(0,1)$, de modo que
+La escala de los scores sigue un espectro decreciente, $\mathrm{Var}(\xi_{tj})=\lambda_j=\lambda_1 \varrho^{\,j-1}$ con $\lambda_1>0$ y $\varrho\in(0,1)$, de modo que
 \begin{equation}
 \label{eq:ane_escala}
-\xi_{tj} = \sqrt{\lambda_j}\; z_{tj},
+\xi_{tj} = \sqrt{\lambda_j}\; \tilde{\xi}_{tj},
 \end{equation}
-donde $z_{tj}$ es una serie de varianza marginal unitaria cuyo mecanismo generador define cada algoritmo. Los primeros $J_a=4$ scores son los activos, por lo que llevan la dinámica distintiva del escenario. Los $J-J_a$ restantes siguen un proceso autorregresivo de primer orden común, $z_{tj}=\phi_p\, z_{t-1,j}+\sqrt{1-\phi_p^{2}}\,e_{tj}$ con $e_{tj}\overset{\mathrm{iid}}{\sim}\mathcal{N}(0,1)$, y completan el espectro sin contribuir a la estructura que el escenario busca evaluar. Las componentes se generan de forma independiente entre sí, de modo que la correlación contemporánea de los scores es nula y la descomposición de las curvas puede alinearse con $\{\varphi_j\}$.\\
+donde $\tilde{\xi}_{tj}$ es una serie de varianza marginal unitaria cuyo mecanismo generador define cada algoritmo. Los primeros $J_a=4$ scores son los activos, por lo que llevan la dinámica distintiva del escenario. Los $J-J_a$ restantes siguen un proceso autorregresivo de primer orden común, $\tilde{\xi}_{tj}=\varphi_p\, \tilde{\xi}_{t-1,j}+\sqrt{1-\varphi_p^{2}}\,\varepsilon_{tj}$ con $\varepsilon_{tj}\overset{\mathrm{iid}}{\sim}\mathcal{N}(0,1)$, y completan el espectro sin contribuir a la estructura que el escenario busca evaluar. Las componentes se generan de forma independiente entre sí, de modo que la correlación contemporánea de los scores es nula y la descomposición de las curvas puede alinearse con $\{\phi_j\}$.\\
 
 \begin{table}[H]
 \centering
@@ -52,12 +52,12 @@ Símbolo & Descripción & Valor \\
 \hline
 $G$          & Número de puntos de la grilla                             & $75$ \\
 $T$          & Número de curvas retenidas                                & $1000$ \\
-$B$          & Curvas de calentamiento                                   & $300$ \\
+$T_{\mathrm{cal}}$        & Curvas de calentamiento                                   & $300$ \\
 $J$          & Número de scores                                          & $10$ \\
 $J_a$        & Número de scores activos                                  & $4$ \\
 $\lambda_1$  & Varianza del primer score                                 & $0.5$ \\
-$r$          & Razón de decaimiento del espectro                        & $0.55$ \\
-$\phi_p$     & Coeficiente autorregresivo de los scores pasivos          & $0.3$ \\
+$\varrho$    & Razón de decaimiento del espectro                        & $0.55$ \\
+$\varphi_p$     & Coeficiente autorregresivo de los scores pasivos          & $0.3$ \\
 \hline
 \end{tabular}
 \end{table}
@@ -68,38 +68,36 @@ Esta sección presenta los tres algoritmos de simulación. Cada uno describe su 
 
 \subsection{Algoritmo C-1: Heterocedasticidad condicional en los scores}
 \label{ane_00_02_01_alg_c1}
-Cada score activo $j\le J_a$ sigue un proceso autorregresivo con innovaciones GARCH$(1,1)$ \cite{ane_00_01_bollerslev1986generalized},
+Cada score activo $j\le J_a$ sigue un proceso autorregresivo con innovaciones GARCH$(1,1)$ \citep{ane_00_01_bollerslev1986generalized},
 \begin{equation}\label{eq:ane_algC1_argarch}
-    u_{tj} = \phi\, u_{t-1,j} + a_{tj},
-    \qquad
-    a_{tj} = \sqrt{h_{tj}}\, \varepsilon_{tj},
+    u_{tj} = \varphi\, u_{t-1,j} + \sigma_{tj}\, \varepsilon_{tj},
     \qquad
     \varepsilon_{tj} \overset{\mathrm{iid}}{\sim} \mathcal{N}(0,1),
 \end{equation}
 con varianza condicional
 \begin{equation}\label{eq:ane_algC1_recursion}
-    h_{tj} = \alpha_0 + \alpha_1\, a_{t-1,j}^2 + \beta_1\, h_{t-1,j},
+    \sigma_{tj}^{2} = \Upsilon_0 + \Upsilon_1\, \sigma_{t-1,j}^{2}\,\varepsilon_{t-1,j}^{2} + \Upsilon_2\, \sigma_{t-1,j}^{2},
 \end{equation}
-donde $\alpha_1$ gobierna la sensibilidad de la varianza futura a la innovación más reciente y $\beta_1$ la persistencia de la varianza condicional pasada. La estacionariedad de segundo orden requiere $\alpha_1+\beta_1<1$, y esta persistencia total fija la memoria de la volatilidad, del orden de $1/(1-\alpha_1-\beta_1)$ períodos. El nivel base se despeja de la varianza incondicional de la innovación como $\alpha_0=\sigma_a^{2}(1-\alpha_1-\beta_1)$, y $\phi$, con $|\phi|<1$, determina la persistencia del nivel del score.\\
+donde $\sigma_{t-1,j}\,\varepsilon_{t-1,j}$ es la innovación del período anterior, $\Upsilon_1$ gobierna la sensibilidad de la varianza futura a esa innovación y $\Upsilon_2$ la persistencia de la varianza condicional pasada. La estacionariedad de segundo orden requiere $\Upsilon_1+\Upsilon_2<1$, y esta persistencia total fija la memoria de la volatilidad, del orden de $1/(1-\Upsilon_1-\Upsilon_2)$ períodos. El nivel base se despeja de la varianza incondicional de la innovación como $\Upsilon_0=\sigma_a^{2}(1-\Upsilon_1-\Upsilon_2)$, y $\varphi$, con $|\varphi|<1$, determina la persistencia del nivel del score.\\
 
-El proceso $u_{tj}$ tiene varianza marginal $\sigma_a^{2}/(1-\phi^{2})$, de modo que
+El proceso $u_{tj}$ tiene varianza marginal $\sigma_a^{2}/(1-\varphi^{2})$, de modo que
 \begin{equation}
 \label{eq:ane_algC1_score}
-z_{tj}=u_{tj}\,\frac{\sqrt{1-\phi^{2}}}{\sigma_a},
+\tilde{\xi}_{tj}=u_{tj}\,\frac{\sqrt{1-\varphi^{2}}}{\sigma_a},
 \qquad
-\xi_{tj}=\sqrt{\lambda_j}\,z_{tj},
+\xi_{tj}=\sqrt{\lambda_j}\,\tilde{\xi}_{tj},
 \end{equation}
 tiene varianza $\lambda_j$ para todo $j$, conforme a \eqref{eq:ane_escala}.\\
 
 La generación procede en los pasos que siguen.
 \begin{enumerate}
-    \item Se fijan $\phi$, $\alpha_1$, $\beta_1$ y $\sigma_a^{2}$, y se calcula $\alpha_0$.
+    \item Se fijan $\varphi$, $\Upsilon_1$, $\Upsilon_2$ y $\sigma_a^{2}$, y se calcula $\Upsilon_0$.
 
-    \item Para cada score activo se inicializan $h_{1j}=\sigma_a^{2}$ y $u_{0j}=0$, y se itera \eqref{eq:ane_algC1_argarch}--\eqref{eq:ane_algC1_recursion} durante $B+T$ períodos.
+    \item Para cada score activo se inicializan $\sigma_{1j}^{2}=\sigma_a^{2}$ y $u_{0j}=0$, y se itera \eqref{eq:ane_algC1_argarch}--\eqref{eq:ane_algC1_recursion} durante $T_{\mathrm{cal}}+T$ períodos.
 
     \item Los scores pasivos se generan como se indica en el esquema común.
 
-    \item Se descartan los $B$ primeros períodos, se obtienen los scores mediante \eqref{eq:ane_algC1_score} y se reconstruyen las curvas mediante \eqref{eq:ane_coef_curva}.
+    \item Se descartan los $T_{\mathrm{cal}}$ primeros períodos, se obtienen los scores mediante \eqref{eq:ane_algC1_score} y se reconstruyen las curvas mediante \eqref{eq:ane_coef_curva}.
 \end{enumerate}
 
 \begin{table}[H]
@@ -110,9 +108,9 @@ La generación procede en los pasos que siguen.
 \hline
 Símbolo & Descripción & Valor \\
 \hline
-$\phi$          & Coeficiente autorregresivo                          & $0.5$ \\
-$\alpha_1$      & Sensibilidad a la innovación reciente               & $0.25$ \\
-$\beta_1$       & Persistencia de la varianza condicional pasada      & $0.60$ \\
+$\varphi$       & Coeficiente autorregresivo                          & $0.5$ \\
+$\Upsilon_1$    & Sensibilidad a la innovación reciente               & $0.25$ \\
+$\Upsilon_2$    & Persistencia de la varianza condicional pasada      & $0.60$ \\
 $\sigma_a^{2}$  & Varianza incondicional de la innovación             & $1.0$ \\
 \hline
 \end{tabular}
@@ -120,49 +118,48 @@ $\sigma_a^{2}$  & Varianza incondicional de la innovación             & $1.0$ \
 
 \subsection{Algoritmo C-2: Cambio de régimen por umbral en los scores}
 \label{ane_00_02_02_alg_c2}
-Cada score activo $j\le J_a$ evoluciona en una coordenada cruda $u_{tj}$ con dos regímenes, $A$ y $B$, asignados mediante un umbral $c_j$ sobre $u_{t-1,j}$. Condicionalmente al régimen $R_{tj}=k\in\{A,B\}$,
+Cada score activo $j\le J_a$ evoluciona en una coordenada cruda $u_{tj}$ con dos regímenes, $A$ y $B$, asignados mediante un umbral $u_j^{\star}$ sobre $u_{t-1,j}$. Condicionalmente al régimen $I_{tj}=k\in\{A,B\}$,
 \begin{equation}\label{eq:ane_algC2}
-    u_{tj}=\mu_{kj}+\phi_{kj}\,u_{t-1,j}+s_{kj}\,e_{tj},
+    u_{tj}=\mu_{kj}+\varphi_{kj}\,u_{t-1,j}+\sigma_{kj}\,\varepsilon_{tj},
     \qquad
-    e_{tj}\overset{\mathrm{iid}}{\sim}\mathcal{N}(0,1),
+    \varepsilon_{tj}\overset{\mathrm{iid}}{\sim}\mathcal{N}(0,1),
 \end{equation}
-de modo que los regímenes difieren en nivel $\mu_{kj}$, persistencia $\phi_{kj}$ y escala $s_{kj}$: el régimen $A$ es persistente y de escala pequeña, y el $B$ revierte y es más volátil.\\
+de modo que los regímenes difieren en nivel $\mu_{kj}$, persistencia $\varphi_{kj}$ y escala $\sigma_{kj}$, donde el régimen $A$ es persistente y de escala pequeña, y el $B$ revierte y es más volátil.\\
 
-La asignación es un probit sobre el rezago propio. Con $\Phi$ la función de distribución normal estándar y $\omega_j>0$ el ancho de la transición,
+La asignación es un probit sobre el rezago propio. Con $\Phi$ la función de distribución normal estándar y $\varsigma_j>0$ el ancho de la transición,
 \begin{align}
-    P(R_{tj}=B\mid u_{t-1,j}) &= \Phi\!\left(\frac{u_{t-1,j}-c_j}{\omega_j}\right), \label{eq:ane_algC2_probs}\\
-    P(R_{tj}=A\mid u_{t-1,j}) &= 1-P(R_{tj}=B\mid u_{t-1,j}). \nonumber
+    \Pr(I_{tj}=B\mid u_{t-1,j}) &= \Phi\!\left(\frac{u_{t-1,j}-u_j^{\star}}{\varsigma_j}\right), \label{eq:ane_algC2_probs}\\
+    \Pr(I_{tj}=A\mid u_{t-1,j}) &= 1-\Pr(I_{tj}=B\mid u_{t-1,j}). \nonumber
 \end{align}
-Con $\omega_j\to0$ la asignación se vuelve determinista y el escenario es un SETAR clásico, mientras que un $\omega_j$ positivo hace la transición suave.\\
+Con $\varsigma_j\to0$ la asignación se vuelve determinista y el escenario es un SETAR clásico, mientras que un $\varsigma_j$ positivo hace la transición suave.\\
 
 La media condicional es exacta,
 \begin{align}
     \mathbb{E}\bigl[u_{tj}\mid u_{t-1,j}\bigr]
-    &=\bigl(1-p_{tj}\bigr)\bigl(\mu_{Aj}+\phi_{Aj}\,u_{t-1,j}\bigr)+p_{tj}\bigl(\mu_{Bj}+\phi_{Bj}\,u_{t-1,j}\bigr), \label{eq:ane_algC2_oraculo}\\
-    p_{tj}&=P(R_{tj}=B\mid u_{t-1,j}), \nonumber
+    &=\Pr(I_{tj}=A\mid u_{t-1,j})\bigl(\mu_{Aj}+\varphi_{Aj}\,u_{t-1,j}\bigr)+\Pr(I_{tj}=B\mid u_{t-1,j})\bigl(\mu_{Bj}+\varphi_{Bj}\,u_{t-1,j}\bigr), \label{eq:ane_algC2_oraculo}
 \end{align}
 y se registra en cada período junto con el régimen sorteado. La dinámica usa un único rezago.\\
 
-El score se obtiene estandarizando $u_{tj}$ con sus momentos poblacionales $(m_j,d_j)$, estimados una sola vez mediante una simulación larga, y escalando por \eqref{eq:ane_escala},
+El score se obtiene estandarizando $u_{tj}$ con sus momentos poblacionales $(\mu_j^{u},\sigma_j^{u})$, estimados una sola vez mediante una simulación larga, y escalando por \eqref{eq:ane_escala},
 \begin{equation}
 \label{eq:ane_algC2_score}
-z_{tj}=\frac{u_{tj}-m_j}{d_j},
+\tilde{\xi}_{tj}=\frac{u_{tj}-\mu_j^{u}}{\sigma_j^{u}},
 \qquad
-\xi_{tj}=\sqrt{\lambda_j}\,z_{tj}.
+\xi_{tj}=\sqrt{\lambda_j}\,\tilde{\xi}_{tj}.
 \end{equation}
 La estandarización pertenece al generador, que fija la escala del escenario, y no se aplica a los datos que recibe un método.\\
 
 La generación procede en los pasos que siguen.
 \begin{enumerate}
-    \item Se fijan, para cada score activo, el umbral $c_j$, el ancho $\omega_j$ y los parámetros $(\mu_{kj},\phi_{kj},s_{kj})$ de los dos regímenes.
+    \item Se fijan, para cada score activo, el umbral $u_j^{\star}$, el ancho $\varsigma_j$ y los parámetros $(\mu_{kj},\varphi_{kj},\sigma_{kj})$ de los dos regímenes.
 
-    \item Para cada período se calcula la probabilidad \eqref{eq:ane_algC2_probs} a partir de $u_{t-1,j}$ y se sortea $R_{tj}$. La secuencia de regímenes no se entrega a los métodos.
+    \item Para cada período se calcula la probabilidad \eqref{eq:ane_algC2_probs} a partir de $u_{t-1,j}$ y se sortea $I_{tj}$. La secuencia de regímenes no se entrega a los métodos.
 
     \item Se genera $u_{tj}$ mediante \eqref{eq:ane_algC2}, con el régimen sorteado.
 
     \item Los scores pasivos se generan como se indica en el esquema común.
 
-    \item Se descartan los $B$ primeros períodos, se obtienen los scores mediante \eqref{eq:ane_algC2_score} y se reconstruyen las curvas mediante \eqref{eq:ane_coef_curva}.
+    \item Se descartan los $T_{\mathrm{cal}}$ primeros períodos, se obtienen los scores mediante \eqref{eq:ane_algC2_score} y se reconstruyen las curvas mediante \eqref{eq:ane_coef_curva}.
 \end{enumerate}
 
 \begin{table}[H]
@@ -174,10 +171,10 @@ La generación procede en los pasos que siguen.
 Símbolo & Descripción & Valor \\
 \hline
 $K$                       & Número de regímenes                                    & $2$ \\
-$c_j$                     & Umbral sobre el rezago propio                          & $0$ \\
-$\omega_j$                     & Ancho de la transición probit                          & Cuadro~\ref{tab:ane_algC2_scores} \\
-$\mu_{kj},\ \phi_{kj},\ s_{kj}$ & Nivel, coeficiente autorregresivo y escala del régimen $k$ & Cuadro~\ref{tab:ane_algC2_scores} \\
-$(m_j,d_j)$               & Media y desviación poblacionales de $u_{tj}$           & Simulación larga \\
+$u_j^{\star}$             & Umbral sobre el rezago propio                          & $0$ \\
+$\varsigma_j$                     & Ancho de la transición probit                          & Cuadro~\ref{tab:ane_algC2_scores} \\
+$\mu_{kj},\ \varphi_{kj},\ \sigma_{kj}$ & Nivel, coeficiente autorregresivo y escala del régimen $k$ & Cuadro~\ref{tab:ane_algC2_scores} \\
+$(\mu_j^{u},\sigma_j^{u})$               & Media y desviación poblacionales de $u_{tj}$           & Simulación larga \\
 \hline
 \end{tabular}
 \end{table}
@@ -189,7 +186,7 @@ $(m_j,d_j)$               & Media y desviación poblacionales de $u_{tj}$       
 \small\setlength{\tabcolsep}{5pt}
 \begin{tabular}{lcccccccc}
 \hline
-$j$ & $\omega_j$ & $\mu_{Aj}$ & $\phi_{Aj}$ & $s_{Aj}$ & $\mu_{Bj}$ & $\phi_{Bj}$ & $s_{Bj}$ & $c_j$ \\
+$j$ & $\varsigma_j$ & $\mu_{Aj}$ & $\varphi_{Aj}$ & $\sigma_{Aj}$ & $\mu_{Bj}$ & $\varphi_{Bj}$ & $\sigma_{Bj}$ & $u_j^{\star}$ \\
 \hline
 $1$ & $0.10$ & $0$ & $0.8$ & $0.25$ & $2.5$ & $-0.9$ & $1.0$ & $0$ \\
 $2$ & $0.10$ & $0$ & $0.6$ & $0.25$ & $2.0$ & $-0.9$ & $1.0$ & $0$ \\
@@ -203,92 +200,92 @@ $4$ & $0.25$ & $0$ & $0.6$ & $0.40$ & $2.5$ & $-0.9$ & $1.0$ & $0$ \\
 \label{ane_00_02_03_alg_c3}
 Este algoritmo genera el vector de scores con una mezcla de $K$ mecanismos lineales, cuya selección depende de la historia reciente del proceso.\\
 
-Sea $Z_t\in\{1,\ldots,K\}$ la variable latente que identifica el mecanismo utilizado en el período $t$. Condicionalmente a $Z_t=k$, el vector de scores se genera mediante
+Sea $I_t\in\{1,\ldots,K\}$ la variable latente que identifica el mecanismo utilizado en el período $t$. Condicionalmente a $I_t=k$, el vector de scores se genera mediante
 \begin{equation}
 \label{eq:ane_algC3}
 \boldsymbol{\xi}_t
 =
-\boldsymbol{\mu}_{Z_t}
+\boldsymbol{\mu}_{I_t}
 +
-\sum_{\ell=1}^{L}
-A_{Z_t,\ell}\,
+\sum_{\ell=1}^{q}
+A_{I_t,\ell}\,
 \boldsymbol{\xi}_{t-\ell}
 +
 \boldsymbol{\varepsilon}_t,
 \end{equation}
-donde $\boldsymbol{\xi}_t=(\xi_{t1},\ldots,\xi_{tJ})^\top$ es el vector de scores, $\boldsymbol{\mu}_{Z_t}$ es la localización del mecanismo seleccionado, $A_{Z_t,\ell}$ es la matriz de dependencia asociada al $\ell$-ésimo rezago y $\boldsymbol{\varepsilon}_t$ es un vector de innovaciones gaussianas independientes de $Z_t$. Los mecanismos comparten el patrón de dependencia de las matrices $A_{k,\ell}$ y difieren en sus valores.\\
+donde $\boldsymbol{\xi}_t=(\xi_{t1},\ldots,\xi_{tJ})^\top$ es el vector de scores, $\boldsymbol{\mu}_{I_t}$ es la localización del mecanismo seleccionado, $A_{I_t,\ell}$ es la matriz de dependencia asociada al $\ell$-ésimo rezago y $\boldsymbol{\varepsilon}_t$ es un vector de innovaciones gaussianas independientes de $I_t$. Los mecanismos comparten el patrón de dependencia de las matrices $A_{k,\ell}$ y difieren en sus valores.\\
 
 La selección del mecanismo depende de los scores correspondientes a múltiples rezagos mediante
 \begin{equation}
 \label{eq:ane_algC3_asignacion}
-P
+Pr
 \left(
-Z_t=k
+I_t=k
 \mid
 \boldsymbol{\xi}_{t-1},
 \ldots,
-\boldsymbol{\xi}_{t-L}
+\boldsymbol{\xi}_{t-q}
 \right)
 =
 \frac{
 \exp\bigl\{
-q_k
+\eta_k
 \left(
 \boldsymbol{\xi}_{t-1},
 \ldots,
-\boldsymbol{\xi}_{t-L}
+\boldsymbol{\xi}_{t-q}
 \right)
 \bigr\}
 }{
 \displaystyle
-\sum_{h=1}^{K}
+\sum_{k'=1}^{K}
 \exp\bigl\{
-q_h
+\eta_{k'}
 \left(
 \boldsymbol{\xi}_{t-1},
 \ldots,
-\boldsymbol{\xi}_{t-L}
+\boldsymbol{\xi}_{t-q}
 \right)
 \bigr\}
 },
 \end{equation}
-donde $q_k(\cdot)$ es afín en los scores considerados y el mecanismo 1 es la referencia del softmax, $q_1\equiv 0$.\\
+donde $\eta_k(\cdot)$ es afín en los scores considerados y el mecanismo 1 es la referencia del softmax, $\eta_1\equiv 0$.\\
 
-Para incorporar dependencia temporal de más de un período se emplean $L=2$ rezagos, de modo que tanto la selección del mecanismo como la generación de los scores utilizan $\boldsymbol{\xi}_{t-1}$ y $\boldsymbol{\xi}_{t-2}$. La dinámica distintiva se concentra en los $J_a$ scores activos; los scores restantes siguen el proceso autorregresivo del esquema común, de modo que el espectro de varianzas sea el de \eqref{eq:ane_escala}.\\
+Para incorporar dependencia temporal de más de un período se emplean $q=2$ rezagos, de modo que tanto la selección del mecanismo como la generación de los scores utilizan $\boldsymbol{\xi}_{t-1}$ y $\boldsymbol{\xi}_{t-2}$. La dinámica distintiva se concentra en los $J_a$ scores activos; los scores restantes siguen el proceso autorregresivo del esquema común, de modo que el espectro de varianzas sea el de \eqref{eq:ane_escala}.\\
 
-Los valores se especifican en la coordenada estandarizada $z_{tj}=\xi_{tj}/\sqrt{\lambda_j}$ de \eqref{eq:ane_escala}, de modo que un coeficiente cruzado se lee igual cualquiera sea la varianza de las componentes que conecta. En la escala de los scores, con $D=\mathrm{diag}(\sqrt{\lambda_1},\ldots,\sqrt{\lambda_J})$, $\boldsymbol{\mu}_k=D\tilde{\boldsymbol{\mu}}_k$, $A_{k,\ell}=D\tilde{A}_{k,\ell}D^{-1}$, $q_k(\boldsymbol{\xi})=\tilde q_k(D^{-1}\boldsymbol{\xi})$ y $\mathrm{Var}(\varepsilon_{tj})=\lambda_j\tilde\sigma_j^{2}$. Los tres mecanismos son un centro ($k=1$) y dos niveles, alto ($k=2$) y bajo ($k=3$), que se separan solo en la localización del primer score, $\tilde\mu_{k1}=0,\,+1,\,-1$, con $\tilde\mu_{kj}=0$ para $j\ge2$. La asignación es
+Los valores se especifican en la coordenada estandarizada $\tilde{\xi}_{tj}=\xi_{tj}/\sqrt{\lambda_j}$ de \eqref{eq:ane_escala}, de modo que un coeficiente cruzado se lee igual cualquiera sea la varianza de las componentes que conecta. En la escala de los scores, con $\boldsymbol{\Lambda}^{1/2}=\mathrm{diag}(\sqrt{\lambda_1},\ldots,\sqrt{\lambda_J})$, $\boldsymbol{\mu}_k=\boldsymbol{\Lambda}^{1/2}\tilde{\boldsymbol{\mu}}_k$, $A_{k,\ell}=\boldsymbol{\Lambda}^{1/2}\tilde{A}_{k,\ell}\boldsymbol{\Lambda}^{-1/2}$, $\eta_k(\boldsymbol{\xi})=\tilde{\eta}_k(\boldsymbol{\Lambda}^{-1/2}\boldsymbol{\xi})$ y $\mathrm{Var}(\varepsilon_{tj})=\lambda_j\tilde\sigma_j^{2}$. Los tres mecanismos son un centro ($k=1$) y dos niveles, alto ($k=2$) y bajo ($k=3$), que se separan solo en la localización del primer score, $\tilde\mu_{k1}=0,\,+1,\,-1$, con $\tilde\mu_{kj}=0$ para $j\ge2$. La asignación es
 \begin{align}
-\tilde q_1 &= 0, \nonumber\\
-\tilde q_2 &= -2.1 + 1.75\,z_{1,t-1} + 0.7\,z_{1,t-2} + 0.5\,z_{2,t-1}, \label{eq:ane_algC3_q}\\
-\tilde q_3 &= -2.1 - 1.75\,z_{1,t-1} - 0.7\,z_{1,t-2} + 0.5\,z_{2,t-1}. \nonumber
+\tilde{\eta}_1 &= 0, \nonumber\\
+\tilde{\eta}_2 &= -2.1 + 1.75\,\tilde{\xi}_{t-1,1} + 0.7\,\tilde{\xi}_{t-2,1} + 0.5\,\tilde{\xi}_{t-1,2}, \label{eq:ane_algC3_q}\\
+\tilde{\eta}_3 &= -2.1 - 1.75\,\tilde{\xi}_{t-1,1} - 0.7\,\tilde{\xi}_{t-2,1} + 0.5\,\tilde{\xi}_{t-1,2}. \nonumber
 \end{align}
-Las matrices $\tilde A_{k,\ell}$ comparten el patrón del Cuadro~\ref{tab:ane_algC3_mecanismos}, la diagonal del bloque activo en el primer rezago y cuatro entradas cruzadas, y difieren en los valores; las entradas no listadas son cero. La entrada $(j,m)$ de $\tilde A_{k,\ell}$ es el coeficiente con que el score $m$ rezagado $\ell$ períodos entra en el score $j$. Los scores pasivos conservan su coeficiente $\phi_p$ en el primer rezago, igual en los tres mecanismos. La innovación tiene desviación $\tilde\sigma_j$ en el bloque activo y $\sqrt{1-\phi_p^{2}}$ en el pasivo.\\
+Las matrices $\tilde A_{k,\ell}$ comparten el patrón del Cuadro~\ref{tab:ane_algC3_mecanismos}, la diagonal del bloque activo en el primer rezago y cuatro entradas cruzadas, y difieren en los valores; las entradas no listadas son cero. La entrada $(j,m)$ de $\tilde A_{k,\ell}$ es el coeficiente con que el score $m$ rezagado $\ell$ períodos entra en el score $j$. Los scores pasivos conservan su coeficiente $\varphi_p$ en el primer rezago, igual en los tres mecanismos. La innovación tiene desviación $\tilde\sigma_j$ en el bloque activo y $\sqrt{1-\varphi_p^{2}}$ en el pasivo.\\
 
 La generación procede en los pasos que siguen.
 \begin{enumerate}
-    \item Se fijan el número de mecanismos $K$, los vectores $\boldsymbol{\mu}_k$, las matrices $A_{k,\ell}$ y las funciones de asignación $q_k(\cdot)$.
+    \item Se fijan el número de mecanismos $K$, los vectores $\boldsymbol{\mu}_k$, las matrices $A_{k,\ell}$ y las funciones de asignación $\eta_k(\cdot)$.
 
     \item Se calculan las probabilidades condicionales de los mecanismos mediante \eqref{eq:ane_algC3_asignacion}, utilizando los scores de los dos rezagos anteriores.
 
-    \item Se sortea $Z_t$ a partir de dichas probabilidades. La secuencia de mecanismos no se entrega a los métodos.
+    \item Se sortea $I_t$ a partir de dichas probabilidades. La secuencia de mecanismos no se entrega a los métodos.
 
     \item Se genera $\boldsymbol{\xi}_t$ mediante \eqref{eq:ane_algC3}, con los parámetros del mecanismo seleccionado.
 
-    \item Se descartan los $B$ primeros períodos y se reconstruyen las curvas mediante \eqref{eq:ane_coef_curva}.
+    \item Se descartan los $T_{\mathrm{cal}}$ primeros períodos y se reconstruyen las curvas mediante \eqref{eq:ane_coef_curva}.
 \end{enumerate}
 
 \begin{table}[H]
 \centering
-\caption{Parámetros del Algoritmo~C-3 (coordenada estandarizada $z$).}
+\caption{Parámetros del Algoritmo~C-3 (coordenada estandarizada $\tilde{\xi}$).}
 \label{tab:ane_algC3}
 \begin{tabular}{llc}
 \hline
 Símbolo & Descripción & Valor \\
 \hline
 $K$                  & Número de mecanismos                                   & $3$ \\
-$L$                  & Número de rezagos utilizados                           & $2$ \\
+$q$                  & Número de rezagos utilizados                           & $2$ \\
 $\tilde\mu_{k1}$     & Localización del primer score, $k=1,2,3$               & $0,\ +1,\ -1$ \\
-$\tilde q_k$         & Funciones de asignación                                & \eqref{eq:ane_algC3_q} \\
+$\tilde{\eta}_k$         & Funciones de asignación                                & \eqref{eq:ane_algC3_q} \\
 $\tilde A_{k,\ell}$  & Matrices de dependencia                                & Cuadro~\ref{tab:ane_algC3_mecanismos} \\
 $\tilde\sigma_j$     & Desviación de la innovación, $j=1,\ldots,4$            & $0.45,\ 0.75,\ 0.80,\ 0.80$ \\
 \hline
@@ -328,7 +325,7 @@ El Cuadro~\ref{tab:dis_particion} presenta la partición temporal, la ventana m�
 Símbolo & Descripción & Valor \\
 \hline
 $T_0$              & Corte entrenamiento / prueba ($70\%$ de las $T = 1000$ curvas del Cuadro~\ref{tab:ane_comun}) & $700$ \\
-$h$                & Horizonte de predicción                         & $1$ \\
+Horizonte          & Pasos adelante de la predicción                 & $1$ \\
 $w$                & Anchos de la ventana móvil                      & $\{20, 30, 40\}$ \\
 $w_{\mathrm{ref}}$ & Ancho reportado en el capítulo                  & $30$ \\
 Paso               & Desplazamiento entre ventanas                   & $1$ \\
@@ -352,10 +349,10 @@ $N$                   & Truncamiento del stick-breaking                         
 $L_j$                 & Puntos de la grilla de localización por predictor       & $50$ \\
 Iteraciones           & Por cadena / descartadas                                & $2500$ / $500$ \\
 Cadenas               & Cadenas independientes por score                        & $3$ \\
-$a_\nu, a_g, b_g$     & Forma de las precisiones y de la contracción            & $0.5$ \\
+$a_\nu, a_\varkappa, b_\varkappa$ & Forma de las precisiones y de la contracción  & $0.5$ \\
 $b_\nu$               & Escala de la precisión del átomo                        & $0.5\,\mathrm{sd}^2(\xi_m)$ \\
 $\nu_{\rho_j}$        & Precisión a priori de los coeficientes de decaimiento $\rho_{hj}$ & $10\,\mathrm{sd}^2$ del predictor $j$ \\
-$(a_{\kappa_j}, b_{\kappa_j})$ & Inclusión, rezago propio de orden uno / resto      & $(0.5, 0.5)$ / $(0.5, 5)$ \\
+$(a_{\varpi_j}, b_{\varpi_j})$ & Inclusión, rezago propio de orden uno / resto      & $(0.5, 0.5)$ / $(0.5, 5)$ \\
 $S$                   & Extracciones de la predictiva por origen                & $1000$ \\
 \hline
 \end{tabular}
@@ -372,10 +369,10 @@ Los modelos de referencia siguen el Cuadro~\ref{tab:dis_referencia}. El FAR se e
 Modelo & Elemento & Valor \\
 \hline
 FAR($p$) & Orden $p$                       & Número de rezagos del escenario, fijo \\
-         & Dimensión del subespacio $k_n$  & Por predicción a un paso, tope $K$ \\
+         & Dimensión del subespacio       & Por predicción a un paso, tope $J$ \\
          & Tramo de selección              & Último $20\%$ del entrenamiento \\
          & Intervalo                       & Gaussiano, residuos de entrenamiento, $\sigma(\tau)$ \\
-Random Forest & Árboles / hojas mínimas / covariables por corte & $500$ / $5$ / $\sqrt{p}$ \\
+Random Forest & Árboles / hojas mínimas / covariables por corte & $500$ / $5$ / $\sqrt{d}$ \\
          & Orden de rezago                 & Por error absoluto en ventanas de entrenamiento \\
 \hline
 \end{tabular}
@@ -395,12 +392,12 @@ RMSE, MAE & Esperanza, mediana puntual, átomo más probable & FAR, Random Fores
 RMSE, MAE (solo C-2) & Pronóstico por comportamiento (Sección~\ref{03_06_03_descripcion}) y mejor comportamiento (cota) & FAR, Random Forest, por separado \\
 $\overline{\mathrm{E}}_{\max}$, $\mathrm{E}_{\max}^{\mathrm{glob}}$ (anexo) & Esperanza en los cuadros; los tres predictores en las figuras & FAR, Random Forest \\
 Winkler, MPIW, PICP & Intervalo equi-colas, banda simultánea, región de máxima densidad & FAR \\
-$\overline{W}_{\max}$, $W_{\max}^{\mathrm{glob}}$, PICPB (anexo) & Los mismos intervalos & FAR \\
+$\overline{\mathrm{W}}_{\max}$, $\mathrm{W}_{\max}^{\mathrm{glob}}$, PICPB (anexo) & Los mismos intervalos & FAR \\
 \hline
 \end{tabular}
 \end{table}
 
-El Cuadro~\ref{tab:dis_comportamientos} fija las constantes del análisis de comportamientos, que se evalúan solo en C-2. La ventana de detalle de $N_{\mathrm{det}}$ orígenes consecutivos de prueba es la de más cambios de régimen verdadero, calculado sobre lo que el generador registra y nunca sobre lo predicho. El pronóstico por comportamiento y su cota se comparan con la esperanza, el FAR y el Random Forest, sobre todos los orígenes de prueba y sobre los de $K_t \geq 2$, y el acierto de la elección se lee por tramos de $p_{t,c^{*}}$.
+El Cuadro~\ref{tab:dis_comportamientos} fija las constantes del análisis de comportamientos, que se evalúan solo en C-2. La ventana de detalle de $N_{\mathrm{det}}$ orígenes consecutivos de prueba es la de más cambios de régimen verdadero, calculado sobre lo que el generador registra y nunca sobre lo predicho. El pronóstico por comportamiento y su cota se comparan con la esperanza, el FAR y el Random Forest, sobre todos los orígenes de prueba y sobre los de $K_t \geq 2$, y el acierto de la elección se lee por tramos de $p_{t,k^{*}}$.
 
 \begin{table}[H]
 \centering\small

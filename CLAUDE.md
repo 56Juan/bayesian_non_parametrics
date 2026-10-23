@@ -751,5 +751,6 @@ en disco de 101 y 102), 30, 29, `avance_tesis_1`, `real_sa1_precio_v02` (27, 2.3
   medoide se calcula y no se reporta; la MBD se eliminó del código. El diseño del estudio (§03_07) es una introducción general más `tab:dis_escenarios` (rezago
   propio o cruzado por escenario, `M_ref = 10`, 6 en C-3); la configuración (partición, muestreador,
   referencias, métricas por resumen, constantes de comportamientos) vive en el Anexo
-  `ane_00_03_configuracion` (2026-10-12); el pronóstico por comportamiento vive en §03_06_03 y la
-  cota sólo en el diseño; sin control de extracciones al azar.
+  `ane_00_03_configuracion` (2026-10-12); el pronóstico por comportamiento y su cota (el mejor
+  comportamiento, `eq:mejor_comportamiento`) viven en §03_06_03 (decisión 2026-10-23; antes la cota
+  sólo se nombraba en el diseño); sin control de extracciones al azar.

@@ -5,7 +5,7 @@
 % Cuadros desde reports/reales/real_trafico_10{1,2}_v01_barrido_M/{98,99}_* y desde los .npz del _04;
 % figuras de §3, §5 y §6 redibujadas con el estilo del Capítulo 3 (scratchpad figuras_trafico.py); el resto, del _01/_04.
 
-Este anexo reúne los resultados de la aplicación al tráfico del Capítulo~\ref{04_00_00_aplicacion} que no se reportan en el cuerpo, para las dos especificaciones que se comparan: la que usa el rezago de un día, $\{1\}$, y la que agrega el de una semana, $\{1,7\}$. Salvo indicación, las cifras corresponden a $M = 10$, al bloque de prueba y a la ventana móvil de ancho $w = 30$.
+Este anexo reúne los resultados de la aplicación al tráfico del Capítulo~\ref{04_00_00_aplicacion} que no se reportan en el cuerpo, para las dos especificaciones que se comparan, la que usa el rezago de un día, $\{1\}$, y la que agrega el de una semana, $\{1,7\}$. Salvo indicación, las cifras corresponden a $M = 10$, al bloque de prueba y a la ventana móvil de ancho $w = 30$.
 
 \section{Configuración de la aplicación}
 \label{aneC_00_01_configuracion}
@@ -23,13 +23,13 @@ Elemento & Descripción & Valor \\
 Datos & Metro Interstate Traffic Volume (UCI), estación ATR 301, I-94 oeste & Volumen horario, miles de veh./h \\
 Ventana & Días de la serie / horas por día & 1 jul 2015 a 30 sep 2018, $T = 1188$ / $G = 24$ \\
 Partición & Entrenamiento / prueba & 831 / 357 días ($T_0 = 831$) \\
-Representación & B-spline cúbica ajustada a las horas observadas & $K = 10$ \\
+Representación & B-spline cúbica ajustada a las horas observadas & $J = 10$ \\
 FPCA & Componentes retenidas, estimadas en entrenamiento & $M = 10$ \\
-Covariables & Scores de $t-1$ / de $t-1$ y $t-7$ & $p = 10$ / $p = 20$ \\
+Covariables & Scores de $t-1$ / de $t-1$ y $t-7$ & $d = 10$ / $d = 20$ \\
 $N$, $L_j$ & Truncamiento y grilla de localización & $30$, $50$ \\
 Muestreador & Cadenas / iteraciones / descartadas & $1$ / $2500$ / $1000$ \\
-$a_\nu$, $a_g$, $b_g$ & Forma de las precisiones y de la contracción & $2$, $0.5$, $0.5$ \\
-$(a_{\kappa_j}, b_{\kappa_j})$ & Inclusión, todos los rezagos & $(1, 5)$ \\
+$a_\nu$, $a_\varkappa$, $b_\varkappa$ & Forma de las precisiones y de la contracción & $2$, $0.5$, $0.5$ \\
+$(a_{\varpi_j}, b_{\varpi_j})$ & Inclusión, todos los rezagos & $(1, 5)$ \\
 FAR($p$) & Orden igual al mayor rezago & $p = 1$ / $p = 7$ \\
 Random Forest & Rezagos elegidos con el entrenamiento & Entre $\{1\}$ y $\{1,7\}$ \\
 Ventana de detalle & Diez días con más días no laborables & 23 dic 2017 a 1 ene 2018 ($t = 907$ a $916$) \\
@@ -62,7 +62,7 @@ La serie diaria, sus momentos, la representación en la base B-spline y la FPCA 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth,height=0.7\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_06_fts_funcional_bspline.png}
-\caption{Curvas diarias en la base B-spline con $K = 10$.}
+\caption{Curvas diarias en la base B-spline con $J = 10$.}
 \label{fig:aneC_06_fts_funcional_bspline}
 \end{figure}
 
@@ -105,7 +105,7 @@ Las diez métricas del Marco Teórico en el bloque de prueba, como promedio sobr
 \label{tab:aneC_A}
 \begin{tabular}{l l cccc}
 \hline
-Rezagos & Modelo & MAE & RMSE & $\overline{E}_{\max}$ & $E_{\max}^{\mathrm{glob}}$ \\
+Rezagos & Modelo & MAE & RMSE & $\overline{\mathrm{E}}_{\max}$ & $\mathrm{E}_{\max}^{\mathrm{glob}}$ \\
 \hline
 $\{1\}$   & PSBPM-FD, esperanza          & 0.413 & 0.646 & 1.241 & 3.347 \\
           & PSBPM-FD, mediana puntual    & 0.376 & 0.658 & 1.147 & 3.999 \\
@@ -130,7 +130,7 @@ $\{1,7\}$ & PSBPM-FD, esperanza          & 0.315 & 0.522 & 0.906 & 3.367 \\
 \label{tab:aneC_B}
 \begin{tabular}{l l cccccc}
 \hline
-Rezagos & Banda & MPIW & PICP & PICPB & Winkler & $\overline{W}_{\max}$ & $W_{\max}^{\mathrm{glob}}$ \\
+Rezagos & Banda & MPIW & PICP & PICPB & Winkler & $\overline{\mathrm{W}}_{\max}$ & $\mathrm{W}_{\max}^{\mathrm{glob}}$ \\
 \hline
 $\{1\}$   & Equi-colas      & 2.124 & 0.961 & 0.731 & 2.734 & 7.845 & 43.392 \\
           & Máxima densidad & 1.995 & 0.960 & 0.742 & 2.669 & 7.422 & 46.019 \\
@@ -504,14 +504,14 @@ Complementa la Sección~\ref{04_03_05_seleccion} con las autofunciones de la FPC
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth,height=0.45\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_autofunciones.png}
-\caption{Curva media del bloque de entrenamiento y su perturbación $\mu \pm 2\sqrt{\lambda_m}\,\psi_m$ a lo largo de las cuatro primeras autofunciones, con la fracción de varianza que explica cada una.}
+\caption{Curva media del bloque de entrenamiento y su perturbación $\mu \pm 2\sqrt{\lambda_m}\,v_m$ a lo largo de las cuatro primeras autofunciones, con la fracción de varianza que explica cada una.}
 \label{fig:aneC_autofunciones}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth,height=0.6\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_autofunciones_menores.png}
-\caption{Curva media del bloque de entrenamiento y su perturbación $\mu \pm 2\sqrt{\lambda_m}\,\psi_m$ a lo largo de las autofunciones $5$ a $10$.}
+\caption{Curva media del bloque de entrenamiento y su perturbación $\mu \pm 2\sqrt{\lambda_m}\,v_m$ a lo largo de las autofunciones $5$ a $10$.}
 \label{fig:aneC_autofunciones_menores}
 \end{figure}
 
@@ -542,4 +542,4 @@ $\xi_{t10}$ & 0.1  & 14.2 & 2 & 0.14 & 29.1 & 10 & 10 & 0.86 \\
 \end{tabular}
 \end{table}
 
-El Cuadro~\ref{tab:aneC_pip} separa dos situaciones. Con el rezago de un día las mezclas de los scores menores son escasas aunque ocupen muchos átomos: las de los scores $6$, $7$, $8$ y $10$ incluyen solo dos covariables, su propio rezago y el de un score principal (el cuarto en el sexto, el primero en el séptimo y el octavo, y el tercero en el décimo), y dejan las demás en $0.47$ o menos. Con el rezago semanal, en cambio, las mezclas del tercer score y de los scores $6$ a $10$ ocupan entre 20 y 30 átomos y todas sus covariables superan $0.5$, con mínimos entre $0.67$ y $0.94$. La selección escasa se conserva solo en las mezclas que usan pocos átomos, las de los scores $1$, $2$ y $5$, con $N_1$ entre 10 y 15. La PIP de las mezclas que llenan el truncamiento refleja el número de átomos ocupados más que la relevancia de cada covariable, y por eso no se interpreta.
+El Cuadro~\ref{tab:aneC_pip} separa dos situaciones. Con el rezago de un día las mezclas de los scores menores son escasas aunque ocupen muchos átomos, pues las de los scores $6$, $7$, $8$ y $10$ incluyen solo dos covariables, su propio rezago y el de un score principal (el cuarto en el sexto, el primero en el séptimo y el octavo, y el tercero en el décimo), y dejan las demás en $0.47$ o menos. Con el rezago semanal, en cambio, las mezclas del tercer score y de los scores $6$ a $10$ ocupan entre 20 y 30 átomos y todas sus covariables superan $0.5$, con mínimos entre $0.67$ y $0.94$. La selección escasa se conserva solo en las mezclas que usan pocos átomos, las de los scores $1$, $2$ y $5$, con $N_1$ entre 10 y 15. La PIP de las mezclas que llenan el truncamiento refleja el número de átomos ocupados más que la relevancia de cada covariable, y por eso no se interpreta.

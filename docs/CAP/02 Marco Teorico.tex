@@ -275,7 +275,7 @@ donde $\mathrm{VE}^{\star} \in (0,1)$ es el umbral de varianza explicada (por ej
 
 En la implementación, las funciones propias $\{v_m\}$ y los valores propios $\{\lambda_m\}$ se estiman a partir de la función de covarianza empírica calculada sobre las curvas suavizadas mediante B-splines. Cuando las curvas se representan en el sistema B-spline, $X_i(\tau) \approx \sum_{j=1}^{J} b_{ij}\, B_{j,r}(\tau)$, la descomposición espectral del operador $\mathcal{C}$ no se reduce a un problema de autovalores ordinario sobre los coeficientes, sino a un problema de autovalores generalizado
 \begin{equation}\label{eq:eigen_generalizado}
-    \mathbf{C}\,\mathbf{u} = \lambda\,\mathbf{G}\,\mathbf{u},
+    \mathbf{C}\,\mathbf{v} = \lambda\,\mathbf{G}\,\mathbf{v},
 \end{equation}
 donde $\mathbf{C}$ es la matriz de covarianza de los coeficientes B-spline y $\mathbf{G}$ la matriz de Gram del sistema (Sección~\ref{02_01_03_bsplines}). La presencia de $\mathbf{G}$ constituye la corrección por la no ortonormalidad del sistema, pues garantiza que las funciones propias estimadas sean ortonormales en la métrica de $L^2(\mathcal{T})$ y no en la métrica euclídea de los coeficientes.\\
 
@@ -375,7 +375,7 @@ celda lineal y estable.}
 \label{tab:limitaciones}
 \end{table}
 
-En primer lugar, estos modelos son temporalmente homogéneos: los operadores $\Psi_\ell$ y $\Theta_\ell$ son fijos, de modo que una misma dinámica rige el comportamiento del sistema en todos los períodos. Este supuesto resulta restrictivo cuando el proceso exhibe regímenes diferenciados o cambios estructurales, es decir, cuando la relación entre el presente y el pasado se altera a lo largo del tiempo (columna derecha del Cuadro~\ref{tab:limitaciones}).\\
+En primer lugar, estos modelos son temporalmente homogéneos, ya que los operadores $\Psi_\ell$ y $\Theta_\ell$ son fijos, de modo que una misma dinámica rige el comportamiento del sistema en todos los períodos. Este supuesto resulta restrictivo cuando el proceso exhibe regímenes diferenciados o cambios estructurales, es decir, cuando la relación entre el presente y el pasado se altera a lo largo del tiempo (columna derecha del Cuadro~\ref{tab:limitaciones}).\\
 
 En segundo lugar, y con independencia de su homogeneidad temporal, estos modelos son lineales, es decir, la dependencia entre el presente y el pasado se restringe a combinaciones lineales de un número finito de operadores integrales. Aun cuando la dinámica fuese perfectamente estable en el tiempo, si la relación verdadera entre las observaciones es no lineal, no pertenece a esta familia y ningún valor de los núcleos permite representarla (fila inferior del Cuadro~\ref{tab:limitaciones}). El modelo incurre entonces en un error de especificación irreducible, que no se corrige con más datos, sino solo ampliando la clase de relaciones admisibles.\\
 
@@ -547,7 +547,7 @@ Dado que cada muestra se genera directamente de la condicional exacta, toda prop
 
 \subsubsection{Slice Sampling}
 \label{02_03_02_03_slice_sampling}
-El Slice Sampling es un método MCMC que evita la necesidad de especificar una distribución de propuesta explícita \citep{02_07_neal2003slice}. La idea central consiste en introducir una variable auxiliar $\upsilon$ y muestrear uniformemente de la región bajo la curva de la densidad objetivo. Formalmente, dado el valor actual $\theta^{(s)}$, el algoritmo procede en dos pasos: primero genera $\upsilon \sim \mathrm{Uniform}(0,\, p(\theta^{(s)} \mid \mathcal{D}))$, definiendo el \textit{slice} $\mathcal{Q} = \{\theta : p(\theta \mid \mathcal{D}) \geq \upsilon\}$; luego muestrea $\theta^{(s+1)} \sim \mathrm{Uniform}(\mathcal{Q})$. Al adaptarse automáticamente a la forma local de la densidad, el método evita el problema de los paseos aleatorios y reduce la autocorrelación entre muestras, lo que lo hace particularmente útil para distribuciones con geometrías complejas o mal condicionadas.
+El Slice Sampling es un método MCMC que evita la necesidad de especificar una distribución de propuesta explícita \citep{02_07_neal2003slice}. La idea central consiste en introducir una variable auxiliar $\upsilon$ y muestrear uniformemente de la región bajo la curva de la densidad objetivo. Formalmente, dado el valor actual $\theta^{(s)}$, el algoritmo procede en dos pasos, primero genera $\upsilon \sim \mathrm{Uniform}(0,\, p(\theta^{(s)} \mid \mathcal{D}))$, definiendo el \textit{slice} $\mathcal{Q} = \{\theta : p(\theta \mid \mathcal{D}) \geq \upsilon\}$; luego muestrea $\theta^{(s+1)} \sim \mathrm{Uniform}(\mathcal{Q})$. Al adaptarse automáticamente a la forma local de la densidad, el método evita el problema de los paseos aleatorios y reduce la autocorrelación entre muestras, lo que lo hace particularmente útil para distribuciones con geometrías complejas o mal condicionadas.
 
 \section{Procesos de Dirichlet}
 \label{02_04_00_procesos_dirichlet}
@@ -572,7 +572,7 @@ Los dos parámetros admiten una lectura directa a partir de las propiedades de l
     \mathbb{E}[P(E)] = P_0(E), \qquad
     \mathrm{Var}[P(E)] = \frac{P_0(E)\,(1 - P_0(E))}{1 + c}.
 \end{equation}
-La esperanza sitúa a $P_0$ como la localización esperada de los átomos de $P$, mientras que la varianza decrece conforme $c$ aumenta, de modo que valores grandes de $c$ producen realizaciones cercanas a $P_0$ y valores pequeños generan mayor variabilidad. Además, $P$ concentra su masa en el soporte de $P_0$: si $P_0(E) > 0$ entonces $P(E) > 0$ casi seguramente, y viceversa.\\
+La esperanza sitúa a $P_0$ como la localización esperada de los átomos de $P$, mientras que la varianza decrece conforme $c$ aumenta, de modo que valores grandes de $c$ producen realizaciones cercanas a $P_0$ y valores pequeños generan mayor variabilidad. Además, $P$ concentra su masa en el soporte de $P_0$, pues si $P_0(E) > 0$ entonces $P(E) > 0$ casi seguramente, y viceversa.\\
 
 Una propiedad adicional, útil para la construcción de modelos jerárquicos, es que el DP se descompone en subprocesos independientes al restringirse a un subconjunto del espacio. Si $E$ es un conjunto medible con $P_0(E) > 0$, la restricción de $P$ al conjunto $E$, denotada $P \mid E$, sigue un $\mathrm{DP}(c P_0(E),\, P_0(\cdot \mid E))$ y es independiente de $P(E)$.
 
@@ -589,7 +589,7 @@ donde los átomos $\theta_h \overset{\mathrm{iid}}{\sim} P_0$ y los pesos $\pi_h
     \qquad V_h \overset{\mathrm{iid}}{\sim} \mathrm{Beta}(1, c).
 \end{equation}
 
-La construcción toma su nombre de la analogía con el quiebre sucesivo de un segmento de longitud unitaria: en cada paso $h$ se extrae una fracción $V_h$ del segmento restante, asignando ese fragmento como peso $\pi_h$ al átomo $\theta_h$. La suma resultante satisface $\sum_{h=1}^{\infty} \pi_h = 1$ casi seguramente.\\
+La construcción toma su nombre de la analogía con el quiebre sucesivo de un segmento de longitud unitaria, ya que en cada paso $h$ se extrae una fracción $V_h$ del segmento restante, asignando ese fragmento como peso $\pi_h$ al átomo $\theta_h$. La suma resultante satisface $\sum_{h=1}^{\infty} \pi_h = 1$ casi seguramente.\\
 
 Esta representación evidencia una propiedad estructural central del Proceso de Dirichlet, correspondiente al carácter discreto de $P$. Aun cuando $P_0$ sea una medida no atómica (por ejemplo, una distribución Normal), la suma \eqref{eq:sb_representation} concentra toda la masa de $P$ en el conjunto numerable de átomos $\{\theta_h\}_{h=1}^{\infty}$, de modo que $P$ es una medida discreta con probabilidad uno, independientemente de la continuidad de $P_0$.\\
 
@@ -736,7 +736,7 @@ Al colocar un DDP como prior sobre la familia $\{P_x\}$, siguiendo la estructura
     \{P_x : x \in \mathcal{X}\} &\sim \mathrm{DDP}.
 \end{aligned}
 \end{equation}
-La diferencia esencial respecto al modelo jerárquico del DPM reside en el segundo nivel: mientras que en el DPM los parámetros $\theta_i$ son idénticamente distribuidos, en el DDP cada $\theta_i$ se extrae de la medida $P_{x_i}$ asociada a su propia covariable $x_i$, por lo que los parámetros dejan de ser idénticamente distribuidos entre observaciones con covariables distintas. Utilizando la representación stick-breaking dependiente de la Sección~\ref{02_06_02_sb_dependiente}, el modelo puede escribirse equivalentemente como una mezcla infinita indexada por $x$:
+La diferencia esencial respecto al modelo jerárquico del DPM reside en el segundo nivel, pues mientras que en el DPM los parámetros $\theta_i$ son idénticamente distribuidos, en el DDP cada $\theta_i$ se extrae de la medida $P_{x_i}$ asociada a su propia covariable $x_i$, por lo que los parámetros dejan de ser idénticamente distribuidos entre observaciones con covariables distintas. Utilizando la representación stick-breaking dependiente de la Sección~\ref{02_06_02_sb_dependiente}, el modelo puede escribirse equivalentemente como una mezcla infinita indexada por $x$:
 \begin{equation}\label{eq:ddpm_sb}
     f(y \mid x) = \sum_{h=1}^{\infty} \pi_h(x)\, f(y \mid \theta_h(x)),
 \end{equation}
