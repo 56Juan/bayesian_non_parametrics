@@ -1103,12 +1103,13 @@ El Cuadro~\ref{tab:res_pronostico_por_M} muestra que la brecha entre la cota y e
 % Fuente: 119_acierto_por_p1.csv del _06 (test, K >= 2, M_ref). 83 de los 90 orígenes tienen p >= 0.5; los 7 restantes tienen K = 3 sin comportamiento dominante.
 \begin{table}[H]
 \centering\small
-\caption{Acierto del pronóstico por comportamiento en C-2 ($K_t \ge 2$, $M_{\mathrm{ref}}$) por tramo de la probabilidad del comportamiento elegido. La última columna es el MAE que se pierde por elegir con la probabilidad en vez de la cota, en promedio sobre los orígenes del tramo. Los siete orígenes sin comportamiento dominante no se tabulan.}
+\caption{Acierto del pronóstico por comportamiento en C-2 ($K_t \ge 2$, $M_{\mathrm{ref}}$) por tramo de la probabilidad del comportamiento elegido. La última columna es el MAE que se pierde por elegir con la probabilidad en vez de la cota, en promedio sobre los orígenes del tramo. La primera fila reúne los siete orígenes con tres o más comportamientos y ninguno dominante.}
 \label{tab:res_acierto_p1}
 \begin{tabular}{l c c c}
 \hline
 $p_{t,k^{*}}$ & Orígenes & Acierto & MAE pronóstico $-$ MAE cota \\
 \hline
+$[0, 0.5)$   & 7  & 57\%  & 0.18 \\
 $[0.5, 0.6)$ & 5  & 20\%  & 0.61 \\
 $[0.6, 0.7)$ & 11 & 36\%  & 0.28 \\
 $[0.7, 0.8)$ & 31 & 87\%  & 0.11 \\
