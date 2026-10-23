@@ -31,7 +31,7 @@ Adicionalmente, una característica distintiva de los datos funcionales es que l
 Para llevar a cabo cualquier procedimiento inferencial es necesario tratar las funciones observadas como elementos de un espacio dotado de estructura adecuada, del mismo modo que en estadística clásica los datos escalares se interpretan como elementos de la recta real $\mathbb{R}$ y los datos multivariados como elementos de un espacio euclídeo de dimensión finita.
 
 \begin{definition}[\textbf{Variable funcional aleatoria}]
-    Una variable aleatoria $X$ se denomina variable funcional aleatoria si toma valores en un espacio de dimensión infinita, o espacio funcional, \cite{02_01_ferraty2006nonparametric}.
+    Una variable aleatoria $X$ se denomina variable funcional aleatoria si toma valores en un espacio de dimensión infinita, o espacio funcional \citep{02_01_ferraty2006nonparametric}.
 \end{definition}
 
 Una realización $\chi$ de $X$ corresponde a lo que se presentó anteriormente como un dato u observación funcional. La definición de variable funcional aleatoria introduce, por tanto, un objeto de dimensión infinita, lo que motiva la búsqueda de un espacio que admita una representación de dimensión finita capaz de conservar la información esencial de la curva.\\
@@ -46,22 +46,22 @@ Este espacio aporta la estructura necesaria para la representación funcional ya
 \end{equation}
 que induce una noción de norma $\|f\| = \langle f, f\rangle^{1/2}$ y de distancia $\|f_1 - f_2\|$.\\
 
-Esta geometría, análoga a la del espacio euclídeo finito-dimensional, confiere sentido a la noción de proyección y a la representación de una función mediante sus coeficientes en un sistema de base, \cite{02_01_kokoszka2017introduction}. Más aún, $L^2(\mathcal{T})$ es separable, propiedad que garantiza la existencia de una base numerable, es decir, un sistema $\{\phi_j\}_{j=1}^{\infty}$ indexado por los números naturales cuyos elementos generan todo el espacio.\\
+Esta geometría, análoga a la del espacio euclídeo finito-dimensional, confiere sentido a la noción de proyección y a la representación de una función mediante sus coeficientes en un sistema de base \citep{02_01_kokoszka2017introduction}. Más aún, $L^2(\mathcal{T})$ es separable, propiedad que garantiza la existencia de una base numerable, es decir, un sistema $\{\phi_j\}_{j=1}^{\infty}$ indexado por los números naturales cuyos elementos generan todo el espacio.\\
 
-Los sistemas de funciones empleados para representar curvas pueden clasificarse en dos categorías según su origen. Los sistemas predeterminados se definen con independencia de los datos, mediante construcciones analíticas fijadas de antemano, como las bases de Fourier, las wavelets y las B-splines, \cite{02_01_ramsay2006functional}. Los sistemas derivados de los datos, en cambio, se construyen a partir del propio proceso observado, como el sistema de funciones propias que produce el Análisis de Componentes Principales Funcional (Sección~\ref{02_01_04_fpca}). Esta clasificación es relevante porque determina tanto el mecanismo mediante el cual la representación finita aproxima a la curva como el criterio con que se elige su dimensión.\\
+Los sistemas de funciones empleados para representar curvas pueden clasificarse en dos categorías según su origen. Los sistemas predeterminados se definen con independencia de los datos, mediante construcciones analíticas fijadas de antemano, como las bases de Fourier, las wavelets y las B-splines \citep{02_01_ramsay2006functional}. Los sistemas derivados de los datos, en cambio, se construyen a partir del propio proceso observado, como el sistema de funciones propias que produce el Análisis de Componentes Principales Funcional (Sección~\ref{02_01_04_fpca}). Esta clasificación es relevante porque determina tanto el mecanismo mediante el cual la representación finita aproxima a la curva como el criterio con que se elige su dimensión.\\
 
 La forma en que una curva se representa mediante un número finito de coeficientes depende, además, de las propiedades geométricas del sistema. El caso más favorable corresponde a un sistema ortonormal completo, es decir, una base ortonormal de $L^2(\mathcal{T})$, propiedad que se define formalmente en la Sección~\ref{02_01_02_01_ortogonalidad_ortonormalidad}. Si $\{\phi_j\}_{j=1}^{\infty}$ es una base ortonormal, toda función $X_i \in L^2(\mathcal{T})$ admite la expansión
 \begin{equation}
     X_i(\tau) = \sum_{j=1}^{\infty} b_{ij}\, \phi_j(\tau),
     \qquad b_{ij} = \langle X_i, \phi_j \rangle,
 \end{equation}
-cuya serie converge a $X_i$ en la norma de $L^2(\mathcal{T})$, y la suma parcial de $J$ términos coincide con la proyección ortogonal de $X_i$ sobre el subespacio generado por $\{\phi_1, \dots, \phi_J\}$, que constituye la mejor aproximación posible dentro de dicho subespacio, \cite{02_01_kokoszka2017introduction}. En este régimen, el truncamiento
+cuya serie converge a $X_i$ en la norma de $L^2(\mathcal{T})$, y la suma parcial de $J$ términos coincide con la proyección ortogonal de $X_i$ sobre el subespacio generado por $\{\phi_1, \dots, \phi_J\}$, que constituye la mejor aproximación posible dentro de dicho subespacio \citep{02_01_kokoszka2017introduction}. En este régimen, el truncamiento
 \begin{equation}
     X_i(\tau) \approx \sum_{j=1}^{J} b_{ij}\, \phi_j(\tau)
 \end{equation}
 está plenamente justificado, con un error igual a la cola de la serie, $\bigl\| X_i - \sum_{j=1}^{J}b_{ij}\,\phi_j \bigr\|^2 = \sum_{j>J}b_{ij}^2$, que decrece monótonamente conforme aumenta $J$.\\
 
-Cabe precisar que esta garantía no se extiende de manera automática a cualquier sistema de funciones. Cuando el sistema no es ortonormal, la existencia de una expansión única y convergente con coeficientes estables requiere condiciones adicionales, y en el caso de los sistemas predeterminados de dimensión finita, el sistema no constituye una base del espacio, sino que genera un subespacio de dimensión finita. En ese régimen la representación finita no proviene de truncar una serie, sino de proyectar la curva sobre el subespacio generado, y la calidad de la aproximación mejora no al agregar términos de una serie fija, sino al enriquecer el propio subespacio, por ejemplo refinando la malla de nodos. La convergencia queda entonces garantizada por la densidad de estos subespacios en $L^2(\mathcal{T})$ conforme crece su dimensión, \cite{02_01_deboor2001practical}.\\
+Cabe precisar que esta garantía no se extiende de manera automática a cualquier sistema de funciones. Cuando el sistema no es ortonormal, la existencia de una expansión única y convergente con coeficientes estables requiere condiciones adicionales, y en el caso de los sistemas predeterminados de dimensión finita, el sistema no constituye una base del espacio, sino que genera un subespacio de dimensión finita. En ese régimen la representación finita no proviene de truncar una serie, sino de proyectar la curva sobre el subespacio generado, y la calidad de la aproximación mejora no al agregar términos de una serie fija, sino al enriquecer el propio subespacio, por ejemplo refinando la malla de nodos. La convergencia queda entonces garantizada por la densidad de estos subespacios en $L^2(\mathcal{T})$ conforme crece su dimensión \citep{02_01_deboor2001practical}.\\
 
 En cualquiera de los dos regímenes, el problema original de dimensión infinita se reduce a un vector de coeficientes $\mathbf{b}_i = (b_{i1}, \dots, b_{iJ})^\top \in \mathbb{R}^J$ que caracteriza la curva en el sistema elegido, de modo que las propiedades de dicho sistema determinan la relación entre la geometría del vector y la de la curva original. Los criterios para elegir la dimensión de la representación en sistemas predeterminados se abordan a continuación, mientras que el criterio correspondiente a los sistemas derivados de los datos se presenta en la Sección~\ref{02_01_04_03_truncamiento_componentes}.
 
@@ -99,7 +99,7 @@ Los tres criterios comparten una limitación, puesto que mejoran de forma monót
     \mathrm{GCV}_i(J) = \frac{G_i\,\mathrm{SSE}_i(J)}
     {\bigl(G_i - \mathrm{df}(J)\bigr)^{2}},
 \end{equation}
-donde $\mathrm{df}(J)$ denota los grados de libertad efectivos de la representación, y la dimensión común se elige minimizando el promedio de \eqref{eq:gcv} sobre las $n$ curvas, \cite{02_01_ramsay2006functional}. La penalización del denominador confiere al criterio un mínimo interior, lo que permite seleccionar la dimensión sin recurrir a umbrales exógenos. En conjunto, el procedimiento selecciona la dimensión mediante GCV y verifica su adecuación mediante los criterios descriptivos, favoreciendo la dimensión más pequeña compatible con una reconstrucción fiel, lo que materializa el compromiso entre fidelidad y regularidad.
+donde $\mathrm{df}(J)$ denota los grados de libertad efectivos de la representación, y la dimensión común se elige minimizando el promedio de \eqref{eq:gcv} sobre las $n$ curvas \citep{02_01_ramsay2006functional}. La penalización del denominador confiere al criterio un mínimo interior, lo que permite seleccionar la dimensión sin recurrir a umbrales exógenos. En conjunto, el procedimiento selecciona la dimensión mediante GCV y verifica su adecuación mediante los criterios descriptivos, favoreciendo la dimensión más pequeña compatible con una reconstrucción fiel, lo que materializa el compromiso entre fidelidad y regularidad.
 
 \subsection{Propiedades de las Funciones Base}
 \label{02_01_02_propiedades_funciones_base}
@@ -135,7 +135,7 @@ donde $\mathbf{G}$ es la matriz de Gram del sistema.\\
 
 La ortonormalidad corresponde, precisamente, al caso $\mathbf{G} = \mathbf{I}$, en que el sistema se desacopla y cada coeficiente se reduce a su proyección.\\
 
-La ortonormalidad incide, además, sobre la interpretación de los coeficientes. Cuando el sistema es ortonormal se verifica la identidad de Parseval, \cite{02_01_kokoszka2017introduction},
+La ortonormalidad incide, además, sobre la interpretación de los coeficientes. Cuando el sistema es ortonormal se verifica la identidad de Parseval \citep{02_01_kokoszka2017introduction},
 \begin{equation}
     \|X_i\|^2 = \sum_{j}b_{ij}^2,
 \end{equation}
@@ -158,7 +158,7 @@ La segunda condición, deseable pero no excluyente, es la ortonormalidad. Un sis
 
 \subsection{Función Base: B-splines}
 \label{02_01_03_bsplines}
-Las funciones base B-splines constituyen una familia de funciones polinomiales por tramos utilizada para suavizar observaciones discretas y obtener representaciones continuas de las curvas subyacentes, \cite{02_01_ramsay2006functional}. Su principal ventaja es la localidad, es decir, cada B-spline es no nula únicamente sobre un intervalo compacto del dominio, lo que confiere al sistema flexibilidad local y estabilidad numérica.\\
+Las funciones base B-splines constituyen una familia de funciones polinomiales por tramos utilizada para suavizar observaciones discretas y obtener representaciones continuas de las curvas subyacentes \citep{02_01_ramsay2006functional}. Su principal ventaja es la localidad, es decir, cada B-spline es no nula únicamente sobre un intervalo compacto del dominio, lo que confiere al sistema flexibilidad local y estabilidad numérica.\\
 
 Sea $\mathcal{T} = [0,1]$ el dominio funcional y sea $\boldsymbol{\kappa} = (\kappa_0, \kappa_1, \dots, \kappa_{J-r+1})$ un vector de $J-r+2$ nodos ordenados con $\kappa_0 = 0$ y $\kappa_{J-r+1} = 1$. Las B-splines de orden $r$ se definen recursivamente a partir de las funciones indicadoras, que son las de orden uno:
 \begin{equation}
@@ -203,7 +203,7 @@ El operador de covarianza $\mathcal{C}: L^2(\mathcal{T}) \to L^2(\mathcal{T})$ s
     \qquad f \in L^2(\mathcal{T}).
 \end{equation}
 
-El operador $\mathcal{C}$ reúne un conjunto de propiedades que garantizan la existencia y las cualidades de su descomposición espectral, \cite{02_02_hsing2015theoretical}. En primer lugar, es lineal, acotado y autoadjunto, pues su núcleo es simétrico, $C(\tau,\tau') = C(\tau',\tau)$, y es semidefinido positivo, ya que su forma cuadrática corresponde a una varianza, $\langle \mathcal{C}f, f\rangle = \mathrm{Var}\bigl(\langle X - \mu, f\rangle\bigr) \geq 0$ para toda $f \in L^2(\mathcal{T})$.\\
+El operador $\mathcal{C}$ reúne un conjunto de propiedades que garantizan la existencia y las cualidades de su descomposición espectral \citep{02_02_hsing2015theoretical}. En primer lugar, es lineal, acotado y autoadjunto, pues su núcleo es simétrico, $C(\tau,\tau') = C(\tau',\tau)$, y es semidefinido positivo, ya que su forma cuadrática corresponde a una varianza, $\langle \mathcal{C}f, f\rangle = \mathrm{Var}\bigl(\langle X - \mu, f\rangle\bigr) \geq 0$ para toda $f \in L^2(\mathcal{T})$.\\
 
 En segundo lugar, la condición de segundo orden implica que $C \in L^2(\mathcal{T}\times\mathcal{T})$, de modo que $\mathcal{C}$ es un operador de Hilbert--Schmidt y, en particular, compacto. Estas propiedades activan el teorema espectral para operadores compactos y autoadjuntos, el cual garantiza la existencia de una sucesión numerable de valores propios reales, con funciones propias asociadas que forman un sistema ortonormal de $L^2(\mathcal{T})$, mientras que la positividad asegura que dichos valores propios son no negativos y pueden ordenarse de forma decreciente. Finalmente, $\mathcal{C}$ es un operador nuclear, es decir, de clase traza, propiedad que se expresa en la identidad
 \begin{equation}\label{eq:traza}
@@ -213,7 +213,7 @@ En segundo lugar, la condición de segundo orden implica que $C \in L^2(\mathcal
 \end{equation}
 la cual establece que la variabilidad total del proceso se descompone exactamente en la suma de los valores propios y que dicha suma es finita, resultado que fundamenta el criterio de selección de componentes de la Sección~\ref{02_01_04_03_truncamiento_componentes}.\\
 
-Bajo la condición adicional de que $C(\tau, \tau')$ sea continua, el Teorema de Mercer \cite{02_01_mercer1909functions} refina la descomposición espectral y establece que el núcleo admite la representación
+Bajo la condición adicional de que $C(\tau, \tau')$ sea continua, el Teorema de Mercer \citet{02_01_mercer1909functions} refina la descomposición espectral y establece que el núcleo admite la representación
 \begin{equation}\label{eq:mercer}
     C(\tau, \tau') = \sum_{m=1}^{\infty} \lambda_m\, v_m(\tau)\, v_m(\tau'),
 \end{equation}
@@ -225,7 +225,7 @@ con convergencia absoluta y uniforme sobre $\mathcal{T}\times\mathcal{T}$, donde
 
 \subsubsection{Representación de Karhunen--Loève y scores FPCA}
 \label{02_01_04_02_karhunen_loeve_scores}
-La separabilidad de $L^2(\mathcal{T})$ garantiza, según se vio en la Sección~\ref{02_01_01_representacion_funcional}, que toda curva admite una expansión en una base numerable. El Teorema de Karhunen--Loève, \cite{02_01_kokoszka2017introduction}, precisa esta idea para procesos aleatorios funcionales y establece que toda variable funcional aleatoria de segundo orden puede representarse como una combinación lineal de funciones deterministas ortonormales, tomadas como las funciones propias del operador de covarianza del proceso. Estas funciones propias y su ortonormalidad provienen de la descomposición espectral establecida en la Sección~\ref{02_01_04_01_operador_covarianza}, de modo que el teorema establece la descomposición correspondiente de la variable funcional aleatoria en esa misma base. Concretamente, para una colección $\{X_i(\tau)\}$ de variables funcionales idénticamente distribuidas según el proceso, dicha expansión adopta la forma
+La separabilidad de $L^2(\mathcal{T})$ garantiza, según se vio en la Sección~\ref{02_01_01_representacion_funcional}, que toda curva admite una expansión en una base numerable. El Teorema de Karhunen--Loève \citep{02_01_kokoszka2017introduction}, precisa esta idea para procesos aleatorios funcionales y establece que toda variable funcional aleatoria de segundo orden puede representarse como una combinación lineal de funciones deterministas ortonormales, tomadas como las funciones propias del operador de covarianza del proceso. Estas funciones propias y su ortonormalidad provienen de la descomposición espectral establecida en la Sección~\ref{02_01_04_01_operador_covarianza}, de modo que el teorema establece la descomposición correspondiente de la variable funcional aleatoria en esa misma base. Concretamente, para una colección $\{X_i(\tau)\}$ de variables funcionales idénticamente distribuidas según el proceso, dicha expansión adopta la forma
 \begin{equation}\label{eq:kl}
     X_i(\tau) = \mu(\tau) + \sum_{m=1}^{\infty}
     \xi_{im}\, v_m(\tau),
@@ -236,12 +236,12 @@ donde los coeficientes $\xi_{im}$, denominados scores, se obtienen mediante proy
     = \int_{\mathcal{T}}
     \bigl(X_i(\tau) - \mu(\tau)\bigr)\, v_m(\tau)\, d\tau,
 \end{equation}
-y la serie converge en media cuadrática, uniformemente en $\tau \in \mathcal{T}$ \cite{02_01_kokoszka2017introduction}, esto es,
+y la serie converge en media cuadrática, uniformemente en $\tau \in \mathcal{T}$ \citep{02_01_kokoszka2017introduction}, esto es,
 \begin{equation}
     \mathbb{E}\,\Bigl\| X_i - \mu - \sum_{m=1}^{M}\xi_{im}\,v_m \Bigr\|^2
     = \sum_{m=M+1}^{\infty}\lambda_m \xrightarrow[M \to \infty]{} 0,
 \end{equation}
-donde la cola de valores propios es finita y decreciente en virtud de la propiedad de clase traza \eqref{eq:traza}. El contenido esencial del teorema es doble. Por una parte, la expansión \eqref{eq:kl} reproduce exactamente la estructura de covarianza del proceso, pues al sustituir \eqref{eq:scores} en la covarianza se recupera la descomposición de Mercer \eqref{eq:mercer}. Por otra, los scores heredan de la ortonormalidad de $\{v_m\}$ las propiedades \cite{02_01_kokoszka2017introduction}
+donde la cola de valores propios es finita y decreciente en virtud de la propiedad de clase traza \eqref{eq:traza}. El contenido esencial del teorema es doble. Por una parte, la expansión \eqref{eq:kl} reproduce exactamente la estructura de covarianza del proceso, pues al sustituir \eqref{eq:scores} en la covarianza se recupera la descomposición de Mercer \eqref{eq:mercer}. Por otra, los scores heredan de la ortonormalidad de $\{v_m\}$ las propiedades \citep{02_01_kokoszka2017introduction}
 \begin{equation}
     \mathbb{E}[\xi_{im}] = 0,
     \qquad
@@ -299,12 +299,12 @@ Esta extensión hereda la doble naturaleza del problema. Por un lado, cada obser
 \label{02_02_01_proceso_estocastico_funcional}
 El tratamiento estadístico de una serie de tiempo funcional requiere modelar la secuencia de observaciones como la realización de un proceso estocástico cuyos estados son funciones. Un proceso estocástico funcional es, en este sentido, una familia de variables funcionales aleatorias $\{X_t,\; t \in \mathbb{Z}\}$, donde cada $X_t$ toma valores en $L^2(\mathcal{T})$.\\
 
-La ley de un proceso de esta naturaleza es un objeto sobre un espacio de dimensión infinita y no resulta manejable de forma directa. No obstante, bajo condiciones de regularidad sobre el espacio de estados, en particular, que sea un espacio métrico completo y separable (satisfecha por $L^2(\mathcal{T})$), el proceso queda completamente caracterizado por sus distribuciones finito-dimensionales, es decir, por las distribuciones conjuntas de cualquier número finito de observaciones $(X_{t_1}, \dots, X_{t_L})$ \cite{02_02_bosq2000linear}. Esta propiedad, común a todo proceso estocástico, es la que permite trabajar con colecciones finitas de curvas en lugar de con la ley completa del proceso.\\
+La ley de un proceso de esta naturaleza es un objeto sobre un espacio de dimensión infinita y no resulta manejable de forma directa. No obstante, bajo condiciones de regularidad sobre el espacio de estados, en particular, que sea un espacio métrico completo y separable (satisfecha por $L^2(\mathcal{T})$), el proceso queda completamente caracterizado por sus distribuciones finito-dimensionales, es decir, por las distribuciones conjuntas de cualquier número finito de observaciones $(X_{t_1}, \dots, X_{t_L})$ \citep{02_02_bosq2000linear}. Esta propiedad, común a todo proceso estocástico, es la que permite trabajar con colecciones finitas de curvas en lugar de con la ley completa del proceso.\\
 
 Para que la inferencia sobre la dinámica del proceso sea factible a partir de una única trayectoria observada, se requiere además que su estructura probabilística permanezca estable en el tiempo, propiedad formalizada mediante la estacionariedad.
 
 \begin{definition}[\textbf{Estacionariedad débil}]
-Un proceso $\{X_t,\; t \in \mathbb{Z}\}$ es débilmente estacionario (o estacionario de segundo orden) si su esperanza $\mathbb{E}[X_t]$ y sus covarianzas $\mathrm{Cov}(X_t, X_{t+\ell})$ no dependen de $t$ \cite{02_02_bosq2000linear}.
+Un proceso $\{X_t,\; t \in \mathbb{Z}\}$ es débilmente estacionario (o estacionario de segundo orden) si su esperanza $\mathbb{E}[X_t]$ y sus covarianzas $\mathrm{Cov}(X_t, X_{t+\ell})$ no dependen de $t$ \citep{02_02_bosq2000linear}.
 \end{definition}
 La definición establece que las dos primeras estructuras de momentos del proceso son invariantes en el tiempo; en otras palabras, la función media es constante respecto a $t$ y la dependencia entre dos observaciones depende únicamente del desfase $\ell$ que las separa, no del instante en que se midan. En el caso funcional, $\mathbb{E}[X_t]$ es una función media $\mu \in L^2(\mathcal{T})$, y $\mathrm{Cov}(X_t, X_{t+\ell})$ corresponde a la función de covarianza cruzada a desfase $\ell$,
 \begin{equation}
@@ -316,7 +316,7 @@ Esta invariancia es la que habilita la estimación de la estructura de dependenc
 
 \subsection{Modelos Funcionales Clásicos}
 \label{02_02_02_modelos_funcionales_clasicos}
-Los modelos de series de tiempo funcionales clásicos extienden los procesos AR, MA y ARMA al contexto de datos funcionales \cite{02_02_bosq2000linear}. La diferencia fundamental respecto al caso escalar es que los coeficientes reales $\psi_\ell$ y $\vartheta_\ell$ son reemplazados por operadores lineales que actúan sobre funciones en $L^2(\mathcal{T})$.
+Los modelos de series de tiempo funcionales clásicos extienden los procesos AR, MA y ARMA al contexto de datos funcionales \citep{02_02_bosq2000linear}. La diferencia fundamental respecto al caso escalar es que los coeficientes reales $\psi_\ell$ y $\vartheta_\ell$ son reemplazados por operadores lineales que actúan sobre funciones en $L^2(\mathcal{T})$.
 
 \begin{definition}[\textbf{Operador Integral}]
 Sea $\psi \in L^2(\mathcal{T} \times \mathcal{T})$. El operador $\Psi: L^2(\mathcal{T}) \to L^2(\mathcal{T})$ definido por
@@ -324,10 +324,10 @@ Sea $\psi \in L^2(\mathcal{T} \times \mathcal{T})$. El operador $\Psi: L^2(\math
     (\Psi f)(\tau) = \int_{\mathcal{T}} \psi(\tau, \tau')\, f(\tau')\, d\tau',
     \qquad f \in L^2(\mathcal{T}),
 \end{equation}
-es lineal y acotado, y se denomina operador integral con núcleo $\psi$ \cite{02_02_bosq2000linear, 02_02_hsing2015theoretical}. En el contexto de series de tiempo funcionales, estos operadores generalizan los coeficientes escalares de los modelos clásicos.
+es lineal y acotado, y se denomina operador integral con núcleo $\psi$ \citep{02_02_bosq2000linear, 02_02_hsing2015theoretical}. En el contexto de series de tiempo funcionales, estos operadores generalizan los coeficientes escalares de los modelos clásicos.
 \end{definition}
 
-\begin{definition}[\textbf{Proceso Autorregresivo Funcional FAR($p$)}] Un proceso estocástico funcional $\{X_t(\tau)\}$ sigue un modelo autorregresivo funcional de orden $p$, denotado $\mathrm{FAR}(p)$, si satisface \cite{02_02_bosq2000linear, 02_02_aue2015prediction}:
+\begin{definition}[\textbf{Proceso Autorregresivo Funcional FAR($p$)}] Un proceso estocástico funcional $\{X_t(\tau)\}$ sigue un modelo autorregresivo funcional de orden $p$, denotado $\mathrm{FAR}(p)$, si satisface \citep{02_02_bosq2000linear, 02_02_aue2015prediction}:
 \begin{equation}
     X_t(\tau) = \sum_{\ell=1}^{p} \int_{\mathcal{T}} \psi_\ell(\tau, \tau')\,
     X_{t-\ell}(\tau')\, d\tau' + \varepsilon_t(\tau),
@@ -335,7 +335,7 @@ es lineal y acotado, y se denomina operador integral con núcleo $\psi$ \cite{02
 donde $\psi_\ell(\tau, \tau')$ es el núcleo del operador autorregresivo $\Psi_\ell$, para $\ell = 1, \dots, p$, y $\{\varepsilon_t(\tau)\}$ es un proceso de ruido blanco funcional. Este modelo generaliza el proceso $\mathrm{AR}(p)$ escalar al permitir que cada función observada en el instante $t$ dependa funcionalmente de las observaciones pasadas.
 \end{definition}
 
-\begin{definition}[\textbf{Proceso de Medias Móviles Funcional FMA($q$)}] Un proceso estocástico funcional $\{X_t(\tau)\}$ sigue un modelo de medias móviles funcional de orden $q$, denotado $\mathrm{FMA}(q)$, si satisface \cite{02_02_klepsch2017innovations}:
+\begin{definition}[\textbf{Proceso de Medias Móviles Funcional FMA($q$)}] Un proceso estocástico funcional $\{X_t(\tau)\}$ sigue un modelo de medias móviles funcional de orden $q$, denotado $\mathrm{FMA}(q)$, si satisface \citep{02_02_klepsch2017innovations}:
 \begin{equation}
     X_t(\tau) = \varepsilon_t(\tau) + \sum_{\ell=1}^{q} \int_{\mathcal{T}}
     \vartheta_\ell(\tau, \tau')\, \varepsilon_{t-\ell}(\tau')\, d\tau',
@@ -344,7 +344,7 @@ donde $\vartheta_\ell(\tau, \tau')$ es el núcleo del operador $\Theta_\ell$, pa
 \end{definition}
 
 \begin{definition}[\textbf{Proceso Autorregresivo de Medias Móviles Funcional\\ FARMA($p,q$)}]
-Un proceso estocástico funcional $\{X_t(\tau)\}$ sigue un modelo $\mathrm{FARMA}(p,q)$ si combina componentes autorregresivas y de medias móviles \cite{02_02_klepsch2017prediction}:
+Un proceso estocástico funcional $\{X_t(\tau)\}$ sigue un modelo $\mathrm{FARMA}(p,q)$ si combina componentes autorregresivas y de medias móviles \citep{02_02_klepsch2017prediction}:
 \begin{equation}
     X_t(\tau) = \sum_{\ell=1}^{p} \int_{\mathcal{T}} \psi_\ell(\tau, \tau')\,
     X_{t-\ell}(\tau')\, d\tau'
@@ -390,7 +390,7 @@ La evaluación del desempeño predictivo de un modelo de series de tiempo funcio
 \subsubsection{Esquema de evaluación temporal con ventana móvil}
 \label{02_02_03_01_esquema_evaluacion}
 
-La evaluación de modelos de series de tiempo debe considerar la dependencia temporal de las observaciones. En este contexto, una partición aleatoria de los datos en conjuntos de entrenamiento y prueba no resulta adecuada, ya que puede incorporar observaciones futuras en el conjunto utilizado para ajustar el modelo. Por esta razón, la estrategia de evaluación debe preservar el orden temporal de la serie \cite{02_02_bergmeir2012crossvalidation}.\\
+La evaluación de modelos de series de tiempo debe considerar la dependencia temporal de las observaciones. En este contexto, una partición aleatoria de los datos en conjuntos de entrenamiento y prueba no resulta adecuada, ya que puede incorporar observaciones futuras en el conjunto utilizado para ajustar el modelo. Por esta razón, la estrategia de evaluación debe preservar el orden temporal de la serie \citep{02_02_bergmeir2012crossvalidation}.\\
 
 Para evaluar el desempeño predictivo del modelo se emplea un esquema de ventana móvil, que consiste en calcular las métricas de error a lo largo de la serie en bloques de observaciones consecutivos. Una vez separados los datos en un conjunto de entrenamiento y un conjunto de prueba, se define una ventana de evaluación de longitud fija, de ancho $w$, por ejemplo $w = 30$. La ventana se sitúa inicialmente sobre las primeras observaciones del conjunto de prueba y se calcula la métrica de desempeño correspondiente; luego se desplaza un período hacia adelante y se recalcula la métrica, repitiendo el procedimiento hasta recorrer todo el conjunto de prueba. De esta manera se obtiene una secuencia de métricas que permite monitorear el desempeño del modelo a lo largo de la serie, en lugar de un único valor global, además de evaluar el deterioro en pasos futuros.
 
@@ -465,7 +465,7 @@ y su promedio en la ventana es el porcentaje de curvas completamente cubiertas:
     \mathrm{PICPB}_t.
 \end{equation}
 
-La cuarta y última es el puntaje de Winkler \cite{02_02_winkler1972decision, 02_02_gneiting2007scoring}, que combina cobertura y ancho en una única cifra, penalizando el ancho del intervalo linealmente y agregando una penalización proporcional a la distancia cuando la observación queda fuera:
+La cuarta y última es el puntaje de Winkler \citep{02_02_winkler1972decision, 02_02_gneiting2007scoring}, que combina cobertura y ancho en una única cifra, penalizando el ancho del intervalo linealmente y agregando una penalización proporcional a la distancia cuando la observación queda fuera:
 \begin{equation}
     \mathrm{W}_t(\tau) = \bigl(U_t(\tau) - L_t(\tau)\bigr)
     + \frac{2}{\zeta}\bigl(L_t(\tau) - X_t(\tau)\bigr)^{+}
@@ -489,7 +489,7 @@ El promedio del peor, $\overline{\mathrm{W}}_{\max} =
 \section{Fundamentos de Inferencia Bayesiana}
 \label{02_03_00_inferencia_bayesiana}
 
-La inferencia estadística tiene como objetivo estimar cantidades desconocidas $\theta$, denominadas parámetros, a partir de datos observados $\mathcal{D}$. El enfoque frecuentista trata $\theta$ como una cantidad fija desconocida y basa la inferencia exclusivamente en la verosimilitud de los datos. El enfoque bayesiano, en cambio, trata $\theta$ como una variable aleatoria y combina la información aportada por los datos con el conocimiento previo disponible sobre $\theta$, expresado en términos probabilísticos mediante una distribución a priori \cite{02_03_bayes1763essay}.\\
+La inferencia estadística tiene como objetivo estimar cantidades desconocidas $\theta$, denominadas parámetros, a partir de datos observados $\mathcal{D}$. El enfoque frecuentista trata $\theta$ como una cantidad fija desconocida y basa la inferencia exclusivamente en la verosimilitud de los datos. El enfoque bayesiano, en cambio, trata $\theta$ como una variable aleatoria y combina la información aportada por los datos con el conocimiento previo disponible sobre $\theta$, expresado en términos probabilísticos mediante una distribución a priori \citep{02_03_bayes1763essay}.\\
 
 Formalmente, sea $p(\theta)$ la distribución a priori que codifica el conocimiento sobre $\theta$ antes de observar los datos, y sea $p(\mathcal{D} \mid \theta)$ la función de verosimilitud que describe la probabilidad de los datos dado el parámetro. La actualización del conocimiento sobre $\theta$ tras observar $\mathcal{D}$ se realiza mediante el Teorema de Bayes:
 \begin{equation}
@@ -502,7 +502,7 @@ donde $p(\mathcal{D}) = \int_{\mathcal{E}} p(\mathcal{D} \mid \theta)\, p(\theta
 
 \subsection{Modelación Jerárquica Bayesiana}
 \label{02_03_01_modelacion_jerarquica}
-En muchas aplicaciones, la estructura del modelo admite múltiples niveles de parámetros, donde algunos parámetros dependen a su vez de otros, denominados hiperparámetros. Esta organización da lugar a los modelos jerárquicos bayesianos, en los que la distribución a priori sobre $\theta$ depende de hiperparámetros $\omega$ que también poseen una distribución a priori propia, \cite{02_03_gelman2013bda}. Formalmente, el modelo se especifica mediante tres niveles:
+En muchas aplicaciones, la estructura del modelo admite múltiples niveles de parámetros, donde algunos parámetros dependen a su vez de otros, denominados hiperparámetros. Esta organización da lugar a los modelos jerárquicos bayesianos, en los que la distribución a priori sobre $\theta$ depende de hiperparámetros $\omega$ que también poseen una distribución a priori propia \citep{02_03_gelman2013bda}. Formalmente, el modelo se especifica mediante tres niveles:
 \begin{align}
     X \mid \theta &\sim p(X \mid \theta), && \text{(datos)} \\
     \theta \mid \omega &\sim p(\theta \mid \omega), && \text{(parámetros)} \\
@@ -518,7 +518,7 @@ La estructura jerárquica permite que los parámetros compartan información a t
 \subsection{Inferencia Probabilística y Métodos MCMC}
 \label{02_03_02_inferencia_probabilistica}
 
-En modelos bayesianos de complejidad moderada o alta, la distribución a posteriori $p(\theta \mid \mathcal{D})$ raramente admite una forma analítica cerrada, en particular cuando las distribuciones a priori no son conjugadas con la verosimilitud. En estos casos, la inferencia se realiza mediante métodos de simulación basados en cadenas de Markov Monte Carlo (MCMC), los cuales construyen una cadena de Markov $\{\theta^{(1)}, \theta^{(2)}, \dots, \theta^{(S)}\}$ cuya distribución estacionaria coincide con la distribución a posteriori de interés \cite{02_07_rizzo2007statistical}.\\
+En modelos bayesianos de complejidad moderada o alta, la distribución a posteriori $p(\theta \mid \mathcal{D})$ raramente admite una forma analítica cerrada, en particular cuando las distribuciones a priori no son conjugadas con la verosimilitud. En estos casos, la inferencia se realiza mediante métodos de simulación basados en cadenas de Markov Monte Carlo (MCMC), los cuales construyen una cadena de Markov $\{\theta^{(1)}, \theta^{(2)}, \dots, \theta^{(S)}\}$ cuya distribución estacionaria coincide con la distribución a posteriori de interés \citep{02_07_rizzo2007statistical}.\\
 
 Una vez que la cadena ha alcanzado su distribución estacionaria, las muestras obtenidas pueden utilizarse para aproximar cualquier cantidad de interés posterior, como la media, la varianza o los cuantiles de $p(\theta \mid \mathcal{D})$. En la práctica, las primeras $B$ iteraciones de la cadena se descartan (período de burn-in) para eliminar la influencia de los valores iniciales. Adicionalmente, dado que muestras consecutivas de la cadena están correlacionadas, es habitual retener solo una de cada cierto número de iteraciones (thinning) con el fin de obtener un conjunto de muestras aproximadamente independientes.\\
 
@@ -526,7 +526,7 @@ A continuación se describen los tres algoritmos MCMC empleados en el posterior 
 
 \subsubsection{Algoritmo de Metropolis--Hastings}
 \label{02_03_02_01_metropolis_hastings}
-El algoritmo de Metropolis--Hastings genera muestras de una distribución objetivo, aquí la posterior $p(\theta \mid \mathcal{D})$, construyendo una cadena de Markov mediante un mecanismo de propuesta y aceptación \cite{02_07_rizzo2007statistical}. En cada iteración, se propone un candidato $\theta' \sim q(\cdot \mid \theta^{(s)})$ a partir de una distribución de propuesta $q$, y se acepta con probabilidad:
+El algoritmo de Metropolis--Hastings genera muestras de una distribución objetivo, aquí la posterior $p(\theta \mid \mathcal{D})$, construyendo una cadena de Markov mediante un mecanismo de propuesta y aceptación \citep{02_07_rizzo2007statistical}. En cada iteración, se propone un candidato $\theta' \sim q(\cdot \mid \theta^{(s)})$ a partir de una distribución de propuesta $q$, y se acepta con probabilidad:
 \begin{equation}
     a(\theta^{(s)}, \theta') = \min\!\left(1,\,
     \frac{p(\theta' \mid \mathcal{D})\, q(\theta^{(s)} \mid \theta')}
@@ -536,7 +536,7 @@ Si el candidato es rechazado, la cadena permanece en $\theta^{(s)}$. Nótese que
 
 \subsubsection{Muestreador de Gibbs}
 \label{02_03_02_02_muestreador_gibbs}
-El muestreador de Gibbs es un caso particular del algoritmo de Metropolis--Hastings aplicable cuando el vector de parámetros $\boldsymbol{\theta} = (\theta_1, \dots, \theta_{d_\theta})$ puede particionarse en bloques cuyas distribuciones condicionales completas son conocidas y tratables \cite{02_07_rizzo2007statistical}. El algoritmo actualiza cada componente $\theta_j$ muestreando de su distribución condicional completa:
+El muestreador de Gibbs es un caso particular del algoritmo de Metropolis--Hastings aplicable cuando el vector de parámetros $\boldsymbol{\theta} = (\theta_1, \dots, \theta_{d_\theta})$ puede particionarse en bloques cuyas distribuciones condicionales completas son conocidas y tratables \citep{02_07_rizzo2007statistical}. El algoritmo actualiza cada componente $\theta_j$ muestreando de su distribución condicional completa:
 \begin{equation}
     \theta_j^{(s+1)} \sim p\!\left(\theta_j \mid
     \theta_1^{(s+1)}, \dots, \theta_{j-1}^{(s+1)},
@@ -547,17 +547,17 @@ Dado que cada muestra se genera directamente de la condicional exacta, toda prop
 
 \subsubsection{Slice Sampling}
 \label{02_03_02_03_slice_sampling}
-El Slice Sampling es un método MCMC que evita la necesidad de especificar una distribución de propuesta explícita \cite{02_07_neal2003slice}. La idea central consiste en introducir una variable auxiliar $\upsilon$ y muestrear uniformemente de la región bajo la curva de la densidad objetivo. Formalmente, dado el valor actual $\theta^{(s)}$, el algoritmo procede en dos pasos: primero genera $\upsilon \sim \mathrm{Uniform}(0,\, p(\theta^{(s)} \mid \mathcal{D}))$, definiendo el \textit{slice} $\mathcal{Q} = \{\theta : p(\theta \mid \mathcal{D}) \geq \upsilon\}$; luego muestrea $\theta^{(s+1)} \sim \mathrm{Uniform}(\mathcal{Q})$. Al adaptarse automáticamente a la forma local de la densidad, el método evita el problema de los paseos aleatorios y reduce la autocorrelación entre muestras, lo que lo hace particularmente útil para distribuciones con geometrías complejas o mal condicionadas.
+El Slice Sampling es un método MCMC que evita la necesidad de especificar una distribución de propuesta explícita \citep{02_07_neal2003slice}. La idea central consiste en introducir una variable auxiliar $\upsilon$ y muestrear uniformemente de la región bajo la curva de la densidad objetivo. Formalmente, dado el valor actual $\theta^{(s)}$, el algoritmo procede en dos pasos: primero genera $\upsilon \sim \mathrm{Uniform}(0,\, p(\theta^{(s)} \mid \mathcal{D}))$, definiendo el \textit{slice} $\mathcal{Q} = \{\theta : p(\theta \mid \mathcal{D}) \geq \upsilon\}$; luego muestrea $\theta^{(s+1)} \sim \mathrm{Uniform}(\mathcal{Q})$. Al adaptarse automáticamente a la forma local de la densidad, el método evita el problema de los paseos aleatorios y reduce la autocorrelación entre muestras, lo que lo hace particularmente útil para distribuciones con geometrías complejas o mal condicionadas.
 
 \section{Procesos de Dirichlet}
 \label{02_04_00_procesos_dirichlet}
-El marco bayesiano presentado en la Sección~\ref{02_03_01_modelacion_jerarquica} requiere especificar una distribución a priori sobre los parámetros del modelo. Cuando la distribución generadora de los datos es desconocida o de forma compleja, los priors paramétricos convencionales (como una distribución Normal o Gamma) resultan insuficientes, pues restringen la inferencia a una familia distribucional de forma fija. La inferencia bayesiana no paramétrica supera esta limitación definiendo priors directamente sobre espacios de medidas de probabilidad, de modo que la complejidad del modelo pueda adaptarse automáticamente a los datos, \cite{02_04_muller2015bayesian}.\\
+El marco bayesiano presentado en la Sección~\ref{02_03_01_modelacion_jerarquica} requiere especificar una distribución a priori sobre los parámetros del modelo. Cuando la distribución generadora de los datos es desconocida o de forma compleja, los priors paramétricos convencionales (como una distribución Normal o Gamma) resultan insuficientes, pues restringen la inferencia a una familia distribucional de forma fija. La inferencia bayesiana no paramétrica supera esta limitación definiendo priors directamente sobre espacios de medidas de probabilidad, de modo que la complejidad del modelo pueda adaptarse automáticamente a los datos \citep{02_04_muller2015bayesian}.\\
 
-El Proceso de Dirichlet (DP) constituye el prior no paramétrico bayesiano más ampliamente utilizado. Introducido por \cite{02_04_ferguson1973bayesian}, define una distribución aleatoria sobre el espacio de medidas de probabilidad, de modo que sus realizaciones son distribuciones de probabilidad. Esto lo convierte en un prior natural para modelos en los que la distribución generadora de los datos es desconocida y se desea estimarla de manera flexible.
+El Proceso de Dirichlet (DP) constituye el prior no paramétrico bayesiano más ampliamente utilizado. Introducido por \citet{02_04_ferguson1973bayesian}, define una distribución aleatoria sobre el espacio de medidas de probabilidad, de modo que sus realizaciones son distribuciones de probabilidad. Esto lo convierte en un prior natural para modelos en los que la distribución generadora de los datos es desconocida y se desea estimarla de manera flexible.
 
 \subsection{Definición y propiedades}
 \label{02_04_01_propiedades_dp}
-\begin{definition}[\textbf{Proceso de Dirichlet, \cite{02_04_muller2015bayesian}}]
+\begin{definition}[\textbf{Proceso de Dirichlet, \citep{02_04_muller2015bayesian}}]
 Sea $c > 0$ un parámetro de concentración y $P_0$ una medida de probabilidad definida sobre un espacio medible $(\mathcal{E}, \mathcal{B})$. Se dice que una medida de probabilidad aleatoria $P$ sigue un Proceso de Dirichlet con parámetros $c$ y $P_0$, denotado $P \sim \mathrm{DP}(c, P_0)$, si para toda partición finita medible $\{E_1, \dots, E_L\}$ de $\mathcal{E}$ se cumple:
 \begin{equation}
     \bigl(P(E_1), \dots, P(E_L)\bigr)
@@ -579,7 +579,7 @@ Una propiedad adicional, útil para la construcción de modelos jerárquicos, es
 \subsection{Construcción Stick-Breaking}
 \label{02_04_02_stick_breaking}
 
-La representación stick-breaking, introducida por \cite{02_04_sethuraman1994constructive}, proporciona una construcción explícita de las realizaciones del DP como sumas ponderadas infinitas de masas puntuales. Si $P \sim \mathrm{DP}(c, P_0)$, entonces:
+La representación stick-breaking, introducida por \citet{02_04_sethuraman1994constructive}, proporciona una construcción explícita de las realizaciones del DP como sumas ponderadas infinitas de masas puntuales. Si $P \sim \mathrm{DP}(c, P_0)$, entonces:
 \begin{equation}\label{eq:sb_representation}
     P(\cdot) = \sum_{h=1}^{\infty} \pi_h\, \delta_{\theta_h}(\cdot),
 \end{equation}
@@ -597,7 +597,7 @@ Este carácter discreto tiene una consecuencia directa sobre cualquier muestra g
 
 \subsection{Distribución Posterior}
 \label{02_04_03_posterior_dp}
-Una propiedad central del DP es su conjugación respecto al muestreo independiente e idénticamente distribuido. Sea $X_1, \dots, X_n \mid P \overset{\mathrm{iid}}{\sim} P$ con $P \sim \mathrm{DP}(c, P_0)$. Entonces la distribución posterior de $P$ dado el conjunto de observaciones es nuevamente un Proceso de Dirichlet, \cite{02_04_muller2015bayesian}:
+Una propiedad central del DP es su conjugación respecto al muestreo independiente e idénticamente distribuido. Sea $X_1, \dots, X_n \mid P \overset{\mathrm{iid}}{\sim} P$ con $P \sim \mathrm{DP}(c, P_0)$. Entonces la distribución posterior de $P$ dado el conjunto de observaciones es nuevamente un Proceso de Dirichlet, \citep{02_04_muller2015bayesian}:
 \begin{equation}\label{eq:dp_posterior}
     P \mid X_1, \dots, X_n \;\sim\;
     \mathrm{DP}\!\left(c + n,\;\frac{c}{c+n}\,P_0
@@ -605,13 +605,13 @@ Una propiedad central del DP es su conjugación respecto al muestreo independien
 \end{equation}
 donde $\widehat{P}_n = \frac{1}{n}\sum_{i=1}^n \delta_{X_i}$ es la medida empírica de las observaciones. La medida base posterior es por tanto un promedio ponderado entre el prior $P_0$ y la evidencia empírica $\widehat{P}_n$, con pesos proporcionales a $c$ y $n$ respectivamente. El parámetro de concentración se actualiza de $c$ a $c + n$, reflejando el incremento en la precisión posterior conforme aumenta el tamaño muestral.\\
 
-La propiedad de conjugación garantiza que la inferencia sobre $P$ sea analíticamente tratable en el caso independiente e idénticamente distribuido, y constituye la base de los algoritmos de muestreo para modelos de mezcla basados en DP que se describen en la sección siguiente. Una representación alternativa de la distribución marginal, conocida como urna de Pólya de \cite{02_04_blackwell1973polya}, conduce a la misma posterior y es la base de los muestreadores de Gibbs colapsados para estos modelos.
+La propiedad de conjugación garantiza que la inferencia sobre $P$ sea analíticamente tratable en el caso independiente e idénticamente distribuido, y constituye la base de los algoritmos de muestreo para modelos de mezcla basados en DP que se describen en la sección siguiente. Una representación alternativa de la distribución marginal, conocida como urna de Pólya de \citet{02_04_blackwell1973polya}, conduce a la misma posterior y es la base de los muestreadores de Gibbs colapsados para estos modelos.
 
 \section{Mezcla de Procesos de Dirichlet}
 \label{02_05_00_mezclas_dpm}
 En la modelación jerárquica bayesiana (Sección~\ref{02_03_01_modelacion_jerarquica}) se asigna a los parámetros del modelo una distribución a priori. Sobre esa idea, la Sección~\ref{02_04_00_procesos_dirichlet} presentó el Proceso de Dirichlet como un prior flexible sobre el espacio de medidas de probabilidad, dotado de propiedades como su carácter discreto y su conjugación. Como se estableció a partir de su construcción stick-breaking (Sección~\ref{02_04_02_stick_breaking}), ese mismo carácter discreto impide emplear el DP de forma directa como modelo para datos continuos, pues sus realizaciones concentran toda la masa en un conjunto numerable de átomos.\\
 
-Para conservar la flexibilidad del prior no paramétrico sin renunciar a una densidad continua sobre los datos, surgen los modelos de Mezcla de Procesos de Dirichlet (DPM), que emplean el DP como prior sobre los parámetros de un núcleo de densidad continua, \cite{02_04_muller2015bayesian}.
+Para conservar la flexibilidad del prior no paramétrico sin renunciar a una densidad continua sobre los datos, surgen los modelos de Mezcla de Procesos de Dirichlet (DPM), que emplean el DP como prior sobre los parámetros de un núcleo de densidad continua \citep{02_04_muller2015bayesian}.
 
 \subsection{Modelo Jerárquico con DP}
 \label{02_05_01_dpm}
@@ -619,7 +619,7 @@ Sea $f(X \mid \theta)$ un núcleo de densidad continua parametrizado por $\theta
 \begin{equation}
     f_P(X) = \int_{\mathcal{E}} f(X \mid \theta)\, dP(\theta).
 \end{equation}
-Al colocar un DP como prior sobre $P$, el modelo jerárquico completo se especifica como, \cite{02_04_muller2015bayesian}:
+Al colocar un DP como prior sobre $P$, el modelo jerárquico completo se especifica como, \citep{02_04_muller2015bayesian}:
 \begin{equation}
 \begin{aligned}
     X_i \mid \theta_i &\overset{\mathrm{ind}}{\sim} f(\cdot \mid \theta_i),
@@ -640,7 +640,7 @@ El carácter discreto de las realizaciones del DP implica que los parámetros $\
 
 Sean $\theta_1^*, \dots, \theta_K^*$ los valores únicos adoptados por los $\theta_i$. Cada observación $X_i$ queda asignada al cluster $j$ mediante el indicador $S_i \in \{1, \dots, K\}$, donde $S_i = j$ si y solo si $\theta_i = \theta_j^*$; se denota $\mathcal{S}_j = \{i : S_i = j\}$ el conjunto de índices asignados al $j$-ésimo cluster y $n_j = |\mathcal{S}_j|$ su tamaño.\\
 
-La distribución condicional de asignación de una observación $X_i$ dado el resto satisface, \cite{02_05_escobar1995bayesian}:
+La distribución condicional de asignación de una observación $X_i$ dado el resto satisface, \citep{02_05_escobar1995bayesian}:
 \begin{equation}
     p(S_i = j \mid S_{-i}, X) \propto
     \begin{cases}
@@ -656,7 +656,7 @@ La inferencia en el DPM se realiza mediante algoritmos MCMC que alternan entre l
     p(\theta_j^* \mid S_1, \dots, S_n, X) \propto P_0(\theta_j^*)
     \prod_{i \in \mathcal{S}_j} f(X_i \mid \theta_j^*).
 \end{equation}
-En el caso conjugado, ambas distribuciones condicionales son analíticamente tratables y pueden muestrearse directamente mediante un muestreador de Gibbs \cite{02_05_escobar1995bayesian}. Para modelos no conjugados, \cite{02_05_neal2000markov} propone el Algoritmo~8, que introduce clusters candidatos muestreados de $P_0$ para aproximar la integral $f_0(X_i)$, evitando el requisito de conjugación.
+En el caso conjugado, ambas distribuciones condicionales son analíticamente tratables y pueden muestrearse directamente mediante un muestreador de Gibbs \citep{02_05_escobar1995bayesian}. Para modelos no conjugados, \citep{02_05_neal2000markov} propone el Algoritmo~8, que introduce clusters candidatos muestreados de $P_0$ para aproximar la integral $f_0(X_i)$, evitando el requisito de conjugación.
 
 \subsection{Aleatorización de Hiperparámetros}
 \label{02_05_04_hiperparametros}
@@ -669,7 +669,7 @@ Una especificación completamente bayesiana asigna distribuciones a priori tanto
     (\omega, c) &\sim p(\omega, c).
 \end{aligned}
 \end{equation}
-La inferencia sobre $\omega$ y $c$ se realiza de forma conjunta con el resto de los parámetros del modelo. Para el parámetro de concentración, asumiendo $c \sim \mathrm{Gamma}(a_c, b_c)$, \cite{02_05_escobar1995bayesian} proponen un esquema eficiente basado en una variable auxiliar que permite muestrear $c$ desde una mezcla de distribuciones Gamma, cuya composición depende del número de clusters activos $K$ y del tamaño muestral $n$. Para los hiperparámetros $\omega$, la actualización se incorpora como un paso adicional en el muestreador de Gibbs, muestreando desde:
+La inferencia sobre $\omega$ y $c$ se realiza de forma conjunta con el resto de los parámetros del modelo. Para el parámetro de concentración, asumiendo $c \sim \mathrm{Gamma}(a_c, b_c)$, \citet{02_05_escobar1995bayesian} proponen un esquema eficiente basado en una variable auxiliar que permite muestrear $c$ desde una mezcla de distribuciones Gamma, cuya composición depende del número de clusters activos $K$ y del tamaño muestral $n$. Para los hiperparámetros $\omega$, la actualización se incorpora como un paso adicional en el muestreador de Gibbs, muestreando desde:
 \begin{equation}
     p(\omega \mid \theta_1^*, \dots, \theta_K^*) \propto
     p(\omega) \prod_{j=1}^{K} P_0(\theta_j^* \mid \omega).
@@ -682,11 +682,11 @@ Los modelos de Mezcla de Procesos de Dirichlet desarrollados en la Sección~\ref
 La idea central es sustituir la medida aleatoria única del DPM por una familia de medidas aleatorias indexada por las covariables, conservando para cada valor de $x$ la estructura de mezcla infinita que caracteriza al DPM.
 \subsection{Procesos de Dirichlet Dependientes}
 \label{02_06_01_ddp}
-La extensión del DPM al caso condicional se formaliza mediante los Procesos de Dirichlet Dependientes (DDP), introducidos por \cite{02_06_maceachern1999dependent}. La idea consiste en reemplazar la medida de probabilidad aleatoria única $P \sim \mathrm{DP}(c, P_0)$ por una familia de medidas aleatorias indexada por las covariables,
+La extensión del DPM al caso condicional se formaliza mediante los Procesos de Dirichlet Dependientes (DDP), introducidos por \citet{02_06_maceachern1999dependent}. La idea consiste en reemplazar la medida de probabilidad aleatoria única $P \sim \mathrm{DP}(c, P_0)$ por una familia de medidas aleatorias indexada por las covariables,
 \begin{equation}
     \{P_x : x \in \mathcal{X}\},
 \end{equation}
-donde $\mathcal{X}$ denota el espacio de covariables. La construcción de \cite{02_06_maceachern1999dependent} impone que cada $P_x$ sea marginalmente un Proceso de Dirichlet, de modo que, fijado un valor $x$, se recupera exactamente la estructura del DPM. El conjunto completo de la familia, en cambio, posee una estructura de dependencia que hace que $P_x$ y $P_{x'}$ sean tanto más similares cuanto más próximos estén $x$ y $x'$ en $\mathcal{X}$. De este modo, el DDP define un prior no paramétrico sobre la aplicación $x \mapsto P_x$, permitiendo que la distribución condicional de los datos varíe de manera flexible y coherente a lo largo del espacio de predictores \cite{02_06_maceachern1999dependent}.\\
+donde $\mathcal{X}$ denota el espacio de covariables. La construcción de \citet{02_06_maceachern1999dependent} impone que cada $P_x$ sea marginalmente un Proceso de Dirichlet, de modo que, fijado un valor $x$, se recupera exactamente la estructura del DPM. El conjunto completo de la familia, en cambio, posee una estructura de dependencia que hace que $P_x$ y $P_{x'}$ sean tanto más similares cuanto más próximos estén $x$ y $x'$ en $\mathcal{X}$. De este modo, el DDP define un prior no paramétrico sobre la aplicación $x \mapsto P_x$, permitiendo que la distribución condicional de los datos varíe de manera flexible y coherente a lo largo del espacio de predictores \citep{02_06_maceachern1999dependent}.\\
 
 Mediante la representación stick-breaking de la Sección~\ref{02_04_02_stick_breaking}, la familia $\{P_x\}$ admite la forma general
 \begin{equation}\label{eq:ddp_general}
@@ -715,11 +715,11 @@ Esta estructura garantiza que, para cada valor fijo $x \in \mathcal{X}$, los pes
     \sum_{h=1}^{\infty} \mathbb{E}\bigl[\log\{1 - V_h(x)\}\bigr] = -\infty
     \qquad \text{para cada } x \in \mathcal{X},
 \end{equation}
-condición análoga a la establecida para procesos stick-breaking generales \cite{03_02_chung2009nonparametric}.\\
+condición análoga a la establecida para procesos stick-breaking generales \citep{03_02_chung2009nonparametric}.\\
 
 La elección del proceso $V_h(\cdot)$ determina las propiedades del DDP resultante y ha dado lugar a diversas formulaciones en la literatura, que se diferencian en el mecanismo mediante el cual se induce dependencia entre las variables de quiebre. \\
 
-\citet{02_06_griffin2006order} propusieron procesos que preservan el orden estocástico entre distribuciones con índices distintos, de modo que la relación de orden entre $P_x$ y $P_{x'}$ se mantiene consistente a lo largo de $\mathcal{X}$. \citet{02_06_reich2007multivariate} desarrollaron aplicaciones espaciales en las que la dependencia entre $V_h(x)$ y $V_h(x')$ se modela mediante kernels de correlación definidos sobre la distancia entre ubicaciones espaciales. \citet{02_06_dunson2008kernel} introdujeron el Kernel Stick-Breaking Process (KSBP), en el que cada variable de quiebre se pondera mediante una función kernel del predictor, permitiendo que la influencia de cada componente decaiga suavemente con la distancia en $\mathcal{X}$. Estas formulaciones comparten la flexibilidad de admitir prácticamente cualquier estructura de dependencia deseada, pero a costa de una estructura a posteriori compleja que dificulta la inferencia eficiente, en particular cuando el espacio de covariables es de dimensión moderada o alta \cite{03_02_chung2009nonparametric}. Esta limitación motiva la búsqueda de especificaciones alternativas que introduzcan dependencia en los pesos mediante una estructura que admita conjugacidad y permita el desarrollo de algoritmos de muestreo eficientes.
+\citet{02_06_griffin2006order} propusieron procesos que preservan el orden estocástico entre distribuciones con índices distintos, de modo que la relación de orden entre $P_x$ y $P_{x'}$ se mantiene consistente a lo largo de $\mathcal{X}$. \citet{02_06_reich2007multivariate} desarrollaron aplicaciones espaciales en las que la dependencia entre $V_h(x)$ y $V_h(x')$ se modela mediante kernels de correlación definidos sobre la distancia entre ubicaciones espaciales. \citet{02_06_dunson2008kernel} introdujeron el Kernel Stick-Breaking Process (KSBP), en el que cada variable de quiebre se pondera mediante una función kernel del predictor, permitiendo que la influencia de cada componente decaiga suavemente con la distancia en $\mathcal{X}$. Estas formulaciones comparten la flexibilidad de admitir prácticamente cualquier estructura de dependencia deseada, pero a costa de una estructura a posteriori compleja que dificulta la inferencia eficiente, en particular cuando el espacio de covariables es de dimensión moderada o alta \citep{03_02_chung2009nonparametric}. Esta limitación motiva la búsqueda de especificaciones alternativas que introduzcan dependencia en los pesos mediante una estructura que admita conjugacidad y permita el desarrollo de algoritmos de muestreo eficientes.
 
 \subsection{Modelos de Mezclas DDP}
 \label{02_06_03_mezclas_ddp}
@@ -749,4 +749,4 @@ Una aplicación natural del modelo de mezclas de DDP presentado en la Sección~\
 
 El interés de esta formulación reside en la naturaleza de la dependencia que admite. Los modelos clásicos (Sección~\ref{02_02_02_01_limitaciones_estructurales}) asumen que la media o la varianza condicional son funciones lineales del pasado; el DDP, en cambio, no impone ninguna forma paramétrica fija a la relación temporal, sino que permite que la distribución completa de $y_t$ (incluyendo su forma, asimetría y colas) varíe de manera no paramétrica en función del estado previo del sistema. De este modo, el enfoque cubre precisamente las situaciones que los modelos lineales no pueden representar, correspondientes a la fila no lineal del Cuadro~\ref{tab:limitaciones}.\\
 
-Esta estrategia ha sido ilustrada por \cite{02_06_quintana2022dependent} en el contexto del modelo LDDP aplicado a la serie del géiser Old Faithful, donde el predictor $x = y_{t-1}$ determina distribuciones condicionales que exhiben bimodalidad cambiante según el valor rezagado, un comportamiento que un modelo lineal no podría capturar.
+Esta estrategia ha sido ilustrada por \citep{02_06_quintana2022dependent} en el contexto del modelo LDDP aplicado a la serie del géiser Old Faithful, donde el predictor $x = y_{t-1}$ determina distribuciones condicionales que exhiben bimodalidad cambiante según el valor rezagado, un comportamiento que un modelo lineal no podría capturar.

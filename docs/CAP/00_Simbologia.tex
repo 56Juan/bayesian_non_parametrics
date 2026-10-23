@@ -1,0 +1,269 @@
+% Requiere \usepackage{longtable} en main.tex.
+\chapter*{Simbología}
+\addcontentsline{toc}{chapter}{Simbología}
+
+Cada símbolo tiene un único significado en toda la tesis. La última columna indica la sección donde se define o se usa por primera vez.
+
+\small
+\begin{longtable}{p{0.17\textwidth} p{0.66\textwidth} p{0.12\textwidth}}
+\hline
+Símbolo & Significado & Sección \\
+\hline
+\endfirsthead
+\hline
+Símbolo & Significado & Sección \\
+\hline
+\endhead
+\hline
+\endfoot
+\multicolumn{3}{l}{\textit{Índices}} \\
+\hline
+$t$ & Instante de la serie y origen de la predicción de la curva $X_t$ & \S\ref{02_02_00_series_tiempo_funcionales} \\
+$i$ & Curva de una muestra sin orden temporal, $i = 1, \dots, n$ & \S\ref{02_01_01_representacion_funcional} \\
+$j$ & Función de la base, $j = 1, \dots, J$ (Capítulo~\ref{02_00_00_fundamentos_teoricos_metodologicos}); predictor, $j = 1, \dots, d$ (Capítulo~\ref{03_00_00_mezclas_ddp_series_tiempo_funcionales}) & \\
+$m$ & Componente principal funcional, $m = 1, \dots, M$ & \S\ref{02_01_04_fpca} \\
+$h$ & Átomo de la mezcla, $h = 1, \dots, N$ & \S\ref{02_04_02_stick_breaking} \\
+$s$ & Iteración retenida del muestreador, $s = 1, \dots, S$ & \S\ref{02_03_02_inferencia_probabilistica} \\
+$g$ & Punto de la grilla del dominio, $g = 1, \dots, G$ & \S\ref{03_05_00_reconstruccion_funcional} \\
+$k$ & Comportamiento predictivo o grupo de $k$-medias, $k = 1, \dots, K$; régimen o mecanismo del generador & \S\ref{03_06_00_comportamientos} \\
+$\ell$ & Rezago o desfase temporal & \S\ref{02_02_01_proceso_estocastico_funcional} \\
+$l$ & Punto de medición de una curva; punto de la grilla de localización; átomo anterior a $h$ en el stick-breaking & \S\ref{02_01_01_01_criterios_truncamiento_representacion} \\
+\hline
+\multicolumn{3}{l}{\textit{Datos funcionales y representación}} \\
+\hline
+$\mathcal{T}$, $|\mathcal{T}|$ & Dominio de la curva, usualmente $[0,1]$, y su longitud & \S\ref{02_01_00_datos_funcionales} \\
+$\tau$, $\tau'$ & Puntos del dominio & \S\ref{02_01_00_datos_funcionales} \\
+$\chi(\tau)$ & Dato funcional, una realización & \S\ref{02_01_00_datos_funcionales} \\
+$X$ & Variable funcional aleatoria & \S\ref{02_01_01_representacion_funcional} \\
+$X_i(\tau)$, $X_t(\tau)$ & Curva observada $i$ o del instante $t$ & \S\ref{02_01_01_representacion_funcional} \\
+$L^2(\mathcal{T})$ & Espacio de funciones de cuadrado integrable sobre $\mathcal{T}$ & \S\ref{02_01_01_representacion_funcional} \\
+$\langle f_1, f_2\rangle$ & Producto interno de $L^2(\mathcal{T})$ & \S\ref{02_01_01_representacion_funcional} \\
+$\|f\|$ & Norma de $L^2(\mathcal{T})$ & \S\ref{02_01_01_representacion_funcional} \\
+$\phi_j$ & Función $j$ del sistema de base; en el generador, la base de Fourier & \S\ref{02_01_01_representacion_funcional} \\
+$J$ & Dimensión de la base & \S\ref{02_01_01_representacion_funcional} \\
+$b_{ij}$ & Coeficiente de la curva $i$ sobre $\phi_j$ & \S\ref{02_01_01_representacion_funcional} \\
+$\mathbf{b}_i$ & Vector de coeficientes de la curva $i$ & \S\ref{02_01_01_representacion_funcional} \\
+$\mathbf{G}$ & Matriz de Gram del sistema de base & \S\ref{02_01_02_01_ortogonalidad_ortonormalidad} \\
+$\mathbf{g}_i$ & Vector de proyecciones $\langle X_i, \phi_j\rangle$ & \S\ref{02_01_02_01_ortogonalidad_ortonormalidad} \\
+$\delta_{jj'}$ & Delta de Kronecker & \S\ref{02_01_02_01_ortogonalidad_ortonormalidad} \\
+$\tau_{il}$ & Punto de medición $l$ de la curva $i$ & \S\ref{02_01_01_01_criterios_truncamiento_representacion} \\
+$\mathsf{x}_{il}$ & Valor medido de la curva $i$ en $\tau_{il}$ & \S\ref{02_01_01_01_criterios_truncamiento_representacion} \\
+$G_i$ & Número de mediciones de la curva $i$ & \S\ref{02_01_01_01_criterios_truncamiento_representacion} \\
+$\widehat{X}_i^{(J)}$ & Curva $i$ reconstruida con $J$ funciones base & \S\ref{02_01_01_01_criterios_truncamiento_representacion} \\
+$\mathrm{SSE}_i(J)$ & Suma de cuadrados del error de reconstrucción de la curva $i$ & \S\ref{02_01_01_01_criterios_truncamiento_representacion} \\
+$\mathrm{VE}(J)$ & Proporción de variabilidad explicada por la reconstrucción & \S\ref{02_01_01_01_criterios_truncamiento_representacion} \\
+$\mathrm{RMSE}^{\mathrm{rec}}(J)$ & Error cuadrático medio de reconstrucción & \S\ref{02_01_01_01_criterios_truncamiento_representacion} \\
+$\mathrm{RMSE}^{\mathrm{rec}}_{\max}(J)$ & Peor error cuadrático medio de reconstrucción entre las curvas & \S\ref{02_01_01_01_criterios_truncamiento_representacion} \\
+$\mathrm{GCV}_i(J)$ & Validación cruzada generalizada de la curva $i$ & \S\ref{02_01_01_01_criterios_truncamiento_representacion} \\
+$\mathrm{df}(J)$ & Grados de libertad efectivos de la representación & \S\ref{02_01_01_01_criterios_truncamiento_representacion} \\
+$B_{j,r}^{\boldsymbol{\kappa}}$ & B-spline $j$ de orden $r$ sobre los nodos $\boldsymbol{\kappa}$ & \S\ref{02_01_03_bsplines} \\
+$r$ & Orden de la B-spline (grado $r-1$) & \S\ref{02_01_03_bsplines} \\
+$\boldsymbol{\kappa}$ & Vector de nodos de la B-spline & \S\ref{02_01_03_bsplines} \\
+$\mu(\tau)$ & Función media del proceso & \S\ref{02_01_04_01_operador_covarianza} \\
+$C(\tau, \tau')$ & Función de covarianza & \S\ref{02_01_04_01_operador_covarianza} \\
+$\mathcal{C}$ & Operador de covarianza & \S\ref{02_01_04_01_operador_covarianza} \\
+$\lambda_m$ & Valor propio $m$ del operador de covarianza, decreciente en $m$ & \S\ref{02_01_04_01_operador_covarianza} \\
+$v_m(\tau)$ & Función propia $m$ del operador de covarianza & \S\ref{02_01_04_01_operador_covarianza} \\
+$\xi_{im}$, $\xi_{tm}$ & Score $m$ de la curva $i$ o del instante $t$ & \S\ref{02_01_04_02_karhunen_loeve_scores} \\
+$\boldsymbol{\xi}_i$, $\boldsymbol{\xi}_t$ & Vector de scores $(\xi_{t1}, \dots, \xi_{tM})^\top$ de la curva $i$ o del instante $t$ & \S\ref{02_01_04_03_truncamiento_componentes} \\
+$M$ & Número de componentes principales retenidas & \S\ref{02_01_04_03_truncamiento_componentes} \\
+$\mathrm{VE}^{\star}$ & Umbral de varianza explicada para elegir $M$ & \S\ref{02_01_04_03_truncamiento_componentes} \\
+$\mathbf{C}$ & Matriz de covarianza de los coeficientes de la base & \S\ref{02_01_04_03_truncamiento_componentes} \\
+$\mathbf{v}$ & Vector propio del problema de autovalores generalizado (coeficientes de $v_m$ en la base) & \S\ref{02_01_04_03_truncamiento_componentes} \\
+$X_t^{(M)}(\tau)$ & Representación truncada de la curva con $M$ componentes & \S\ref{03_04_00_modelo_propuesto_psbpm_fd} \\
+$\tau_g$ & Punto $g$ de la grilla de evaluación del dominio & \S\ref{03_05_00_reconstruccion_funcional} \\
+$G$ & Número de puntos de la grilla del dominio & \S\ref{03_05_00_reconstruccion_funcional} \\
+\hline
+\multicolumn{3}{l}{\textit{Series de tiempo funcionales y evaluación}} \\
+\hline
+$T$ & Número de curvas de la serie & \S\ref{02_02_00_series_tiempo_funcionales} \\
+$T_0$ & Último instante del bloque de entrenamiento & \S\ref{03_04_01_esquema_inferencia} \\
+$C_\ell(\tau, \tau')$ & Función de covarianza cruzada a desfase $\ell$ & \S\ref{02_02_01_proceso_estocastico_funcional} \\
+$\Psi_\ell$ & Operador autorregresivo del rezago $\ell$ del FAR & \S\ref{02_02_02_modelos_funcionales_clasicos} \\
+$\psi_\ell(\tau, \tau')$ & Núcleo del operador $\Psi_\ell$ & \S\ref{02_02_02_modelos_funcionales_clasicos} \\
+$\Theta_\ell$ & Operador de medias móviles del rezago $\ell$ del FMA & \S\ref{02_02_02_modelos_funcionales_clasicos} \\
+$\vartheta_\ell(\tau, \tau')$ & Núcleo del operador $\Theta_\ell$ & \S\ref{02_02_02_modelos_funcionales_clasicos} \\
+$p$ & Orden del FAR($p$) & \S\ref{02_02_02_modelos_funcionales_clasicos} \\
+$q$ & Orden del FMA($q$); en el PSBPM-FD, número de rezagos del estado & \S\ref{02_02_02_modelos_funcionales_clasicos}, \S\ref{03_04_00_modelo_propuesto_psbpm_fd} \\
+$\varepsilon_t(\tau)$ & Ruido blanco funcional & \S\ref{02_02_02_modelos_funcionales_clasicos} \\
+$w$ & Ancho de la ventana móvil & \S\ref{02_02_03_01_esquema_evaluacion} \\
+$w_{\mathrm{ref}}$ & Ancho de ventana reportado en los cuadros & \S\ref{03_07_00_diseno_estudio_simulacion} \\
+$t_0$ & Primer instante de la ventana móvil & \S\ref{02_02_03_02_metricas_error} \\
+$\widehat{X}_t$ & Predicción a un paso de la curva $X_t$ & \S\ref{02_02_03_02_metricas_error} \\
+$e_t(\tau)$ & Error de predicción de la curva $X_t$ & \S\ref{02_02_03_02_metricas_error} \\
+$\mathrm{MAE}$ & Error absoluto medio funcional en la ventana & \S\ref{02_02_03_02_metricas_error} \\
+$\mathrm{RMSE}$ & Raíz del error cuadrático medio funcional en la ventana & \S\ref{02_02_03_02_metricas_error} \\
+$\mathrm{E}_{\max}(t)$ & Error máximo de la curva predicha en $t$ & \S\ref{02_02_03_02_metricas_error} \\
+$\overline{\mathrm{E}}_{\max}$ & Promedio de los errores máximos por curva en la ventana & \S\ref{02_02_03_02_metricas_error} \\
+$\mathrm{E}_{\max}^{\mathrm{glob}}$ & Máximo de los errores máximos en la ventana & \S\ref{02_02_03_02_metricas_error} \\
+$\mathrm{IC}_t(\tau)$ & Intervalo de credibilidad puntual de la curva $X_t$ & \S\ref{02_02_03_04_calibracion} \\
+$L_t(\tau)$, $U_t(\tau)$ & Extremos inferior y superior de $\mathrm{IC}_t(\tau)$ & \S\ref{02_02_03_04_calibracion} \\
+$\zeta$ & Complemento del nivel de credibilidad, $1 - \zeta$; también masa mínima de un comportamiento & \S\ref{02_02_03_04_calibracion} \\
+$\mathrm{MPIW}$ & Ancho medio del intervalo en la ventana & \S\ref{02_02_03_04_calibracion} \\
+$\mathrm{PICP}_t$, $\mathrm{PICP}$ & Fracción del dominio cubierta en la curva $t$ y su promedio en la ventana & \S\ref{02_02_03_04_calibracion} \\
+$\mathrm{PICPB}_t$, $\mathrm{PICPB}$ & Indicador de curva completamente cubierta y su promedio en la ventana & \S\ref{02_02_03_04_calibracion} \\
+$\mathrm{W}_t(\tau)$ & Puntaje de Winkler en el punto $\tau$ de la curva $t$ & \S\ref{02_02_03_04_calibracion} \\
+$\mathrm{W}_t$, $\mathrm{W}$ & Winkler integrado en la curva $t$ y su promedio en la ventana & \S\ref{02_02_03_04_calibracion} \\
+$\mathrm{W}_t^{\max}$ & Peor Winkler dentro de la curva $t$ & \S\ref{02_02_03_04_calibracion} \\
+$\overline{\mathrm{W}}_{\max}$ & Promedio de los peores Winkler por curva en la ventana & \S\ref{02_02_03_04_calibracion} \\
+$\mathrm{W}_{\max}^{\mathrm{glob}}$ & Peor Winkler de la ventana & \S\ref{02_02_03_04_calibracion} \\
+$(\cdot)^{+}$ & Parte positiva, $\max(\cdot, 0)$ & \S\ref{02_02_03_04_calibracion} \\
+$\mathbf{1}(\cdot)$ & Función indicadora & \S\ref{02_02_03_04_calibracion} \\
+\hline
+\multicolumn{3}{l}{\textit{Inferencia bayesiana y procesos de Dirichlet}} \\
+\hline
+$\theta$ & Parámetro genérico & \S\ref{02_03_00_inferencia_bayesiana} \\
+$\mathcal{D}$ & Datos observados; en el PSBPM-FD, el bloque de entrenamiento & \S\ref{02_03_00_inferencia_bayesiana} \\
+$p(\cdot)$ & Densidad a priori, a posteriori o condicional de parámetros & \S\ref{02_03_00_inferencia_bayesiana} \\
+$f(\cdot)$ & Densidad de los datos o núcleo de la mezcla & \S\ref{02_03_00_inferencia_bayesiana} \\
+$\omega$ & Hiperparámetros de un modelo jerárquico & \S\ref{02_03_01_modelacion_jerarquica} \\
+$\theta^{(s)}$ & Extracción $s$ de la cadena de Markov & \S\ref{02_03_02_inferencia_probabilistica} \\
+$S$ & Número de extracciones retenidas & \S\ref{02_03_02_inferencia_probabilistica} \\
+$B$ & Iteraciones de calentamiento descartadas del muestreador & \S\ref{02_03_02_inferencia_probabilistica} \\
+$\theta'$ & Candidato propuesto en Metropolis--Hastings & \S\ref{02_03_02_01_metropolis_hastings} \\
+$a(\theta^{(s)}, \theta')$ & Probabilidad de aceptación de Metropolis--Hastings & \S\ref{02_03_02_01_metropolis_hastings} \\
+$q(\cdot \mid \cdot)$ & Distribución de propuesta de Metropolis--Hastings & \S\ref{02_03_02_01_metropolis_hastings} \\
+$\upsilon$ & Variable auxiliar del Slice Sampling & \S\ref{02_03_02_03_slice_sampling} \\
+$\mathcal{Q}$ & Rebanada del Slice Sampling & \S\ref{02_03_02_03_slice_sampling} \\
+$P$ & Medida de probabilidad aleatoria del DP & \S\ref{02_04_01_propiedades_dp} \\
+$P_0$ & Medida base del DP & \S\ref{02_04_01_propiedades_dp} \\
+$c$ & Parámetro de concentración del DP & \S\ref{02_04_01_propiedades_dp} \\
+$\mathcal{E}$ & Espacio de parámetros, sobre el que se definen el DP y sus mezclas & \S\ref{02_03_00_inferencia_bayesiana} \\
+$\mathcal{B}$ & $\sigma$-álgebra de $\mathcal{E}$ & \S\ref{02_04_01_propiedades_dp} \\
+$E$, $\{E_1, \dots, E_L\}$ & Conjunto medible y partición finita de $\mathcal{E}$ & \S\ref{02_04_01_propiedades_dp} \\
+$L$ & Tamaño de una colección finita genérica (partición, distribuciones finito-dimensionales) & \S\ref{02_02_01_proceso_estocastico_funcional} \\
+$\theta_h$ & Átomo $h$ de la mezcla & \S\ref{02_04_02_stick_breaking} \\
+$\pi_h$ & Peso del átomo $h$ & \S\ref{02_04_02_stick_breaking} \\
+$V_h$ & Variable de quiebre $h$ del stick-breaking & \S\ref{02_04_02_stick_breaking} \\
+$\delta_{\theta}$ & Medida de Dirac en $\theta$ & \S\ref{02_04_02_stick_breaking} \\
+$\widehat{P}_n$ & Medida empírica de las observaciones & \S\ref{02_04_03_posterior_dp} \\
+$f_P$ & Densidad de la mezcla con medida mezcladora $P$ & \S\ref{02_05_01_dpm} \\
+$f_0$ & Verosimilitud marginal bajo la medida base & \S\ref{02_05_02_clusters} \\
+$\theta_i$ & Parámetro de la observación $i$ en la mezcla & \S\ref{02_05_01_dpm} \\
+$\theta_j^*$ & Valor único $j$ entre los parámetros de las observaciones & \S\ref{02_05_02_clusters} \\
+$K$ & Número de valores únicos (clusters); en $k$-medias, número de grupos & \S\ref{02_05_02_clusters}, \S\ref{03_06_01_agrupamiento} \\
+$S_i$ & Cluster o átomo asignado a la observación $i$ & \S\ref{02_05_02_clusters} \\
+$\mathcal{S}_j$ & Conjunto de observaciones asignadas al cluster $j$ & \S\ref{02_05_02_clusters} \\
+$n_j$ & Tamaño del cluster $j$ & \S\ref{02_05_02_clusters} \\
+$x$ & Covariable & \S\ref{02_06_01_ddp} \\
+$\mathcal{X}$ & Espacio de covariables & \S\ref{02_06_01_ddp} \\
+$P_x$ & Medida aleatoria dependiente de la covariable $x$ & \S\ref{02_06_01_ddp} \\
+$\pi_h(x)$ & Peso del átomo $h$ en la covariable $x$ & \S\ref{02_06_01_ddp} \\
+$V_h(x)$ & Variable de quiebre dependiente de la covariable & \S\ref{02_06_02_sb_dependiente} \\
+\hline
+\multicolumn{3}{l}{\textit{Probit stick-breaking (PSBP y PSBPM)}} \\
+\hline
+$\Phi(\cdot)$ & Función de distribución normal estándar & \S\ref{03_03_00_psbp} \\
+$\eta_h(x)$ & Predictor lineal probit del átomo $h$ & \S\ref{03_03_00_psbp} \\
+$\alpha_h$ & Intercepto probit del átomo $h$ & \S\ref{03_03_00_psbp} \\
+$g_h(x)$ & Función de regresión de los pesos del átomo $h$ & \S\ref{03_03_00_psbp} \\
+$\mu_\alpha$ & Media a priori de los interceptos $\alpha_h$ & \S\ref{03_03_00_psbp} \\
+$m_\alpha$, $\nu_\alpha$ & Media y precisión del hiperprior de $\mu_\alpha$ & \S\ref{03_03_02_esquema_inferencia_bayesiana} \\
+$\rho_{hj}$ & Coeficiente de decaimiento del átomo $h$ en el predictor $j$ & \S\ref{03_03_00_psbp} \\
+$\Gamma_{hj}$ & Localización del átomo $h$ en el predictor $j$ & \S\ref{03_03_00_psbp} \\
+$\boldsymbol{\Gamma}_h$ & Centro del átomo $h$ en el espacio de predictores & \S\ref{03_03_00_psbp} \\
+$\mu_{\rho_j}$, $\nu_{\rho_j}$ & Media y precisión a priori de $\rho_{hj}$ & \S\ref{03_03_00_psbp} \\
+$\Gamma_{jl}^*$ & Punto $l$ de la grilla de localización del predictor $j$ & \S\ref{03_03_00_psbp} \\
+$L_j$ & Tamaño de la grilla de localización del predictor $j$ & \S\ref{03_03_00_psbp} \\
+$H$ & Prior de los parámetros $(\rho_{hj}, \Gamma_{hj})$ & \S\ref{03_03_00_psbp} \\
+$\mathcal{P}_{\mathcal{X}}$ & Colección de medidas $\{P_x : x \in \mathcal{X}\}$ & \S\ref{03_03_00_psbp} \\
+$\mathcal{N}^{+}$ & Distribución normal truncada en cero por abajo & \S\ref{03_03_00_psbp} \\
+$y$ & Variable respuesta & \S\ref{03_03_01_especificacion_modelo_mezclas} \\
+$\mathbf{x}_0$ & Vector predictor con intercepto, $(1, x^\top)^\top$ & \S\ref{03_03_01_especificacion_modelo_mezclas} \\
+$d$ & Número de predictores; en el PSBPM-FD, $d = qM$ & \S\ref{03_03_01_especificacion_modelo_mezclas} \\
+$\boldsymbol{\beta}_h^*$ & Coeficientes de regresión del átomo $h$ & \S\ref{03_03_01_especificacion_modelo_mezclas} \\
+$\nu_h^*$ & Precisión del átomo $h$ & \S\ref{03_03_01_especificacion_modelo_mezclas} \\
+$\gamma_{hj}$ & Indicador de inclusión del predictor $j$ en el átomo $h$ & \S\ref{03_03_01_especificacion_modelo_mezclas} \\
+$\varpi_j$ & Probabilidad de inclusión del predictor $j$ & \S\ref{03_03_01_especificacion_modelo_mezclas} \\
+$\gamma_j$ & Indicador global de inclusión del predictor $j$ & \S\ref{03_03_01_especificacion_modelo_mezclas} \\
+$a_{\varpi_j}$, $b_{\varpi_j}$ & Parámetros de la Beta de $\varpi_j$ & \S\ref{03_03_01_especificacion_modelo_mezclas} \\
+$a_\nu$, $b_\nu$ & Forma y escala de la Gamma de la precisión $\nu_h^*$ & \S\ref{03_03_01_especificacion_modelo_mezclas} \\
+$\varkappa$ & Escalar del g-prior de los coeficientes & \S\ref{03_03_01_especificacion_modelo_mezclas} \\
+$a_\varkappa$, $b_\varkappa$ & Forma y escala de la Gamma de $\varkappa$ & \S\ref{03_03_01_especificacion_modelo_mezclas} \\
+$\boldsymbol{\Sigma}_{\gamma_h,h}$ & Covarianza a priori de $\boldsymbol{\beta}_h^*$ con los predictores incluidos & \S\ref{03_03_01_especificacion_modelo_mezclas} \\
+$\mathbf{X}_{\gamma_h,h}$ & Matriz de diseño del átomo $h$ con los predictores incluidos & \S\ref{03_03_01_especificacion_modelo_mezclas} \\
+$N$ & Nivel de truncamiento del stick-breaking & \S\ref{03_03_02_esquema_inferencia_bayesiana} \\
+$Z_{il}^*$, $Z_{il}$ & Variables latentes del aumento de datos y sus indicadores & \S\ref{03_03_02_esquema_inferencia_bayesiana} \\
+$n_h$ & Número de observaciones con $S_i \geq h$ & \S\ref{03_03_02_esquema_inferencia_bayesiana} \\
+$\tilde{n}_h$ & Número de observaciones con $S_i = h$ & \S\ref{03_03_02_esquema_inferencia_bayesiana} \\
+$d_{\gamma_h}$ & Número de predictores incluidos en el átomo $h$ & \S\ref{03_03_02_esquema_inferencia_bayesiana} \\
+\hline
+\multicolumn{3}{l}{\textit{Modelo PSBPM-FD}} \\
+\hline
+$\mathbf{z}_t$ & Estado rezagado $(\boldsymbol{\xi}_{t-1}^\top, \dots, \boldsymbol{\xi}_{t-q}^\top)^\top$ & \S\ref{03_04_00_modelo_propuesto_psbpm_fd} \\
+$z_{tj}$ & Componente $j$ del estado $\mathbf{z}_t$ & \S\ref{03_04_00_modelo_propuesto_psbpm_fd} \\
+$\pi_{hm}(\mathbf{z}_t)$ & Peso del átomo $h$ de la mezcla de la componente $m$ & \S\ref{03_04_00_modelo_propuesto_psbpm_fd} \\
+$\eta_{hm}$, $\alpha_{hm}$ & Predictor lineal probit e intercepto del átomo $h$ de la componente $m$ & \S\ref{03_04_00_modelo_propuesto_psbpm_fd} \\
+$\rho_{hmj}$, $\Gamma_{hmj}$ & Decaimiento y localización del átomo $h$ de la componente $m$ en el predictor $j$ & \S\ref{03_04_00_modelo_propuesto_psbpm_fd} \\
+$\theta_{hm}$ & Átomo $h$ de la componente $m$, $(\beta_{0,hm}^*, \boldsymbol{\beta}_{hm}^*, \nu_{hm}^*)$ & \S\ref{03_04_00_modelo_propuesto_psbpm_fd} \\
+$\mathrm{sd}_m$ & Desviación estándar del score $m$ en entrenamiento & \S\ref{03_04_01_esquema_inferencia} \\
+$\mathrm{sd}_j$ & Desviación estándar del predictor $j$ en entrenamiento & \S\ref{03_04_01_esquema_inferencia} \\
+$\boldsymbol{\Omega}_m$ & Parámetros de pesos y átomos de la mezcla de la componente $m$ & \S\ref{03_04_01_esquema_inferencia} \\
+$\boldsymbol{\Omega}_m^{(s)}$ & Extracción $s$ de $\boldsymbol{\Omega}_m$ & \S\ref{03_04_01_esquema_inferencia} \\
+\hline
+\multicolumn{3}{l}{\textit{Predictiva, predictores, intervalos y comportamientos}} \\
+\hline
+$\mu_{hm}^{(s)}$ & Media condicional del átomo $h$ de la componente $m$ en la iteración $s$ & \S\ref{03_05_01_esperanza} \\
+$\bar{\mu}_{tm}^{(s)}$ & Media de la mezcla de la componente $m$ en la iteración $s$ & \S\ref{03_05_01_esperanza} \\
+$\widehat{\mathbb{E}}[\cdot]$ & Esperanza predictiva estimada & \S\ref{03_05_01_esperanza} \\
+$h_m^{(s)}$ & Átomo elegido para la componente $m$ en la iteración $s$ & \S\ref{03_05_03_extracciones} \\
+$\xi_{tm}^{(s)}$ & Extracción $s$ del score $m$ & \S\ref{03_05_03_extracciones} \\
+$\widehat{X}_t^{(s)}$ & Extracción $s$ de la curva predicha & \S\ref{03_05_03_extracciones} \\
+$\widehat{F}_{t,g}$ & Distribución empírica de las extracciones en $\tau_g$ & \S\ref{03_05_04_01_mediana_puntual} \\
+$\widehat{X}_t^{\mathrm{med}}$ & Mediana puntual & \S\ref{03_05_04_01_mediana_puntual} \\
+$h_m^{\star(s)}$ & Átomo más probable de la componente $m$ en la iteración $s$ & \S\ref{03_05_04_02_atomo_modal} \\
+$\boldsymbol{\xi}_t^{\mathrm{mod}}$ & Vector modal de scores & \S\ref{03_05_04_02_atomo_modal} \\
+$\widehat{\sigma}_t(\tau_g)$ & Escala robusta de las extracciones en $\tau_g$ & \S\ref{03_05_05_02_banda_simultanea} \\
+$D^{(s)}$ & Desviación máxima normalizada de la extracción $s$ & \S\ref{03_05_05_02_banda_simultanea} \\
+$q_{1-\zeta}(D)$ & Cuantil $1-\zeta$ de $\{D^{(s)}\}$ & \S\ref{03_05_05_02_banda_simultanea} \\
+$\mathcal{R}_{1-\zeta}$ & Región de máxima densidad de nivel $1-\zeta$ & \S\ref{03_05_05_03_hdr} \\
+$f_\zeta$ & Umbral de densidad de la región $\mathcal{R}_{1-\zeta}$ & \S\ref{03_05_05_03_hdr} \\
+$\mathcal{G}_k$ & Grupo $k$ de $k$-medias & \S\ref{03_06_01_agrupamiento} \\
+$\bar{\boldsymbol{\xi}}_{t,k}$ & Centroide del grupo $k$ & \S\ref{03_06_01_agrupamiento} \\
+$\mathrm{SCD}_K$ & Suma de cuadrados dentro de los grupos con $K$ grupos & \S\ref{03_06_01_agrupamiento} \\
+$R^2_K$ & Fracción de varianza explicada por la partición en $K$ grupos & \S\ref{03_06_01_agrupamiento} \\
+$\mathbf{d}_t$ & Eje unitario que une los dos centroides & \S\ref{03_06_02_numero} \\
+$\widehat{f}$ & Densidad estimada por núcleo sobre la proyección & \S\ref{03_06_02_numero} \\
+$K_t$ & Número de comportamientos en el origen $t$ & \S\ref{03_06_03_descripcion} \\
+$p_{t,k}$ & Probabilidad del comportamiento $k$ en el origen $t$ & \S\ref{03_06_03_descripcion} \\
+$\widehat{X}_{t,k}$ & Curva típica del comportamiento $k$ & \S\ref{03_06_03_descripcion} \\
+$\Delta_{t,kk'}$ & Contraste entre las curvas típicas de los comportamientos $k$ y $k'$ & \S\ref{03_06_03_descripcion} \\
+$k_t^{*}$ & Comportamiento más probable en el origen $t$ & \S\ref{03_06_03_descripcion} \\
+$\widehat{X}_t^{\mathrm{mp}}$ & Pronóstico por comportamiento & \S\ref{03_06_03_descripcion} \\
+\hline
+\multicolumn{3}{l}{\textit{Estudio de simulación y aplicación}} \\
+\hline
+$M_{\mathrm{ref}}$ & Dimensión reportada en los cuadros & \S\ref{03_07_00_diseno_estudio_simulacion} \\
+$N_{\mathrm{det}}$ & Número de orígenes de la ventana de detalle & \S\ref{03_07_00_diseno_estudio_simulacion} \\
+$J_a$ & Número de scores activos del generador & \S\ref{03_07_02_escenarios} \\
+$\{1\}$, $\{1,7\}$ & Conjuntos de rezagos de las dos especificaciones del tráfico & \S\ref{04_02_00_diseno} \\
+$\widehat{R}$ & Diagnóstico de convergencia entre cadenas & \S\ref{04_02_00_diseno} \\
+$N_1$ & Índice medio del último átomo ocupado & \S\ref{04_03_05_seleccion} \\
+\hline
+\multicolumn{3}{l}{\textit{Generadores del estudio de simulación (Anexo~\ref{ane_00_00_anexo})}} \\
+\hline
+$T_{\mathrm{cal}}$ & Curvas de calentamiento descartadas por el generador & \S\ref{ane_00_01_esquema_comun} \\
+$\lambda_1$ & Varianza del primer score & \S\ref{ane_00_01_esquema_comun} \\
+$\varrho$ & Razón de decaimiento del espectro de varianzas & \S\ref{ane_00_01_esquema_comun} \\
+$\tilde{\xi}_{tj}$ & Score estandarizado, $\xi_{tj} = \sqrt{\lambda_j}\,\tilde{\xi}_{tj}$ & \S\ref{ane_00_01_esquema_comun} \\
+$\varphi_p$ & Coeficiente autorregresivo de los scores pasivos & \S\ref{ane_00_01_esquema_comun} \\
+$\varepsilon_{tj}$ & Innovación $\mathcal{N}(0,1)$ del score $j$ & \S\ref{ane_00_01_esquema_comun} \\
+$u_{tj}$ & Coordenada cruda del score activo $j$ antes de estandarizar & \S\ref{ane_00_02_01_alg_c1} \\
+$\varphi$ & Coeficiente autorregresivo de los scores activos (C-1) & \S\ref{ane_00_02_01_alg_c1} \\
+$\sigma_{tj}^2$ & Varianza condicional GARCH (C-1) & \S\ref{ane_00_02_01_alg_c1} \\
+$\Upsilon_0$, $\Upsilon_1$, $\Upsilon_2$ & Nivel, sensibilidad y persistencia del GARCH$(1,1)$ (C-1) & \S\ref{ane_00_02_01_alg_c1} \\
+$\sigma_a^2$ & Varianza incondicional de la innovación (C-1) & \S\ref{ane_00_02_01_alg_c1} \\
+$I_{tj}$ & Régimen del score $j$ en el período $t$ (C-2) & \S\ref{ane_00_02_02_alg_c2} \\
+$\mu_{kj}$, $\varphi_{kj}$, $\sigma_{kj}$ & Nivel, persistencia y escala del régimen $k$ del score $j$ (C-2) & \S\ref{ane_00_02_02_alg_c2} \\
+$u_j^{\star}$ & Umbral de régimen del score $j$ (C-2) & \S\ref{ane_00_02_02_alg_c2} \\
+$\varsigma_j$ & Ancho de la transición probit del score $j$ (C-2) & \S\ref{ane_00_02_02_alg_c2} \\
+$\mu_j^{u}$, $\sigma_j^{u}$ & Media y desviación poblacionales de $u_{tj}$ (C-2) & \S\ref{ane_00_02_02_alg_c2} \\
+$I_t$ & Mecanismo del período $t$ (C-3) & \S\ref{ane_00_02_03_alg_c3} \\
+$\boldsymbol{\mu}_k$ & Localización del mecanismo $k$ (C-3) & \S\ref{ane_00_02_03_alg_c3} \\
+$A_{k,\ell}$ & Matriz de dependencia del mecanismo $k$ en el rezago $\ell$ (C-3) & \S\ref{ane_00_02_03_alg_c3} \\
+$\eta_k(\cdot)$ & Predictor lineal del softmax del mecanismo $k$ (C-3) & \S\ref{ane_00_02_03_alg_c3} \\
+$\boldsymbol{\Lambda}^{1/2}$ & Matriz diagonal $\mathrm{diag}(\sqrt{\lambda_1}, \dots, \sqrt{\lambda_J})$ (C-3) & \S\ref{ane_00_02_03_alg_c3} \\
+$\tilde{\boldsymbol{\mu}}_k$, $\tilde{A}_{k,\ell}$, $\tilde{\eta}_k$ & Parámetros del mecanismo $k$ en la coordenada estandarizada (C-3) & \S\ref{ane_00_02_03_alg_c3} \\
+$\tilde{\sigma}_j$ & Desviación de la innovación del score $j$ en la coordenada estandarizada (C-3) & \S\ref{ane_00_02_03_alg_c3} \\
+\end{longtable}
+\normalsize
