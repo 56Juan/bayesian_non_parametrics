@@ -10,7 +10,7 @@ Todos los algoritmos especifican la dinámica directamente sobre los scores de l
 \section{Esquema común}
 \label{ane_00_01_esquema_comun}
 
-Esta sección presenta los elementos comunes a los tres algoritmos, la representación de las curvas en una base ortonormal, la grilla de observación, el espectro de varianzas de los scores y la generación de los scores pasivos. Los algoritmos se distinguen únicamente por el mecanismo que gobierna la dinámica de los scores activos presentados posteriormente.\\
+Esta sección presenta los elementos comunes a los tres algoritmos, la representación de las curvas en una base ortonormal, la grilla de observación, el espectro de varianzas de los scores y la generación de los scores pasivos. Los algoritmos se distinguen únicamente por el mecanismo que gobierna la dinámica de los scores activos, que se presentan a continuación.\\
 
 Sea $\{\phi_j\}_{j=1}^{J}$ un sistema ortonormal en $L^2([0,1])$ y sea $\mu(\tau)$ la función media. Cada curva se representa como
 \begin{equation}
@@ -64,7 +64,7 @@ $\varphi_p$     & Coeficiente autorregresivo de los scores pasivos          & $0
 
 \section{Algoritmos basados en Scores de la Representación Funcional}
 \label{ane_00_02_algoritmos_scores}
-Esta sección presenta los tres algoritmos de simulación. Cada uno describe su mecanismo generador, el rol de sus parámetros, el procedimiento de generación y los valores numéricos empleados.
+Esta sección presenta los tres algoritmos de simulación.
 
 \subsection{Algoritmo C-1: Heterocedasticidad condicional en los scores}
 \label{ane_00_02_01_alg_c1}
@@ -138,7 +138,7 @@ La media condicional es exacta,
     \mathbb{E}\bigl[u_{tj}\mid u_{t-1,j}\bigr]
     &=\Pr(I_{tj}=A\mid u_{t-1,j})\bigl(\mu_{Aj}+\varphi_{Aj}\,u_{t-1,j}\bigr)+\Pr(I_{tj}=B\mid u_{t-1,j})\bigl(\mu_{Bj}+\varphi_{Bj}\,u_{t-1,j}\bigr), \label{eq:ane_algC2_oraculo}
 \end{align}
-y se registra en cada período junto con el régimen sorteado. La dinámica usa un único rezago.\\
+y se registra en cada período junto con el régimen sorteado. El generador usa un único rezago, aunque los métodos reciben $q = 4$, como indica el Cuadro~\ref{tab:dis_escenarios}.\\
 
 El score se obtiene estandarizando $u_{tj}$ con sus momentos poblacionales $(\mu_j^{u},\sigma_j^{u})$, estimados una sola vez mediante una simulación larga, y escalando por \eqref{eq:ane_escala},
 \begin{equation}
@@ -218,7 +218,7 @@ donde $\boldsymbol{\xi}_t=(\xi_{t1},\ldots,\xi_{tJ})^\top$ es el vector de score
 La selección del mecanismo depende de los scores correspondientes a múltiples rezagos mediante
 \begin{equation}
 \label{eq:ane_algC3_asignacion}
-Pr
+\Pr
 \left(
 I_t=k
 \mid
@@ -311,7 +311,7 @@ $3$ & Nivel bajo  & $0.2$ & $0.4$ & $0.2$ & $0.2$ & $-0.5$ & $-0.3$ & $0.1$  & $
 
 \section{Configuración del estudio de simulación}
 \label{ane_00_03_configuracion}
-Esta sección recoge la configuración con que se corrió el estudio de simulación de la Sección~\ref{03_07_00_diseno_estudio_simulacion}: partición y ventana móvil, muestreador y predictiva, modelos de referencia, métricas por resumen y constantes de los comportamientos.\\
+Esta sección recoge la configuración con que se corrió el estudio de simulación de la Sección~\ref{03_07_00_diseno_estudio_simulacion}, es decir, partición y ventana móvil, muestreador y predictiva, modelos de referencia, métricas por resumen y constantes de los comportamientos.\\
 
 
 El Cuadro~\ref{tab:dis_particion} presenta la partición temporal, la ventana móvil y las referencias de los cuadros del capítulo; las ventanas que cruzan $T_0$ se excluyen de todo agregado.
@@ -350,8 +350,8 @@ $L_j$                 & Puntos de la grilla de localización por predictor      
 Iteraciones           & Por cadena / descartadas                                & $2500$ / $500$ \\
 Cadenas               & Cadenas independientes por score                        & $3$ \\
 $a_\nu, a_\varkappa, b_\varkappa$ & Forma de las precisiones y de la contracción  & $0.5$ \\
-$b_\nu$               & Escala de la precisión del átomo                        & $0.5\,\mathrm{sd}^2(\xi_m)$ \\
-$\nu_{\rho_j}$        & Precisión a priori de los coeficientes de decaimiento $\rho_{hj}$ & $10\,\mathrm{sd}^2$ del predictor $j$ \\
+$b_\nu$               & Escala de la precisión del átomo                        & $0.5\,\mathrm{sd}_m^{2}$ \\
+$\nu_{\rho_j}$        & Precisión a priori de los coeficientes de decaimiento $\rho_{hj}$ & $10\,\mathrm{sd}_j^{2}$ \\
 $(a_{\varpi_j}, b_{\varpi_j})$ & Inclusión, rezago propio de orden uno / resto      & $(0.5, 0.5)$ / $(0.5, 5)$ \\
 $S$                   & Extracciones de la predictiva por origen                & $1000$ \\
 \hline

@@ -10,7 +10,7 @@ Este anexo reúne los resultados de la aplicación al tráfico del Capítulo~\re
 \section{Configuración de la aplicación}
 \label{aneC_00_01_configuracion}
 
-El Cuadro~\ref{tab:aneC_configuracion} recoge la configuración con que se ajustaron las dos especificaciones. Lo que no se indica coincide con el estudio de simulación (Anexo~\ref{ane_00_03_configuracion}); las diferencias son la representación, que aquí se estima, el hiperparámetro de forma $a_\nu$, la inclusión a priori de los rezagos y el número de cadenas.
+El Cuadro~\ref{tab:aneC_configuracion} recoge la configuración con que se ajustaron las dos especificaciones. Lo que no se indica coincide con el estudio de simulación (Anexo~\ref{ane_00_03_configuracion}); las diferencias son la representación, que aquí se estima, las covariables, que son los diez scores rezagados y no solo el propio, el hiperparámetro de forma $a_\nu$, la inclusión a priori de los rezagos, el número de cadenas y el calentamiento.
 
 \begin{table}[H]
 \centering\small
@@ -287,7 +287,7 @@ Extractos de predicciones del bloque de prueba, la ventana de peor RMSE y los tr
 \section{Comportamientos predictivos}
 \label{aneC_00_06_comportamientos}
 
-Esta sección complementa la Sección~\ref{04_03_03_comportamientos}: el número de comportamientos a lo largo del bloque de prueba, su transición entre especificaciones, los feriados, las extracciones y el catálogo de comportamientos, y los diez orígenes de la ventana de detalle.
+Esta sección complementa la Sección~\ref{04_03_03_comportamientos} con el número de comportamientos a lo largo del bloque de prueba, su transición entre especificaciones, los feriados, las extracciones y el catálogo de comportamientos, y los diez orígenes de la ventana de detalle.
 
 % Fuente: K de comportamientos_psbp.npz y calendario de 65_comportamientos_calendario.csv (test).
 \begin{figure}[H]
@@ -297,7 +297,7 @@ Esta sección complementa la Sección~\ref{04_03_03_comportamientos}: el número
 \label{fig:aneC_Kserie}
 \end{figure}
 
-El Cuadro~\ref{tab:aneC_transicion} cruza el número de comportamientos de cada origen de prueba en las dos especificaciones. De los 256 orígenes con dos comportamientos con el rezago de un día, 139 pasan a tener uno solo al agregar el rezago semanal y 114 los conservan, mientras que solo 11 de los 101 orígenes con un comportamiento ganan un segundo.
+El Cuadro~\ref{tab:aneC_transicion} cruza el número de comportamientos de cada origen de prueba en las dos especificaciones. De los 256 orígenes con dos comportamientos con el rezago de un día, 139 pasan a tener uno solo al agregar el rezago semanal, 114 los conservan y tres pasan a tener tres, mientras que solo 11 de los 101 orígenes con un comportamiento ganan un segundo.
 
 % Fuente: K de comportamientos_psbp.npz de 101 y 102 (test, mismos 357 orígenes).
 \begin{table}[H]
