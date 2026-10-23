@@ -213,7 +213,7 @@ En segundo lugar, la condición de segundo orden implica que $C \in L^2(\mathcal
 \end{equation}
 la cual establece que la variabilidad total del proceso se descompone exactamente en la suma de los valores propios y que dicha suma es finita, resultado que fundamenta el criterio de selección de componentes de la Sección~\ref{02_01_04_03_truncamiento_componentes}.\\
 
-Bajo la condición adicional de que $C(\tau, \tau')$ sea continua, el Teorema de Mercer \citet{02_01_mercer1909functions} refina la descomposición espectral y establece que el núcleo admite la representación
+Bajo la condición adicional de que $C(\tau, \tau')$ sea continua, el Teorema de Mercer \citep{02_01_mercer1909functions} refina la descomposición espectral y establece que el núcleo admite la representación
 \begin{equation}\label{eq:mercer}
     C(\tau, \tau') = \sum_{m=1}^{\infty} \lambda_m\, v_m(\tau)\, v_m(\tau'),
 \end{equation}
@@ -225,7 +225,7 @@ con convergencia absoluta y uniforme sobre $\mathcal{T}\times\mathcal{T}$, donde
 
 \subsubsection{Representación de Karhunen--Loève y scores FPCA}
 \label{02_01_04_02_karhunen_loeve_scores}
-La separabilidad de $L^2(\mathcal{T})$ garantiza, según se vio en la Sección~\ref{02_01_01_representacion_funcional}, que toda curva admite una expansión en una base numerable. El Teorema de Karhunen--Loève \citep{02_01_kokoszka2017introduction}, precisa esta idea para procesos aleatorios funcionales y establece que toda variable funcional aleatoria de segundo orden puede representarse como una combinación lineal de funciones deterministas ortonormales, tomadas como las funciones propias del operador de covarianza del proceso. Estas funciones propias y su ortonormalidad provienen de la descomposición espectral establecida en la Sección~\ref{02_01_04_01_operador_covarianza}, de modo que el teorema establece la descomposición correspondiente de la variable funcional aleatoria en esa misma base. Concretamente, para una colección $\{X_i(\tau)\}$ de variables funcionales idénticamente distribuidas según el proceso, dicha expansión adopta la forma
+La separabilidad de $L^2(\mathcal{T})$ garantiza, según se vio en la Sección~\ref{02_01_01_representacion_funcional}, que toda curva admite una expansión en una base numerable. El Teorema de Karhunen--Loève \citep{02_01_kokoszka2017introduction} precisa esta idea para procesos aleatorios funcionales y establece que toda variable funcional aleatoria de segundo orden puede representarse como una combinación lineal de funciones deterministas ortonormales, tomadas como las funciones propias del operador de covarianza del proceso. Estas funciones propias y su ortonormalidad provienen de la descomposición espectral establecida en la Sección~\ref{02_01_04_01_operador_covarianza}, de modo que el teorema establece la descomposición correspondiente de la variable funcional aleatoria en esa misma base. Concretamente, para una colección $\{X_i(\tau)\}$ de variables funcionales idénticamente distribuidas según el proceso, dicha expansión adopta la forma
 \begin{equation}\label{eq:kl}
     X_i(\tau) = \mu(\tau) + \sum_{m=1}^{\infty}
     \xi_{im}\, v_m(\tau),
@@ -434,7 +434,7 @@ que corresponde al peor error puntual observado en toda la ventana.
 
 \subsubsection{Evaluación de los intervalos de credibilidad}
 \label{02_02_03_04_calibracion}
-Los intervalos de credibilidad $\mathrm{IC}_t(\tau) =[L_t(\tau),\, U_t(\tau)]$ al nivel $1-\zeta$ se construyen a partir de los cuantiles empíricos de las extracciones de la predictiva. Su calidad también debe ser medida.\\
+Los intervalos de credibilidad $\mathrm{IC}_t(\tau) =[L_t(\tau),\, U_t(\tau)]$ al nivel $1-\zeta$ se construyen a partir de los cuantiles empíricos de las extracciones de la predictiva, y su calidad se mide con cuatro métricas.\\
 
 En primer lugar se define el ancho medio del intervalo alrededor de la curva, que se integra sobre el dominio para cada curva y se promedia sobre la ventana:
 \begin{equation}
@@ -557,7 +557,7 @@ El Proceso de Dirichlet (DP) constituye el prior no paramétrico bayesiano más 
 
 \subsection{Definición y propiedades}
 \label{02_04_01_propiedades_dp}
-\begin{definition}[\textbf{Proceso de Dirichlet, \citep{02_04_muller2015bayesian}}]
+\begin{definition}[\textbf{Proceso de Dirichlet} \citep{02_04_muller2015bayesian}]
 Sea $c > 0$ un parámetro de concentración y $P_0$ una medida de probabilidad definida sobre un espacio medible $(\mathcal{E}, \mathcal{B})$. Se dice que una medida de probabilidad aleatoria $P$ sigue un Proceso de Dirichlet con parámetros $c$ y $P_0$, denotado $P \sim \mathrm{DP}(c, P_0)$, si para toda partición finita medible $\{E_1, \dots, E_L\}$ de $\mathcal{E}$ se cumple:
 \begin{equation}
     \bigl(P(E_1), \dots, P(E_L)\bigr)
@@ -567,7 +567,7 @@ Sea $c > 0$ un parámetro de concentración y $P_0$ una medida de probabilidad d
 
 La definición caracteriza al DP a través del comportamiento de $P$ sobre particiones del espacio. Dada cualquier partición finita $\{E_1, \dots, E_L\}$, las masas que $P$ asigna a cada bloque, $\bigl(P(E_1), \dots, P(E_L)\bigr)$, forman un vector aleatorio de componentes no negativas que suman uno, con distribución de Dirichlet finita. Esta condición debe cumplirse simultáneamente para toda partición posible, lo que determina por completo la ley de $P$ como medida de probabilidad aleatoria. En otras palabras, el DP no especifica directamente una densidad sobre el espacio de medidas, sino que prescribe cómo se distribuye la masa de probabilidad de manera consistente sobre cualquier agrupamiento finito de regiones.\\
 
-Los dos parámetros admiten una lectura directa a partir de las propiedades de la distribución de Dirichlet: $P_0$ actúa como centro del prior y $c$ como su parámetro de concentración en torno a ese centro. Esta lectura se precisa a través de los momentos de $P$ sobre cualquier conjunto medible $E$:
+Los dos parámetros admiten una lectura directa a partir de las propiedades de la distribución de Dirichlet, en la que $P_0$ actúa como centro del prior y $c$ como su parámetro de concentración en torno a ese centro. Esta lectura se precisa a través de los momentos de $P$ sobre cualquier conjunto medible $E$:
 \begin{equation}
     \mathbb{E}[P(E)] = P_0(E), \qquad
     \mathrm{Var}[P(E)] = \frac{P_0(E)\,(1 - P_0(E))}{1 + c}.
@@ -597,7 +597,7 @@ Este carácter discreto tiene una consecuencia directa sobre cualquier muestra g
 
 \subsection{Distribución Posterior}
 \label{02_04_03_posterior_dp}
-Una propiedad central del DP es su conjugación respecto al muestreo independiente e idénticamente distribuido. Sea $X_1, \dots, X_n \mid P \overset{\mathrm{iid}}{\sim} P$ con $P \sim \mathrm{DP}(c, P_0)$. Entonces la distribución posterior de $P$ dado el conjunto de observaciones es nuevamente un Proceso de Dirichlet, \citep{02_04_muller2015bayesian}:
+Una propiedad central del DP es su conjugación respecto al muestreo independiente e idénticamente distribuido. Sea $X_1, \dots, X_n \mid P \overset{\mathrm{iid}}{\sim} P$ con $P \sim \mathrm{DP}(c, P_0)$. Entonces la distribución posterior de $P$ dado el conjunto de observaciones es nuevamente un Proceso de Dirichlet \citep{02_04_muller2015bayesian}:
 \begin{equation}\label{eq:dp_posterior}
     P \mid X_1, \dots, X_n \;\sim\;
     \mathrm{DP}\!\left(c + n,\;\frac{c}{c+n}\,P_0
@@ -619,7 +619,7 @@ Sea $f(X \mid \theta)$ un núcleo de densidad continua parametrizado por $\theta
 \begin{equation}
     f_P(X) = \int_{\mathcal{E}} f(X \mid \theta)\, dP(\theta).
 \end{equation}
-Al colocar un DP como prior sobre $P$, el modelo jerárquico completo se especifica como, \citep{02_04_muller2015bayesian}:
+Al colocar un DP como prior sobre $P$, el modelo jerárquico completo se especifica como \citep{02_04_muller2015bayesian}:
 \begin{equation}
 \begin{aligned}
     X_i \mid \theta_i &\overset{\mathrm{ind}}{\sim} f(\cdot \mid \theta_i),
@@ -640,7 +640,7 @@ El carácter discreto de las realizaciones del DP implica que los parámetros $\
 
 Sean $\theta_1^*, \dots, \theta_K^*$ los valores únicos adoptados por los $\theta_i$. Cada observación $X_i$ queda asignada al cluster $j$ mediante el indicador $S_i \in \{1, \dots, K\}$, donde $S_i = j$ si y solo si $\theta_i = \theta_j^*$; se denota $\mathcal{S}_j = \{i : S_i = j\}$ el conjunto de índices asignados al $j$-ésimo cluster y $n_j = |\mathcal{S}_j|$ su tamaño.\\
 
-La distribución condicional de asignación de una observación $X_i$ dado el resto satisface, \citep{02_05_escobar1995bayesian}:
+La distribución condicional de asignación de una observación $X_i$ dado el resto satisface \citep{02_05_escobar1995bayesian}:
 \begin{equation}
     p(S_i = j \mid S_{-i}, X) \propto
     \begin{cases}
@@ -656,7 +656,7 @@ La inferencia en el DPM se realiza mediante algoritmos MCMC que alternan entre l
     p(\theta_j^* \mid S_1, \dots, S_n, X) \propto P_0(\theta_j^*)
     \prod_{i \in \mathcal{S}_j} f(X_i \mid \theta_j^*).
 \end{equation}
-En el caso conjugado, ambas distribuciones condicionales son analíticamente tratables y pueden muestrearse directamente mediante un muestreador de Gibbs \citep{02_05_escobar1995bayesian}. Para modelos no conjugados, \citep{02_05_neal2000markov} propone el Algoritmo~8, que introduce clusters candidatos muestreados de $P_0$ para aproximar la integral $f_0(X_i)$, evitando el requisito de conjugación.
+En el caso conjugado, ambas distribuciones condicionales son analíticamente tratables y pueden muestrearse directamente mediante un muestreador de Gibbs \citep{02_05_escobar1995bayesian}. Para modelos no conjugados, \citet{02_05_neal2000markov} propone el Algoritmo~8, que introduce clusters candidatos muestreados de $P_0$ para aproximar la integral $f_0(X_i)$, evitando el requisito de conjugación.
 
 \subsection{Aleatorización de Hiperparámetros}
 \label{02_05_04_hiperparametros}
@@ -696,7 +696,7 @@ donde tanto los pesos $\pi_h(x)$ como los átomos $\theta_h(x)$ pueden depender 
 
 Las distintas variantes del DDP se diferencian según el componente sobre el cual recae la dependencia. En la variante de átomos dependientes y pesos fijos, la heterogeneidad entre distribuciones se introduce a través de los átomos $\theta_h(x)$, mientras que la estructura de pesos permanece invariante. En la variante de pesos dependientes y átomos fijos, los átomos $\theta_h \overset{\mathrm{iid}}{\sim} P_0$ son compartidos por todas las distribuciones de la familia y la dependencia se introduce exclusivamente a través de los pesos $\pi_h(x)$; esta última resulta de especial relevancia para el presente trabajo, pues permite que la estructura de mezcla varíe con las covariables sin alterar la localización de los componentes.\\
 
-La variante de pesos dependientes resulta especialmente atractiva porque hereda de forma directa la construcción stick-breaking presentada en la Sección~\ref{02_04_02_stick_breaking}: basta con permitir que las variables de quiebre $V_h$ dejen de ser constantes iid y pasen a depender del predictor $x$, dando lugar a los Procesos Stick-Breaking Dependientes.
+La variante de pesos dependientes resulta especialmente atractiva porque hereda de forma directa la construcción stick-breaking presentada en la Sección~\ref{02_04_02_stick_breaking}, pues basta con permitir que las variables de quiebre $V_h$ dejen de ser constantes iid y pasen a depender del predictor $x$, dando lugar a los Procesos Stick-Breaking Dependientes.
 
 \subsection{Procesos Stick-Breaking Dependientes}
 \label{02_06_02_sb_dependiente}
@@ -710,7 +710,7 @@ La generalización dependiente reemplaza las variables de stick-breaking iid por
     \pi_h(x) = V_h(x) \prod_{l=1}^{h-1}\bigl\{1 - V_l(x)\bigr\},
     \qquad V_h : \mathcal{X} \to [0,1].
 \end{equation}
-Esta estructura garantiza que, para cada valor fijo $x \in \mathcal{X}$, los pesos $\{\pi_h(x)\}_{h=1}^{\infty}$ forman una distribución de probabilidad válida: $\sum_{h=1}^{\infty} \pi_h(x) = 1$ casi seguramente para todo $x$, siempre que las variables de quiebre satisfagan
+Esta estructura garantiza que, para cada valor fijo $x \in \mathcal{X}$, los pesos $\{\pi_h(x)\}_{h=1}^{\infty}$ forman una distribución de probabilidad válida, es decir, $\sum_{h=1}^{\infty} \pi_h(x) = 1$ casi seguramente para todo $x$, siempre que las variables de quiebre satisfagan
 \begin{equation}\label{eq:ddp_sb_condicion}
     \sum_{h=1}^{\infty} \mathbb{E}\bigl[\log\{1 - V_h(x)\}\bigr] = -\infty
     \qquad \text{para cada } x \in \mathcal{X},
@@ -749,4 +749,4 @@ Una aplicación natural del modelo de mezclas de DDP presentado en la Sección~\
 
 El interés de esta formulación reside en la naturaleza de la dependencia que admite. Los modelos clásicos (Sección~\ref{02_02_02_01_limitaciones_estructurales}) asumen que la media o la varianza condicional son funciones lineales del pasado; el DDP, en cambio, no impone ninguna forma paramétrica fija a la relación temporal, sino que permite que la distribución completa de $y_t$ (incluyendo su forma, asimetría y colas) varíe de manera no paramétrica en función del estado previo del sistema. De este modo, el enfoque cubre precisamente las situaciones que los modelos lineales no pueden representar, correspondientes a la fila no lineal del Cuadro~\ref{tab:limitaciones}.\\
 
-Esta estrategia ha sido ilustrada por \citep{02_06_quintana2022dependent} en el contexto del modelo LDDP aplicado a la serie del géiser Old Faithful, donde el predictor $x = y_{t-1}$ determina distribuciones condicionales que exhiben bimodalidad cambiante según el valor rezagado, un comportamiento que un modelo lineal no podría capturar.
+Esta estrategia ha sido ilustrada por \citet{02_06_quintana2022dependent} en el contexto del modelo LDDP aplicado a la serie del géiser Old Faithful, donde el predictor $x = y_{t-1}$ determina distribuciones condicionales que exhiben bimodalidad cambiante según el valor rezagado, un comportamiento que un modelo lineal no podría capturar.
