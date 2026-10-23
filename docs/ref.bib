@@ -1,0 +1,1031 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CAPITULO 1  -- Motivacion / aplicaciones de series de tiempo funcionales
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+@article{01_01_shang2013electricity,
+  author  = {Shang, Han Lin},
+  title   = {Functional Time Series Approach for Forecasting Very Short-Term Electricity Demand},
+  journal = {Journal of Applied Statistics},
+  volume  = {40},
+  number  = {1},
+  pages   = {152--168},
+  year    = {2013},
+  doi     = {10.1080/02664763.2012.740619}
+}
+
+@article{01_01_shah2020electricity,
+  author  = {Shah, Ismail and Lisi, Francesco},
+  title   = {Forecasting of Electricity Price Through a Functional Prediction of Sale and Purchase Curves},
+  journal = {Journal of Forecasting},
+  volume  = {39},
+  number  = {2},
+  pages   = {242--259},
+  year    = {2020},
+  doi     = {10.1002/for.2624}
+}
+
+@article{01_01_shang2017intraday,
+  author  = {Shang, Han Lin},
+  title   = {Forecasting Intraday {S\&P} 500 Index Returns: {A} Functional Time Series Approach},
+  journal = {Journal of Forecasting},
+  volume  = {36},
+  number  = {7},
+  pages   = {741--755},
+  year    = {2017},
+  doi     = {10.1002/for.2467}
+}
+
+@article{01_01_wang2025crudeoil,
+  author  = {Wang, Deqing and Lu, Zhihao and Liu, Zhenhua and Xue, Shoucong and
+             Guo, Mengxia and Hou, Yiwen},
+  title   = {A Functional Mixture Prediction Model for Dynamically Forecasting
+             Cumulative Intraday Returns of Crude Oil Futures},
+  journal = {International Journal of Forecasting},
+  year    = {2025},
+  note    = {En prensa. Verificar volumen, n{\'u}mero, p{\'a}ginas y {DOI}}
+}
+
+@article{01_01_beyaztas2021riverflow,
+  author  = {Beyaztas, Ufuk and Shang, Han Lin and Yaseen, Zaher Mundher},
+  title   = {A Functional Autoregressive Model Based on Exogenous Hydrometeorological
+             Variables for River Flow Prediction},
+  journal = {Journal of Hydrology},
+  volume  = {598},
+  pages   = {126380},
+  year    = {2021},
+  doi     = {10.1016/j.jhydrol.2021.126380}
+}
+
+@article{01_01_wagnermuns2018traffic,
+  author  = {Wagner-Muns, Ian M. and Guardiola, Ivan G. and Samaranayke, V. A. and
+             Kayani, Wessam I.},
+  title   = {A Functional Data Analysis Approach to Traffic Volume Forecasting},
+  journal = {IEEE Transactions on Intelligent Transportation Systems},
+  volume  = {19},
+  number  = {3},
+  pages   = {878--888},
+  year    = {2018},
+  doi     = {10.1109/TITS.2017.2706143}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CAPITULO 2  -- Marco teorico
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%% 02_01  DATOS FUNCIONALES
+@article{02_01_mercer1909functions,
+  author    = {Mercer, James},
+  title     = {Functions of Positive and Negative Type and Their Connection With
+               the Theory of Integral Equations},
+  journal   = {Philosophical Transactions of the Royal Society of London. Series A},
+  volume    = {209},
+  number    = {441-458},
+  pages     = {415--446},
+  year      = {1909},
+  publisher = {The Royal Society London}
+}
+
+@book{02_01_ferraty2006nonparametric,
+  author    = {Ferraty, Fr{\'e}d{\'e}ric and Vieu, Philippe},
+  title     = {Nonparametric Functional Data Analysis: Theory and Practice},
+  series    = {Springer Series in Statistics},
+  publisher = {Springer},
+  address   = {New York},
+  year      = {2006},
+  isbn      = {9780387303697}
+}
+
+@book{02_01_ramsay2006functional,
+  author    = {Ramsay, James O. and Silverman, Bernard W.},
+  title     = {Functional Data Analysis},
+  series    = {Springer Series in Statistics},
+  publisher = {Springer},
+  address   = {New York},
+  year      = {2006},
+  isbn      = {9780387227511}
+}
+
+@book{02_01_kokoszka2017introduction,
+  author    = {Kokoszka, Piotr and Reimherr, Matthew},
+  title     = {Introduction to Functional Data Analysis},
+  series    = {Chapman \& Hall/CRC Texts in Statistical Science},
+  publisher = {CRC Press},
+  year      = {2017},
+  isbn      = {9781498746694}
+}
+
+@book{02_01_ramsay2009functional,
+  author    = {Ramsay, James O. and Hooker, Giles and Graves, Spencer},
+  title     = {Functional Data Analysis with {R} and {MATLAB}},
+  series    = {Use R!},
+  publisher = {Springer},
+  address   = {New York},
+  year      = {2009},
+  isbn      = {9780387981857}
+}
+
+@article{02_01_liu2020splinets,
+  author  = {Liu, Xijia and Nassar, Hiba and Podg{\'o}rski, Krzysztof},
+  title   = {{Splinets} -- Efficient Orthonormalization of the {B}-splines},
+  journal = {arXiv preprint arXiv:1910.07341},
+  year    = {2020},
+  url     = {https://arxiv.org/abs/1910.07341}
+}
+%%Nuevo
+@book{02_01_deboor2001practical,
+  author    = {de Boor, Carl},
+  title     = {A Practical Guide to Splines},
+  edition   = {Revised},
+  series    = {Applied Mathematical Sciences},
+  volume    = {27},
+  publisher = {Springer-Verlag},
+  address   = {New York},
+  year      = {2001},
+  isbn      = {978-0-387-95366-3}
+}
+
+%%%% 02_02  SERIES DE TIEMPO FUNCIONALES
+@book{02_02_bosq2000linear,
+  author    = {Bosq, Denis},
+  title     = {Linear Processes in Function Spaces: Theory and Applications},
+  series    = {Lecture Notes in Statistics},
+  volume    = {149},
+  publisher = {Springer-Verlag},
+  address   = {New York},
+  year      = {2000},
+  isbn      = {978-0-387-95052-7},
+  doi       = {10.1007/978-1-4612-1154-9}
+}
+
+@book{02_02_horvath2012inference,
+  author    = {Horv{\'a}th, Lajos and Kokoszka, Piotr},
+  title     = {Inference for Functional Data with Applications},
+  series    = {Springer Series in Statistics},
+  volume    = {200},
+  publisher = {Springer},
+  address   = {New York},
+  year      = {2012},
+  isbn      = {978-1-4614-3654-6},
+  doi       = {10.1007/978-1-4614-3655-3}
+}
+
+@book{02_02_hsing2015theoretical,
+  author    = {Hsing, Tailen and Eubank, Randall},
+  title     = {Theoretical Foundations of Functional Data Analysis, with an
+               Introduction to Linear Operators},
+  series    = {Wiley Series in Probability and Statistics},
+  publisher = {Wiley},
+  address   = {Chichester, UK},
+  year      = {2015},
+  isbn      = {978-0-470-01691-6},
+  doi       = {10.1002/9781118762547}
+}
+
+@article{02_02_klepsch2017innovations,
+  author    = {Klepsch, Johannes and Kl{\"u}ppelberg, Claudia},
+  title     = {An Innovations Algorithm for the Prediction of Functional Linear Processes},
+  journal   = {Journal of Multivariate Analysis},
+  volume    = {155},
+  pages     = {252--271},
+  year      = {2017},
+  publisher = {Elsevier},
+  doi       = {10.1016/j.jmva.2017.01.005}
+}
+
+@article{02_02_klepsch2017prediction,
+  author    = {Klepsch, Johannes and Kl{\"u}ppelberg, Claudia and Wei, Taojun},
+  title     = {Prediction of Functional {ARMA} Processes with an Application to Traffic Data},
+  journal   = {Econometrics and Statistics},
+  volume    = {1},
+  pages     = {128--149},
+  year      = {2017},
+  publisher = {Elsevier},
+  doi       = {10.1016/j.ecosta.2016.10.009}
+}
+
+@article{02_02_kuenzer2024estimation,
+  author    = {Kuenzer, Thomas},
+  title     = {Estimation of Functional {ARMA} Models},
+  journal   = {Bernoulli},
+  volume    = {30},
+  number    = {1},
+  pages     = {559--583},
+  year      = {2024},
+  publisher = {Bernoulli Society for Mathematical Statistics and Probability},
+  doi       = {10.3150/23-BEJ1606}
+}
+
+@article{02_02_besse2000autoregressive,
+  author    = {Besse, Philippe C. and Cardot, Herv{\'e} and Stephenson, David B.},
+  title     = {Autoregressive Forecasting of Some Functional Climatic Variations},
+  journal   = {Scandinavian Journal of Statistics},
+  volume    = {27},
+  number    = {4},
+  pages     = {673--687},
+  year      = {2000},
+  publisher = {Wiley},
+  doi       = {10.1111/1467-9469.00215}
+}
+
+@article{02_02_kokoszka2013determining,
+  author    = {Kokoszka, Piotr and Reimherr, Matthew},
+  title     = {Determining the Order of the Functional Autoregressive Model},
+  journal   = {Journal of Time Series Analysis},
+  volume    = {34},
+  number    = {1},
+  pages     = {116--129},
+  year      = {2013},
+  publisher = {Wiley},
+  doi       = {10.1111/j.1467-9892.2012.00816.x}
+}
+
+@article{02_02_aue2015prediction,
+  author    = {Aue, Alexander and Norinho, Diogo Dubart and H{\"o}rmann, Siegfried},
+  title     = {On the Prediction of Stationary Functional Time Series},
+  journal   = {Journal of the American Statistical Association},
+  volume    = {110},
+  number    = {509},
+  pages     = {378--392},
+  year      = {2015},
+  publisher = {Taylor \& Francis},
+  doi       = {10.1080/01621459.2014.909317}
+}
+
+% nuevo
+@article{02_02_bergmeir2012crossvalidation,
+  author  = {Bergmeir, Christoph and Ben{\'i}tez, Jos{\'e} M.},
+  title   = {On the use of cross-validation for time series predictor evaluation},
+  journal = {Information Sciences},
+  volume  = {191},
+  pages   = {192--213},
+  year    = {2012}
+}
+
+@article{02_02_tashman2000outofsample,
+  author  = {Tashman, Leonard J.},
+  title   = {Out-of-sample tests of forecasting accuracy: an analysis and review},
+  journal = {International Journal of Forecasting},
+  volume  = {16},
+  number  = {4},
+  pages   = {437--450},
+  year    = {2000}
+}
+
+@article{02_02_gneiting2007scoring,
+  author  = {Gneiting, Tilmann and Raftery, Adrian E.},
+  title   = {Strictly proper scoring rules, prediction, and estimation},
+  journal = {Journal of the American Statistical Association},
+  volume  = {102},
+  number  = {477},
+  pages   = {359--378},
+  year    = {2007}
+}
+
+@article{02_02_gneiting2008energy,
+  author  = {Gneiting, Tilmann and Stanberry, Larissa I. and Grimit, Eric P. and Held, Leonhard and Johnson, Nicholas A.},
+  title   = {Assessing probabilistic forecasts of multivariate quantities, with an application to ensemble predictions of surface winds},
+  journal = {TEST},
+  volume  = {17},
+  number  = {2},
+  pages   = {211--235},
+  year    = {2008}
+}
+
+@article{02_02_burkner2020lfo,
+  author  = {B{\"u}rkner, Paul-Christian and Gabry, Jonah and Vehtari, Aki},
+  title   = {Approximate leave-future-out cross-validation for {B}ayesian time series models},
+  journal = {Journal of Statistical Computation and Simulation},
+  volume  = {90},
+  number  = {14},
+  pages   = {2499--2523},
+  year    = {2020}
+}
+@article{02_02_winkler1972decision,
+  author  = {Winkler, Robert L.},
+  title   = {A Decision-Theoretic Approach to Interval Estimation},
+  journal = {Journal of the American Statistical Association},
+  volume  = {67},
+  number  = {337},
+  pages   = {187--191},
+  year    = {1972},
+  doi     = {10.1080/01621459.1972.10481224}
+}
+%%%% 02_03  INFERENCIA BAYESIANA
+@article{02_03_bayes1763essay,
+  author  = {Bayes, Thomas},
+  title   = {An Essay Towards Solving a Problem in the Doctrine of Chances},
+  journal = {Philosophical Transactions of the Royal Society of London},
+  volume  = {53},
+  pages   = {370--418},
+  year    = {1763},
+  note    = {Publicado p{\'o}stumamente por Richard Price},
+  url     = {https://royalsocietypublishing.org/doi/10.1098/rstl.1763.0053}
+}
+
+@misc{02_03_ehlers2006introducao,
+  author       = {Ehlers, Ricardo S.},
+  title        = {Introdu{\c{c}}{\~a}o {\`a} Infer{\^e}ncia Bayesiana},
+  howpublished = {Notas de curso, Departamento de Estat{\'i}stica, Universidade Federal do Paran{\'a}},
+  year         = {2006},
+  url          = {https://www.leg.ufpr.br/~paulojus/CE227/ce227/ce227.html},
+  note         = {Accedido: 2025-08-25}
+}
+
+@book{02_03_gelman2013bda,
+  author    = {Gelman, Andrew and Carlin, John B. and Stern, Harold S. and
+               Dunson, David B. and Vehtari, Aki and Rubin, Donald B.},
+  title     = {Bayesian Data Analysis},
+  edition   = {3},
+  publisher = {Chapman \& Hall/CRC},
+  address   = {Boca Raton, FL},
+  year      = {2013},
+  isbn      = {978-1-4398-4095-5}
+}
+
+@incollection{02_03_zellner1986gprior,
+  author    = {Zellner, Arnold},
+  title     = {On Assessing Prior Distributions and {Bayesian} Regression Analysis
+               with {$g$}-Prior Distributions},
+  booktitle = {Bayesian Inference and Decision Techniques: Essays in Honor of Bruno de Finetti},
+  editor    = {Goel, Prem K. and Zellner, Arnold},
+  publisher = {North-Holland},
+  address   = {Amsterdam},
+  pages     = {233--243},
+  year      = {1986}
+}
+
+%%%% 02_04  PROCESO DE DIRICHLET
+@book{02_04_muller2015bayesian,
+  author    = {M{\"u}ller, Peter and Quintana, Fernando A. and Jara, Alejandro and Hanson, Timothy E.},
+  title     = {Bayesian Nonparametric Data Analysis},
+  series    = {Springer Series in Statistics},
+  publisher = {Springer},
+  year      = {2015},
+  isbn      = {978-3-319-18967-1},
+  doi       = {10.1007/978-3-319-18968-8}
+}
+
+@book{02_04_hjort2010bayesian,
+  author    = {Hjort, Nils Lid and Holmes, Chris and M{\"u}ller, Peter and Walker, Stephen G.},
+  title     = {Bayesian Nonparametrics},
+  series    = {Cambridge Series in Statistical and Probabilistic Mathematics},
+  volume    = {28},
+  publisher = {Cambridge University Press},
+  address   = {Cambridge, UK},
+  year      = {2010},
+  isbn      = {978-0-521-51360-3},
+  doi       = {10.1017/CBO9780511802478}
+}
+
+@article{02_04_ferguson1973bayesian,
+  author  = {Ferguson, Thomas S.},
+  title   = {A {Bayesian} Analysis of Some Nonparametric Problems},
+  journal = {The Annals of Statistics},
+  volume  = {1},
+  number  = {2},
+  pages   = {209--230},
+  year    = {1973},
+  doi     = {10.1214/aos/1176342360}
+}
+
+@article{02_04_blackwell1973polya,
+  author    = {Blackwell, David and MacQueen, James B.},
+  title     = {{Ferguson} Distributions via {P{\'o}lya} Urn Schemes},
+  journal   = {The Annals of Statistics},
+  volume    = {1},
+  number    = {2},
+  pages     = {353--355},
+  year      = {1973},
+  publisher = {Institute of Mathematical Statistics},
+  doi       = {10.1214/aos/1176342372}
+}
+
+@article{02_04_sethuraman1994constructive,
+  author    = {Sethuraman, Jayaram},
+  title     = {A Constructive Definition of {Dirichlet} Priors},
+  journal   = {Statistica Sinica},
+  volume    = {4},
+  number    = {2},
+  pages     = {639--650},
+  year      = {1994},
+  publisher = {Institute of Statistical Science, Academia Sinica}
+}
+
+%%%% 02_05  MEZCLAS DE PROCESO DE DIRICHLET (DPM)
+@phdthesis{02_05_escobar1988estimating,
+  author = {Escobar, Michael D.},
+  title  = {Estimating the Means of Several Normal Populations by Nonparametric
+            Estimation of the Distributions of the Means},
+  school = {Department of Statistics, Yale University},
+  type   = {Tesis doctoral},
+  year   = {1988}
+}
+
+@article{02_05_escobar1995bayesian,
+  author    = {Escobar, Michael D. and West, Mike},
+  title     = {Bayesian Density Estimation and Inference Using Mixtures},
+  journal   = {Journal of the American Statistical Association},
+  volume    = {90},
+  number    = {430},
+  pages     = {577--588},
+  year      = {1995},
+  publisher = {Taylor \& Francis}
+}
+
+@article{02_05_neal2000markov,
+  author  = {Neal, Radford M.},
+  title   = {Markov Chain Sampling Methods for {Dirichlet} Process Mixture Models},
+  journal = {Journal of Computational and Graphical Statistics},
+  volume  = {9},
+  number  = {2},
+  pages   = {249--265},
+  year    = {2000},
+  doi     = {10.1080/10618600.2000.10474879}
+}
+
+@article{02_05_walker2007sampling,
+  author    = {Walker, Stephen G.},
+  title     = {Sampling the {Dirichlet} Mixture Model with Slices},
+  journal   = {Communications in Statistics -- Simulation and Computation},
+  volume    = {36},
+  number    = {1},
+  pages     = {45--54},
+  year      = {2007},
+  publisher = {Taylor \& Francis},
+  doi       = {10.1080/03610910601096262}
+}
+
+%%%% 02_06  PROCESOS DE DIRICHLET DEPENDIENTES (DDP)
+@inproceedings{02_06_maceachern1999dependent,
+  author    = {MacEachern, Steven N.},
+  title     = {Dependent Nonparametric Processes},
+  booktitle = {Proceedings of the Section on Bayesian Statistical Science},
+  publisher = {American Statistical Association},
+  pages     = {50--55},
+  year      = {1999}
+}
+
+@article{02_06_deiorio2004anova,
+  author    = {De Iorio, Maria and M{\"u}ller, Peter and Rosner, Gary L. and MacEachern, Steven N.},
+  title     = {An {ANOVA} Model for Dependent Random Measures},
+  journal   = {Journal of the American Statistical Association},
+  volume    = {99},
+  number    = {465},
+  pages     = {205--215},
+  year      = {2004},
+  publisher = {Taylor \& Francis},
+  doi       = {10.1198/016214504000000205}
+}
+
+@article{02_06_gelfand2005bayesian,
+  author    = {Gelfand, Alan E. and Kottas, Athanasios and MacEachern, Steven N.},
+  title     = {Bayesian Nonparametric Spatial Modeling with {Dirichlet} Process Mixing},
+  journal   = {Journal of the American Statistical Association},
+  volume    = {100},
+  number    = {471},
+  pages     = {1021--1035},
+  year      = {2005},
+  publisher = {Taylor \& Francis},
+  doi       = {10.1198/016214504000002078}
+}
+
+@article{02_06_griffin2006order,
+  author    = {Griffin, Jim E. and Steel, Mark F. J.},
+  title     = {Order-Based Dependent {Dirichlet} Processes},
+  journal   = {Journal of the American Statistical Association},
+  volume    = {101},
+  number    = {473},
+  pages     = {179--194},
+  year      = {2006},
+  publisher = {Taylor \& Francis},
+  doi       = {10.1198/016214505000000727}
+}
+
+@article{02_06_reich2007multivariate,
+  author    = {Reich, Brian J. and Fuentes, Montserrat},
+  title     = {A Multivariate Semiparametric {Bayesian} Spatial Modeling Framework
+               for Hurricane Surface Wind Fields},
+  journal   = {The Annals of Applied Statistics},
+  volume    = {1},
+  number    = {1},
+  pages     = {249--264},
+  year      = {2007},
+  publisher = {Institute of Mathematical Statistics},
+  doi       = {10.1214/07-AOAS108}
+}
+
+@article{02_06_dunson2008kernel,
+  author    = {Dunson, David B. and Park, Ju-Hyun},
+  title     = {Kernel Stick-Breaking Processes},
+  journal   = {Biometrika},
+  volume    = {95},
+  number    = {2},
+  pages     = {307--323},
+  year      = {2008},
+  publisher = {Oxford University Press},
+  doi       = {10.1093/biomet/asn012}
+}
+
+@article{02_06_ren2011logistic,
+  author  = {Ren, Lu and Du, Lan and Carin, Lawrence and Dunson, David B.},
+  title   = {Logistic Stick-Breaking Process},
+  journal = {Journal of Machine Learning Research},
+  volume  = {12},
+  number  = {7},
+  pages   = {203--239},
+  year    = {2011},
+  url     = {http://jmlr.org/papers/v12/ren11a.html}
+}
+
+@article{02_06_quintana2022dependent,
+  author    = {Quintana, Fernando A. and M{\"u}ller, Peter and Jara, Alejandro and MacEachern, Steven N.},
+  title     = {The Dependent {Dirichlet} Process and Related Models},
+  journal   = {Statistical Science},
+  volume    = {37},
+  number    = {1},
+  pages     = {24--41},
+  year      = {2022},
+  publisher = {Institute of Mathematical Statistics},
+  doi       = {10.1214/20-STS819}
+}
+
+%%%% 02_07  METODOS DE SIMULACION / MCMC
+@book{02_07_hanada2022mcmc,
+  author    = {Hanada, M. and Matsuura, S.},
+  title     = {{MCMC} from Scratch: A Practical Introduction to {Markov} Chain {Monte Carlo}},
+  publisher = {Springer Nature Singapore},
+  year      = {2022},
+  isbn      = {9789811927157}
+}
+
+@book{02_07_suess2010introduction,
+  author    = {Suess, Eric A. and Trumbo, Bruce E.},
+  title     = {Introduction to Probability Simulation and {Gibbs} Sampling with {R}},
+  series    = {Use R!},
+  publisher = {Springer},
+  address   = {New York},
+  year      = {2010},
+  isbn      = {9780387687650}
+}
+
+@book{02_07_rizzo2007statistical,
+  author    = {Rizzo, Maria L.},
+  title     = {Statistical Computing with {R}},
+  series    = {Chapman \& Hall/CRC The R Series},
+  publisher = {Chapman \& Hall/CRC},
+  year      = {2007},
+  isbn      = {9781584885450}
+}
+
+@techreport{02_07_neal2003slice,
+  author      = {Neal, Radford M.},
+  title       = {Slice Sampling},
+  institution = {Department of Statistics and Department of Computer Science, University of Toronto},
+  type        = {Technical Report},
+  number      = {TR-2003-010},
+  year        = {2003},
+  note        = {Version publicada con discusion en Annals of Statistics 31(3):705--767. Verificar cual citar}
+}
+
+%%%% 02_08  SERIES DE TIEMPO ESCALARES (UNIVARIADAS Y MULTIVARIADAS)
+@book{02_08_wei2006time,
+  author    = {Wei, William W. S.},
+  title     = {Time Series Analysis: Univariate and Multivariate Methods},
+  edition   = {2},
+  publisher = {Pearson Addison Wesley},
+  year      = {2006}
+}
+
+@book{02_08_tsay2009financial,
+  author    = {Tsay, Ruey S.},
+  title     = {Analysis of Financial Time Series},
+  edition   = {2},
+  publisher = {Wiley},
+  year      = {2009},
+  isbn      = {9780470414354}
+}
+
+@book{02_08_brockwell2006introduction,
+  author    = {Brockwell, Peter J. and Davis, Richard A.},
+  title     = {Introduction to Time Series and Forecasting},
+  series    = {Springer Texts in Statistics},
+  publisher = {Springer},
+  address   = {New York},
+  year      = {2006},
+  isbn      = {9780387216577}
+}
+
+@article{02_08_mauricio1995exact,
+  author    = {Mauricio, Jos{\'e} Alberto},
+  title     = {Exact Maximum Likelihood Estimation of Stationary Vector {ARMA} Models},
+  journal   = {Journal of the American Statistical Association},
+  volume    = {90},
+  number    = {429},
+  pages     = {282--291},
+  year      = {1995},
+  publisher = {Taylor \& Francis},
+  doi       = {10.1080/01621459.1995.10476511}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CAPITULO 3  -- Estado del arte / propuesta bayesiana no parametrica
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% 03_00  MOTIVACION 
+
+@article{03_00_hormann2010weakly,
+  author    = {H{\"o}rmann, Siegfried and Kokoszka, Piotr},
+  title     = {Weakly Dependent Functional Data},
+  journal   = {The Annals of Statistics},
+  volume    = {38},
+  number    = {3},
+  pages     = {1845--1884},
+  year      = {2010},
+  publisher = {Institute of Mathematical Statistics},
+  doi       = {10.1214/09-AOS768}
+}
+
+@article{03_00_horvath2014testing,
+  author    = {Horv{\'a}th, Lajos and Kokoszka, Piotr and Rice, Gregory},
+  title     = {Testing Stationarity of Functional Time Series},
+  journal   = {Journal of Econometrics},
+  volume    = {179},
+  number    = {1},
+  pages     = {66--82},
+  year      = {2014},
+  publisher = {Elsevier},
+  doi       = {10.1016/j.jeconom.2013.11.002},
+  note      = {Verificar DOI}
+}
+
+@article{03_00_aue2018detecting,
+  author    = {Aue, Alexander and Rice, Gregory and S{\"o}nmez, Ozan},
+  title     = {Detecting and Dating Structural Breaks in Functional Data
+               Without Dimension Reduction},
+  journal   = {Journal of the Royal Statistical Society: Series B
+               (Statistical Methodology)},
+  volume    = {80},
+  number    = {3},
+  pages     = {509--529},
+  year      = {2018},
+  publisher = {Wiley},
+  doi       = {10.1111/rssb.12257},
+  note      = {Verificar DOI. Preprint: arXiv:1511.04020}
+}
+
+@article{03_00_chen2021review,
+  author    = {Chen, Ying and Koch, Thorsten and Lim, Kian Guan and
+               Xu, Xiaofei and Zakiyeva, Nazgul},
+  title     = {A Review Study of Functional Autoregressive Models with
+               Application to Energy Forecasting},
+  journal   = {WIREs Computational Statistics},
+  volume    = {13},
+  number    = {3},
+  pages     = {e1525},
+  year      = {2021},
+  publisher = {Wiley},
+  doi       = {10.1002/wics.1525},
+  note      = {Verificar lista de autores contra la version publicada}
+}
+
+@inproceedings{03_00_foldesi2022uncertainty,
+  author    = {Foldesi, Levente and Valdenegro-Toro, Matias},
+  title     = {Comparison of Uncertainty Quantification with Deep Learning
+               in Time Series Regression},
+  booktitle = {NeurIPS 2022 Workshop on Robustness in Sequence Modeling},
+  year      = {2022},
+  note      = {arXiv:2211.06233},
+  url       = {https://arxiv.org/abs/2211.06233}
+}
+
+@inproceedings{03_00_kamarthi2021doubt,
+  author    = {Kamarthi, Harshavardhan and Kong, Lingkai and
+               Rodr{\'i}guez, Alexander and Zhang, Chao and Prakash, B. Aditya},
+  title     = {When in Doubt: Neural Non-Parametric Uncertainty Quantification
+               for Epidemic Forecasting},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {34},
+  year      = {2021},
+  note      = {arXiv:2106.03904},
+  url       = {https://arxiv.org/abs/2106.03904}
+}
+
+@misc{03_00_wang2025profnet,
+  author       = {Wang, Haixu and Cao, Jiguo},
+  title        = {Probabilistic Functional Neural Networks},
+  howpublished = {arXiv preprint arXiv:2503.21585},
+  year         = {2025},
+  url          = {https://arxiv.org/abs/2503.21585},
+  note         = {Verificar si ya fue publicado en revista al momento de
+                  cerrar la bibliograf{\'i}a}
+}
+@article{03_00_hyndman2007robust,
+  author  = {Hyndman, Rob J. and Ullah, Md. Shahid},
+  title   = {Robust forecasting of mortality and fertility rates: {A} functional data approach},
+  journal = {Computational Statistics \& Data Analysis},
+  volume  = {51},
+  number  = {10},
+  pages   = {4942--4956},
+  year    = {2007}
+}
+ 
+@article{03_00_hyndman2009forecasting,
+  author  = {Hyndman, Rob J. and Shang, Han Lin},
+  title   = {Forecasting functional time series},
+  journal = {Journal of the Korean Statistical Society},
+  volume  = {38},
+  number  = {3},
+  pages   = {199--221},
+  year    = {2009}
+}
+
+@article{03_00_forecast4010022,
+  author  = {Beyaztas, Ufuk and Shang, Hanlin},
+  title   = {Machine-Learning-Based Functional Time Series Forecasting:
+             Application to Age-Specific Mortality Rates},
+  journal = {Forecasting},
+  volume  = {4},
+  year    = {2022},
+  number  = {1},
+  pages   = {394--408},
+  doi     = {10.3390/forecast4010022}
+}
+%% Estado del arte 03_01
+
+@article{03_01_rodriguez2008dynamic,
+  author  = {Rodr{\'i}guez, Abel and ter Horst, Enrique},
+  title   = {{Bayesian Dynamic Density Estimation}},
+  journal = {Bayesian Analysis},
+  volume  = {3},
+  number  = {2},
+  pages   = {339--365},
+  year    = {2008},
+  doi     = {10.1214/08-BA313}
+}
+ 
+@article{03_01_dilucca2013simple,
+  author  = {Di Lucca, Maria Anna and Guglielmi, Alessandra and M{\"u}ller, Peter and Quintana, Fernando A.},
+  title   = {{A Simple Class of Bayesian Nonparametric Autoregression Models}},
+  journal = {Bayesian Analysis},
+  volume  = {8},
+  number  = {1},
+  pages   = {63--88},
+  year    = {2013},
+  month   = mar,
+  doi     = {10.1214/13-BA803}
+}
+ 
+@article{03_01_griffin2011stick,
+  author  = {Griffin, Jim E. and Steel, Mark F. J.},
+  title   = {{Stick-Breaking Autoregressive Processes}},
+  journal = {Journal of Econometrics},
+  volume  = {162},
+  number  = {2},
+  pages   = {383--396},
+  year    = {2011},
+  doi     = {10.1016/j.jeconom.2011.03.001}
+}
+ 
+@inproceedings{03_01_caron2007urna,
+  author    = {Caron, Fran{\c c}ois and Davy, Manuel and Doucet, Arnaud},
+  title     = {{Generalized Polya Urn for Time-Varying Dirichlet Process Mixtures}},
+  booktitle = {Proceedings of the 23rd Conference on Uncertainty in Artificial Intelligence (UAI 2007)},
+  pages     = {33--40},
+  year      = {2007},
+  publisher = {AUAI Press}
+}
+ 
+@inproceedings{03_01_saad2018temporally,
+  author    = {Saad, Feras A. and Mansinghka, Vikash K.},
+  title     = {{Temporally-Reweighted Chinese Restaurant Process Mixtures for Clustering, Imputing, and Forecasting Multivariate Time Series}},
+  booktitle = {Proceedings of the 21st International Conference on Artificial Intelligence and Statistics (AISTATS)},
+  pages     = {755--764},
+  year      = {2018},
+  volume    = {84},
+  series    = {Proceedings of Machine Learning Research},
+  publisher = {PMLR}
+}
+ 
+@article{03_01_petrone2009hybrid,
+  author  = {Petrone, Sonia and Guindani, Michele and Gelfand, Alan E.},
+  title   = {{Hybrid Dirichlet Mixture Models for Functional Data}},
+  journal = {Journal of the Royal Statistical Society Series B (Statistical Methodology)},
+  volume  = {71},
+  number  = {4},
+  pages   = {755--782},
+  year    = {2009},
+  month   = sep,
+  doi     = {10.1111/j.1467-9868.2009.00708.x}
+}
+ 
+@article{03_01_rodriguez2009functional,
+  author  = {Rodr{\'i}guez, Abel and Dunson, David B. and Gelfand, Alan E.},
+  title   = {{Bayesian Nonparametric Functional Data Analysis Through Density Estimation}},
+  journal = {Biometrika},
+  volume  = {96},
+  number  = {1},
+  pages   = {149--162},
+  year    = {2009},
+  month   = mar,
+  doi     = {10.1093/biomet/asn054}
+}
+ 
+@article{03_01_scarpa2014enriched,
+  author  = {Scarpa, Bruna and Dunson, David B.},
+  title   = {{Enriched Stick-Breaking Processes for Functional Data}},
+  journal = {Journal of the American Statistical Association},
+  volume  = {109},
+  number  = {506},
+  pages   = {647--660},
+  year    = {2014},
+  doi     = {10.1080/01621459.2013.866564}
+}
+ 
+@article{03_01_gamasaee2017mining,
+  author  = {Gamasaee, R. and {Fazel Zarandi}, M. H.},
+  title   = {{A New Dirichlet Process for Mining Dynamic Patterns in Functional Data}},
+  journal = {Information Sciences},
+  volume  = {405},
+  pages   = {55--80},
+  year    = {2017},
+  month   = sep
+}
+ 
+@article{03_01_rodriguez2011probit,
+  author  = {Rodr{\'i}guez, Abel and Dunson, David B.},
+  title   = {{Nonparametric Bayesian Models Through Probit Stick-Breaking Processes}},
+  journal = {Bayesian Analysis},
+  volume  = {6},
+  number  = {1},
+  pages   = {145--177},
+  year    = {2011},
+  month   = mar,
+  doi     = {10.1214/11-BA605}
+}
+ 
+@article{03_01_grazian2025spatiotemporal,
+  author  = {Grazian, Clara},
+  title   = {{Spatio-Temporal Stick-Breaking Process}},
+  journal = {Bayesian Analysis},
+  volume  = {20},
+  number  = {3},
+  pages   = {763--794},
+  year    = {2025},
+  month   = sep,
+  doi     = {10.1214/24-BA1419},
+  note    = {Preprint: arXiv:2303.17177 (2023)}
+}
+
+%% Marco teorico propio 03_02
+
+
+@article{03_02_chung2009nonparametric,
+  author    = {Chung, Yeonseung and Dunson, David B.},
+  title     = {Nonparametric {Bayes} Conditional Distribution Modeling with Variable Selection},
+  journal   = {Journal of the American Statistical Association},
+  volume    = {104},
+  number    = {488},
+  pages     = {1646--1660},
+  year      = {2009},
+  publisher = {Taylor \& Francis},
+  doi       = {10.1198/jasa.2009.tm08302}
+}
+
+%% Simulacion 03_04
+@article{03_04_horman2013arch,
+  author    = {H{\"o}rmann, Siegfried and Horv{\'a}th, Lajos and Reeder, Ron},
+  title     = {A Functional Version of the {ARCH} Model},
+  journal   = {Econometric Theory},
+  volume    = {29},
+  number    = {2},
+  pages     = {267--288},
+  year      = {2013},
+  publisher = {Cambridge University Press},
+  doi       = {10.1017/S0266466612000345}
+}
+@article{03_04_lachos2011heteroscedastic,
+  author  = {Lachos, Victor H. and Bandyopadhyay, Dipankar and Garay, Aldo M.},
+  title   = {Heteroscedastic Nonlinear Regression Models Based on Scale Mixtures of Skew-Normal Distributions},
+  journal = {Statistics and Probability Letters},
+  volume  = {81},
+  number  = {8},
+  pages   = {1208--1217},
+  year    = {2011},
+  doi     = {10.1016/j.spl.2011.03.022}
+}
+%% 03_05  reconstruccion
+@article{03_05_gneiting2011point,
+  author  = {Gneiting, Tilmann},
+  title   = {Making and evaluating point forecasts},
+  journal = {Journal of the American Statistical Association},
+  year    = {2011}, volume = {106}, number = {494}, pages = {746--762}}
+@article{03_05_gneiting2007strictly,
+  author  = {Gneiting, Tilmann and Raftery, Adrian E.},
+  title   = {Strictly proper scoring rules, prediction, and estimation},
+  journal = {Journal of the American Statistical Association},
+  year    = {2007}, volume = {102}, number = {477}, pages = {359--378}}
+@article{03_05_kemperman1987median,
+  author  = {Kemperman, J. H. B.},
+  title   = {The median of a finite measure on a {B}anach space},
+  journal = {Statistical Data Analysis Based on the $L_1$-Norm and Related Methods},
+  year    = {1987}, pages = {217--230}, note = {Y. Dodge (ed.), North-Holland}}
+@article{03_05_gervini2008robust,
+  author  = {Gervini, Daniel},
+  title   = {Robust functional estimation using the median and spherical principal components},
+  journal = {Biometrika},
+  year    = {2008}, volume = {95}, number = {3}, pages = {587--600}}
+@article{03_05_lopezpintado2009band,
+  author  = {L{\'o}pez-Pintado, Sara and Romo, Juan},
+  title   = {On the concept of depth for functional data},
+  journal = {Journal of the American Statistical Association},
+  year    = {2009}, volume = {104}, number = {486}, pages = {718--734}}
+@article{03_05_sun2011boxplot,
+  author  = {Sun, Ying and Genton, Marc G.},
+  title   = {Functional boxplots},
+  journal = {Journal of Computational and Graphical Statistics},
+  year    = {2011}, volume = {20}, number = {2}, pages = {316--334}}
+@article{03_05_degras2011bands,
+  author  = {Degras, David A.},
+  title   = {Simultaneous confidence bands for nonparametric regression with functional data},
+  journal = {Statistica Sinica},
+  year    = {2011}, volume = {21}, number = {4}, pages = {1735--1765}}
+@article{03_05_hyndman1996hdr,
+  author  = {Hyndman, Rob J.},
+  title   = {Computing and graphing highest density regions},
+  journal = {The American Statistician},
+  year    = {1996}, volume = {50}, number = {2}, pages = {120--126}}
+@article{03_05_hyndman2010rainbow,
+  author  = {Hyndman, Rob J. and Shang, Han Lin},
+  title   = {Rainbow plots, bagplots, and boxplots for functional data},
+  journal = {Journal of Computational and Graphical Statistics},
+  year    = {2010}, volume = {19}, number = {1}, pages = {29--45}}
+
+@article{03_05_hartigan1985dip,
+  author  = {Hartigan, J. A. and Hartigan, P. M.},
+  title   = {The dip test of unimodality},
+  journal = {The Annals of Statistics},
+  year    = {1985}, volume = {13}, number = {1}, pages = {70--84}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Anexo 1  -- Simulacion
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+@article{ane_00_01_granger1980introduction,
+  author  = {Granger, Clive W. J. and Joyeux, Roselyne},
+  title   = {An introduction to long-memory time series models and fractional differencing},
+  journal = {Journal of Time Series Analysis},
+  volume  = {1},
+  number  = {1},
+  pages   = {15--29},
+  year    = {1980}
+}
+
+@article{ane_00_01_hosking1981fractional,
+  author  = {Hosking, J. R. M.},
+  title   = {Fractional differencing},
+  journal = {Biometrika},
+  volume  = {68},
+  number  = {1},
+  pages   = {165--176},
+  year    = {1981}
+}
+
+@article{ane_00_01_davies1987tests,
+  author  = {Davies, R. B. and Harte, D. S.},
+  title   = {Tests for {H}urst effect},
+  journal = {Biometrika},
+  volume  = {74},
+  number  = {1},
+  pages   = {95--101},
+  year    = {1987}
+}
+
+@article{ane_00_01_hamilton1989new,
+  author  = {Hamilton, James D.},
+  title   = {A new approach to the economic analysis of nonstationary time series and the business cycle},
+  journal = {Econometrica},
+  volume  = {57},
+  number  = {2},
+  pages   = {357--384},
+  year    = {1989}
+}
+
+@article{ane_00_01_bollerslev1986generalized,
+  author  = {Bollerslev, Tim},
+  title   = {Generalized autoregressive conditional heteroskedasticity},
+  journal = {Journal of Econometrics},
+  volume  = {31},
+  number  = {3},
+  pages   = {307--327},
+  year    = {1986}
+}
+
+
+@misc{04_01_hogue2019metro,
+  author       = {Hogue, John},
+  title        = {Metro Interstate Traffic Volume},
+  year         = {2019},
+  howpublished = {UCI Machine Learning Repository},
+  note         = {Conjunto de datos},
+  doi          = {10.24432/C5X60B},
+  url          = {https://doi.org/10.24432/C5X60B}
+}

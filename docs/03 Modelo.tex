@@ -320,7 +320,7 @@ La construcción anterior se instancia por separado para cada componente, con á
     \nu_{hm}^{*-1}\right),
     \qquad m = 1, \dots, M,
 \end{equation}
-donde el score presente juega el rol de la variable respuesta $y$ de la Sección~\ref{03_03_01_especificacion_modelo_mezclas} y el vector $\mathbf{z}_t$ el del predictor $x$, y los pesos, a los que se llama también compuertas de la mezcla, se obtienen del predictor lineal
+donde el score presente juega el rol de la variable respuesta $y$ de la Sección~\ref{03_03_01_especificacion_modelo_mezclas} y el vector $\mathbf{z}_t$ el del predictor $x$, y los pesos se obtienen del predictor lineal
 \begin{equation}\label{eq:eta_psbpm_fd}
     \eta_{hm}(\mathbf{z}_t) = \alpha_{hm}
     - \sum_{j=1}^{p} \rho_{hmj}\bigl|z_{tj} - \Gamma_{hmj}\bigr|,
@@ -573,6 +573,7 @@ El régimen o mecanismo que sortea el generador se registra pero no se entrega a
 
 \begin{table}[H]
 \centering\small
+\setlength{\tabcolsep}{4pt}
 \caption{Escenarios del estudio y configuración de los métodos en cada uno.}
 \label{tab:dis_escenarios}
 \begin{tabular}{p{0.07\textwidth} p{0.30\textwidth} p{0.14\textwidth} p{0.05\textwidth} p{0.20\textwidth} p{0.10\textwidth}}
@@ -680,11 +681,12 @@ FAR & \multicolumn{4}{c}{0.906} & \multicolumn{4}{c}{0.980} & \multicolumn{4}{c}
 \label{fig:res_bloqueA_vs_M_C3}
 \end{figure}
 % Lectura M: el error decae hasta M = 4 (los J_a = 4 scores activos del generador) y después queda plano.
-En las Figuras~\ref{fig:res_bloqueA_vs_M_C1} a~\ref{fig:res_bloqueA_vs_M_C3}, el error de todos los métodos que operan sobre los scores disminuye a medida que aumenta $M$, y lo hace de forma consistente en ambas métricas y en los tres escenarios. Se observa una caída pronunciada entre $M = 1$ y $M = 4$, seguida de un tramo plano en el que los valores solo varían en la tercera cifra. Esta caída se explica porque el error se mide contra la curva completa, por tanto la representación con $M$ scores omite la varianza de los $K - M$ restantes, y cada score adicional la recupera. El quiebre en $M = 4$ coincide con el diseño del generador. La dinámica de cada escenario reside en los $J_a = 4$ primeros scores, mientras que los seis restantes son autorregresivos débiles, casi impredecibles; incluirlos devuelve su varianza a la curva, pero no aporta información útil para la predicción. El FAR, que utiliza los $K$ coeficientes, sirve como referencia del truncamiento. Con $M \le 2$ gana en C-1 por construcción; la mezcla lo alcanza en $M = 3$ y lo supera desde $M = 4$. En C-2 lo supera ya con $M = 1$, porque el primer score concentra la mayor parte de la varianza y es el que más cambia de régimen. En C-3, donde las covariables son los rezagos de todos los scores y la dimensión del estado crece con $M$, el mínimo se alcanza en $M = 5$, mientras que $M = 6$ empeora, porque el sexto score es pasivo y lo que aporta como covariable al mecanismo de compuerta es ruido. El Random Forest sigue la misma trayectoria que el PSBPM-FD, ya que ve los mismos scores, y la distancia entre ambos se abre hasta $M = 4$ y después queda fija.
+En las Figuras~\ref{fig:res_bloqueA_vs_M_C1} a~\ref{fig:res_bloqueA_vs_M_C3}, el error de todos los métodos que operan sobre los scores disminuye a medida que aumenta $M$, y lo hace de forma consistente en ambas métricas y en los tres escenarios. Se observa una caída pronunciada entre $M = 1$ y $M = 4$, seguida de un tramo plano en el que los valores solo varían en la tercera cifra. Esta caída se explica porque el error se mide contra la curva completa, por tanto la representación con $M$ scores omite la varianza de los $K - M$ restantes, y cada score adicional la recupera. El quiebre en $M = 4$ coincide con el diseño del generador. La dinámica de cada escenario reside en los $J_a = 4$ primeros scores, mientras que los seis restantes son autorregresivos débiles, casi impredecibles; incluirlos devuelve su varianza a la curva, pero no aporta información útil para la predicción. El FAR, que utiliza los $K$ coeficientes, sirve como referencia del truncamiento. Con $M \le 2$ gana en C-1 por construcción; la mezcla lo alcanza en $M = 3$ y lo supera desde $M = 4$. En C-2 lo supera ya con $M = 1$, porque el primer score concentra la mayor parte de la varianza y es el que más cambia de régimen. En C-3, donde las covariables son los rezagos de todos los scores y la dimensión del estado crece con $M$, el mínimo se alcanza en $M = 5$, mientras que $M = 6$ empeora, porque el sexto score es pasivo y lo que aporta como covariable a los pesos de la mezcla es ruido. El Random Forest sigue la misma trayectoria que el PSBPM-FD, ya que ve los mismos scores, y la distancia entre ambos se abre hasta $M = 4$ y después queda fija.
 
 % Fuente: 98_resumen_bloqueA_min_max_prom.csv del _05 (test, M_ref); cambio relativo del promedio respecto del FAR.
 \begin{table}[H]
-\centering\small
+\centering\footnotesize
+\setlength{\tabcolsep}{4pt}
 \caption{Cambio relativo del MAE y del RMSE respecto del FAR en $M_{\mathrm{ref}}$, por predictor y escenario. Negativo es mejor que el FAR.}
 \label{tab:res_bloqueA_ganancia}
 \begin{tabular}{l cc cc cc}
@@ -706,7 +708,7 @@ El Cuadro~\ref{tab:res_bloqueA_ganancia} resume cuánto se gana en promedio resp
 % Fuente: 72_ventana_modelos_w30.csv del _05 (test, M_ref, w = 30, sin el medoide); porcentaje de las 271 ventanas.
 % Abajo: el predictor consistente con cada métrica (mediana puntual en C-2 y esperanza en C-1 y C-3 para el MAE; esperanza para el RMSE) contra cada referencia.
 \begin{table}[H]
-\centering\small
+\centering\footnotesize
 \caption{Ventanas de prueba ganadas en $M_{\mathrm{ref}}$. Arriba, fracción en que cada modelo es el mejor, abajo, fracción en que el predictor del PSBPM-FD supera a cada referencia.}
 \label{tab:res_bloqueA_ventanas}
 \begin{tabular}{l cc cc cc}
@@ -762,7 +764,7 @@ Los Cuadros~\ref{tab:res_bloqueB_por_M} a~\ref{tab:res_bloqueB_picp_por_M} resum
 
 % Fuente: 99_resumen_bloqueB_min_max_prom.csv del _05 (test, promedio sobre las ventanas, todas las bandas y M).
 \begin{table}[H]
-\centering\small
+\centering\footnotesize
 \setlength{\tabcolsep}{4pt}
 \caption{Winkler en el bloque de prueba por escenario y $M$. En negrita el menor entre las construcciones en $M_{\mathrm{ref}}$, menor es mejor.}
 \label{tab:res_bloqueB_por_M}
@@ -788,7 +790,7 @@ FAR & \multicolumn{3}{c}{4.35} & \multicolumn{3}{c}{4.86} & \multicolumn{3}{c}{4
 \end{table}
 
 \begin{table}[H]
-\centering\small
+\centering\footnotesize
 \setlength{\tabcolsep}{4pt}
 \caption{MPIW en el bloque de prueba por escenario y $M$.}
 \label{tab:res_bloqueB_mpiw_por_M}
@@ -814,7 +816,7 @@ FAR & \multicolumn{3}{c}{3.42} & \multicolumn{3}{c}{3.98} & \multicolumn{3}{c}{3
 \end{table}
 
 \begin{table}[H]
-\centering\small
+\centering\footnotesize
 \setlength{\tabcolsep}{4pt}
 \caption{PICP en el bloque de prueba por escenario y $M$.}
 \label{tab:res_bloqueB_picp_por_M}
@@ -1015,7 +1017,7 @@ El Cuadro~\ref{tab:res_pronostico} resume, en $M_{\mathrm{ref}}$ de C-2, el erro
 
 % Fuente: 113_opciones_por_origen.csv del _06 (m10, test, opción "tipica"); MAE = media por origen, RMSE = raíz de la media de los cuadrados por origen. Coincide con 119_resumen_opciones_por_M.csv.
 \begin{table}[H]
-\centering\small
+\centering\footnotesize
 \caption{Pronóstico por comportamiento en el bloque de prueba de C-2 ($M_{\mathrm{ref}}$), sobre todos los orígenes y sobre los que tienen más de un comportamiento.}
 \label{tab:res_pronostico}
 \begin{tabular}{l cc cc}
@@ -1043,8 +1045,8 @@ Elegir el comportamiento más probable es una apuesta, y por tanto, sobre todos 
 
 % Fuente: 113_opciones_por_origen.csv de cada M del _06 (test, opción "tipica"), medias por origen como en tab:res_pronostico.
 \begin{table}[H]
-\centering\small
-\setlength{\tabcolsep}{4pt}
+\centering\footnotesize
+\setlength{\tabcolsep}{3pt}
 \caption{MAE y RMSE en el bloque de prueba de C-2 por $M$ del pronóstico por comportamiento, de la cota, de la esperanza, del FAR y del Random Forest.}
 \label{tab:res_pronostico_por_M}
 \begin{tabular}{c ccccc ccccc}
@@ -1110,7 +1112,7 @@ La probabilidad del comportamiento elegido dice cuándo conviene apostar, como m
 
 En la predicción puntual, el PSBPM-FD supera al FAR en los tres escenarios, y lo hace de forma sostenida a lo largo del bloque de prueba y no solo en promedio. En C-2, donde la media condicional es no lineal, la esperanza reduce el MAE y el RMSE en torno a un $21\%$ y gana todas las ventanas de prueba. En C-1 y C-3, donde la media condicional es lineal o casi lineal y la referencia está casi bien especificada, la reducción promedio es cercana al $2\%$, pero se repite en cerca de nueve de cada diez ventanas, y alguno de los tres predictores del PSBPM-FD es el mejor modelo en el $82\%$ y el $74\%$ de ellas. Una diferencia pequeña en el promedio corresponde, por tanto, a una ventaja consistente y no a unos pocos tramos favorables. Entre los predictores, la esperanza es la mejor bajo RMSE y la mediana puntual bajo MAE donde la predictiva es multimodal, como corresponde a la pérdida que cada una minimiza, y el átomo más probable es el más débil. En los tres escenarios el error deja de bajar en $M = 4$, la dimensión en que se observa toda la dinámica, la cual es justamente como se simulo.\\
 
-El Random Forest, con las mismas covariables, tiene un error mayor que el FAR en C-1 y queda por detrás del PSBPM-FD en más del $80\%$ de las ventanas de C-1 y C-3, pero es el mejor predictor puntual de C-2, en promedio y en dos de cada tres ventanas. Esto es coherente con la estructura de umbral del escenario, que sus cortes reproducen directamente, mientras que las compuertas probit del PSBPM-FD son suaves. Aun así, la curva que lo supera suele estar entre las opciones de la predictiva del PSBPM-FD ya que como se observo su mejor comportamiento tiene un MAE menor que el del Random Forest, sobre todo en los orígenes con más de un comportamiento ($0.478$ frente a $0.559$), no obstante esta comparación no es del todo justa en la practica ya que es una cota y no un predictor, pero a pesar de eso este resultado indica que la desventaja del PSBPM-FD está en resumir una predictiva multimodal en una sola curva y no en la información que contiene.\\
+El Random Forest, con las mismas covariables, tiene un error mayor que el FAR en C-1 y queda por detrás del PSBPM-FD en más del $80\%$ de las ventanas de C-1 y C-3, pero es el mejor predictor puntual de C-2, en promedio y en dos de cada tres ventanas. Esto es coherente con la estructura de umbral del escenario, que sus cortes reproducen directamente, mientras que los pesos probit del PSBPM-FD cambian de forma suave. Aun así, la curva que lo supera suele estar entre las opciones de la predictiva del PSBPM-FD ya que como se observo su mejor comportamiento tiene un MAE menor que el del Random Forest, sobre todo en los orígenes con más de un comportamiento ($0.478$ frente a $0.559$). No obstante, esta comparación no es del todo justa en la práctica, ya que es una cota y no un predictor, pero a pesar de eso este resultado indica que la desventaja del PSBPM-FD está en resumir una predictiva multimodal en una sola curva y no en la información que contiene.\\
 
 Los intervalos son donde el modelo muestra su ventaja más clara. Las bandas puntuales del PSBPM-FD reducen el Winkler del FAR en un $20\%$ a $22\%$ en C-2 y en cerca de un $3\%$ en C-1 y C-3, y lo superan en entre el $73\%$ y el $100\%$ de las ventanas. En C-2 la reducción viene a la vez de una banda un $10\%$ más angosta y de una mayor cobertura; en C-1 y C-3, de una mejor calibración. La razón es que el ancho de la banda del PSBPM-FD se adapta al estado del proceso, angosta en los tramos tranquilos y ancha en los episodios de mayor varianza o en el régimen volátil, mientras que la banda del FAR hereda una varianza residual fija y tiene el mismo ancho en todos los orígenes. Esa adaptación es la que una ley de error rígida no puede dar, y es la razón por la que la ventaja en los intervalos aparece incluso donde la media condicional es lineal. La región de máxima densidad solo se separa de la equi-colas en C-2, donde la predictiva tiene valles, y ahí es la mejor banda en nueve de cada diez ventanas. La banda simultánea pierde el Winkler por ser más ancha, pero es la única que cubre la curva completa con una frecuencia cercana a la nominal.\\
 
@@ -1120,7 +1122,7 @@ Los comportamientos admiten además una lectura como agrupamiento. Cuando el cam
 
 La principal limitación de los comportamientos es la sobredetección. El modelo declara más de un comportamiento en el $30\%$ de los orígenes de prueba de C-2, mientras que la ley verdadera es multimodal solo en cerca de un $9\%$, porque la transición probit suave deja masa en el régimen volátil lejos del umbral. En la misma línea, cuando la probabilidad del comportamiento elegido está entre $0.5$ y $0.7$, el acierto es de 5 en 16 orígenes, por debajo de lo que esa probabilidad indica; con tan pocos orígenes no puede separarse si se debe a rezagos sobre el umbral o a una probabilidad optimista del modelo.\\
 
-En la práctica, el resumen que conviene reportar depende de la forma de la predictiva en cada origen, que los comportamientos permiten leer. Cuando la predictiva tiene un solo comportamiento, la esperanza resume bien la curva siguiente; cuando tiene más de uno, conviene acompañarla de la mediana puntual o del pronóstico por comportamiento, según la probabilidad de cada opción. Entre los intervalos, la banda equi-colas es la construcción de referencia, la simultánea es la opción conservadora cuando interesa cubrir la curva completa, a costa de un ancho mayor, y la de máxima densidad es la más ajustada cuando la predictiva tiene valles. En cuanto a la dimensión, con rezagos propios agregar componentes no empeora el error puntual, que se estabiliza una vez cubiertos los scores con dinámica, mientras que con los rezagos de todas las componentes cada score adicional agranda el estado de las compuertas y uno sin dinámica puede empeorarlo, como ocurre en C-3 con $M = 6$. La factorización hace además que los $M$ muestreadores sean independientes y puedan ejecutarse en paralelo, y con rezagos propios basta entrenar el mayor $M$ del barrido y reutilizar sus trazas para los menores.
+En la práctica, el resumen que conviene reportar depende de la forma de la predictiva en cada origen, que los comportamientos permiten leer. Cuando la predictiva tiene un solo comportamiento, la esperanza resume bien la curva siguiente; cuando tiene más de uno, conviene acompañarla de la mediana puntual o del pronóstico por comportamiento, según la probabilidad de cada opción. Entre los intervalos, la banda equi-colas es la construcción de referencia, la simultánea es la opción conservadora cuando interesa cubrir la curva completa, a costa de un ancho mayor, y la de máxima densidad es la más ajustada cuando la predictiva tiene valles. En cuanto a la dimensión, con rezagos propios agregar componentes no empeora el error puntual, que se estabiliza una vez cubiertos los scores con dinámica, mientras que con los rezagos de todas las componentes cada score adicional agranda el conjunto de covariables de los pesos de la mezcla y uno sin dinámica puede empeorarlo, como ocurre en C-3 con $M = 6$. La factorización hace además que los $M$ muestreadores sean independientes y puedan ejecutarse en paralelo, y con rezagos propios basta entrenar el mayor $M$ del barrido y reutilizar sus trazas para los menores.
 
 
 

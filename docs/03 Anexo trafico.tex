@@ -97,8 +97,7 @@ La serie diaria, sus momentos, la representación en la base B-spline y la FPCA 
 \section{Métricas completas}
 \label{aneC_00_03_metricas}
 
-Las diez métricas del Marco Teórico en el bloque de prueba, como promedio sobre las ventanas de ancho $w = 30$: las cuatro métricas de error para los tres predictores puntuales del PSBPM-FD, el FAR y el Random Forest, y las seis métricas de intervalo para las tres construcciones del PSBPM-FD y el FAR.
-
+Las diez métricas del Marco Teórico en el bloque de prueba, como promedio sobre las ventanas de ancho $w = 30$.
 % Fuente: 98_resumen_bloqueA_min_max_prom.csv de 101 y 102 (test, M = 10).
 \begin{table}[H]
 \centering\small
@@ -317,7 +316,7 @@ Total     & 229 & 125 & 3 & 357 \\
 \end{tabular}
 \end{table}
 
-El Cuadro~\ref{tab:aneC_feriados} muestra el número de comportamientos en los once feriados del bloque de prueba. Con el rezago de un día nueve de ellos tienen dos comportamientos. Con el rezago semanal conservan dos cinco feriados, todos en lunes, y pasan a uno los dos de mitad de semana y dos lunes; un solo comportamiento no implica que el perfil sea el correcto, porque en esos días la semana anterior anuncia un día laborable.
+El Cuadro~\ref{tab:aneC_feriados} muestra el número de comportamientos en los once feriados del bloque de prueba. Con el rezago de un día nueve de ellos tienen dos comportamientos. Con el rezago semanal conservan dos comportamientos cinco feriados, todos en lunes, y pasan a uno los dos de mitad de semana y dos lunes; un solo comportamiento no implica que el perfil sea el correcto, porque en esos días la semana anterior anuncia un día laborable.
 
 % Fuente: 65_comportamientos_calendario.csv y K de comportamientos_psbp.npz de 101 y 102.
 \begin{table}[H]
@@ -498,9 +497,16 @@ El error y la banda de credibilidad de cada score, como en la Sección~\ref{aneB
 
 \section{Selección de variables en los scores menores}
 \label{aneC_00_09_seleccion}
-% Autofunciones 5-10 (scratchpad figuras_pip.py) y PIP global con burn = 1000 (= 46_pip.csv del _03 de 101 y 102).
+% Autofunciones 1-4 y 5-10 (scratchpad figuras_pip.py) y PIP global con burn = 1000 (= 46_pip.csv del _03 de 101 y 102).
 
-Complementa la Sección~\ref{04_03_05_seleccion} con las autofunciones de los scores $5$ a $10$ y la ocupación de cada mezcla, que condiciona la lectura de la PIP.
+Complementa la Sección~\ref{04_03_05_seleccion} con las autofunciones de la FPCA y la ocupación de cada mezcla, que condiciona la lectura de la PIP.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth,height=0.45\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_autofunciones.png}
+\caption{Curva media del bloque de entrenamiento y su perturbación $\mu \pm 2\sqrt{\lambda_m}\,\psi_m$ a lo largo de las cuatro primeras autofunciones, con la fracción de varianza que explica cada una.}
+\label{fig:aneC_autofunciones}
+\end{figure}
 
 \begin{figure}[H]
 \centering
@@ -509,7 +515,7 @@ Complementa la Sección~\ref{04_03_05_seleccion} con las autofunciones de los sc
 \label{fig:aneC_autofunciones_menores}
 \end{figure}
 
-Las autofunciones menores (Figura~\ref{fig:aneC_autofunciones_menores}) son ajustes locales del perfil, de una amplitud de unos cientos de vehículos por hora frente a los miles de las cuatro primeras. La quinta mueve la madrugada, entre la una y las cinco, frente a la media mañana; la sexta desplaza la punta de la tarde hacia antes o después de las dieciséis horas; la séptima y la octava ajustan el cierre de la tarde y la noche, y la novena y la décima se concentran en las primeras horas del día, en el borde del dominio.
+Las autofunciones menores (Figura~\ref{fig:aneC_autofunciones_menores}) son ajustes locales del perfil, de una amplitud de unos cientos de vehículos por hora frente a los miles de las cuatro primeras (Figura~\ref{fig:aneC_autofunciones}). La quinta mueve la madrugada, entre la una y las cinco, frente a la media mañana; la sexta desplaza la punta de la tarde hacia antes o después de las dieciséis horas; la séptima y la octava ajustan el cierre de la tarde y la noche, y la novena y la décima se concentran en las primeras horas del día, en el borde del dominio.
 
 \begin{table}[H]
 \centering\small
@@ -519,7 +525,8 @@ Las autofunciones menores (Figura~\ref{fig:aneC_autofunciones_menores}) son ajus
 \begin{tabular}{l c ccc cccc}
 \hline
  & & \multicolumn{3}{c}{Rezago $\{1\}$} & \multicolumn{4}{c}{Rezagos $\{1,7\}$} \\
-Score & Varianza (\%) & $N_1$ & PIP $> 0.5$ & PIP mín. & $N_1$ & PIP $> 0.5$, $t-1$ & PIP $> 0.5$, $t-7$ & PIP mín. \\
+ & & & \multicolumn{2}{c}{PIP} & & \multicolumn{3}{c}{PIP} \\
+Score & Var. (\%) & $N_1$ & $> 0.5$ & mín. & $N_1$ & $> 0.5$, $t-1$ & $> 0.5$, $t-7$ & mín. \\
 \hline
 $\xi_{t1}$  & 79.9 & 8.7  & 5 & 0.06 & 10.3 & 4  & 2  & 0.10 \\
 $\xi_{t2}$  & 12.4 & 15.2 & 4 & 0.16 & 15.3 & 5  & 3  & 0.41 \\

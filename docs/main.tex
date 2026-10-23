@@ -1,0 +1,173 @@
+\documentclass[letterpaper,openright,12pt]{book}
+\usepackage[utf8]{inputenc} % Codificación UTF-8
+\usepackage[right=3cm,left=3cm,top=2cm,bottom=2cm,headsep=0.5cm,footskip=0.5cm]{geometry}
+\usepackage[spanish]{babel} % Idioma español
+\usepackage{amsmath}
+\usepackage{amssymb}% Paquetes matemáticos
+\usepackage{graphicx} % Gráficos
+\usepackage{epsfig} % Figuras EPS
+\usepackage{float} % Control de posiciones [H]
+\usepackage{array, multirow, multicol} % Tablas avanzadas
+
+\usepackage[hidelinks,pdfusetitle,pdfdisplaydoctitle]{hyperref} % Hipervínculos
+\usepackage{siunitx} % Para porcentajes en modo matemático
+
+\usepackage[table]{xcolor} % Colores en tablas
+\usepackage{caption, subcaption} % Subfiguras y subtítulos
+\usepackage{listings} % Código fuente
+\usepackage{xcolor} % Colores personalizados
+\usepackage[backend=biber,natbib=true,style=authoryear-comp]{biblatex} % Bibliografía
+
+\usepackage{bm}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{wrapfig} % Figuras rodeadas de texto
+\usepackage{siunitx} % Para porcentajes y unidades
+
+\usepackage{amsthm}
+\theoremstyle{definition} % estilo para definiciones
+\newtheorem{definition}{Definición}[section] % numeración por sección
+
+% Referencia al archivo de bibliografía
+\addbibresource{ref.bib}
+
+% Configuración del índice
+\setcounter{tocdepth}{5}
+\setcounter{secnumdepth}{5}
+%Sin margenes inecesarios 
+\setlength{\parindent}{0cm}
+
+% Configuración de colores para código
+\definecolor{codegreen}{rgb}{0,0.6,0} % Verde para funciones
+\definecolor{codeblue}{rgb}{0,0,0.8} % Azul para palabras clave
+\definecolor{codepurple}{rgb}{0.58,0,0.82} % Púrpura para operadores y otros
+\definecolor{codegray}{rgb}{0.5,0.5,0.5} % Gris para comentarios
+\definecolor{backcolour}{rgb}{0.97,0.97,0.97} % Fondo claro para el código
+\definecolor{stringcolor}{rgb}{0.8,0.1,0.1} % Rojo para cadenas de texto
+
+% Configuración para código R
+\lstdefinelanguage{R}{
+    keywords={if, else, repeat, while, function, for, in, next, break, TRUE, FALSE, NULL, Inf, NaN, NA, NA_integer_, NA_real_, NA_complex_, NA_character_},
+    keywords=[2]{library, require, source, attach, detach, data, options, setwd, getwd, save, load},
+    keywords=[3]{c, mean, sd, var, sum, length, nrow, ncol, apply, lapply, sapply, tapply, mapply, rnorm, runif, seq, rep, rbind, cbind},
+    keywordstyle=\color{codeblue}\bfseries,      % Palabras clave principales
+    keywordstyle=[2]\color{codepurple}\bfseries, % Comandos de librería y datos
+    keywordstyle=[3]\color{codegreen},           % Funciones comunes
+    comment=[l]{\#},                             % Comentarios con #
+    commentstyle=\color{codegray}\ttfamily,      % Estilo de comentarios
+    stringstyle=\color{stringcolor},             % Estilo para cadenas de texto
+    backgroundcolor=\color{backcolour},          % Fondo del código
+    showstringspaces=false,                      % No mostrar espacios en cadenas
+    basicstyle=\ttfamily\small,                  % Fuente básica del código
+    numberstyle=\tiny\color{codegray},           % Estilo para los números de línea
+    numbers=left,                                % Numeración de líneas a la izquierda
+    stepnumber=1,                                % Numerar cada línea
+    tabsize=2,                                   % Tamaño de tabulación
+    breaklines=true,                             % Dividir líneas largas
+    breakatwhitespace=true,                      % Dividir en espacios
+    captionpos=b,                                % Posición del título del bloque de código
+    literate={~}{{\textasciitilde}}1            % Renderizar ~ correctamente
+}
+%Configuracion de Python 
+\lstdefinestyle{mypython}{
+    language=Python,                          % Lenguaje de programación
+    basicstyle=\ttfamily\footnotesize,         % Estilo básico: fuente monoespaciada de tamaño pequeño
+    backgroundcolor=\color{white},             % Fondo blanco
+    commentstyle=\color{gray}\itshape,         % Comentarios en gris y en cursiva
+    keywordstyle=\color{blue}\bfseries,        % Palabras clave en azul y en negrita
+    stringstyle=\color{red},                   % Cadenas de texto en rojo
+    numbers=left,                              % Números de línea a la izquierda
+    numberstyle=\tiny\color{gray},             % Estilo para los números de línea (pequeños y en gris)
+    stepnumber=1,                              % Incremento en los números de línea
+    numbersep=10pt,                            % Separación entre el código y los números de línea
+    frame=single,                              % Marco alrededor del código
+    rulecolor=\color{black},                   % Color del marco
+    captionpos=b,                              % Leyenda en la parte inferior
+    breaklines=true,                           % Rompe las líneas largas automáticamente
+    breakatwhitespace=true,                    % Rompe solo en los espacios en blanco
+    showspaces=false,                          % No mostrar los espacios como caracteres
+    showstringspaces=false,                    % No mostrar los espacios en las cadenas
+    showtabs=false,                            % No mostrar las tabulaciones
+    escapeinside={\%*}{*)},                    % Permite insertar LaTeX dentro del código
+    moredelim=**[is][\color{purple}]{@}{@},     % Resaltar partes personalizadas del código
+    tabsize=2,                                 % Tamaño de la tabulación
+    extendedchars=true,                        % Caracteres extendidos para lenguajes internacionales
+}
+
+% Establecer la configuración por defecto
+\lstset{style=mypython}
+
+% Configuración de comandos personalizados para insertar bloques de código
+\lstnewenvironment{rcode}[1][]{%
+    \lstset{language=R, caption=#1}%
+}{}
+
+%Problema de codificacion, quitar si genera mucho problemas en el futuro. 
+%\UseRawInputEncoding
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%% PORTADA %%%%%%%%%%%%%%%%%
+
+\begin{titlepage}
+\pagestyle{plain}
+\begin{center}
+\psfig{figure=Logo-2016.png,height=3.5cm,,}
+\end{center}
+\begin{center}
+{\bf Universidad de Santiago de Chile\\  Departamento de Matemática y Ciencia de la Computaci\'on}
+\end{center} 
+\vspace{2cm}
+\begin{center}
+
+{\huge \bf Modelamiento de Series de Tiempo Funcionales a través de Mezclas de Procesos Dirichlet  Dependientes\\
+
+}
+
+\end{center}
+
+\begin{center}
+\vspace{2cm}
+\bf Ingeniería Estadística\\
+\end{center}
+\vspace{4cm}
+
+\begin{flushleft}
+\begin{tabular}{ l }
+%
+%
+
+Profesor: Andres Iturriaga Jofre\\
+
+\vspace{1mm}\\
+
+Estudiante: Juan Francisco Ceballos González\\
+
+\end{tabular}
+\end{flushleft}
+
+\end{titlepage}
+%%%%%%%%%%%%%%%%% FIN PORTADA %%%%%%%%%%%%%%%%%
+\addtocontents{toc}{\hspace{-7.5mm} \textbf{Secciones}}
+\addtocontents{toc}{\hfill \textbf{Página} \par}
+\addtocontents{toc}{\vspace{-1mm} \hspace{1mm}\par}
+
+\tableofcontents\newpage
+
+\input{CAP/00_Antes}
+\input{CAP/01 Introduccion}
+\input{CAP/02 Marco Teorico}
+\input{CAP/03 Modelo}
+\input{CAP/04 Aplicacion}
+\appendix 
+\input{ANE/01 Anexo}
+\input{ANE/02 Anexo Resultados}
+\input{ANE/03 Anexo trafico}
+\input{ANE/04 Anexo otros}
+
+\printbibliography
+
+
+\end{document}
+
+

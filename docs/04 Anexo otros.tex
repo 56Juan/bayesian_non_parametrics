@@ -9,7 +9,7 @@ Este anexo reúne los resultados del PSBPM-FD en otras cinco series reales de cu
 \section{Series y configuración}
 \label{aneD_00_01_series}
 
-El Cuadro~\ref{tab:aneD_series} describe las series. Cada día es una curva observada en $G$ instantes, a la que se aplica, cuando se indica, una transformación que estabiliza su escala, y las métricas se calculan en la escala transformada. La configuración es la del tráfico con el rezago de un día (Cuadro~\ref{tab:aneC_configuracion}): base B-spline cúbica de $K = 10$ funciones con el mismo tratamiento de los huecos, FPCA estimada con el bloque de entrenamiento, $M = 10$ componentes, los diez scores del día anterior como covariables de cada score, $a_\nu = 2$, inclusión a priori $(1, 5)$ y una cadena de 2500 iteraciones con 30 átomos. La única diferencia es el calentamiento, de 500 iteraciones en lugar de 1000. Las referencias son el FAR(1), con su banda gaussiana, y el Random Forest con las mismas covariables.
+El Cuadro~\ref{tab:aneD_series} describe las series. Cada día es una curva observada en $G$ instantes, a la que se aplica, cuando se indica, una transformación que estabiliza su escala, y las métricas se calculan en la escala transformada. La configuración es la del tráfico con el rezago de un día (Cuadro~\ref{tab:aneC_configuracion}) con base B-spline cúbica de $K = 10$ funciones con el mismo tratamiento de los huecos, FPCA estimada con el bloque de entrenamiento, $M = 10$ componentes, los diez scores del día anterior como covariables de cada score, $a_\nu = 2$, inclusión a priori $(1, 5)$ y una cadena de 2500 iteraciones con 30 átomos. La única diferencia es el calentamiento, de 500 iteraciones en lugar de 1000. Las referencias son el FAR(1), con su banda gaussiana, y el Random Forest con las mismas covariables.
 
 % Fuente: datasets_manifest.json y 65_comportamientos_calendario.csv de cada corrida; descripción de la curva en el _01.
 \begin{table}[H]
@@ -17,7 +17,7 @@ El Cuadro~\ref{tab:aneD_series} describe las series. Cada día es una curva obse
 \setlength{\tabcolsep}{3.5pt}
 \caption{Series reales adicionales: variable de la curva diaria, número de instantes por día ($G$), período, número de días ($T$) y partición en entrenamiento y prueba.}
 \label{tab:aneD_series}
-\begin{tabular}{l p{0.36\textwidth} c c c c}
+\begin{tabular}{l p{0.32\textwidth} c c c c}
 \hline
 Serie & Curva diaria & $G$ & Período & $T$ & Entren. / prueba \\
 \hline
@@ -37,8 +37,8 @@ Los Cuadros~\ref{tab:aneD_bloqueA} a~\ref{tab:aneD_bloqueA_gana} resumen el MAE 
 
 % Fuente: 98_resumen_bloqueA_min_max_prom.csv del barrido (test, M = 10, promedio sobre ventanas).
 \begin{table}[H]
-\centering\small
-\setlength{\tabcolsep}{3pt}
+\centering\footnotesize
+\setlength{\tabcolsep}{2.5pt}
 \caption{MAE y RMSE en el bloque de prueba por serie ($M = 10$, $w = 30$). En negrita el menor de cada métrica.}
 \label{tab:aneD_bloqueA}
 \begin{tabular}{l ccccc ccccc}
@@ -62,7 +62,7 @@ Volatilidad BTC & 0.3288 & 0.3303 & 0.3489 & 0.3292 & \textbf{0.3242} & 0.4229 &
 \label{tab:aneD_bloqueA_ganancia}
 \begin{tabular}{l cc cc cc cc}
 \hline
- & \multicolumn{2}{c}{Esperanza} & \multicolumn{2}{c}{Mediana puntual} & \multicolumn{2}{c}{Átomo más probable} & \multicolumn{2}{c}{Random Forest} \\
+ & \multicolumn{2}{c}{Esperanza} & \multicolumn{2}{c}{Mediana} & \multicolumn{2}{c}{Modal} & \multicolumn{2}{c}{Random Forest} \\
 Serie & MAE & RMSE & MAE & RMSE & MAE & RMSE & MAE & RMSE \\
 \hline
 Precio SA1 & $0.0\%$ & $0.0\%$ & $+0.2\%$ & $+0.3\%$ & $+4.8\%$ & $+5.6\%$ & $+4.1\%$ & $+2.5\%$ \\
