@@ -29,14 +29,15 @@
 \usepackage{xcolor} % Colores personalizados
 \usepackage[backend=biber,natbib=true,style=authoryear-comp]{biblatex} % Bibliografía
 
-\usepackage{bm}
 \usepackage{algorithm}
 \usepackage{algorithmic}
 \usepackage{wrapfig} % Figuras rodeadas de texto
 \usepackage{siunitx} % Para porcentajes y unidades
 
 \usepackage{amsthm}
-\usepackage{newtxtext,newtxmath} % Times; debe ir después de amsmath y amsthm (ambos definen \openbox)
+\usepackage{newtxtext} % Times; debe ir después de amsmath y amsthm (ambos definen \openbox)
+\usepackage[bigdelims]{newtxmath}
+\usepackage{bm} % después de newtxmath, para que \boldsymbol use la negrita de Times y no la de Computer Modern
 \theoremstyle{definition} % estilo para definiciones
 \newtheorem{definition}{Definición}[section] % numeración por sección
 
