@@ -1,11 +1,13 @@
 % Requiere \usepackage{longtable} en main.tex.
 \chapter*{Simbología}
+\markboth{Simbología}{Simbología}
 \addcontentsline{toc}{chapter}{Simbología}
 
-Cada símbolo tiene un único significado en toda la tesis. La última columna indica la sección donde se define o se usa por primera vez.
+Cada símbolo tiene un único significado en toda la tesis, salvo los pocos casos que la propia tabla señala y que el contexto distingue. La última columna indica la sección donde se define o se usa por primera vez.
 
 \small
-\begin{longtable}{p{0.17\textwidth} p{0.66\textwidth} p{0.12\textwidth}}
+\setlength{\tabcolsep}{4pt}
+\begin{longtable}{p{0.16\textwidth} p{0.65\textwidth} p{0.12\textwidth}}
 \hline
 Símbolo & Significado & Sección \\
 \hline
@@ -269,4 +271,5 @@ $\boldsymbol{\Lambda}^{1/2}$ & Matriz diagonal $\mathrm{diag}(\sqrt{\lambda_1}, 
 $\tilde{\boldsymbol{\mu}}_k$, $\tilde{A}_{k,\ell}$, $\tilde{\eta}_k$ & Parámetros del mecanismo $k$ en la coordenada estandarizada (C-3) & \S\ref{ane_00_02_03_alg_c3} \\
 $\tilde{\sigma}_j$ & Desviación de la innovación del score $j$ en la coordenada estandarizada (C-3) & \S\ref{ane_00_02_03_alg_c3} \\
 \end{longtable}
+\setlength{\tabcolsep}{6pt} % valor por defecto, para los cuadros de los capítulos
 \normalsize

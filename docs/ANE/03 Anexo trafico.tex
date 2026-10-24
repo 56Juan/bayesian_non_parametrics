@@ -45,49 +45,49 @@ Las constantes de los comportamientos son las del Cuadro~\ref{tab:dis_comportami
 
 La serie diaria, sus momentos, la representación en la base B-spline y la FPCA son comunes a las dos especificaciones.
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth,height=0.7\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_04_serie_diaria.png}
 \caption{Serie diaria del volumen de tráfico.}
 \label{fig:aneC_04_serie_diaria}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth,height=0.7\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_03_media_varianza_raw.png}
 \caption{Media y varianza de la curva diaria.}
 \label{fig:aneC_03_media_varianza_raw}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth,height=0.7\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_06_fts_funcional_bspline.png}
 \caption{Curvas diarias en la base B-spline con $J = 10$.}
 \label{fig:aneC_06_fts_funcional_bspline}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth,height=0.7\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_07_fpca_scree.png}
 \caption{Varianza explicada por componente de la FPCA (bloque de entrenamiento).}
 \label{fig:aneC_07_fpca_scree}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth,height=0.7\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_07b_series_scores.png}
 \caption{Series de scores de la FPCA.}
 \label{fig:aneC_07b_series_scores}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth,height=0.7\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_09a_rezagos_pearson.png}
 \caption{Autocorrelación de los scores por rezago (Pearson).}
 \label{fig:aneC_09a_rezagos_pearson}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth,height=0.7\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_10_tres_curvas.png}
 \caption{Tres curvas observadas y su representación con $M = 10$.}
@@ -145,14 +145,14 @@ $\{1,7\}$ & Equi-colas      & 1.752 & 0.956 & 0.754 & 2.707 & 8.041 & 67.843 \\
 \end{tabular}
 \end{table}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth,height=0.75\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_78_ganador_ventana_bloqueA_101.png}
 \caption{Modelo con menor MAE en cada ventana, tráfico con rezago $\{1\}$ ($M = 10$).}
 \label{fig:aneC_78_ganador_ventana_bloqueA_101}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth,height=0.75\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_78_ganador_ventana_bloqueA_102.png}
 \caption{Modelo con menor MAE en cada ventana, tráfico con rezagos $\{1,7\}$ ($M = 10$).}
@@ -166,56 +166,56 @@ Las métricas de error y de intervalo sobre la ventana móvil con $w = 20$ y $w 
 
 % Fuente: 72_ventana_modelos_w{20,40}.csv del _05 y ventana móvil de las bandas de banda_funcional_psbp.npz,
 % recalculada con la llamada del _04 (con w = 30 reproduce 81_ventana_bloqueB_w30.csv a 1e-14).
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth]{IMG/aneC_00/aneC_00_58_ventana_predictores_w20_101.png}
 \caption{Métricas de error sobre la ventana móvil con $w = 20$, tráfico con rezago $\{1\}$ ($M = 10$).}
 \label{fig:aneC_58_ventana_predictores_w20_101}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth]{IMG/aneC_00/aneC_00_58_ventana_predictores_w40_101.png}
 \caption{Métricas de error sobre la ventana móvil con $w = 40$, tráfico con rezago $\{1\}$ ($M = 10$).}
 \label{fig:aneC_58_ventana_predictores_w40_101}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth]{IMG/aneC_00/aneC_00_58_ventana_predictores_w20_102.png}
 \caption{Métricas de error sobre la ventana móvil con $w = 20$, tráfico con rezagos $\{1,7\}$ ($M = 10$).}
 \label{fig:aneC_58_ventana_predictores_w20_102}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth]{IMG/aneC_00/aneC_00_58_ventana_predictores_w40_102.png}
 \caption{Métricas de error sobre la ventana móvil con $w = 40$, tráfico con rezagos $\{1,7\}$ ($M = 10$).}
 \label{fig:aneC_58_ventana_predictores_w40_102}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth]{IMG/aneC_00/aneC_00_59_ventana_intervalos_w20_101.png}
 \caption{Métricas de intervalo sobre la ventana móvil con $w = 20$, tráfico con rezago $\{1\}$ ($M = 10$).}
 \label{fig:aneC_59_ventana_intervalos_w20_101}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth]{IMG/aneC_00/aneC_00_59_ventana_intervalos_w40_101.png}
 \caption{Métricas de intervalo sobre la ventana móvil con $w = 40$, tráfico con rezago $\{1\}$ ($M = 10$).}
 \label{fig:aneC_59_ventana_intervalos_w40_101}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth]{IMG/aneC_00/aneC_00_59_ventana_intervalos_w20_102.png}
 \caption{Métricas de intervalo sobre la ventana móvil con $w = 20$, tráfico con rezagos $\{1,7\}$ ($M = 10$).}
 \label{fig:aneC_59_ventana_intervalos_w20_102}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth]{IMG/aneC_00/aneC_00_59_ventana_intervalos_w40_102.png}
 \caption{Métricas de intervalo sobre la ventana móvil con $w = 40$, tráfico con rezagos $\{1,7\}$ ($M = 10$).}
@@ -228,56 +228,56 @@ Las métricas de error y de intervalo sobre la ventana móvil con $w = 20$ y $w 
 
 Extractos de predicciones del bloque de prueba, la ventana de peor RMSE y los tres predictores puntuales en cuatro orígenes de la ventana de detalle.
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth,height=0.8\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_54_extractos_curvas_test_101.png}
 \caption{Extractos de predicciones del bloque de prueba, tráfico con rezago $\{1\}$ ($M = 10$).}
 \label{fig:aneC_54_extractos_curvas_test_101}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth,height=0.8\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_55_extractos_frontera_101.png}
 \caption{Predicciones en la frontera entre los bloques de entrenamiento y de prueba, tráfico con rezago $\{1\}$ ($M = 10$).}
 \label{fig:aneC_55_extractos_frontera_101}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth,height=0.8\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_56b_peor_ventana_rmse_f_t908_101.png}
 \caption{Ventana de peor RMSE (origen $t = 908$), tráfico con rezago $\{1\}$ ($M = 10$).}
 \label{fig:aneC_56b_peor_ventana_rmse_f_t908_101}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth,height=0.8\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_54_extractos_curvas_test_102.png}
 \caption{Extractos de predicciones del bloque de prueba, tráfico con rezagos $\{1,7\}$ ($M = 10$).}
 \label{fig:aneC_54_extractos_curvas_test_102}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth,height=0.8\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_55_extractos_frontera_102.png}
 \caption{Predicciones en la frontera entre los bloques de entrenamiento y de prueba, tráfico con rezagos $\{1,7\}$ ($M = 10$).}
 \label{fig:aneC_55_extractos_frontera_102}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth,height=0.8\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_56b_peor_ventana_rmse_f_t908_102.png}
 \caption{Ventana de peor RMSE (origen $t = 908$), tráfico con rezagos $\{1,7\}$ ($M = 10$).}
 \label{fig:aneC_56b_peor_ventana_rmse_f_t908_102}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth]{IMG/aneC_00/aneC_00_61b_curvas_predictores_101.png}
 \caption{Esperanza, mediana puntual y átomo más probable en cuatro orígenes de la ventana de detalle, con la banda equi-colas y la curva observada, tráfico con rezago $\{1\}$ ($M = 10$).}
 \label{fig:aneC_predictores_101}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth]{IMG/aneC_00/aneC_00_61b_curvas_predictores_102.png}
 \caption{Esperanza, mediana puntual y átomo más probable en cuatro orígenes de la ventana de detalle, con la banda equi-colas y la curva observada, tráfico con rezagos $\{1,7\}$ ($M = 10$).}
@@ -290,7 +290,7 @@ Extractos de predicciones del bloque de prueba, la ventana de peor RMSE y los tr
 Esta sección complementa la Sección~\ref{04_03_03_comportamientos} con el número de comportamientos a lo largo del bloque de prueba, su transición entre especificaciones, los feriados, las extracciones y el catálogo de comportamientos, y los diez orígenes de la ventana de detalle.
 
 % Fuente: K de comportamientos_psbp.npz y calendario de 65_comportamientos_calendario.csv (test).
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth]{IMG/aneC_00/aneC_00_102b_K_serie.png}
 \caption{Número de comportamientos $K_t$ en cada origen de prueba, con los días no laborables marcados, con rezago $\{1\}$ (arriba) y rezagos $\{1,7\}$ (abajo) ($M = 10$).}
@@ -342,28 +342,28 @@ Fecha & Día & Feriado & $\{1\}$ & $\{1,7\}$ \\
 \end{tabular}
 \end{table}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth,height=0.6\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_61_histogramas_draws_101.png}
 \caption{Histograma de las extracciones del score en un origen con más de un comportamiento, tráfico con rezago $\{1\}$ ($M = 10$).}
 \label{fig:aneC_hist_101}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth,height=0.6\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_61_histogramas_draws_102.png}
 \caption{Histograma de las extracciones del score en un origen con más de un comportamiento, tráfico con rezagos $\{1,7\}$ ($M = 10$).}
 \label{fig:aneC_hist_102}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth,height=0.6\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_64_catalogo_global_101.png}
 \caption{Catálogo global de comportamientos, tráfico con rezago $\{1\}$ ($M = 10$).}
 \label{fig:aneC_catalogo_101}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth,height=0.6\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_64_catalogo_global_102.png}
 \caption{Catálogo global de comportamientos, tráfico con rezagos $\{1,7\}$ ($M = 10$).}
@@ -371,14 +371,14 @@ Fecha & Día & Feriado & $\{1\}$ & $\{1,7\}$ \\
 \end{figure}
 
 % Fuente: comportamientos_psbp.npz y banda_funcional_psbp.npz del _04 de 101 y 102, curva suavizada (theta @ phi^T).
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth]{IMG/aneC_00/aneC_00_63_detalle_101.png}
 \caption{Ventana de detalle completa, del 23 de diciembre de 2017 al 1 de enero de 2018, tráfico con rezago $\{1\}$ ($M = 10$): curva observada, esperanza y, por comportamiento, curva típica, banda condicional y probabilidad.}
 \label{fig:aneC_detalle_101}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth]{IMG/aneC_00/aneC_00_63_detalle_102.png}
 \caption{Ventana de detalle completa, del 23 de diciembre de 2017 al 1 de enero de 2018, tráfico con rezagos $\{1,7\}$ ($M = 10$). Con tres comportamientos, las probabilidades van en orden de nivel.}
@@ -391,42 +391,42 @@ Fecha & Día & Feriado & $\{1\}$ & $\{1,7\}$ \\
 
 Las tres construcciones de intervalo del PSBPM-FD y la banda del FAR en los diez orígenes de la ventana de detalle.
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth,height=0.75\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_79_ic_contraste_detalle_101.png}
 \caption{Bandas equi-colas y del FAR en la ventana de detalle, tráfico con rezago $\{1\}$ ($M = 10$).}
 \label{fig:aneC_79_ic_contraste_detalle_101}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth,height=0.75\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_79_ic_contraste_detalle_hdr_101.png}
 \caption{Región de máxima densidad en la ventana de detalle, tráfico con rezago $\{1\}$ ($M = 10$).}
 \label{fig:aneC_79_ic_contraste_detalle_hdr_101}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth,height=0.75\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_79_ic_contraste_detalle_simultanea_101.png}
 \caption{Banda simultánea en la ventana de detalle, tráfico con rezago $\{1\}$ ($M = 10$).}
 \label{fig:aneC_79_ic_contraste_detalle_simultanea_101}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth,height=0.75\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_79_ic_contraste_detalle_102.png}
 \caption{Bandas equi-colas y del FAR en la ventana de detalle, tráfico con rezagos $\{1,7\}$ ($M = 10$).}
 \label{fig:aneC_79_ic_contraste_detalle_102}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth,height=0.75\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_79_ic_contraste_detalle_hdr_102.png}
 \caption{Región de máxima densidad en la ventana de detalle, tráfico con rezagos $\{1,7\}$ ($M = 10$).}
 \label{fig:aneC_79_ic_contraste_detalle_hdr_102}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth,height=0.75\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_79_ic_contraste_detalle_simultanea_102.png}
 \caption{Banda simultánea en la ventana de detalle, tráfico con rezagos $\{1,7\}$ ($M = 10$).}
@@ -439,56 +439,56 @@ Las tres construcciones de intervalo del PSBPM-FD y la banda del FAR en los diez
 
 El error y la banda de credibilidad de cada score, como en la Sección~\ref{aneB_00_05_intervalos_componente} para la simulación.
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth,height=0.75\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_91_ventana_univariado_w30_101.png}
 \caption{Error de cada score sobre la ventana móvil, tráfico con rezago $\{1\}$ ($M = 10$).}
 \label{fig:aneC_91_ventana_univariado_w30_101}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth,height=0.75\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_92_scores_banda_credibilidad_101.png}
 \caption{Banda de credibilidad al 95\% de cada score, tráfico con rezago $\{1\}$ ($M = 10$).}
 \label{fig:aneC_92_scores_banda_credibilidad_101}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth,height=0.75\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_93_ventana_scores_intervalo_w30_101.png}
 \caption{Métricas de intervalo de cada score sobre la ventana móvil, tráfico con rezago $\{1\}$ ($M = 10$).}
 \label{fig:aneC_93_ventana_scores_intervalo_w30_101}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth,height=0.75\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_94_scores_dispersion_vs_real_101.png}
 \caption{Dispersión estimada de cada score frente a la observada, tráfico con rezago $\{1\}$ ($M = 10$).}
 \label{fig:aneC_94_scores_dispersion_vs_real_101}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth,height=0.75\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_91_ventana_univariado_w30_102.png}
 \caption{Error de cada score sobre la ventana móvil, tráfico con rezagos $\{1,7\}$ ($M = 10$).}
 \label{fig:aneC_91_ventana_univariado_w30_102}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth,height=0.75\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_92_scores_banda_credibilidad_102.png}
 \caption{Banda de credibilidad al 95\% de cada score, tráfico con rezagos $\{1,7\}$ ($M = 10$).}
 \label{fig:aneC_92_scores_banda_credibilidad_102}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth,height=0.75\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_93_ventana_scores_intervalo_w30_102.png}
 \caption{Métricas de intervalo de cada score sobre la ventana móvil, tráfico con rezagos $\{1,7\}$ ($M = 10$).}
 \label{fig:aneC_93_ventana_scores_intervalo_w30_102}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth,height=0.75\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_94_scores_dispersion_vs_real_102.png}
 \caption{Dispersión estimada de cada score frente a la observada, tráfico con rezagos $\{1,7\}$ ($M = 10$).}
@@ -501,14 +501,14 @@ El error y la banda de credibilidad de cada score, como en la Sección~\ref{aneB
 
 Complementa la Sección~\ref{04_03_05_seleccion} con las autofunciones de la FPCA y la ocupación de cada mezcla, que condiciona la lectura de la PIP.
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth,height=0.45\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_autofunciones.png}
 \caption{Curva media del bloque de entrenamiento y su perturbación $\mu \pm 2\sqrt{\lambda_m}\,v_m$ a lo largo de las cuatro primeras autofunciones, con la fracción de varianza que explica cada una.}
 \label{fig:aneC_autofunciones}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth,height=0.6\textheight,keepaspectratio]{IMG/aneC_00/aneC_00_autofunciones_menores.png}
 \caption{Curva media del bloque de entrenamiento y su perturbación $\mu \pm 2\sqrt{\lambda_m}\,v_m$ a lo largo de las autofunciones $5$ a $10$.}

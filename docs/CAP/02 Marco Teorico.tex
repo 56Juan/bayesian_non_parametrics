@@ -1,6 +1,6 @@
 \chapter{Marco Teórico}
 \label{02_00_00_fundamentos_teoricos_metodologicos}
-El modelo propuesto en esta tesis representa cada curva por un vector de coeficientes, modela la dinámica entre curvas sucesivas y estima esa dinámica con una mezcla de procesos de Dirichlet dependientes. Cada una de esas tres etapas descansa sobre un cuerpo de teoría propio, y este capítulo los desarrolla en ese orden.\\
+El modelo propuesto en esta tesis representa cada curva por un vector de coeficientes, modela la dinámica entre curvas sucesivas y estima esa dinámica con una mezcla de procesos de Dirichlet dependientes. Cada una de esas tres etapas descansa sobre un cuerpo de teoría propio, y este capítulo las desarrolla en ese orden.\\
 
 La primera etapa es el objeto de la Sección~\ref{02_01_00_datos_funcionales}, que introduce la noción de dato funcional y su representación mediante sistemas de funciones base, junto con los criterios para seleccionar la dimensión de dicha representación. Se discuten las propiedades que debe satisfacer el sistema de base, en particular la ortogonalidad y ortonormalidad, y se presentan las B-splines como familia de funciones base predeterminada. La sección cierra con el Análisis de Componentes Principales Funcional (FPCA), que mediante la descomposición espectral del operador de covarianza y la representación de Karhunen--Loève provee el sistema ortonormal óptimo derivado de los propios datos.\\
 
@@ -522,7 +522,7 @@ En modelos bayesianos de complejidad moderada o alta, la distribución a posteri
 
 Una vez que la cadena ha alcanzado su distribución estacionaria, las muestras obtenidas pueden utilizarse para aproximar cualquier cantidad de interés posterior, como la media, la varianza o los cuantiles de $p(\theta \mid \mathcal{D})$. En la práctica, las primeras $B$ iteraciones de la cadena se descartan (período de burn-in) para eliminar la influencia de los valores iniciales. Adicionalmente, dado que muestras consecutivas de la cadena están correlacionadas, es habitual retener solo una de cada cierto número de iteraciones (thinning) con el fin de obtener un conjunto de muestras aproximadamente independientes.\\
 
-A continuación se describen los tres algoritmos MCMC empleados en el posterior algoritmo.
+A continuación se describen los tres algoritmos MCMC empleados en el muestreador del Capítulo~\ref{03_00_00_mezclas_ddp_series_tiempo_funcionales}.
 
 \subsubsection{Algoritmo de Metropolis--Hastings}
 \label{02_03_02_01_metropolis_hastings}
