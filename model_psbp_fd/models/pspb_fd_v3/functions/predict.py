@@ -387,8 +387,7 @@ class PSBPPredictor:
 
         Se obtiene promediando sobre las iteraciones la densidad de la mezcla,
         sin recurrir a muestras, de modo que sirve tanto para graficar la
-        predictiva como para el puntaje logaritmico exacto via
-        `fit.lps_desde_log_densidad`.
+        predictiva como para el puntaje logaritmico exacto.
 
         Retorna (n, len(y_grid)), o (T, n, len(y_grid)) si `por_iteracion`.
         """

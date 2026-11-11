@@ -68,16 +68,6 @@ errores no son independientes entre origenes --menos aun con ventanas
 solapadas--, de modo que toda cuantificacion de incertidumbre sale del
 bootstrap de bloques de `incertidumbre.py` y no del error estandar
 independiente.
-
-Advertencia sobre las formas cerradas gaussianas
-------------------------------------------------
-`crps_gaussiano`, `lps_gaussiano` y `pit_gaussiano` implementan la
-aproximacion de dos momentos de la distribucion predictiva. Es adecuada para
-modelos cuya predictiva es efectivamente gaussiana, pero aplicarla a la
-predictiva de mezcla del modelo propuesto descarta su forma ---multimodalidad,
-asimetria--- que es precisamente aquello que el estudio busca medir. Para el
-modelo de mezcla deben emplearse las versiones muestrales o
-`lps_desde_log_densidad` con la densidad de la mezcla en forma cerrada.
 """
 
 from .metrics_puntual import (
@@ -88,9 +78,7 @@ from .metrics_puntual import (
     razon_dispersion,
     mise,
     rmse_funcional,
-    resumen_puntual,
     mae,
-    mae_por_coeficiente,
     cuantil_error_absoluto,
     error_maximo,
     pesos_normalizados,
@@ -100,17 +88,13 @@ from .metrics_puntual import (
 
 from .metrics_distribucional import (
     crps_muestral,
-    crps_gaussiano,
     energy_score,
     cobertura,
     estratos_por_cuantil,
     cobertura_condicional,
     intervalo_muestral,
     pit_muestral,
-    pit_gaussiano,
     diagnostico_pit,
-    lps_gaussiano,
-    lps_desde_log_densidad,
     winkler,
     indicador_cobertura,
     indicador_cobertura_simultanea,
@@ -128,7 +112,6 @@ from .rolling import (
 
 from .inclusion import (
     pip_global,
-    pip_por_componente,
     matriz_pip,
     contraste_con_verdad,
 )
@@ -146,7 +129,6 @@ from .diagnostics_mcmc import (
 
 from .pooling import (
     agrupar_momentos,
-    agrupar_muestras,
 )
 
 from .intervalos import (
@@ -160,8 +142,6 @@ from .incertidumbre import (
     largo_bloque_sugerido,
     bloques_circulares,
     bootstrap_bloques,
-    diagnostico_dependencia,
-    tabla_bootstrap,
 )
 
 from .baselines import (
@@ -180,10 +160,8 @@ __all__ = [
     "razon_dispersion",
     "mise",
     "rmse_funcional",
-    "resumen_puntual",
     # -- Bloque A: normas L^p del error --
     "mae",
-    "mae_por_coeficiente",
     "cuantil_error_absoluto",
     "error_maximo",
     "pesos_normalizados",
@@ -191,17 +169,13 @@ __all__ = [
     "resumen_error_funcional",
     # ── Distribucion predictiva (§2.2.3.3) ──
     "crps_muestral",
-    "crps_gaussiano",
     "energy_score",
     "cobertura",
     "estratos_por_cuantil",
     "cobertura_condicional",
     "intervalo_muestral",
     "pit_muestral",
-    "pit_gaussiano",
     "diagnostico_pit",
-    "lps_gaussiano",
-    "lps_desde_log_densidad",
     # -- Bloque B: intervalos de prediccion --
     "winkler",
     "indicador_cobertura",
@@ -216,7 +190,6 @@ __all__ = [
     "ventana_movil_funcional",
     # ── Probabilidades de inclusion (§03_06 eje 3) ──
     "pip_global",
-    "pip_por_componente",
     "matriz_pip",
     "contraste_con_verdad",
     # ── Diagnosticos MCMC ──
@@ -230,7 +203,6 @@ __all__ = [
     "resumen_convergencia",
     # ── Agrupacion de cadenas MCMC ──
     "agrupar_momentos",
-    "agrupar_muestras",
     # ── Intervalos implicados por el modelo ──
     "cuantil_normal",
     "sigma_residual",
@@ -240,8 +212,6 @@ __all__ = [
     "largo_bloque_sugerido",
     "bloques_circulares",
     "bootstrap_bloques",
-    "diagnostico_dependencia",
-    "tabla_bootstrap",
     # ── Lineas base ──
     "prediccion_media_incondicional",
     "prediccion_persistencia",

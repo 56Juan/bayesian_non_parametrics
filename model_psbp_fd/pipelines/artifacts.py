@@ -94,10 +94,6 @@ _MATRICES_2D = {"theta", "basis_phi", "fpca_eigenfun", "fpca_gram_W",
 # UTILIDADES INTERNAS
 # ==========================================================================
 
-def _ruta(paths: dict, clave_dir: str, clave_archivo: str) -> Path:
-    return Path(paths[clave_dir]) / ARCHIVOS[clave_archivo]
-
-
 def _leer_matriz(path: Path, forzar_2d: bool) -> np.ndarray:
     """
     Lee un CSV numerico garantizando la dimensionalidad esperada.

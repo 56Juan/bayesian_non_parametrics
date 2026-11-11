@@ -10,8 +10,7 @@ de Python la traza llega con dos ejes en vez de tres.
 Eso ocurre exactamente cuando el diseno tiene **una sola covariable**, es decir
 cuando `p = q * M = 1`: el punto `M = 1` del barrido de la Etapa D. Todo el
 codigo aguas abajo asume `(nsim, N, p)` --`PSBPPredictor` lee `shape[2]` para
-fijar `n_features_`, `pip_por_componente` promedia sobre el eje 0 esperando
-`(N, p)`-- y falla con `IndexError: tuple index out of range` o devuelve una
+fijar `n_features_`-- y falla con `IndexError: tuple index out of range` o devuelve una
 matriz de una dimension menos. No es un problema del muestreador ni de los
 datos: la traza es correcta, le falta el eje.
 
@@ -33,11 +32,6 @@ __all__ = ["normalizar_trazas_mat", "asegurar_3d"]
 # Claves cuya forma canonica es (nsim, *, p) y que por tanto pierden el ultimo
 # eje cuando p = 1.
 _CLAVES_3D = ("betajhout", "psijhout", "Gammajhout", "gammajhout")
-
-# Claves cuya forma canonica es (nsim, p): con p = 1 MATLAB las guarda como
-# (nsim, 1), que ya es 2D, de modo que no hay nada que restaurar.
-# Se listan solo para dejar constancia de por que NO estan en _CLAVES_3D.
-_CLAVES_2D = ("osumout", "pijout", "wjout")
 
 
 def asegurar_3d(a: np.ndarray) -> np.ndarray:

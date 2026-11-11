@@ -22,9 +22,7 @@ import numpy as np
 __all__ = [
     "pesos_trapezoidales",
     "integrar",
-    "producto_interno",
     "gram",
-    "norma_L2",
 ]
 
 
@@ -66,11 +64,6 @@ def integrar(F: np.ndarray, tau: np.ndarray) -> np.ndarray:
     return F @ w
 
 
-def producto_interno(F: np.ndarray, G: np.ndarray, tau: np.ndarray) -> np.ndarray:
-    """Producto interno de L^2 entre filas de F y G, evaluadas en la grilla."""
-    return integrar(np.asarray(F, dtype=float) * np.asarray(G, dtype=float), tau)
-
-
 def gram(Phi: np.ndarray, tau: np.ndarray) -> np.ndarray:
     """
     Matriz de Gram de un sistema de funciones base evaluado en la grilla.
@@ -90,7 +83,3 @@ def gram(Phi: np.ndarray, tau: np.ndarray) -> np.ndarray:
     W = Phi.T @ (w[:, None] * Phi)
     return 0.5 * (W + W.T)
 
-
-def norma_L2(F: np.ndarray, tau: np.ndarray) -> np.ndarray:
-    """Norma de L^2 de cada fila de F (..., L)."""
-    return np.sqrt(integrar(np.asarray(F, dtype=float) ** 2, tau))

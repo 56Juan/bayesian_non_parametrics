@@ -32,11 +32,9 @@ Utilidades transversales del proyecto.
 from .quadrature import (
     pesos_trapezoidales,
     integrar,
-    producto_interno,
     gram,
-    norma_L2,
 )
-from .linalg import sym, safe_chol, es_triangular_inferior
+from .linalg import sym, safe_chol
 from .raiz import get_project_root
 from .rutas import (
     CLAVES_PATHS,
@@ -55,13 +53,10 @@ __all__ = [
     # Cuadratura L2
     "pesos_trapezoidales",
     "integrar",
-    "producto_interno",
     "gram",
-    "norma_L2",
     # Algebra lineal estable
     "sym",
     "safe_chol",
-    "es_triangular_inferior",
     # Infraestructura
     "get_project_root",
     # Rutas del contrato y convencion del EXPERIMENT_ID

@@ -231,7 +231,7 @@ def _llamadas_notebook(nb: Path):
 def test_notebooks_200_siguen_ligando():
     import importlib
     for nombre in ("200_04_evaluacion.ipynb", "200_05_comparacion.ipynb"):
-        importados, llamadas = _llamadas_notebook(RAIZ / "notebooks/simulaciones/200_sim_TAR" / nombre)
+        importados, llamadas = _llamadas_notebook(RAIZ / "notebooks/simulaciones/08_02 3 escenarios/200_sim_TAR" / nombre)
         objetos = {}
         for alias, (mod, attr) in importados.items():
             objetos[alias] = getattr(importlib.import_module(mod), attr)       # importa

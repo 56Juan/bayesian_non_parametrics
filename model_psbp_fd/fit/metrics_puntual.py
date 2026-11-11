@@ -19,8 +19,6 @@ en igualdad de condiciones modelos de naturaleza distinta.
 
 from __future__ import annotations
 
-from typing import Optional
-
 import numpy as np
 
 from ..utils.quadrature import integrar, pesos_trapezoidales
@@ -33,10 +31,8 @@ __all__ = [
     "razon_dispersion",
     "mise",
     "rmse_funcional",
-    "resumen_puntual",
     # -- Bloque A: normas L^p del error --
     "mae",
-    "mae_por_coeficiente",
     "cuantil_error_absoluto",
     "error_maximo",
     "pesos_normalizados",
@@ -138,40 +134,6 @@ def rmse_funcional(X_obs, X_pred, tau) -> float:
     return float(np.sqrt(mise(X_obs, X_pred, tau)))
 
 
-def resumen_puntual(y_obs, y_pred, X_obs=None, X_pred=None, tau=None,
-                    etiquetas: Optional[list] = None):
-    """
-    Tabla de metricas puntuales por componente y, si se entregan curvas, a
-    nivel funcional.
-
-    y_obs, y_pred : (n, M) coeficientes o scores observados y predichos.
-    X_obs, X_pred : (n, G) curvas, opcionales.
-    Retorna un DataFrame con una fila por componente y, cuando corresponde,
-    dos columnas adicionales con el MISE y el RMSE funcional del conjunto.
-    """
-    import pandas as pd
-
-    A, P = _2d(y_obs), _2d(y_pred)
-    M = A.shape[1]
-    idx = etiquetas if etiquetas is not None else [f"comp_{m+1}" for m in range(M)]
-
-    tabla = pd.DataFrame({
-        "RMSE": rmse_por_coeficiente(A, P),
-        "R2": r2_por_columna(A, P, centrar=True),
-        "corr": [float(np.corrcoef(A[:, m], P[:, m])[0, 1]) for m in range(M)],
-        "sd_pred/sd_obs": razon_dispersion(A, P),
-        "n": A.shape[0],
-    }, index=idx)
-    tabla.index.name = "componente"
-
-    if X_obs is not None and X_pred is not None:
-        if tau is None:
-            raise ValueError("Se requiere `tau` para las metricas funcionales.")
-        tabla.attrs["MISE"] = mise(X_obs, X_pred, tau)
-        tabla.attrs["RMSE_funcional"] = rmse_funcional(X_obs, X_pred, tau)
-    return tabla
-
-
 # ==========================================================================
 # BLOQUE A - NORMAS L^p DEL ERROR
 # ==========================================================================
@@ -248,14 +210,6 @@ def mae(y_obs, y_pred) -> float:
     if y_obs.shape != y_pred.shape:
         raise ValueError(f"Formas incompatibles: {y_obs.shape} vs {y_pred.shape}.")
     return float(np.abs(y_pred - y_obs).mean())
-
-
-def mae_por_coeficiente(alpha_obs, alpha_pred) -> np.ndarray:
-    """MAE por columna; el analogo L^1 de `mse_por_coeficiente`."""
-    A, P = _2d(alpha_obs), _2d(alpha_pred)
-    if A.shape != P.shape:
-        raise ValueError(f"Formas incompatibles: {A.shape} vs {P.shape}.")
-    return np.abs(P - A).mean(axis=0)
 
 
 def cuantil_error_absoluto(y_obs, y_pred, q: float = 0.95) -> float:

@@ -28,7 +28,7 @@ correlacion contemporanea es ~0 y la FPCA puede alinearse con las phi_j.
 
 El score es z_tj = (u_tj - m_j) / d_j, con (m_j, d_j) la media y la sd
 POBLACIONALES de u_j (`MOMENTOS_TAR`, de una simulacion de 200 000 pasos con
-seed 7; `momentos_poblacionales` los recalcula), y xi_tj = s_j z_tj con
+seed 7), y xi_tj = s_j z_tj con
 s_j = sqrt(lambda_j), lambda_j = 0.5 * 0.55^(j-1) como en C. Las componentes
 5..10 son AR(1) propios con coeficiente 0.3 y varianza unitaria en z.
 
@@ -105,7 +105,6 @@ __all__ = [
     "PARAMETROS_TAR",
     "MOMENTOS_TAR",
     "ConfigEscenarioTAR",
-    "momentos_poblacionales",
     "generar_escenario_TAR",
     "resumen_escenario_TAR",
     "predictiva_oraculo_TAR",
@@ -122,7 +121,8 @@ PARAMETROS_TAR = np.array([
     [0.0, 0.8, 0.40, 2.0, -0.9, 1.0, 0.0, 0.25],
     [0.0, 0.6, 0.40, 2.5, -0.9, 1.0, 0.0, 0.25],
 ])
-# (media, sd) poblacionales de u_j: momentos_poblacionales(T=200_000, seed=7).
+# (media, sd) poblacionales de u_j: simulacion de 200 000 pasos con seed 7,
+# descartando los primeros 1000.
 MOMENTOS_TAR = np.array([
     [+0.1625, 1.2642],
     [+0.2677, 1.1436],
@@ -173,19 +173,6 @@ def _paso_activo(u_prev, unif, e):
     u = np.where(reg, mB + sB * e, mA + sA * e)
     ora = (1 - p) * mA + p * mB
     return u, reg, p, ora, p * (1 - p) * (mA - mB) ** 2
-
-
-def momentos_poblacionales(T: int = 200_000, seed: int = 7) -> np.ndarray:
-    """(media, sd) de u_j en una simulacion larga: la fuente de MOMENTOS_TAR."""
-    rng = np.random.default_rng(seed)
-    u = np.zeros(BLOQUE_ACTIVO_TAR)
-    U = np.empty((T, BLOQUE_ACTIVO_TAR))
-    for t in range(T):
-        u = _paso_activo(u, rng.random(BLOQUE_ACTIVO_TAR),
-                         rng.standard_normal(BLOQUE_ACTIVO_TAR))[0]
-        U[t] = u
-    U = U[1000:]
-    return np.column_stack([U.mean(0), U.std(0)])
 
 
 def _simular(T: int, burn_in: int, rng: np.random.Generator) -> dict:

@@ -1,40 +1,24 @@
 """
 pipelines
 =========
-Composicion del estudio: generacion de datos, persistencia de artefactos y
-contrato entre los flujos de trabajo.
+Generacion de datos y contrato de artefactos entre los flujos de trabajo.
 
-El paquete agrupa tres responsabilidades:
+1. Generadores de datos. Los escenarios vigentes se simulan sobre los SCORES de
+   una base de Fourier conocida, sin ruido de medicion: `sim_scores_comun` es el
+   motor comun, `sim_escenario_TAR` el generador de la corrida 200,
+   `sim_escenario_GARCH` el de la 201 y `sim_escenario_C1` el de la 202.
+   `sim_comun` aloja la configuracion de observacion, la salida y la
+   persistencia de un escenario; `sim_escenario_C` la base de Fourier.
 
-1. Generadores de datos (`sim_comun.py`, `sim_escenario_k.py`).
-   `sim_comun` aloja el esquema de observacion, la cuadratura de los operadores
-   integrales, la innovacion funcional gaussiana y el control de calidad
-   transversal. Cada `sim_escenario_k` implementa el Algoritmo k del anexo y
-   expone el mismo contrato: una dataclass de configuracion que hereda de
-   `ConfigObservacion`, una funcion generadora que retorna R replicas
-   independientes, y una funcion de control de calidad especifica del
-   algoritmo. El producto entregado a los metodos es siempre la matriz de
-   observaciones discretas contaminadas con ruido de medicion, de dimension
-   (R, T, L).
+2. Contrato de persistencia (`artifacts.py`). Funciones emparejadas de escritura
+   y lectura de los artefactos que produce el preprocesamiento y consumen MATLAB
+   y la evaluacion, para que la convencion de nombres y las garantias de forma
+   tengan una sola definicion. `verificar_contrato` cruza manifest,
+   hiperparametros y artefactos FPCA antes de que el analisis comience.
 
-2. Contrato de persistencia (`artifacts.py`).
-   Funciones emparejadas de escritura y lectura para los artefactos que el
-   flujo de preprocesamiento produce y que el flujo de resultados y MATLAB
-   consumen. Concentrar ambos extremos en un mismo modulo evita que la
-   convencion de nombres y las garantias de forma se repliquen ---y diverjan---
-   en cada notebook.
-
-3. Verificacion cruzada (`verificar_contrato`).
-   Comprueba la consistencia entre manifest, hiperparametros y artefactos FPCA
-   antes de que el analisis comience.
-
-Generadores vivos: `sim_comun`, `sim_scores_comun` (motor de los escenarios sobre
-scores), `sim_escenario_TAR` (corrida 200), `sim_escenario_GARCH` (201) y
-`sim_escenario_C1` (202, mezcla de mecanismos en el espacio de scores), mas
-`sim_escenario_1/B1/B2/B3/C` y `sim_series_clasicas`, de los que dependen. Los
-generadores de corridas retiradas (Escenarios 2-6, A-1, A-2, A-3, B, C-2, C-3, C-F,
-TS, J, K, L y CE) viven en `pipelines/deprecated/`: siguen importables desde ahi,
-no desde este paquete, y no forman parte del estudio oficial.
+`sim_escenario_1/B1/B2/B3` y `sim_series_clasicas` no tienen corrida viva y se
+conservan por dependencias. Los generadores de corridas retiradas viven en
+`pipelines/deprecated/`: siguen importables desde ahi, no desde este paquete.
 """
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -109,21 +93,10 @@ from .sim_escenario_B3 import (
     resumen_escenario_B3,
 )
 
-# --- Algoritmos C-1, C-2 y C-3: coeficientes de la representacion (seccion C) ---
-from .sim_escenario_C import (
-    ConfigEscenarioC,
-    base_fourier,
-    config_C1,
-    config_C2,
-    config_C3,
-    contabilidad_varianzas,
-    correlaciones_impulsor,
-    curvas_truncadas,
-    generar_escenario_C,
-    resumen_escenario_C,
-)
+# --- Base de Fourier ortonormal de los escenarios sobre scores ---
+from .sim_escenario_C import base_fourier, gram_base
 # --- Algoritmos C-1, C-2 y C-3 del anexo vigente: mezcla de mecanismos en el
-#     espacio de scores (corridas 107-109). `sim_escenario_C` es otro diseno.
+#     espacio de scores (generador de la corrida 202).
 from .sim_escenario_C1 import (
     ConfigEscenarioC1,
     MecanismoScores,
@@ -140,7 +113,7 @@ from .sim_escenario_GARCH import (
     resumen_escenario_GARCH,
 )
 
-# Escenario TAR (corrida 114): umbral suave sobre el rezago propio de cada score.
+# Escenario TAR (corrida 200): umbral suave sobre el rezago propio de cada score.
 from .sim_escenario_TAR import (
     ConfigEscenarioTAR,
     generar_escenario_TAR,
@@ -240,17 +213,9 @@ __all__ = [
     "resumen_escenario_B3",
     "probabilidades_softmax",
     "A_ASIGNACION_B3",
-    # ── Algoritmos C-1, C-2 y C-3: coeficientes de la representacion ──
-    "ConfigEscenarioC",
-    "config_C1",
-    "config_C2",
-    "config_C3",
-    "generar_escenario_C",
-    "resumen_escenario_C",
+    # ── Base de Fourier de los escenarios sobre scores ──
     "base_fourier",
-    "curvas_truncadas",
-    "contabilidad_varianzas",
-    "correlaciones_impulsor",
+    "gram_base",
     # ── Algoritmos C-1, C-2 y C-3: mezcla de mecanismos en el espacio de scores ──
     "ConfigEscenarioC1",
     "generar_escenario_C1",

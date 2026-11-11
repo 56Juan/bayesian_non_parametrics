@@ -5,9 +5,6 @@ Visualizadores de datos funcionales para el pipeline PSBP-FD.
 
 Funciones públicas
 ------------------
-plot_functional_series     : Serie temporal completa de curvas (formato tipo
-                             plot_functional_time_series, usando la representación
-                             funcional reconstruida continua).
 plot_empirical_sample      : Muestra aleatoria o especificada de curvas empíricas
                              en el dominio S.
 plot_functional_mean       : Media funcional con banda ±1 std (y opcionalmente
@@ -39,81 +36,6 @@ _HIGHLIGHT_COLORS = ["#c0392b", "#1a6faf", "#27ae60", "#8e44ad",
 # ─────────────────────────────────────────────────────────────────────────────
 # API pública
 # ─────────────────────────────────────────────────────────────────────────────
-
-def plot_functional_series(
-    X: np.ndarray,
-    grid: np.ndarray,
-    fr=None,
-    highlight_idx: Optional[List[int]] = None,
-    title: str = "Series de tiempo funcionales",
-    xlabel: str = "s",
-    ylabel: str = r"$X_t(s)$",
-    alpha_bg: float = 0.18,
-    color_bg: str = "steelblue",
-    figsize: Tuple[float, float] = (12, 5),
-    save_path: Optional[str] = None,
-) -> plt.Figure:
-    """
-    Muestra la serie de tiempo funcional completa.
-
-    Si se pasa `fr` (instancia de FunctionalRepresentation ajustada), muestra
-    las curvas reconstruidas (representación funcional continua). Si no,
-    muestra las curvas empíricas discretas.
-
-    Parámetros
-    ----------
-    X            : (T, G) curvas (empíricas o estandarizadas)
-    grid         : (G,) dominio S
-    fr           : FunctionalRepresentation ajustada (opcional). Si se pasa,
-                   se muestra X_hat = fr.reconstruct(fr.transform(X)).
-    highlight_idx: índices t a resaltar con colores distintos (máx 8)
-    title        : título de la figura
-    xlabel       : etiqueta eje x
-    ylabel       : etiqueta eje y
-    alpha_bg     : transparencia de las curvas de fondo
-    color_bg     : color de las curvas de fondo
-    figsize      : tamaño de la figura
-    save_path    : ruta de guardado opcional
-
-    Retorna
-    -------
-    fig : Figure
-    """
-    T, G = X.shape
-    if fr is not None:
-        # Representación funcional reconstruida (continua)
-        THETA = fr.transform(X, grid)
-        X_plot = fr.reconstruct(THETA)
-        label_source = "Representación funcional"
-    else:
-        X_plot = X
-        label_source = "Curvas empíricas"
-
-    fig, ax = plt.subplots(figsize=figsize)
-
-    # ── Curvas de fondo ──────────────────────────────────────────────────
-    hi_set = set(highlight_idx or [])
-    for t in range(T):
-        if t not in hi_set:
-            ax.plot(grid, X_plot[t], color=color_bg, lw=0.5, alpha=alpha_bg)
-
-    # ── Curvas destacadas ────────────────────────────────────────────────
-    if highlight_idx:
-        for i, t in enumerate(highlight_idx[:len(_HIGHLIGHT_COLORS)]):
-            ax.plot(grid, X_plot[t],
-                    color=_HIGHLIGHT_COLORS[i], lw=1.8,
-                    label=f"t = {t}", zorder=3)
-        ax.legend(fontsize=8, loc="upper right")
-
-    ax.set_xlabel(xlabel, fontsize=10)
-    ax.set_ylabel(ylabel, fontsize=10)
-    ax.set_title(f"{title}\n({label_source}, T={T})", fontsize=11)
-    ax.grid(True, alpha=0.3)
-    plt.tight_layout()
-    if save_path:
-        fig.savefig(save_path, dpi=150, bbox_inches="tight")
-    return fig
-
 
 def plot_empirical_sample(
     X: np.ndarray,

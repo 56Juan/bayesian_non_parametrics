@@ -52,8 +52,7 @@ La regla operativa del estudio tiene dos partes, y la primera domina:
   2. DEPENDENCIA DEL PROCESO. Si lo que se remuestrea son errores POR ORIGEN
      --sin ventana de por medio-- el bloque tiene que cubrir la memoria de la
      serie de errores. La referencia habitual es del orden de n^(1/3), y una
-     comprobacion barata es mirar la autocorrelacion de la serie remuestreada:
-     `diagnostico_dependencia` la reporta.
+     comprobacion barata es mirar la autocorrelacion de la serie remuestreada.
 
 Cuando ambas aplican, manda la mayor. Y `largo_bloque` es un PARAMETRO
 explicito, sin valor por defecto oculto, porque la anchura del intervalo
@@ -66,14 +65,11 @@ from __future__ import annotations
 from typing import Callable, Optional, Sequence
 
 import numpy as np
-import pandas as pd
 
 __all__ = [
     "largo_bloque_sugerido",
     "bloques_circulares",
     "bootstrap_bloques",
-    "diagnostico_dependencia",
-    "tabla_bootstrap",
 ]
 
 
@@ -183,46 +179,3 @@ def bootstrap_bloques(valores, estadistico: Callable[[np.ndarray], float] = np.m
         "B": int(B), "n": int(n),
     }
 
-
-def diagnostico_dependencia(valores, k_max: int = 5) -> dict:
-    """
-    Autocorrelacion de la serie remuestreada, para justificar `largo_bloque`.
-
-    Si `acf1` es alta, un bloque corto no captura la dependencia y el intervalo
-    quedara demasiado angosto. Con cifras de ventana movil solapada la acf es
-    alta POR CONSTRUCCION y no dice nada sobre el proceso: ahi el criterio que
-    manda es el del solapamiento, no este.
-    """
-    v = np.asarray(valores, dtype=float).ravel()
-    v = v[np.isfinite(v)]
-    c = v - v.mean()
-    den = float((c ** 2).sum())
-    acf = [float((c[k:] * c[:-k]).sum() / den) if den > 0 else np.nan
-           for k in range(1, int(k_max) + 1)]
-    return {"n": int(v.size),
-            "acf1": acf[0] if acf else np.nan,
-            "acf": acf,
-            "primer_rezago_bajo_0.1": next(
-                (k + 1 for k, a in enumerate(acf) if abs(a) < 0.1), None)}
-
-
-def tabla_bootstrap(series: dict, estadistico: Callable = np.mean,
-                    largo_bloque: Optional[int] = None,
-                    B: int = 2000, nivel: float = 0.95,
-                    w: Optional[int] = None, paso: int = 1,
-                    seed: int = 0) -> pd.DataFrame:
-    """
-    Aplica `bootstrap_bloques` a un dict {etiqueta: serie} y devuelve una tabla.
-
-    Todas las series comparten `largo_bloque`, `B`, `nivel` y semilla: si cada
-    una usara el suyo, la anchura de los intervalos ya no seria comparable
-    entre modelos, que es justamente para lo que se los mira.
-    """
-    filas = []
-    for nombre, v in series.items():
-        d = bootstrap_bloques(v, estadistico=estadistico,
-                              largo_bloque=largo_bloque, B=B, nivel=nivel,
-                              w=w, paso=paso, seed=seed)
-        dep = diagnostico_dependencia(v)
-        filas.append({"serie": nombre, **d, "acf1": dep["acf1"]})
-    return pd.DataFrame(filas).set_index("serie")

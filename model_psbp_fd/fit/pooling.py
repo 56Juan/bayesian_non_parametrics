@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import numpy as np
 
-__all__ = ["agrupar_momentos", "agrupar_muestras"]
+__all__ = ["agrupar_momentos"]
 
 
 def agrupar_momentos(medias: np.ndarray, desviaciones: np.ndarray):
@@ -46,31 +46,3 @@ def agrupar_momentos(medias: np.ndarray, desviaciones: np.ndarray):
     var = (S ** 2).mean(axis=1) + ((M - mu[:, None]) ** 2).mean(axis=1)
     return mu, np.sqrt(var)
 
-
-def agrupar_muestras(lista_muestras) -> np.ndarray:
-    """
-    Concatena las extracciones de varias cadenas en una sola muestra.
-
-    Es la representacion exacta de la mezcla cuando las cadenas tienen igual
-    longitud tras el descarte inicial; con longitudes distintas la mezcla queda
-    ponderada por el numero de extracciones, por lo que se verifica la
-    homogeneidad y se advierte en caso contrario.
-
-    lista_muestras : lista de arreglos (S_c, ...) con dimensiones no iniciales
-                     identicas entre cadenas.
-    """
-    arrs = [np.asarray(a, dtype=float) for a in lista_muestras]
-    if not arrs:
-        raise ValueError("La lista de muestras esta vacia.")
-    formas = {a.shape[1:] for a in arrs}
-    if len(formas) > 1:
-        raise ValueError(f"Dimensiones no iniciales heterogeneas: {formas}.")
-    longitudes = {a.shape[0] for a in arrs}
-    if len(longitudes) > 1:
-        import warnings
-        warnings.warn(
-            f"Cadenas de longitud distinta {sorted(longitudes)}: la mezcla "
-            "resultante queda ponderada por el numero de extracciones.",
-            RuntimeWarning,
-        )
-    return np.concatenate(arrs, axis=0)

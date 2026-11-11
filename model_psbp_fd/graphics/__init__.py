@@ -11,7 +11,6 @@ from .viz_global_components import (
 )
 
 from .viz_functional_data import (
-    plot_functional_series,
     plot_empirical_sample,
     plot_functional_mean,
     plot_functional_variance,
@@ -96,7 +95,6 @@ __all__ = [
     "plot_global_components",
     "plot_active_clusters",
     # viz_functional_data
-    "plot_functional_series",
     "plot_empirical_sample",
     "plot_functional_mean",
     "plot_functional_variance",

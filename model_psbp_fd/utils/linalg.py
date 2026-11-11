@@ -27,25 +27,13 @@ import warnings
 import numpy as np
 from numpy.linalg import cholesky, LinAlgError
 
-__all__ = ["sym", "safe_chol", "es_triangular_inferior"]
+__all__ = ["sym", "safe_chol"]
 
 
 def sym(A: np.ndarray) -> np.ndarray:
     """Simetriza A para eliminar la asimetria residual de punto flotante."""
     A = np.asarray(A, dtype=float)
     return (A + A.T) / 2.0
-
-
-def es_triangular_inferior(A: np.ndarray, tol: float = 1e-12) -> bool:
-    """
-    Indica si A es triangular inferior dentro de la tolerancia.
-
-    Se expone porque el fallback espectral de `safe_chol` NO retorna un factor
-    triangular: cualquier consumidor que resuelva sistemas por sustitucion
-    hacia adelante en lugar de por producto matricial debe verificarlo antes.
-    """
-    A = np.asarray(A, dtype=float)
-    return bool(np.abs(np.triu(A, k=1)).max() <= tol)
 
 
 def safe_chol(
@@ -111,8 +99,7 @@ def safe_chol(
 
     warnings.warn(
         "safe_chol: se recurrio al fallback espectral. El factor retornado "
-        "satisface L L^T ~= A pero NO es triangular inferior; verifique con "
-        "`es_triangular_inferior` si el consumidor asume triangularidad.",
+        "satisface L L^T ~= A pero NO es triangular inferior.",
         RuntimeWarning,
         stacklevel=2,
     )

@@ -44,7 +44,6 @@ from ..utils.trazas import asegurar_3d
 
 __all__ = [
     "pip_global",
-    "pip_por_componente",
     "matriz_pip",
     "contraste_con_verdad",
 ]
@@ -71,22 +70,6 @@ def pip_global(traces: Dict[str, np.ndarray], burn: int) -> np.ndarray:
         raise KeyError("Se requiere 'osumout' o 'gammajhout' en las trazas.")
     g = asegurar_3d(np.asarray(traces["gammajhout"], dtype=float))[burn:]  # (T, N, p)
     return (g.max(axis=1) > 0).mean(axis=0)
-
-
-def pip_por_componente(traces: Dict[str, np.ndarray], burn: int) -> np.ndarray:
-    """
-    P(gamma_hj = 1) para cada atomo h y variable j, forma (N, p).
-
-    Sin restringir a atomos ocupados: los atomos vacios muestrean del prior y
-    su presencia en la matriz es informativa --muestra donde termina la senal
-    y empieza el prior-- siempre que se lea como tal.
-    """
-    if "gammajhout" not in traces:
-        raise KeyError("Se requiere 'gammajhout' en las trazas.")
-    # `asegurar_3d`: con p = 1 MATLAB guarda gammajhout como (nsim, N) y la
-    # media sobre el eje 0 devolveria (N,) en vez de (N, 1).
-    g = asegurar_3d(np.asarray(traces["gammajhout"], dtype=float))[burn:]  # (T, N, p)
-    return g.mean(axis=0)
 
 
 # ==========================================================================
