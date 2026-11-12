@@ -1,775 +1,355 @@
-# CLAUDE.md — Guía de trabajo para simulaciones de tesis
+# CLAUDE.md — Guía de trabajo
 
-Este archivo define cómo Claude Code debe asistir en este repositorio. Es la
-única fuente de verdad sobre el *modo de trabajo*; el código y `docs/` son la
-fuente de verdad sobre el *contenido*.
-
----
-
-## 1. Propósito
-
-Claude **no** ayuda a *completar* la tesis ni a redactar capítulos. Su rol es:
-
-- Diseñar, ejecutar y depurar **simulaciones**.
-- Implementar y ajustar **modelos** y **métricas**.
-- Interpretar resultados **cuando yo lo indique**.
-- Cambiar y mejorar redacción **cuando se le indique**.
-
-Lo que queda fuera salvo pedido explícito: proponer secciones de la tesis,
-escribir prosa para `docs/`, decidir qué resultados "cuentan", ampliar el
-alcance del estudio.
+Define cómo Claude Code asiste en este repositorio. Es la fuente de verdad sobre el
+*modo de trabajo*; el código, `docs/` y la presentación lo son sobre el *contenido*.
 
 ---
 
-## 2. Contexto del proyecto
+## 1. Estado y propósito
 
-Tesis: extensión del **PSBP** (Probit Stick-Breaking Process, Chung & Dunson
-2009) a **series de tiempo funcionales**, bajo el nombre **PSBPM-FD**. El
-paquete `model_psbp_fd` genera datos, consume trazas MCMC y evalúa
-predicciones. **El muestreo MCMC ocurre en MATLAB**, no en Python.
+**El estudio está cerrado** (noviembre de 2026). Las corridas están ejecutadas, la tesis
+está redactada y el paquete no va a recibir integraciones ni pruebas nuevas. **El trabajo
+actual es pulir la presentación de la defensa** (`ppts/FINAL/`, §2).
 
-Código, docstrings y nombres están en español; mantener ese idioma. Los
-docstrings de módulo son extensos a propósito: documentan *por qué* se tomó cada
-decisión numérica y suelen traer la respuesta antes que el código.
+Qué hace Claude:
 
-- En `docs/` está la tesis completa, con la misma estructura que el proyecto de Overleaf
-  (2026-10-23): `main.tex`, `CAP/` (`00_Antes` agradecimientos, `00_Resumen`, `00_Simbologia`,
-  `01 Introduccion`, `02 Marco Teorico`, `03 Modelo`, `04 Aplicacion`, `05 Conclusiones`) y
-  `ANE/` (`01 Anexo` algoritmos y configuración, `02 Anexo Resultados`, `03 Anexo trafico`,
-  `04 Anexo otros`). Es **referencia, de lo que se va a hacer**: se puede modificar, y de ahí
-  salen indicaciones, no obligaciones. Convenciones del texto: prosa sin dos puntos ni listas,
-  un párrafo por idea cerrado con `\\`, citas `\citep` entre paréntesis y `\citet` cuando el
-  autor es sujeto (`biblatex` `authoryear`, `\cite` suelto imprime sin paréntesis). Compila en
-  Overleaf; esta máquina no tiene LaTeX.
-- **Todo el estudio de simulación se especifica sobre los scores** de la
-  representación funcional. El anexo vigente tiene tres escenarios, cada uno
-  asociado a un rasgo de la ley condicional del score que un modelo de media
-  lineal no representa: **TAR** (cambio de régimen por umbral), **GARCH**
-  (heterocedasticidad condicional) y **multimodalidad**. **El conjunto no está
-  cerrado**: pueden agregarse escenarios (cada uno = un algoritmo nuevo en el
-  anexo + una copia de la 200 con otro generador). Cuáles se muestran en el
-  documento es una decisión pendiente del autor (§8).
-- **La predictiva del PSBPM-FD es una mezcla** y se resume de más de una forma.
-  `docs/03 Modelo.tex §03_05` define **tres** predictores puntuales (esperanza,
-  mediana puntual, átomo más probable; la mediana de Fréchet/medoide L¹ se quitó del
-  documento el 2026-10-11 por decisión del autor pero el código la sigue calculando; la mediana
-  por profundidad MBD se eliminó del código el 2026-10-11), tres intervalos
-  (equi-colas, banda simultánea, región de máxima densidad puntual) y `§03_06` los
-  **comportamientos predictivos** (k-medias sobre los draws de scores con reglas
-  valle/crecimiento/masa). Regla de consistencia (Gneiting 2011): MAE y E_max se
-  reportan con una mediana, RMSE con la esperanza; las seis métricas del Bloque B
-  con cada construcción de intervalo. En 200–202 y las reales el pipeline calcula
-  la esperanza y la equi-colas; en las 30x (`predictores=`, `intervalos=`) los
-  cuatro predictores y los tres intervalos (§4, §7).
-- El foco experimental son **escenarios donde el modelo puede ganar**: se trata de
-  caracterizar *cuándo y por qué* el PSBPM-FD supera a las alternativas, no de
-  probar que gana siempre. Un resultado negativo bien acotado es un resultado,
-  no un fracaso (p. ej. GARCH deja la media lineal y se espera ventaja sólo en el
-  Bloque B).
+- Editar la presentación y el guion **cuando se le indique y sólo lo indicado**.
+- Regenerar o ajustar figuras de la presentación.
+- Responder preguntas sobre el modelo, los resultados y el código.
+- Cambios puntuales al paquete o a `docs/` cuando se pidan.
+
+Fuera salvo pedido explícito: redactar capítulos, proponer secciones, ejecutar corridas,
+agregar métricas o etapas, decidir qué resultados "cuentan".
+
+Código, docstrings y nombres están en español; mantener ese idioma.
 
 ---
 
-## 3. Invariantes
+## 2. La presentación — `ppts/FINAL/`
 
-Estos tres elementos **no cambian entre escenarios**. Si una instrucción mía los
-contradice, avisar **antes** de ejecutar.
+`ppts/` está en `.gitignore`: **no hay historial que la recupere**. Respaldar el `.pptx` en
+el scratchpad antes de cada edición.
 
-### 3.1 Métricas — el conjunto es fijo y son diez
+| Archivo | Qué es |
+|---|---|
+| `PRESENTACION_TESIS.pptx` | **La fuente de verdad.** 38 láminas, 16:9. El autor la edita a mano. |
+| `PRESENTACION_TESIS.pdf` | Exportación de revisión. |
+| `GUION_PRESENTACION.docx` | Guion hablado. El autor lo edita en Word. |
+| `build_presentacion_tesis.py` | Script que armó la primera versión. **Ya no reproduce el deck: no reconstruir láminas con él.** |
+| `tesis/estilo.py` | Colores, tarjetas, `add_text`, `fit_image`, fórmulas (`eq_png`, `eq_nat`). Usar estos helpers al agregar formas. |
+| `figuras/figuras.py` | Todas las figuras, a `IMG/`. `python ppts/FINAL/figuras/figuras.py t05 m01` regenera sólo las que empiezan así. |
+| `animar_tesis.py` | Agrega animaciones con PowerPoint (COM) desde `tesis/anim.json` y exporta el PDF. |
+| `medir_desbordes.py` | Textos que no caben en su caja y formas fuera del área útil (COM). |
+| `revisar.py <carpeta>` | Exporta a PDF y arma hojas de contacto de 6 láminas. |
 
-**La fuente de verdad es `docs/02 Marco Teorico.tex §02_02_03`**, y el conjunto
-es exactamente el que ahí se define: ni una más.
+Orden del deck: portada e índice (1–3) · datos reales, los dos problemas (4–6) · marco
+teórico: datos funcionales, FPCA, series, DP, DPM, DDP (7–16) · modelo: predictiva,
+predictores, intervalos, comportamientos (17–22) · resultados: evaluación, tráfico,
+comportamientos (23–31) · síntesis (32–33) · anexos (34–38). Los números cambian cuando el
+autor quita o agrega láminas: **ubicar una lámina por su kicker o su título, no por número**.
 
-Se calculan **una sola vez**, sobre la ventana móvil, con
-`ventana_movil_funcional(..., bloque_A=True)`. No hay tabla agregada aparte:
-todo lo demás (resumen mínimo/máximo/promedio, comparación entre `M`, quién gana
-cada ventana) se **deriva** de esa misma tabla.
+### Cómo editar
 
-| # | Bloque | Métrica (`.tex`) | Columna |
-|---|---|---|---|
-| 1 | **A** — error, `§02_02_03_02` | MAE funcional | `mae_f` |
-| 2 | | RMSE funcional | `rmse_f` |
-| 3 | | Ē_max — promedio de los errores máximos por curva | `linf_medio` |
-| 4 | | E_max^glob — máximo de los errores máximos en la ventana | `linf_max` |
-| 5 | **B** — calibración, `§02_02_03_04` | MPIW | `mpiw` |
-| 6 | | PICP — fracción del dominio cubierta | `picp` |
-| 7 | | PICPB — fracción de curvas cubiertas por completo | `picp_simultaneo` |
-| 8 | | Winkler integrado sobre el dominio | `winkler` |
-| 9 | | W̄_max — promedio del peor Winkler por curva | `winkler_max_medio` |
-| 10 | | W_max^glob — peor Winkler de la ventana | `winkler_max_glob` |
+- **Parchar el `.pptx` en sitio** con python-pptx, dando nombre explícito a las formas
+  nuevas, y guardar en un temporal. Después un paso COM hace el `SaveAs` al definitivo.
+  Si `POWERPNT` está abierto, abortar sin tocar nada.
+- Verificar exportando la lámina a PNG y mirándola. `medir_desbordes.py` para los textos.
+- **Tocar sólo lo que el autor nombró.** No reescribir ni agregar frases en otros cuadros;
+  si el cambio pedido obliga a tocar otro cuadro, preguntar antes. No agregar acotaciones.
+- En las definiciones se redacta en general, sin el ejemplo del tráfico, salvo que se pida.
+- **Guion**: leer el `.docx` actual y usarlo como base; aplicar sólo lo pedido y comprobar
+  que los cortes del autor siguen. **Nunca restablecer algo que él quitó.** El guion no
+  remite al anexo: explica lo que la lámina muestra. Las indicaciones escénicas van entre
+  corchetes.
 
-Se declaran en la celda `[CONFIG]` de `_04` y `_05` como `METRICAS_A` /
-`METRICAS_B`, con el mismo contenido que `fit/evaluacion_barrido.py` (un `assert`
-lo verifica), y `_01` las persiste en `eval_config.json`.
+### Estilo (el de `ppts/AVANCE_2/AVANCE_2.pptx`)
 
-Relaciones verificadas con `assert`, que **no** deben romperse:
-`mae_f <= l2_medio <= linf_medio <= linf_max`, `picp_simultaneo <= picp`, y
-`winkler <= winkler_max_medio <= winkler_max_glob`.
+- Fondo blanco, kicker celeste `1C7293` con letras espaciadas ("2 · MARCO TEÓRICO · FPCA"),
+  título serif Cambria en navy `21295C`, logo USACH arriba a la derecha.
+- Contenido en tarjetas redondeadas gris `EEF3F6`; definiciones y teoremas en tarjetas navy
+  con título menta `02C39A`; entradas en negrita celeste. Pie "PSBPM-FD · Series de Tiempo
+  Funcionales".
+- **Letra: cuerpo 16 pt, encabezados de tarjeta 18 pt**, kicker y pie 14 pt. Se probaron
+  17 y 18 pt y se descartaron: no volver a proponerlo.
+- Figuras con fondo `EEF3F6` y fuente Calibri, dibujadas al tamaño exacto de su caja
+  (`CAJAS` en `figuras.py`) para insertarlas a escala 1; ningún texto bajo 14 pt.
+- Las fórmulas son **imágenes** (mathtext, caché en `tesis/eq/`). Cambiar una letra obliga
+  a re-renderizarla y escalarla a la altura de la original.
 
-**`rmse_f` NO pertenece a la cadena L¹ ≤ L² ≤ L^∞.** Es la raíz del MSE
-*agregado*, una media **cuadrática** sobre los orígenes: por Jensen
-`l2_medio <= rmse_f`, pero `rmse_f <= linf_medio` **es falso** cuando el error es
-desigual entre los orígenes de la ventana. La cadena se verifica sobre `l2_medio`.
+### Notación del deck — difiere de la tesis a propósito
 
-`linf_max` y `winkler_max_glob` dependen de una sola evaluación y son las cifras
-frágiles del conjunto: se reportan porque el marco teórico las define. **`mise` y
-`mise_rel` siguen en la tabla** pero son diagnóstico interno (salto en `T0`,
-piso de truncamiento), no métricas reportables.
-
-### 3.2 Ventanas temporales — la segmentación es fija
-
-- Anchos `w ∈ {20, 30, 40}`, `paso = 1`, solapadas. `W_REF = VENTANAS_W[len // 2]`
-  = **30**: las figuras superponen los tres anchos y las tablas usan `W_REF`.
-- **Las ventanas que cruzan `T0` se excluyen** de todo agregado (`cruza_T0`).
-- Partición: `PROP_TRAIN = 0.70`, `T0` marca el corte y va en el manifest.
-- Se **leen** de `eval_config.json["ventana_movil"]`; **no se redeclaran** en
-  `_04` / `_05`.
-- El documento reporta `w = 30`, el mismo del código (decisión 2026-10-12, para no reejecutar los
-  `_04`). Los `_05` y `_06` llevan `W_REF_DOC = None` en `[CONFIG]`; un entero de `VENTANAS_W`
-  sobrescribiría `DIS["W_REF"]` sin tocar `eval_config.json`.
-
-### 3.3 Evaluación sobre todos los `M`
-
-`M_FPCA_LIST` se declara en **los cuatro notebooks y en el `.m`**, y los cuatro
-recorren el barrido completo en una sola pasada.
-
-- `_01` produce un juego de artefactos por cada `M` (bucle `procesar_punto(M)`);
-  los objetos comunes —`fr`, `fpca`, `THETA`, la partición— se pasan por
-  clausura y **no se recalculan**: ésa es la garantía de que los puntos
-  comparten realización y base.
-- `_03`, `_04` y `_05` cargan cada punto en `EST[M]` e iteran sobre él.
-- `psbp_fd_iteracion.m` arma **una sola lista plana** de jobs
-  `(M × cadena × componente)` con un único `parfor`, no uno por `M`.
-- `SALTAR_M_SIN_TRAZAS` / `SALTAR_M_SIN_ARTEFACTOS` permiten mirar el barrido
-  mientras MATLAB va terminando.
-- Los puntos **deben compartir diseño**: `T`, `T0`, `n_lags`, `nivel`,
-  `modo_residuo`, `objetivo_evaluacion`, ventanas y `mcmc_config` idénticos, y
-  las mismas curvas. Si no, la comparación entre `M` mezclaría el efecto de `M`
-  con el de otra cosa, y el notebook **falla en vez de callar**.
-
-`M` significa dos cosas: en FPCA es el número de componentes retenidas; en
-`mcmc_config` es el tamaño de la grilla de localización G\* del stick-breaking
-(ahí `N` es el truncamiento de átomos).
+| Cantidad | Deck | Tesis (`CAP/00_Simbologia.tex`) |
+|---|---|---|
+| concentración del DP | **M** | c |
+| componentes FPCA retenidas | **Q** | M |
 
 ---
 
-## 4. Estructura canónica: la corrida 200
+## 3. El proyecto
 
-**`notebooks/simulaciones/200_sim_TAR/` es la plantilla.** Toda simulación nueva
-sigue **esa misma estructura, sin agregados**: se cambian parámetros o
-escenario, no la arquitectura del pipeline. Las corridas 201 y 202 son copias
-suyas con otro generador (§7).
+Tesis: extensión del **PSBP** (Probit Stick-Breaking Process, Chung & Dunson 2009) a
+**series de tiempo funcionales**, con el nombre **PSBPM-FD**. El paquete `model_psbp_fd`
+genera datos, consume trazas MCMC y evalúa predicciones. **El muestreo MCMC ocurre en
+MATLAB.**
 
-**Cuatro notebooks y un paso MATLAB**, acoplados por archivos en disco:
+- El estudio de simulación se especifica **sobre los scores** de una base de Fourier
+  conocida, con tres escenarios: **TAR** (C-2, cambio de régimen por umbral), **GARCH**
+  (C-1, heterocedasticidad condicional) y **multimodalidad** (C-3).
+- La predictiva es una **mezcla**. `docs §03_05` define tres predictores puntuales
+  (esperanza, mediana puntual, átomo modal; el código calcula además el medoide L¹, que no
+  se reporta) y tres intervalos (equi-colas, banda simultánea, HDR); `§03_06`, los
+  **comportamientos predictivos** (k-medias sobre los draws de scores).
+- Regla de consistencia (Gneiting 2011): MAE y E_max con una mediana, RMSE con la esperanza.
+- El foco es caracterizar **cuándo y por qué** el PSBPM-FD supera a las alternativas. Un
+  resultado negativo bien acotado es un resultado.
+
+### `docs/` — la tesis
+
+`main.tex`, `CAP/` (`00_Antes`, `00_Resumen`, `00_Simbologia`, `01 Introduccion`,
+`02 Marco Teorico`, `03 Modelo`, `04 Aplicacion`, `05 Conclusiones`) y `ANE/` (`01 Anexo`,
+`02 Anexo Resultados`, `03 Anexo trafico`, `04 Anexo otros`). Compila en Overleaf; esta
+máquina no tiene LaTeX. `docs/` figura en `.gitignore` pero sus archivos están versionados:
+un archivo nuevo necesita `git add -f`.
+
+Convenciones del texto: prosa sin dos puntos ni listas, un párrafo por idea cerrado con
+`\\`, `\citep` entre paréntesis y `\citet` cuando el autor es sujeto.
+
+**El documento no tiene que calzar con el código**: el código genera insumos de más. No
+cambiar código para seguir un valor del documento.
+
+---
+
+## 4. Invariantes del estudio
+
+Referencia de cómo se evaluó todo. Si una instrucción los contradice, avisar antes.
+
+### 4.1 Diez métricas, fijadas por `docs §02_02_03`
+
+Se calculan una sola vez sobre la ventana móvil (`ventana_movil_funcional(..., bloque_A=True)`);
+todo lo demás se deriva de esa tabla.
+
+| Bloque | Métrica | Columna |
+|---|---|---|
+| **A** error | MAE funcional | `mae_f` |
+| | RMSE funcional | `rmse_f` |
+| | Ē_max, promedio de los máximos por curva | `linf_medio` |
+| | E_max^glob, máximo de la ventana | `linf_max` |
+| **B** calibración | MPIW | `mpiw` |
+| | PICP, fracción del dominio cubierta | `picp` |
+| | PICPB, curvas cubiertas por completo | `picp_simultaneo` |
+| | Winkler integrado | `winkler` |
+| | W̄_max, promedio del peor Winkler por curva | `winkler_max_medio` |
+| | W_max^glob, peor Winkler de la ventana | `winkler_max_glob` |
+
+Relaciones verificadas con `assert`: `mae_f <= l2_medio <= linf_medio <= linf_max`,
+`picp_simultaneo <= picp`, `winkler <= winkler_max_medio <= winkler_max_glob`. **`rmse_f` no
+pertenece a esa cadena** (es una media cuadrática sobre orígenes). `mise` y `mise_rel` son
+diagnóstico interno, no métricas reportables.
+
+### 4.2 Ventanas
+
+`w ∈ {20, 30, 40}`, `paso = 1`, solapadas; se reporta **`w = 30`**. Las ventanas que cruzan
+`T0` se excluyen. Partición 70/30. Se leen de `eval_config.json["ventana_movil"]`.
+
+### 4.3 Barrido en `M`
+
+`M_FPCA_LIST` se declara en todos los notebooks y en el `.m`; los puntos comparten
+realización, base, partición y `mcmc_config`. `M` significa dos cosas: en FPCA, componentes
+retenidas; en `mcmc_config`, tamaño de la grilla G\* del stick-breaking (`N` es el
+truncamiento de átomos).
+
+### 4.4 El error se mide contra la curva
+
+Nunca contra la grilla cruda (`docs §03_05_00`). El Bloque A, contra la curva suavizada; el
+Bloque B, contra la curva suavizada y contra la representación truncada `X_t^(M)`.
+`modo_residuo = "ninguno"` por construcción del modelo.
+
+---
+
+## 5. El pipeline
+
+Cada corrida es una carpeta con notebooks y un paso MATLAB, acoplados **por archivos en disco**.
 
 | Paso | Archivo | Qué hace |
 |---|---|---|
-| 1 | `200_01_simulaciones.ipynb` | **Genera los datos** y los prepara: simulación, partición temporal, representación en la base del generador, FPCA de oráculo, datasets AR, contrato. Un juego de artefactos por cada `M`. |
-| 2 | `psbp_fd_iteracion.m` | **Entrena.** Lee el contrato, arma los jobs y llama a `psbp_train.m`. Sólo con el bloque train. No tiene notebook. |
-| 3 | `200_03_convergencia.ipynb` | **Convergencia de las cadenas.** No toca el bloque de prueba. |
-| 4 | `200_04_evaluacion.ipynb` | **Evaluación propia del modelo**: las diez métricas sobre la ventana móvil, PIP, monitoreo por componente. |
-| 5 | `200_05_comparacion.ipynb` | **Comparación** del PSBPM-FD contra FAR y RF. |
+| 1 | `_01` | Genera o carga los datos, representación, FPCA, datasets AR y contrato. Un juego de artefactos por `M`. |
+| 2 | `psbp_fd_iteracion.m` | Lee el contrato y entrena con `psbp_train.m`, sólo con el bloque train. |
+| 3 | `_03_convergencia` | Diagnósticos de las cadenas. No toca el bloque de prueba. |
+| 4 | `_04_evaluacion` | Predictiva, métricas sobre la ventana móvil, PIP, comportamientos. |
+| 5 | `_05_comparacion` | PSBPM-FD contra FAR(p) y RF. Bloque B sólo FAR y PSBPM-FD. |
+| 6 | `_06_opciones` | Comportamientos como opciones de pronóstico: **más probable** y **mejor comportamiento** (cota). |
 
-> `_01` **no** es "el entrenamiento": genera los datos. El entrenamiento es el
-> paso MATLAB. Si las cadenas no convergen, los números de `_04` no significan
-> nada: por eso `_03` es un notebook aparte.
+`hyperparameters.json` es la **única fuente de verdad del contrato Python ↔ MATLAB**
+(`n_iter`, `mcmc_config`, `hyperparams_list`, `partition`, `seed_base`, `trazas_en`). Hay una
+copia de `config_paths.m` y `psbp_train.m` por carpeta.
 
-### La representación (scores como insumo)
+Los notebooks sólo orquestan:
 
-El generador entrega los **scores**; los modelos de scores los reciben **crudos**
-(`scores_scale = "raw_fpca_scores"`, estandarizador en identidad, sin ruido de
-medición: `sigma_obs = 0`). La base de Fourier ortonormal del generador **es** la
-representación: `theta_t = mu_theta + xi_t`, exacta (porque `mu = sin(2πτ)` cae en
-la base), con `K = J = 10`. **No hay GCV, ni B-spline, ni FPCA estimada**:
-`FunctionalRepresentation.desde_base` y `FPCA_L2.desde_scores_conocidos` arman los
-objetos del contrato con la base y los scores conocidos, en el orden de la base.
-El prior se mantiene equivariante a la escala con hiperparámetros relativos a la
-dispersión de cada serie (§7), no reescalando los datos.
-
-### Secciones de cada notebook
-
-`_01`: §1 imports y `[CONFIG]` (§1.1 experimento y barrido en `M`) · §2
-simulación (§2.1 `[CONFIG]` generador, §2.3 figuras, §2.5 partición) · §3
-representación (§3.1 base conocida y coeficientes, §3.2 FPCA de oráculo) · §4
-bucle sobre `M_FPCA_LIST` (§4.1 componentes, §4.2 estandarizador identidad, §4.3
-diagnóstico de rezagos, §4.4 datasets AR, §4.5 hiperparámetros y MCMC, §4.6
-evaluación y contrato) · §5 resumen del barrido.
-
-`_03`: §1 artefactos (`[CONFIG]`, `cargar_artefactos`) · §2 trazas · §3 tabla de
-diagnósticos · §4 ocupación de la mezcla (§4.1 gating) · §5 figuras por parámetro ·
-§6 PIP (§6.1 contraste con el generador) · §7 verificación muestreador ↔
-predictor (§7.1 paso de Γ) · §8 comparación entre puntos del barrido · §9
-comparación entre variantes.
-
-`_04`: §1 artefactos · §2 trazas · §3 predicción a `h=1` (§3.1 persistencia de la
-banda) · §4 Bloque A sobre la ventana móvil (§4.1 qué `M` gana cada ventana) · §5
-Bloque B · §6 muestra de predicciones · §7 PIP · §8 resumen mín/máx/promedio · §9
-monitoreo univariado por componente · §10 banda de credibilidad de cada `xi_k`,
-métricas de intervalo por componente y dispersión `xi_hat` contra `xi`.
-
-`_05`: §1 artefactos · §2 validaciones · §3 competidores (§3.1 FAR, §3.2 RF, §3.3
-PSBPM-FD) · §4 Bloque A (los tres modelos) · §5 Bloque B (sólo FAR y PSBPM-FD) ·
-§6–§7 quién gana cada ventana · §8 resumen y métricas contra `M` · §9 intervalos
-curva a curva.
-
-**Las 30x** (`300_sim_TAR_estimadores/` es la referencia; 301 y 302, copias con otro escenario)
-agregan al `_04`/`_05` de la 200, sin quitar nada, lo que define `docs §03_05–§03_06`: cuatro
-predictores puntuales (`predictores=`), tres construcciones de intervalo (`intervalos=`),
-diagnóstico de multimodalidad (`_04` §11) y comportamientos predictivos (`_04` §12, validados
-contra el régimen o mecanismo verdadero en 300 y 302 y contra `h_t` en 301); en el `_05`, una
-fila por predictor, una banda por construcción junto al FAR (`111_*`) y §10 los comportamientos
-contra lo observado, sobre todo el test y, aparte, sobre la ventana de detalle (`subconjunto` y
-`origenes` = todos / `K>=2` en `83` y `105`; `validar_observado(..., curvas_ref=)` da el error
-de la curva típica y de esperanza, FAR y RF en los mismos orígenes). Los artefactos se **copian**
-de la 20x con `00_copiar_200.py`; `_01`, MATLAB y `_03` no se ejecutan.
-
-- **Ventana de detalle** (`PROMPT_30x_ventana_detalle.md`): métricas de ventana, bandas,
-  predictores y `K` por origen van sobre toda la serie; el análisis origen a origen (`_04` §6,
-  §11, §12.2–§12.5; `_05` §9) va sobre `N_DETALLE = 10` orígenes consecutivos de prueba que el
-  `_04` §3.2 elige con un criterio del escenario sobre los `internos`, nunca sobre lo predicho
-  (300: más cambios de régimen; 301: máximo de `h_t` agregada en tercera posición; 302: más
-  orígenes con `K ≥ 2` en la ley verdadera; reales: calendario) y escribe en
-  `112_ventana_detalle.json`, que `_05` y `_06` leen. Con 10 orígenes las cifras son cuentas.
-- **`_06_opciones`** (2026-10-11; en 300–302, 101 y 102, ejecutado en los cinco): los comportamientos como
-  opciones de pronóstico. Lee draws, comportamientos y banda del `_04`, reajusta FAR y RF como el
-  `_05` y, por comportamiento, calcula curva típica, mediana puntual y medoide del grupo. Dos
-  filas de modelo por opción: **más probable** (el pronóstico por comportamiento de docs
-  §03_06_03) y **mejor comportamiento** (menor error L² en el origen: una cota, usa lo observado);
-  con `K = 1` ambas son el predictor marginal de la misma opción. Cada una contra FAR y RF **por
-  separado**, en ventana móvil, contra `M` y por origen (test; todos / `K ≥ 2`), y acierto (el
-  mejor es el más probable) por tramos de `p_1`. Salidas `113`–`115` por `M`, `116`–`119` en el
-  barrido. Sin control de extracciones al azar (decisión del autor).
-- **`W_REF_DOC`** en `[CONFIG]` de `_05` y `_06` (30x, 32, 101, 102): `None` (= 30, lo que reporta
-  el documento); un entero de `VENTANAS_W` sobrescribiría `DIS["W_REF"]` sin tocar el `_04`.
-
-### Dónde vive el código de cada notebook
-
-Los notebooks **sólo orquestan**; el cálculo y el dibujo están en el paquete:
-
-| Notebook | Cálculo | Figuras |
+| Notebook | Cálculo (`fit/`) | Figuras (`graphics/`) |
 |---|---|---|
-| `_01` | `fit/preparacion_barrido.py` (`preparar_punto(M, CTX)`: datasets AR, hiperparámetros, contrato) | `graphics/viz_fpca.py` (`plot_diagnostico_rezagos`, `plot_series_componentes`) |
-| `_03` | `fit/convergencia_barrido.py` | `graphics/viz_convergencia.py` (+ `viz_traces`, `viz_global_components`) |
-| `_04` | `fit/evaluacion_barrido.py` | `graphics/viz_evaluacion_barrido.py` (+ `viz_evaluacion`) |
-| `_05` | `fit/comparacion_barrido.py` | `graphics/viz_comparacion.py` |
-| 30x (`_04` §11–§12, `_05` §10) | `fit/resumenes_predictiva.py`, `fit/comportamientos.py` | `graphics/viz_comportamientos.py` |
-| 30x (`_04` §3, §5.1, §8.2; `_05` §5, §7, §9) | `fit/intervalos_predictiva.py` (las tres construcciones y las métricas sobre una unión de tramos; `rolling.ventana_movil_funcional(..., region=)`) | `graphics/viz_evaluacion_barrido.py` (`plot_ventana_grupos_por_M`, `plot_ganador_grupo_vs_M`), `viz_comparacion.ESTILOS_BANDAS` |
-| 301 (`_04` §12.4) | `fit/heterocedasticidad.py` (banda contra la varianza condicional del GARCH) | `graphics/viz_heterocedasticidad.py` |
-| 302 (`_04` §12.4) | `pipelines/sim_escenario_C1.predictiva_oraculo_C1`; `fit/comportamientos.intervalos_contra_oraculo` (vía `regimen_barrido(..., intervalos=True)`: columnas `frac_multitramo_*`, `masa_*`, `ancho_*` en `65_*` y `104_*`; con la ventana de detalle se muestran como cuentas) | `viz_comportamientos.plot_validacion_regimen` (cuarto panel; sin uso desde la ventana de detalle) |
+| `_01` | `preparacion_barrido` | `viz_fpca` |
+| `_03` | `convergencia_barrido`, `diagnostics_mcmc` | `viz_convergencia`, `viz_traces`, `viz_global_components` |
+| `_04` | `evaluacion_barrido`, `rolling`, `resumenes_predictiva`, `intervalos_predictiva`, `comportamientos` | `viz_evaluacion_barrido`, `viz_evaluacion`, `viz_comportamientos` |
+| `_05`, `_06` | `comparacion_barrido`, `far_operador` | `viz_comparacion` |
 
-`cargar_artefactos(..., con_test=True)` carga cada punto y cruza el contrato
-(`verificar_contrato`); `cargar_representaciones` fija el diseño común y exige que
-los puntos coincidan. Los tres comparten el estado `EST[M]`.
+**Competidores.** FAR(p) sobre los coeficientes en métrica L², con `p = N_LAGS` fijo. RF:
+un bosque por componente con las mismas covariables del PSBPM-FD; elige el orden por
+ventanas de *train*. El PSBPM-FD se **lee** de `banda_funcional_psbp.npz`, no se recalcula.
 
-### Los competidores del `_05`
+### Artefactos
 
-`FAR(p)` · `RF` · y el PSBPM-FD. **No hay líneas base (media, persistencia) ni
-GBT**. Hay una sola referencia lineal.
+| Clave | Ruta | Contenido |
+|---|---|---|
+| `raw` | `data/<dominio>/raw/<EID>/` | curvas, configuración, `escenario_<id>.npz` |
+| `functional` | `data/<dominio>/processed/functional/<EID>/` | manifest, datasets por componente, FPCA, `theta.csv` |
+| `predict` | `data/<dominio>/processed/predict/<EID>/` | `banda_funcional_psbp.npz`, `draws_scores_psbp.npy` (ignorado por git), `comportamientos_psbp.npz` |
+| `out_report` | `reports/<dominio>/<EID>/` | figuras y CSV del punto |
+| `out_artefact` | `artefact/<dominio>/<EID>/` | `hyperparameters.json`, `eval_config.json`, trazas `.mat` |
 
-- **FAR(p)** sobre los coeficientes de la base, en la métrica L²: se estima
-  blanqueando `THETA` con la Cholesky de la Gram (`W = LL^T`), verificado con
-  `assert` (con base ortonormal `W = I`). Se ajusta con `pesos="conteo"` (pesar de
-  nuevo con la trapezoidal aplicaría L² dos veces). **`p = N_LAGS` fijo, no se
-  selecciona**: seleccionarlo daría una ventaja de especificación que el PSBPM-FD
-  no tiene. Tope de `kn` = `K`.
-- **RF**: un bosque **por componente**, con las **mismas covariables** que el
-  PSBPM-FD (rezago propio en 200/201; todos los rezagos en 202). Barre el orden
-  `1..N_LAGS` y se queda con el que gana más **ventanas de TRAIN** en `mae_f`;
-  nunca test.
-- **PSBPM-FD**: su predicción puntual y su banda se **leen** de
-  `banda_funcional_psbp.npz`, que persiste `_04`; no se recalcula desde las trazas.
-  En 200–202 y las reales hasta la 31 el punto es la **esperanza analítica**
-  (`momentos()`). En las 30x `predecir_barrido(..., predictores=PREDICTORES)`
-  calcula además mediana puntual, medoide L¹ y átomo modal
-  (`fit/resumenes_predictiva.py`), el `.npz` los lleva como `X_pred_<predictor>`
-  y `cargar_psbp(..., predictores=...)` registra una fila `PSBPM-FD (<predictor>)`
-  por cada uno; `e["X_PSBP"]` (la esperanza) es la que acompaña a las bandas en el
-  Bloque B. Con `intervalos=INTERVALOS` se agregan la banda simultánea y la HDR
-  (`cargar_psbp(..., intervalos=...)`, `construir_bandas(..., intervalos_psbp=...)`,
-  filas `G_PSS` y `G_PSH`). Sin `predictores` ni `intervalos` todo es como en la 200
-  (sin columnas `predictor` ni `intervalo`).
+`<EID>` es `escenario_<NNN>_<variante>_<id>_r<NN>_m<NN>` en simulaciones y
+`real_<serie>_v<NN>_m<NN>` en reales. Lo que cruza los puntos del barrido va a
+`reports/<dominio>/..._barrido_M/`. `utils/rutas.py` construye los directorios (gemelo de
+`config_paths.m`) y `pipelines/artifacts.py` decide los nombres de archivo.
 
-El Bloque B se restringe a FAR y PSBPM-FD —los únicos con mecanismo de intervalo propio— con dos filas por `M`: la banda gaussiana del FAR y la banda nativa del PSBPM-FD (cuantiles
-de su predictiva). `IC_PSBP_TAMBIEN_GAUSSIANA = False`: no se corre el control con banda gaussiana
-sobre la media del PSBPM-FD.
+### Modelo
+
+`models/pspb_fd_v3` es la versión en uso y no tiene muestreador: trazas `.mat` → predictiva
+por score → `PropagadorFuncional` → muestras de curvas `(S, n, G)`. La entrada de los
+notebooks es `ModeloTraza` (`leer_traza`, `momentos`, `muestrear`). `psbp_fd_v1` y `v2` son
+heredadas y no se importan.
+
+Hiperparámetros: Chung y Dunson §4.2 en escala cruda, relativos a la dispersión de cada
+serie en train. Variante `chungEscG` (rezago propio, `taupsij_z = 10`) y `chungEscX`
+(covariables cruzadas). `atau = 0.5` en simulaciones, `atau = 2` en reales.
 
 ---
 
-## 5. Cómo trabajar conmigo
+## 6. Corridas y dónde está cada cosa
 
-- Si una instrucción mía rompe los invariantes (§3) o la estructura de la corrida
-  200 (§4), **avisar antes de ejecutar**.
-- **No agregar pasos, métricas ni etapas** al pipeline sin que yo lo pida.
-- **No ejecutar notebooks ni MATLAB** sin que lo pida (las corridas son largas y
-  los artefactos se pisan con `limpiar=True`). Sí: chequeo estático de las celdas
-  y scripts sueltos de verificación sobre datos ya generados.
-- Ser conciso: priorizar código, comandos y diagnósticos sobre explicaciones largas.
-- No leer ni escribir artefactos a mano desde un notebook: usar
-  `pipelines/artifacts.py` y `utils/rutas.py` (§6.3).
-- `200_sim_TAR/` es la plantilla y se edita con cuidado. Las copias 201/202 **no
-  se actualizan solas**: un cambio en la 200 se propaga a mano. Lo histórico (§7)
-  no se toca.
-- **Las corridas 300–302 no regeneran ni reentrenan**: toman los artefactos de
-  200–202 por copia en disco bajo IDs nuevos (`escenario_30x`) y sólo ejecutan
-  `_04`/`_05`. Nunca escribir en los directorios de 200–202 desde una 30x.
-- Los cambios al paquete que piden las 30x son **aditivos**: valores por defecto
-  que dejan 200–202 y las reales exactamente como están.
-- Tras cambiar el paquete, el kernel de los notebooks debe **reiniciarse** (los
-  módulos ya importados no se recargan).
+### Simulaciones — `notebooks/simulaciones/`
+
+| Carpeta | Escenario | Estado |
+|---|---|---|
+| `08_02 3 escenarios/200_sim_TAR`, `201_sim_GARCH`, `202_sim_MULT` | generación y entrenamiento originales | notebooks con salidas embebidas; **sus artefactos ya no están en disco** |
+| `300_sim_TAR_estimadores` | TAR (C-2), `M = 1..10`, rezago propio | evaluada; tiene sus propios datos y trazas |
+| `301_sim_GARCH_estimadores` | GARCH (C-1), `M = 1..10`, rezago propio | evaluada |
+| `302_sim_MULT_estimadores` | multimodalidad (C-3), `M = 3..6`, cruzadas | evaluada |
+
+**Las cifras del documento salen de las 30x**, que son las 20x reevaluadas con todos los
+predictores e intervalos. En 300 y 301 los `.mat` están sólo en `m10` y los demás puntos
+apuntan ahí con `trazas_en`.
+
+Configuración común: `T = 1000` (`T0 = 700`), grilla de 75 puntos, `J = K = 10`,
+`MCMC = {nsim 2500, burn 500, N 30, M 50}`, 3 cadenas, semilla 41232, una réplica.
+
+Lectura: la esperanza gana el RMSE en los tres; la mediana puntual baja el MAE ~1.3 % en la
+300 y coincide con la esperanza en 301 y 302; el RF gana el Bloque A en la 300. La HDR sólo
+se parte en la 300 y ahí le gana el Winkler a la equi-colas; la simultánea es la única
+calibrada en PICPB; las tres le ganan al FAR desde `M = 4`. `K ≥ 2` en 30 % del test de la
+300 (ley verdadera 9 %), 0.3 % en la 301 y 0 % en la 302.
+
+### Datos reales — `notebooks/reales/`
+
+Todas con `M = 10`, una cadena, `chungEscG`, `atau = 2`.
+
+| Carpeta | `SERIE_ID` | Serie |
+|---|---|---|
+| `101_real_trafico` | `trafico_101` | tráfico I-94, rezago 1 |
+| `102_real_trafico_l17` | `trafico_102` | tráfico I-94, rezagos `{1, 7}` |
+| `103_real_sa_precio` | `sa1_103` | precio SA1 (AEMO) |
+| `104_real_pm25` | `pm25_104` | PM2.5 Parque O'Higgins (SINCA) |
+| `105_real_beijing_pm25` | `beijing_105` | PM2.5 de Beijing |
+| `106_real_eolica_smard` | `eolica_106` | factor de planta eólico DE (SMARD) |
+| `107_real_btc_vol` | `btc_107` | volatilidad realizada de BTCUSDT |
+
+**El capítulo 4 y la presentación usan sólo el tráfico (101 y 102)**; 103–107 van en el
+anexo D. Fuera del tráfico la predictiva es unimodal (`K = 1` en más del 99 % del test) y el
+Bloque A queda empatado o del FAR, salvo la 104; el Bloque B es del PSBPM-FD en Beijing y la
+104. `102_04` no se ejecuta: sus salidas son copia de la 32.
+
+### Historia — no se edita ni se cita como estado actual
+
+- `notebooks/simulaciones/00_*` a `07_*`, y `notebooks/reales/01 Antiguos primera tanda` y
+  `02 Antiguos segunda tanda` (21–32). Otra arquitectura (B-spline por GCV, ruido de
+  medición, escalera de hiperparámetros): sus cifras no son comparables con las vigentes.
+  Sus artefactos ya no están en disco; valen por sus salidas embebidas.
+- `model_psbp_fd/pipelines/deprecated/`: generadores de esas corridas.
+- En disco quedan artefactos sin notebook vivo: `real_sa1_precio_v02`, `real_pm25_poh_v02`,
+  `real_trafico_{mi,m10,l17}`, `real_btcusdt_vr`, `real_pm25_104_v02_m01..m06`,
+  `avance_tesis_1`. **No se borran sin que se pida.**
 
 ---
 
-## 6. Referencia técnica
+## 7. Cómo trabajar conmigo
 
-### 6.1 Instalación y pruebas
+- **No ejecutar notebooks ni MATLAB** sin que lo pida. Sí: chequeo estático y scripts
+  sueltos de verificación sobre datos ya generados.
+- **Los notebooks no se tocan** salvo pedido explícito.
+- Ser conciso: código, comandos y diagnósticos antes que explicaciones largas. Comentarios
+  escuetos.
+- No leer ni escribir artefactos a mano: usar `pipelines/artifacts.py` y `utils/rutas.py`.
+- Tras cambiar el paquete hay que reiniciar el kernel de los notebooks.
+- Si un notebook importa código viejo, el `pip install -e .` apunta a otra copia: reinstalar
+  desde la raíz.
 
 ```bash
 pip install -e .
 ```
 
-Alternativa conda en `environment.yml` (entorno `psbp_fd`).
-
 ```bash
-python -m pytest tests/test_metricas_bloques_AB.py tests/test_far_operador.py tests/test_sim_escenario_B_mezcla.py tests/test_resumenes_predictiva.py tests/test_comportamientos.py tests/test_intervalos_predictiva.py -v
+python -m pytest tests -q
 ```
 
-Cubren los Bloques A y B y su enganche con la ventana móvil, el FAR contra salidas
-de R, el generador de mezcla B, los cuatro predictores puntuales (con el
-`PSBPPredictor` real sobre trazas sintéticas, el medoide contra su definición
-directa, el `.npz` nuevo y uno antiguo, y que las llamadas de `200_04`/`200_05`
-sigan ligando con las firmas), las reglas de comportamientos sobre muestras con
-`K` conocido y las tres construcciones de intervalo (las métricas de tramos con
-K = 1 reproducen las de siempre al bit; HDR de dos tramos en una bimodal, igual a
-la equi-colas en una gaussiana; simultánea robusta a las colas de atau ≤ 1; el
-`.npz` con intervalos y el Bloque B del `_05` por tramos). No hay configuración de pytest, CI ni linter.
+En Windows, `jupyter execute` necesita `PYTHONUTF8=1` o corrompe las tildes del `.ipynb`.
 
-### 6.2 El ciclo Python → MATLAB → Python
+### Gotchas
 
-Las tres etapas se acoplan **por archivos en disco**, no por llamadas.
-`hyperparameters.json` es la **única fuente de verdad del contrato Python ↔
-MATLAB** (`n_iter`, `mcmc_config`, `hyperparams_list`, `partition`, `seed_base`,
-`trazas_en`). **No hardcodear esos valores en el `.m`.**
-
-`psbp_fd_iteracion.m` **lee `seed_base` del JSON** y falla si falta. La semilla
-por job es `seed_base + chain*9973 + k*31`. Hay **una copia de `config_paths.m` y
-`psbp_train.m` por carpeta de experimento**: un cambio de convención se propaga a
-mano a todas.
-
-Con **rezago propio** el score `xi_k` no depende de `M`, así que MATLAB entrena
-**sólo** `M_ENTRENO = max(M_FPCA_LIST)` y los `M` menores reutilizan las trazas vía
-`hyperparameters.json["trazas_en"]`. Con **covariables cruzadas** el diseño cambia
-con `M` y **se entrena cada punto**.
-
-### 6.3 Artefactos: dónde vive cada cosa
-
-| Clave | Ruta | Contenido |
-|---|---|---|
-| `raw` | `data/<dominio>/raw/<EID>/` | `X_curves.npy`, `X_curves_true.npy`, `simulation_config.json`, `escenario_<id>.npz` |
-| `functional` | `data/<dominio>/processed/functional/<EID>/` | `datasets_manifest.json`, `dataset_fpc_<idx>_{train,test}.csv`, CSV de FPCA, estandarizador, `theta.csv` |
-| `predict` | `data/<dominio>/processed/predict/<EID>/` | `banda_funcional_psbp.npz` (`li`, `ls` = equi-colas, `X_pred` = esperanza y, en las 30x, `X_pred_<predictor>`, `li_simultanea`/`ls_simultanea` `(n, G)` y `hdr_L`/`hdr_U` `(n, G, hdr_kmax)` float32 con NaN donde no hay tramo); en las 30x además `draws_scores_psbp.npy` (extracciones de scores `(S, n, M)` float32, ~240 MB con `M = 10`, ignorado por git) y `comportamientos_psbp.npz` (`K`, masas, centroides, curvas típicas y bandas condicionales por origen) |
-| `out_report` | `reports/<dominio>/<EID>/` | figuras y CSV del punto |
-| `out_artefact` | `artefact/<dominio>/<EID>/` | `hyperparameters.json`, `eval_config.json`, trazas `.mat` |
-
-- **`utils/rutas.py` construye los directorios** (`experiment_id`,
-  `construir_paths`, `rutas_por_M`, `ruta_barrido_M`, `guardar_en_todos`,
-  `replicar_figura`). Es el gemelo Python de `config_paths.m`; si una cambia, la
-  otra también.
-- **`pipelines/artifacts.py` decide los nombres de archivo** (dict `ARCHIVOS`) y
-  centraliza escritura y lectura emparejadas. `verificar_contrato()` cruza
-  manifest, hiperparámetros y artefactos FPCA.
-- `construir_paths(limpiar=True)` vacía `raw`, `functional`, `predict` y
-  `out_artefact`, pero **no** `out_report`: un dataset o una traza rancios se
-  leerían como si fueran de la corrida actual.
-
-### 6.4 El modelo
-
-**`psbp_fd_v3` es la versión que se usa** y no tiene muestreador: trazas `.mat` →
-predictiva por score → `PropagadorFuncional` (reconstruye la curva) → muestras de
-curvas `(S, n, G)`, que son el insumo de `fit/`.
-
-La puerta de entrada de los notebooks vivos es `ModeloTraza`: `leer_traza` da
-`(traces, burn, feature_names)` y `ModeloTraza.momentos(df)` / `.muestrear(df, S)`
-producen media, sd predictiva y extracciones por score. **No redefinir la
-convención de nombres de traza en un notebook**: usar `ruta_traza`. (`N1out`,
-`Nout` y `muout` no vienen en `leer_traza`: los agrega
-`convergencia_barrido._leer_traza_completa`.)
-
-`curva_media_desde_scores` es el mapa determinista (`modo_residuo="ninguno"`, sin
-muestreo) con el que los competidores entran en la misma escala de curva que el
-PSBPM-FD. `v1` / `v2` son heredadas: siguen en disco pero `models/__init__.py` ya no las importa (sólo `v3`).
-
-**Contrato v2 → v3:** `predict(return_std=True)` devuelve la **predictiva** (ley de
-varianza total), no la sd de la media condicional (`sd_centro`). Usar la de v2
-como banda produce subcobertura que se confunde con fracaso del modelo. Con
-`atau <= 1` esa sd **no existe** (diverge); las bandas por cuantiles sí.
-
-### 6.5 El error se mide contra la curva, no contra la grilla cruda
-
-**La fuente de verdad es `docs/03 Modelo.tex §03_05_00`**, con dos objetivos:
-
-| objetivo | qué es | quién se mide contra él |
-|---|---|---|
-| **curva suavizada** | `fr.reconstruct(fr.transform(X_obs))` | **todos**: FAR, PSBPM-FD y RF |
-| **representación FPCA** `X_t^(M)` | `mu + sum_{m<=M} xi_tm psi_m`, la expansión truncada | sólo los métodos sobre scores |
-
-En 200–202 la representación es exacta, así que la curva suavizada **coincide con
-la curva verdadera**. El segundo objetivo cambia con `M` y aísla la dinámica sobre
-los scores. El **Bloque A** se reporta contra la curva suavizada; el **Bloque B**,
-contra **los dos**, en una tabla con una columna que declara el objetivo (la banda
-del FAR vive en `K` y la del PSBPM-FD en `M`).
-
-`modo_residuo` **no es una perilla**: es `"ninguno"` por construcción del modelo
-(la variabilidad vive dentro de la mezcla, no en un error aditivo). Sigue en
-`eval_config.json` porque el `PropagadorFuncional` lo consume. `objetivo_evaluacion`
-se registra desde `_01`; **no se decide en el notebook de evaluación**.
-
-### 6.6 Convenciones
-
-- **Ejes del estudio**, sin abreviar: `ESCENARIO_ID`, `REPLICA_ID`, `chain`,
-  `k` (componente FPCA), `M` (componentes retenidas).
-- **`EXPERIMENT_ID`** nombra por igual `data/`, `artefact/` y `reports/`, y debe
-  coincidir **exactamente** entre los cuatro notebooks y el `.m`:
-  `f"{BASENAME}_{ESCENARIO_ID}_r{REPLICA_ID:02d}_m{M_FPCA:02d}"` (p. ej.
-  `escenario_200_chungEscG_1_r01_m03`). Datos reales: `real_<serie>_v<NN>_m<NN>`.
-  `M` viaja en el id para que cada punto escriba sus propios datos sin pisar los
-  demás; por eso `M_FPCA_LIST` se declara en `[CONFIG]` antes de construir rutas.
-- **Constantes al inicio, igual en los cuatro notebooks**: `[CONFIG]` con
-  `PROJECT_ROOT`, `VARIANTE`, `BASENAME`, `ESCENARIO_ID`, `REPLICA_ID` y
-  `M_FPCA_LIST`, más las constantes propias de cada uno.
-- **Índices base-0 vs base-1.** `component_idx` del manifest es base-0; los
-  nombres de archivo usan `fpc_idx = component_idx[k] + 1`. Las trazas se llaman
-  `chain_fpc_<fpc_idx>_iter<chain a 2 dígitos>.mat`; **no cambiar**.
-- **Salidas del barrido**: lo que cruza los puntos va a
-  `reports/<dominio>/<BASENAME>_<ESCENARIO>_r<NN>_barrido_M/`, hermano de los de
-  cada `M`.
-
-  | Notebook | Por `M` (`out_report`) | Barrido (`_barrido_M`) |
-  |---|---|---|
-  | `_01` | `01`–`09`, `30_baselines_test.csv` | — |
-  | `_03` | `40`–`49b` | `80`–`83` |
-  | `_04` | `54`–`57`, `66`–`67`, `90`–`94` | `84`–`89` |
-  | `_05` | `72`–`81b` | `76`, `77`, `96`–`99` |
-  | `_04` de las 30x, además | `60`–`65` (§11–§12) | `100`–`104` (`101b`, `102b`) |
-  | `_05` de las 30x, además | `82`–`83` (§10) | `105`–`107` |
-  | `_04` de las 30x, intervalos | `58`–`59` (§4 por predictor, §5.1 por intervalo) | `108`–`110` |
-  | `_05` de las 30x, intervalos | `81b_*_PSBPM-FD-simultanea/-hdr` | `111` |
-  | 30x, ventana de detalle | `_04`: `63_detalle_t<t>.png`; `_05`: `79_ic_contraste_detalle{,_hdr,_simultanea}.png` | `112_ventana_detalle.json`, `112_ventana_detalle_por_origen.csv` |
-  | `_06` de las 30x y la 32 | `113_opciones_por_origen.csv`, `114_ventana_{mas_probable,mejor}_w<w>.png`, `115_ventana_modelos_w<w>.csv` | `116_resumen_bloqueA_opciones.csv`, `117_{ganador_ventana,razones}_opciones.csv`, `118_{mas_probable,mejor}_vs_M.png`, `119_resumen_opciones_por_M.csv`, `119_acierto_por_p1.{csv,png}` |
-
-  En la 301 los prefijos de la validación contra régimen (`65` por `M`, `104` en el
-  barrido) llevan el diagnóstico de banda contra `h_t`.
-
-  Los prefijos `80`/`81` aparecen en dos notebooks pero en **directorios
-  distintos**; no "arreglar" la numeración sin pedirlo.
-- Retención temporal: todo lo **estimado** con datos (autovalores de la FPCA,
-  `kn` del FAR, orden del RF, `sd` de los hiperparámetros) usa **sólo** el bloque
-  de entrenamiento; el estandarizador (identidad) guarda `n_ajuste`.
-- `.gitignore` excluye `*.npy` y los compilados; los `.mat` y las figuras `.png`
-  **sí** se versionan.
-
-### 6.7 Gotchas
-
-- **MATLAB colapsa la dimensión singleton final al guardar.** Con `p = 1`
-  (`M = 1` con rezago propio y `N_LAGS = 1`) `betajhout`, `psijhout`, `Gammajhout`
-  y `gammajhout` llegan con dos ejes en vez de tres. `utils/trazas.py`
-  (`normalizar_trazas_mat` / `asegurar_3d`) restaura el eje. **No leer
-  `traces["betajhout"].shape[2]` a mano**: usar `predictor.n_features_`.
-- **`np.loadtxt` colapsa a 1D** con una sola columna; `artifacts.py` fuerza 2D en
-  `_MATRICES_2D`.
-- **Cuadratura y Cholesky tienen una sola definición**:
-  `utils.quadrature.pesos_trapezoidales` y `utils.linalg.safe_chol`. Duplicarlas
-  degrada en silencio la ortonormalidad o cambia trayectorias ante la misma semilla.
-- **`base_en_grilla` obtiene cada base por diferencia**
-  (`reconstruct(e_k) - reconstruct(0)`) porque con `center=True` la reconstrucción
-  es afín.
-- **No usar `crps_gaussiano` / `lps_gaussiano` / `pit_gaussiano`** con la
-  predictiva del modelo propuesto: descartan la multimodalidad/asimetría que el
-  estudio existe para medir. Usar las versiones muestrales.
-- **Los diagnósticos MCMC se calculan sobre cantidades invariantes a la
-  permutación de etiquetas** (`extraer_traza_variable` promedia sobre átomos).
-  `fit/diagnostics_mcmc.py` tiene la única definición.
-- **`fit/rolling.py` no reentrena**: desliza la ventana de *evaluación* sobre una
-  serie de predicciones a `h=1` con rezagos reales.
-- Los comentarios `% [FIX]` / `% [FIX N]` en los `.m` documentan correcciones
-  deliberadas (grid G\* por predictor, log-verosimilitud en el paso de Γ, etc.).
-  **No revertirlos sin entender el motivo.**
-
-### 6.8 Terminología
-
-**FAR(p)** autorregresivo funcional · **TAR / SETAR** autorregresivo por umbral
-(el umbral aquí es el rezago propio: autoexcitado) · **GARCH** varianza
-condicional autorregresiva · **HS** norma de Hilbert-Schmidt · **FPC/FPCA** análisis
-principal funcional en métrica L² · **MISE** error cuadrático integrado ·
-**Winkler**, **PICP**, **MPIW**, cobertura simultánea: Bloque B · **T0** corte de la
-partición temporal · **G\*** grilla de localización del stick-breaking probit ·
-**oráculo** la media condicional verdadera, cota superior de lo alcanzable ·
-**scores activos / pasivos** los `J_a = 4` primeros llevan la dinámica del escenario
-y los otros seis son AR(1) de coeficiente 0.3.
+- **MATLAB colapsa la dimensión singleton final** al guardar (`p = 1`).
+  `utils/trazas.normalizar_trazas_mat` restaura el eje; no leer `shape[2]` a mano, usar
+  `predictor.n_features_`.
+- **Cuadratura y Cholesky tienen una sola definición**: `utils.quadrature.pesos_trapezoidales`
+  y `utils.linalg.safe_chol`.
+- **Con `atau <= 1` la sd predictiva no existe** (diverge); las bandas por cuantiles sí.
+  Nunca la media de los draws como estimador; recorte a 0.5–99.5 % antes de agrupar.
+- `predict(return_std=True)` de v3 devuelve la sd **predictiva**, no la de la media
+  condicional.
+- Los diagnósticos MCMC se calculan sobre cantidades invariantes a la permutación de
+  etiquetas (`fit/diagnostics_mcmc.py`).
+- `fit/rolling.py` no reentrena: desliza la ventana de *evaluación*.
+- Índices: `component_idx` del manifest es base-0; los nombres de archivo usan
+  `fpc_idx = component_idx + 1`. Trazas: `chain_fpc_<fpc_idx>_iter<chain>.mat`.
+- Los comentarios `% [FIX]` de los `.m` documentan correcciones deliberadas.
+- `.git` pesa ~23 GB: borrar archivos no lo reduce.
 
 ---
 
-## 7. Estado del repositorio
+## 8. Decisiones cerradas — no reabrir
 
-**Se trabaja sobre las corridas 200–202 (hechas) y sus reevaluaciones 300–302
-(las tres hechas).** Todo lo anterior existe en el repo y no se borra, pero es
-**historia**: no es plantilla, no se edita y no se cita como estado actual.
+- Escenarios del documento: C-1, C-2 y C-3. Un escenario simulado con regímenes que
+  difieran en nivel es trabajo futuro.
+- Una réplica por escenario; las cifras son descriptivas y el documento lo declara.
+- La 200/300 está calibrada a favor del gating; las conclusiones valen para esa calibración.
+- Equi-colas y HDR son puntuales; sólo la banda simultánea está calibrada para el PICPB.
+- Las etiquetas de los átomos no convergen (ψ, Γ, α; los β sí); la predictiva es
+  invariante. R̂ no se calcula con una cadena.
+- La regla de valle evalúa la densidad en los centroides; con tres modos colineales nunca
+  da `K = 3`. No se cambia.
+- Se reportan tres predictores; el medoide se calcula y no se reporta.
+- La **cota** (mejor comportamiento) se lee primero como diagnóstico de la predictiva y
+  después como costo de elegir. El exceso de comportamientos en C-2 (30 % contra 9 %) **no**
+  se llama sobredetección: es masa repartida cerca del umbral por la transición probit suave.
+- C-3 se describe como "multimodalidad en la ley conjunta de los scores" que no llega a la
+  marginal de la curva.
+- Capítulo 4: sólo tráfico I-94 (101 y 102). El cuadro de comportamientos contra tipo de día
+  se quitó; el cálculo sigue reproducible desde `comportamientos_psbp.npz`.
+- Sin control de extracciones al azar en el `_06`.
 
-### Corridas vivas — `notebooks/simulaciones/`
+### Terminología
 
-| Carpeta | Escenario (anexo) | Generador | `BASENAME` | `M_FPCA_LIST` | covariables | estado |
-|---|---|---|---|---|---|---|
-| `200_sim_TAR` | **TAR de dos regímenes** (C-2) | `sim_escenario_TAR.py` | `escenario_200` | `(1, …, 10)` | rezago propio, `N_LAGS = 4` | entrenada y evaluada, 3 cadenas |
-| `201_sim_GARCH` | **GARCH en los scores** (C-1) | `sim_escenario_GARCH.py` | `escenario_201` | `(1, …, 10)` | rezago propio, `N_LAGS = 4` | entrenada y evaluada, 3 cadenas |
-| `202_sim_MULT` | **Multimodalidad** (C-3) | `sim_escenario_C1.py` | `escenario_202` | `(3, 4, 5, 6)` | **cruzadas**, `N_LAGS = L = 2` | entrenada y evaluada, 3 cadenas |
-| `300_sim_TAR_estimadores` | el de la 200 | ninguno (copia de la 200 con `00_copiar_200.py`) | `escenario_300` | `(1, …, 10)` | las de la 200 | **evaluada** (`_04`, `_05`); `_01`/`.m`/`_03` copiados, no se ejecutan |
-| `301_sim_GARCH_estimadores` | el de la 201 | ninguno (copia de la 201 con `00_copiar_200.py --origen escenario_201_chungEscG_1_r01 --destino escenario_301_chungEscG_1_r01`) | `escenario_301` | `(1, …, 10)` | las de la 201 | **evaluada** (`_04`, `_05`); `_01`/`.m`/`_03` copiados, no se ejecutan |
-| `302_sim_MULT_estimadores` | el de la 202 | ninguno (copia de la 202 con `00_copiar_200.py --origen escenario_202_chungEscX_1_r01 --destino escenario_302_chungEscX_1_r01 --M 3 4 5 6`; cada `M` con sus trazas) | `escenario_302` | `(3, 4, 5, 6)` | las de la 202 | **evaluada** (`_04`, `_05`); `_01`/`.m`/`_03` copiados, no se ejecutan |
-
-Las 30x reevalúan 200–202 con `docs §03_05–§03_06`. **Cifras completas en
-`notebooks/simulaciones/RESULTADOS_30x.md`** (300, 301, 302 y sus ventanas de detalle; test,
-`w = 30`). La lectura: la esperanza gana el RMSE en los tres escenarios; la mediana puntual baja
-el MAE ~1.3 % en la 300 y coincide con la esperanza en 301 y 302 (predictivas unimodales); el
-medoide empeora con `M` alto y el modal es el peor; el RF gana el Bloque A en la 300. La HDR sólo
-se parte en la 300 y ahí le gana el Winkler a la equi-colas; la simultánea es la única calibrada
-en PICPB y pierde el Winkler; las tres le ganan al FAR desde `M = 4`. Comportamientos: `K ≥ 2` en
-30 % del test de la 300 (ley verdadera 9 %), 0.3 % en la 301 y 0 % en la 302 (la multimodalidad
-de C-3 no llega a la marginal). **Pendiente**: reejecutar `_05` (§10 sobre todo el test) en las tres.
-
-El generador común (`pipelines/sim_scores_comun.py`) arma la salida a partir de un
-simulador de `z`, calcula `mu_theta`, `theta` y el control de calidad
-`resumen_scores`. En `internos` van los scores, el oráculo, `Phi`, `soporte` y lo
-propio de cada escenario (regímenes, varianza condicional, mecanismos); **nada de
-eso se entrega a la estimación**.
-
-- **200 — TAR.** Cada score activo `ξ_1..ξ_4` cambia de régimen (A tranquilo y
-  persistente, B volátil y reversivo) según **su propio rezago** con
-  `P(B|u) = Φ((u − c)/h)`; `ξ_5..ξ_10` son AR(1) pasivos. Calibración
-  **deliberadamente favorable al gating** (hay que decirlo al presentarla): brecha
-  oráculo−AR(2) 0.41/0.51/0.42/0.44 (0.386 agregada en L²). Parámetros en
-  `PARAMETROS_TAR`, momentos poblacionales en `MOMENTOS_TAR`.
-- **201 — GARCH.** Cada score activo es AR(1) con innovaciones GARCH(1,1)
-  (`φ=0.5`, `α₁=0.25`, `β₁=0.60`, `σ_a²=1`): media **lineal**, varianza persistente
-  (memoria de ~7 curvas, acf1 de los cuadrados ≈ 0.36). La innovación reciente `a_{t-1} = u_{t-1} − φ u_{t-2}`
-  es función de los dos rezagos propios; con `N_LAGS ≥ 2` el término `α₁a²` es
-  aprendible, `β₁` no. Se espera ventaja en el Bloque B.
-- **202 — Multimodalidad.** Mezcla de 3 mecanismos lineales con asignación softmax
-  sobre `ξ_{t-1}, ξ_{t-2}`; los mecanismos comparten el **patrón** de `A_{k,l}` y
-  difieren en valores. La **media condicional es casi lineal** (R² oráculo 0.45
-  contra 0.42 lineal): la multimodalidad está en la ley. El régimen depende de
-  `ξ_1, ξ_2`, así que se usan **covariables cruzadas** (`p = M·L`) y se entrena
-  **cada `M`**.
-
-**Configuración común** (leída de los `_01`):
-
-| Cantidad | Valor |
-|---|---|
-| `L_GRILLA` / `T_CURVAS` | **75** / **1000** (⇒ `T0 = 700`, test = 300) |
-| `PROP_TRAIN` | 0.70 |
-| `SIGMA_OBS` | **0** (los scores son el insumo) |
-| `SEED` | 41232 |
-| `REPLICA_ID` / `R` | 1 |
-| `J` / `K` | 10 / 10 (base de Fourier del generador; acota el barrido en `M`) |
-| `MCMC_CONFIG` | `{"nsim": 2500, "burn": 500, "N": 30, "M": 50}`, `N_CHAINS = 3` |
-| ventanas | `w ∈ {20, 30, 40}`, `W_REF = 30` (también en el documento) |
-| scores | **sin estandarizar**: `scores_scale = "raw_fpca_scores"` |
-| `M` (regla) | primera `M` con varianza acumulada `>= 95 %` da 5; el documento usa `M_ref = 10` (6 en C-3), la mayor del barrido |
-
-**Hiperparámetros: Chung y Dunson §4.2 en escala cruda, sin escalera.** Valen igual
-para todas las componentes: `atau = ag = bg = 0.5`, `btau = 0.5·sd_y²`,
-`taupsij = taupsij_z·sd_x²` (las `sd` son de **train**; así el prior es
-proporcional a la varianza de cada componente), `mupsij = 0`, `mumu = 0`,
-`taumu = 1`, `pwj = 0.5`. Inclusión: `apij/bpij = 0.5/0.5` en el rezago 1 y
-`0.5/5.0` del rezago 2 en adelante (y en los cruzados). La variante **`chungEscG`**
-(200, 201) usa `taupsij_z = 10` (gating libre; sd a priori de ψ 0.32 en z) y
-**`chungEscX`** (202) lo mismo con covariables cruzadas; `chungEsc` usa 100 (el
-prior del paper). `G*` por predictor, sobre el rango de train con extremos.
-
-Código del modelo que se conserva y se usa (§4): `fit/` (`convergencia_barrido`,
-`evaluacion_barrido`, `comparacion_barrido`, `rolling`, `metrics_*`, `intervalos`,
-`far_operador`, `inclusion`, `diagnostics_mcmc`), `functions_models/`
-(`FunctionalRepresentation.desde_base`, `FPCA_L2.desde_scores_conocidos`),
-`graphics/viz_*` y `models/pspb_fd_v3`. `functions_odpc.py` (ODPC) se conserva de
-corridas anteriores y no lo usa ninguna corrida viva.
-
-### Datos reales — `notebooks/reales/`
-
-Dos generaciones. `21_real_nivel/` a `25_real_cripto/` siguen **la arquitectura
-anterior** (base B-spline por GCV, FPCA estimada, escalera de hiperparámetros):
-nivel diario del RÍO MAPOCHO EN LOS ALMENDROS (21–24, 48 mediciones por día) y
-BTCUSDT de Binance en velas de 5 min (25, 288 barras por día UTC). `24` y `25`
-eran las vivas de esa generación (rezago propio `N_LAGS = 7`, `MCMC_CONFIG =
-{5000, 2000, 40, 60}`, `N_CHAINS = 2`); 21–23 **no son comparables** con la 24.
-**Desde el 2026-10-12 sus artefactos, datos procesados y reportes se borraron del disco** (`real_nivel_v01`–`v05`,
-`real_btcusdt_v01`, `real_btcusdt_cierre_v01`, `datos_caudal_1`–`3`, `datos_nivel_3`); sólo quedan los
-notebooks 21–26 y `01 Antiguos primera tanda` con sus salidas embebidas, y los datos crudos
-(`Tabla_de_Mediciones…xlsx`, `cripto_binance`).
-
-`26`–`31` llevan el pipeline de la 200 portado a reales (B-spline 10/3 elegida por el analista,
-FPCA en train, scores crudos, `chungEscG`, `atau = 2`, covariables cruzadas con un rezago salvo
-indicación): `26` BTC cierre, `27` precio SA1 (AEMO), `28` PM2.5 Parque O'Higgins (SINCA), `29`
-BTC volatilidad realizada (+ exógenas), `30` tráfico I-94 barrido `M = 1..6`, `31` tráfico
-`M = 10` (1 cadena). Datasets de la tesis de Katerin en `data/reales/raw/katerin_*` (tráfico y
-PM2.5 crudo son los candidatos; household no). Los datos de cada serie, su calidad y su
-calibración están en los `_01`.
-
-**Tráfico I-94, las corridas del capítulo de aplicación** (M = 10, 1 cadena, `atau = 2`,
-ventana 2015-07-01..2018-09-30, 70/30):
-
-| Carpeta | `SERIE_ID` | rezagos | trazas | estado |
-|---|---|---|---|---|
-| `31_real_trafico_m10` | `trafico_m10` | `{1}` | entrenada | evaluada con el pipeline 200; histórica |
-| `32_real_trafico_l17` | `trafico_l17` | `{1, 7}` | entrenada (2026-10-11) | `_04` y `_05` ejecutados; origen de la 102 |
-| `101_real_trafico` | `trafico_101` | `{1}` | copia de la 31 (`00_copiar_31.py`) | `_04`, `_05` (§10 sobre todo el test) y `_06` ejecutados con el pipeline 30x (2026-10-12) |
-| `102_real_trafico_l17` | `trafico_102` | `{1, 7}` | copia de la 32 | `_04` **por copia** de las salidas de la 32 (2026-10-12; mismo notebook, otro ID); `_05` (reproduce la 32) y `_06` ejecutados (2026-10-12) |
-
-Rezagos no contiguos (32/102): el manifest lleva `lags = [1, 7]` y `n_lags = max(lags) = 7`
-(desplazamiento, `t_offset` y orden del FAR completo); `verificar_contrato` acepta `lags`; el
-FAR(7) completo es la referencia y el RF barre `{1}` y `{1, 7}` (`ajustar_rf(..., ordenes=LAGS)`);
-inclusión (1, 5) también para el rezago 7. El `_04` de reales es el `300_04` sin generador ni
-oráculo: `BURN_EVAL = 1000`, ventana de detalle por calendario (los 10 días de prueba con más
-días no laborables, columna `holiday` del CSV) y §12.4 cruza `K` con el día de la semana y los
-feriados (`65_comportamientos_calendario.csv`, `104_*`). `32_06` existe y no se usa (lo reemplaza
-el `102_06`).
-
-**Construcciones nuevas 103–107** (2026-10-12/13; **ejecutadas completas**: `_01`, MATLAB, `_03`–`_06`, sin commit).
-La 103 se reconstruyó igual desde la 27 (generador `parte_103`); la 104 (2026-10-13) es la 28 con `M_FPCA_LIST = (10,)`
-entrenada en su carpeta (`00_copiar_28.py` quitado con `git rm`; los puntos viejos `real_pm25_104_v02_m01..m06` quedan en disco sin uso).
-Desde cero, no por copia: `_01` = el `28_01` con las celdas de datos de cada serie (huecos como la 28), B-spline
-**10/3** (K = 10), cruzadas con un rezago, `M_FPCA_LIST = (10,)`, 1 cadena, `chungEscG`, `atau = 2`,
-`psbp_train.m` vigente (md5 `e8c38259`); `_03` de la 28; `_04`/`_05`/`_06` de los 101 con `BURN_EVAL = None`.
-
-| Carpeta | `SERIE_ID` | serie | ventana de detalle (§3.2) |
-|---|---|---|---|
-| `105_real_beijing_pm25` | `beijing_105` | PM2.5 horario de Beijing, promedio de las 12 estaciones PRSA, log(1 + x), 2013-03..2017-02, T = 1461 | más días con promedio ≥ 150 µg/m³ |
-| `106_real_eolica_smard` | `eolica_106` | factor de planta eólico onshore DE (SMARD), 96 por día, 2015-01..2026-10, T = 4299; insumo recuperado de git en `data/reales/raw/smard_eolica/` | más días con factor medio ≥ 0.5 |
-| `107_real_btc_vol` | `btc_107` | ½ log RV horaria de BTCUSDT (5 min), 2020-01..2026-08, T = 2435 | más días con log RV diaria > cuantil 0.9 de train |
-
-Resultados (test, `w = 30`, `M = 10`; MAE / RMSE; Winkler; PICPB). En las cuatro la predictiva es **unimodal**
-(K = 1 en 99.7–100 % del test; el `_06` tiene 0–1 orígenes con K ≥ 2) y el `_03` no pasa (ocupación en el
-truncamiento N = 30, ESS mínimo 6–18; mismo patrón que la 31):
-
-| | FAR | esperanza | mediana | RF | Winkler FAR / equi-colas / HDR / simultánea | equi-colas gana al FAR | PICPB FAR / equi / simult. |
-|---|---|---|---|---|---|---|---|
-| 104 PM2.5 POH | 0.3214 / 0.4347 | **0.3166 / 0.4300** | 0.3168 | 0.3281 | 2.484 / **2.421** / 2.441 / 2.696 | 61 % | 0.68 / 0.69 / 0.90 |
-| 103 SA1 | 0.3280 / 0.4418 | 0.3279 / 0.4417 | 0.3286 | 0.3415 | 2.374 / 2.354 / 2.361 / 2.977 | 60 % | 0.72 / 0.70 / 0.95 |
-| 105 Beijing | 0.551 / 0.739 | 0.566 / 0.745 | 0.552 | 0.596 | 3.88 / 3.52 / 3.72 / 4.17 | 80 % | 0.79 / 0.76 / 0.93 |
-| 106 eólica | 0.0857 / 0.1197 | 0.0859 / 0.1191 | 0.0853 | 0.0961 | 0.581 / 0.605 / 0.622 / 0.730 | 34 % | 0.78 / 0.81 / 0.94 |
-| 107 BTC | 0.3242 / 0.4184 | 0.3288 / 0.4229 | 0.3303 | 0.3292 | 2.075 / 2.076 / 2.075 / 2.608 | 44 % | 0.63 / 0.67 / 0.95 |
-
-Lectura: Bloque A empatado o del FAR salvo la 104, donde la esperanza gana (−1.5 % MAE, 31 % de ventanas contra 22 % del FAR;
-con M = 6 empataba: 0.3209); Bloque B claro para el PSBPM-FD en Beijing y la 104 (−2.5 % Winkler, 61 %), empate en SA1
-y BTC, FAR en la eólica. 104: K ≥ 2 en 0.5 % del test (5 orígenes), `_03` 63 de 200 marcadas, ESS mín 7.
-
-**SA1 y PM2.5 con el pipeline 30x — 103 y 104** (2026-10-12; `_04`, `_05` y `_06` ejecutados; la
-esperanza, la equi-colas, el FAR y el RF reproducen la 27 y la 28 a precisión de máquina):
-
-| Carpeta | `SERIE_ID` | origen | `M_FPCA_LIST` | ventana de detalle (§3.2) |
-|---|---|---|---|---|
-| `103_real_sa_precio` | `sa1_103` | **reconstruida desde cero y ejecutada completa (2026-10-12, sin commit)**: base 10/3 (K = 10), cruzadas con un rezago, 1 cadena, `atau = 2`, MCMC 2500/500/30/50; ya no copia de la 27 (`00_copiar_27.py` borrado) y su `hyperparameters.json` tiene `trazas_en` a sí misma. Las cifras de la SA1 en el párrafo de abajo son de la versión anterior sobre la 27 (base 29/3, 3 cadenas, `atau = 0.5`); las vigentes, en la tabla de resultados de 103 y 105–107 | `(10,)` | más días con pico (RRP máximo del día > 300 AUD/MWh): t = 1227..1236, 2025-05-11..20 |
-| `104_real_pm25` | `pm25_104` | **reconstruida 2026-10-13**: la 28 con M = 10, trazas propias (antes copia de la 28 con M = 1..6; las cifras del párrafo de abajo son de esa versión) | `(10,)` | más días sobre la norma diaria (promedio 24 h ≥ 50 µg/m³): t = 3474..3483, 2024-07-05..14 |
-
-Hasta la reconstrucción, 103 y 104 se copiaban de la 27/28 (`00_copiar_27.py` / `00_copiar_28.py --trazas-en-origen`,
-ambos quitados). `BURN_EVAL = None` (burn del `.mat`, como la 27/28 y
-las 30x). §12.4 cruza `K` con día de la semana, mes y el evento del día predicho y del anterior
-(`pico` / `episodio`). Lectura: en las dos series la predictiva es **unimodal** (K = 1 en 100 % del test
-de la SA1 y 99.7–100 % del PM2.5), los cuatro predictores quedan a ≤ 0.5 % de la esperanza y el `_06` no
-tiene orígenes con K ≥ 2; la HDR coincide con la equi-colas y sólo la simultánea calibra el PICPB (0.91 /
-0.87) perdiendo el Winkler. El FAR gana el Bloque A (SA1: MAE 0.345 contra 0.348 en M = 10; PM2.5:
-0.321 contra 0.321 en M = 6) y el PSBPM-FD le gana el Winkler por poco desde M = 6 en la SA1 (2.490 contra
-2.523, 61 % de ventanas) y desde M = 5 en el PM2.5 (2.466 contra 2.484, 54 %).
-
-### Disco y dependencias (inventario 2026-10-12)
-
-**Trazas (`.mat`) y quién las lee** — antes de borrar nada, `hyperparameters.json["trazas_en"]` manda:
-
-- 200 y 201: los 30 `.mat` están sólo en `m10`; `m01`–`m09` apuntan ahí. 202: cada `M` tiene los suyos.
-- 300–302: copia propia, **blob-idéntica** a la de su 20x (en `.git` se deduplica; en disco son ~900 MB).
-- 101 y 102: 10 `.mat` propios. 103–107: 10 `.mat` propios cada una (`trazas_en` apunta a sí mismas).
-- `real_pm25_104_v02_m01..m06`: puntos de la 104 vieja (copia de la 28, sin `.mat`, `trazas_en` → la 28); sin uso.
-
-**Sin dependientes vivos** (candidatas a limpieza; no se borran sin que se pida): 31 y 32 (duplicados
-en disco de 101 y 102), 30, 29, `avance_tesis_1`, `real_sa1_precio_v02` (27, 2.3 GB), la 28 entera (`real_pm25_poh_v02`, ya no la lee la 104) y `real_pm25_104_v02_m01..m06`. **Ya borradas (2026-10-12):** 21–26 y
-`datos_caudal_*` / `datos_nivel_3` (§ "Datos reales").
-
-- `draws_scores_psbp.npy` (ignorado por git): ~1.35 GB en 300 y en 301, 447 MB en 302, 704 MB en los `m01..m06` viejos de la 104.
-  Son entrada de `_05`/`_06`; regenerarlos es re-ejecutar `_04`.
-- `.git` pesa ~23 GB (HEAD rastreado ~14.5 GB): borrar archivos **no** lo reduce, haría falta reescribir
-  historia. `.claude/worktrees/agent-*` son dos worktrees git registrados (~1.5 GB).
-- `tests/test_intervalos_predictiva.py` lee `reports/simulaciones/escenario_201_chungEscG_1_r01_m05/
-  57_ventana_funcional_w30.csv` si existe (con guarda).
-- `reports/simulaciones/exploracion_bases` lo escribe `notebooks/auxiliar/explorar_bases_101_109.py`.
-
-### Historia — no se edita ni se cita como estado actual
-
-- `notebooks/simulaciones/06_07_Testo_cosas/` (corridas 61–66, 71–73),
-  `07_01 Antiguos casi listos/` (101–114: variantes de rezago propio, mezclas de
-  mecanismos y de scores, ODPC, variantes MCMC y el TAR de la 114, antecedente
-  directo de la 200) y `00_Estudio_Modelo/`, `01_Inicio_Formato/`,
-  `02_Antiguas_pruebas/`, `03_04_Antiguas_pruebas/`, `05_Testeo_hiperparametros/`.
-  Usaban base B-spline por GCV, ruido de medición `sigma_obs = 0.25`, scores
-  estandarizados o escalera de hiperparámetros, y `N_LAGS`/`MCMC` distintos: **sus
-  cifras no son comparables una a una** con las de 200–202.
-- Las corridas `30`–`34`, `50`–`53`, `61`–`73` y `101`–`113` **ya no tienen artefactos ni reportes en
-  disco** (inventario 2026-10-12): sólo quedan sus notebooks con las salidas embebidas y, de
-  `101`–`114`, `data/simulaciones/raw/escenario_1xx_*` (~0.2 GB; vacíos: `105_1`, `106_1`,
-  `113_chungEscN20`). La `114` conserva además `functional` y `predict`.
-- `model_psbp_fd/pipelines/deprecated/` — generadores de esas corridas; siguen
-  importables desde ahí, **no** desde `pipelines` directamente. Incluye ahora
-  `sim_escenario_A1/A2/A3` y `C2/C3`. Siguen en `pipelines` `B1/B2/B3` y `C`, sin
-  corrida viva, por dependencias; `C1` es el generador de la 202.
-- `versioning/`, `escenarios_simulados.txt` y `modelo_e_hiperparametros.txt`
-  describen corridas y un Gibbs anteriores y **están desactualizados**.
-
----
-
-## 8. Decisiones abiertas y hechos que no se reabren
-
-**Abiertas — preguntar antes de codificar contra ellas:**
-
-1. **Capítulo de aplicación** (2026-10-15, redactado el 2026-10-23): el capítulo 4
-   (`docs/CAP/04 Aplicacion.tex`) es sólo el tráfico I-94 (101 y 102), con la estructura de
-   §03_08. Los gráficos extras del tráfico van en `docs/ANE/03 Anexo trafico.tex` (`aneC_00`) y
-   las series 103–107 en `docs/ANE/04 Anexo otros.tex` (`aneD_00`); figuras en
-   `docs/IMG/{04_03,aneC_00,aneD_00}/`, incluida `04_bloqueB_ancho.png`. El cuadro de
-   comportamientos contra tipo de día (`tab:apl_K_tipo`, acierto / masa en el correcto /
-   cercanía) se quitó el 2026-10-23 por decisión del autor; el cálculo sigue reproducible desde
-   `comportamientos_psbp.npz` y `65_comportamientos_calendario.csv` de 101 y 102.
-2. **Trazas duplicadas**: las 30x copian los `.mat` de su 20x (~220 MB en la 300) y 101/102 los
-   de 31/32; todo se versiona. Se deja así salvo que el repo pese demasiado. Verificado
-   (2026-10-12): los `.mat` 20x/30x son blob-idénticos, así que en `.git` ya están deduplicados y el
-   costo es sólo de disco; apuntar el `trazas_en` de las 30x a su 20x (como hace la 104 con la 28) los
-   eliminaría sin regenerar nada.
-
-**Hechos — no reabrir (decididos el 2026-10-10/12):**
-
-- Escenarios del documento: C-1, C-2 y C-3. Un escenario simulado con comportamientos (regímenes
-  que difieran en nivel) es trabajo futuro, no pendiente.
-- `W_REF = 30` en código y documento; `W_REF_DOC = None` en `_05`/`_06`.
-- Una réplica por escenario; las cifras son descriptivas y así lo declara el documento.
-- `200_sim_TAR` está calibrada a favor del gating; las conclusiones valen para esa calibración.
-- `atau = 0.5` en 200–202 deja colas no acotadas en los draws: nunca la media de los draws como
-  estimador; recorte a 0.5–99.5 % antes de agrupar. Las reales usan `atau = 2`.
-- Equi-colas y HDR son puntuales; PICPB es cobertura de curva completa y sólo la simultánea está
-  calibrada para ella.
-- Las etiquetas de los átomos no convergen (ψ, Γ, α; los β sí); la predictiva es invariante; R̂
-  no se calcula con 1 cadena.
-- La regla de valle evalúa la densidad en los centroides, como dice la ecuación; con tres modos
-  colineales nunca da `K = 3` (`tests/test_comportamientos.py`). No se cambia.
-- `pipelines/real_pipeline.py` (stub) se borró; el flujo real vive en `notebooks/reales/`.
-- `102_04` no se ejecuta: sus salidas son copia de la 32 (mismo notebook, otro ID).
-- Documento (2026-10-23): hay Resumen (antes del índice, con `\frontmatter`), Simbología y un
-  Capítulo 5 de conclusiones, limitaciones y trabajo futuro que cita los cuadros de los
-  capítulos 3 y 4 en vez de repetir cifras; cada capítulo empírico cierra con su propia
-  "Discusión" (§03_09 ya no se llama Resumen). La **cota** (mejor comportamiento) se lee primero
-  como diagnóstico de la predictiva (si es baja, la ley estimada contiene la curva que ocurre) y
-  sólo después como costo de elegir; va antes del pronóstico en §03_08_04 y §04_03_04. El exceso
-  de comportamientos en C-2 (30 % contra 9 %) **no** se llama sobredetección: es masa repartida
-  cerca del umbral por la transición probit suave, una opción de baja probabilidad, y la pagan
-  el pronóstico y no las bandas ni la cota. C-3 se describe como "multimodalidad en la ley
-  conjunta de los scores" que no llega a la marginal de la curva.
-- Documento: se reportan **tres** predictores (esperanza, mediana puntual, átomo modal); el
-  medoide se calcula y no se reporta; la MBD se eliminó del código. El diseño del estudio (§03_07) es una introducción general más `tab:dis_escenarios` (rezago
-  propio o cruzado por escenario, `M_ref = 10`, 6 en C-3); la configuración (partición, muestreador,
-  referencias, métricas por resumen, constantes de comportamientos) vive en el Anexo
-  `ane_00_03_configuracion` (2026-10-12); el pronóstico por comportamiento y su cota (el mejor
-  comportamiento, `eq:mejor_comportamiento`) viven en §03_06_03 (decisión 2026-10-23; antes la cota
-  sólo se nombraba en el diseño); sin control de extracciones al azar.
+**FAR(p)** autorregresivo funcional · **TAR** autorregresivo por umbral (aquí el umbral es el
+rezago propio) · **GARCH** varianza condicional autorregresiva · **FPCA** análisis principal
+funcional en métrica L² · **Winkler**, **PICP**, **PICPB**, **MPIW**: Bloque B · **HDR**
+región de máxima densidad · **T0** corte de la partición · **G\*** grilla de localización
+del stick-breaking probit · **oráculo** la media condicional verdadera · **scores activos /
+pasivos**: los 4 primeros llevan la dinámica del escenario, los otros 6 son AR(1) de
+coeficiente 0.3.
